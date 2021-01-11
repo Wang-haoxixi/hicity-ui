@@ -8,8 +8,6 @@
 
             <el-button v-if="sys_city_edit" type="primary" icon="el-icon-edit" @click="handlerEdit">编辑</el-button>
             <el-button v-if="sys_city_del" type="primary" icon="el-icon-delete" @click="handleDelete">删除</el-button>
-            <el-button type="primary" icon="el-icon-download" @click="handleExport">导出</el-button>
-            <el-button type="primary" icon="el-icon-upload2" @click="handleImport">导入</el-button>
           </el-button-group>
         </el-form-item>
       </el-form>
@@ -36,8 +34,8 @@
                 <el-input v-model="form.id" :disabled="formEdit" placeholder="节点编号"></el-input>
               </el-form-item>
               <el-form-item label="行政区域代码" prop="regionCode"
-                :rules="[{ required: true, validator: checkCode, trigger: 'blur' }]">
-                <el-input v-model="form.regionCode" :disabled="formEdit" placeholder="请输入行政区域代码" maxlength="3">
+                :rules="[{ required: true, message:'请输入行政区划代码', trigger: 'blur' }]">
+                <el-input v-model="form.regionCode" :disabled="formEdit" placeholder="请输入行政区域代码" maxlength="6">
                 </el-input>
               </el-form-item>
               <el-form-item label="行政区域名称" prop="regionName"
@@ -88,9 +86,6 @@
         </el-tree>
       </el-dialog>
     </basic-container>
-    <upload ref="upload" @upload="getList" @down="downloadModel"></upload>
-    <exportDialog :title="`行政区划导出`" :data="exportData.data" :listQuery="exportData.listQuery" ref="exportDialog"
-      :downLoadFn="downloadExport" />
   </div>
 </template>
 
@@ -99,13 +94,11 @@
     getCityTree,
     getCityById,
     postCity,
-    downloadModel,
     downloadColumns,
     deleteCity,
     putCity,
     checkRegionCode,
     checkCityName,
-    downloadExport
   } from '@/api/admin/city'
   import {
     mapGetters
@@ -118,7 +111,6 @@
           update: '编辑',
           create: '创建',
         },
-        downloadExport,
         exportData: {
           listQuery: {
             columns: [],
@@ -220,7 +212,6 @@
           id: 0,
           regionName: '最上级'
         })
-        console.log('结果',arr)
         return arr
       },
     },
@@ -271,35 +262,7 @@
         }
         return arr
       },
-      // 下载模板
-      downloadModel() {
-        downloadModel()
-      },
       // 导入
-      handleImport() {
-        this.$refs.upload.open({
-          name: "下载行政区划导入模板",
-          url: `/admin/sys/city/import`
-        }, '/admin/importTask')
-      },
-      // 导出
-      handleExport() {
-        downloadColumns().then(({
-          data
-        }) => {
-          this.exportData = {
-            listQuery: {
-              columns: [],
-            },
-            data: [{
-              title: '行政区划字段',
-              prop: 'columns',
-              data: data.data,
-            }],
-          }
-          this.$refs.exportDialog.open()
-        })
-      },
       filterNode(value, data) {
         if (!value) return true
         return data.regionName.indexOf(value) !== -1

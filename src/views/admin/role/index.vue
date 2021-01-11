@@ -24,20 +24,17 @@
             @click="handleCreate">添加
           </el-button>
         </template>
-        <template slot="dsScopeForm" slot-scope="scope">
-          <div v-if="form.dsType == 1">
-            <el-tree
-              ref="scopeTree"
-              :data="dsScopeData"
-              :check-strictly="true"
-              :props="defaultProps"
-              :default-checked-keys="checkedDsScope"
-              class="filter-tree"
-              node-key="id"
-              highlight-current
-              show-checkbox/>
-          </div>
-        </template>
+
+        <template
+            slot="cityIdForm"
+            slot-scope="scope">
+            <avue-input
+              v-model="form.cityId"
+              :dic="treeCityData"
+              :props="cityProps"
+              type="tree"
+              placeholder="请选择所属部门"/>
+          </template>
 
         <template
           slot="menu"
@@ -103,7 +100,7 @@
 <script>
 import { addObj, delObj, fetchList, fetchRoleTree, permissionUpd, putObj } from '@/api/admin/role'
 import { tableOption } from '@/const/crud/admin/role'
-import { fetchTree } from '@/api/admin/dept'
+import { getCityTree } from '@/api/admin/city'
 import { fetchMenuTree } from '@/api/admin/menu'
 import { mapGetters } from 'vuex'
 
@@ -113,12 +110,16 @@ export default {
     return {
       searchForm: {},
       tableOption: tableOption,
-      dsScopeData: [],
+      treeCityData: [],
       treeData: [],
       checkedKeys: [],
       checkedDsScope: [],
       defaultProps: {
         label: 'name',
+        value: 'id'
+      },
+      cityProps: {
+        label: 'regionName',
         value: 'id'
       },
       page: {
@@ -174,13 +175,8 @@ export default {
       this.$refs.crud.rowAdd()
     },
     handleOpenBefore(show) {
-      fetchTree().then(response => {
-        this.dsScopeData = response.data.data
-        if (this.form.dsScope) {
-          this.checkedDsScope = (this.form.dsScope).split(',')
-        } else {
-          this.checkedDsScope = []
-        }
+      getCityTree().then(response => {
+        this.treeCityData = response.data.data
       })
       show()
     },
@@ -248,7 +244,7 @@ export default {
       if (this.form.dsType === 1) {
         this.form.dsScope = this.$refs.scopeTree.getCheckedKeys().join(',')
       }
-      addObj(this.form).then(() => {
+      addObj({...this.form, dsType: 2}).then(() => {
         this.getList(this.page)
         done()
         this.$notify.success('创建成功')
@@ -260,7 +256,7 @@ export default {
       if (this.form.dsType === 1) {
         this.form.dsScope = this.$refs.scopeTree.getCheckedKeys().join(',')
       }
-      putObj(this.form).then(() => {
+      putObj({...this.form, dsType: 2}).then(() => {
         this.getList(this.page)
         done()
         this.$notify.success('修改成功')

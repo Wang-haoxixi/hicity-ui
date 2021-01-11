@@ -8,6 +8,14 @@ export function fetchList(query) {
   })
 }
 
+export function manageList(query) {
+  return request({
+    url: '/admin/user/manager_page',
+    method: 'get',
+    params: query
+  })
+}
+
 export function addObj(obj) {
   return request({
     url: '/admin/user',

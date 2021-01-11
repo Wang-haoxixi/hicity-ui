@@ -41,34 +41,41 @@ export const tableOption = {
     rules: [
       { max: 128, message: '长度在 128 个字符内', trigger: 'blur' }
     ]
-  }, {
-    width: 180,
-    label: '数据权限',
-    prop: 'dsType',
-    type: 'select',
-    span: 24,
-    rules: [
-      { required: true, message: '请选择数据权限类型', trigger: 'blur'}
-    ],
-    dicData: [{
-      label: '全部',
-      value: 0
-    }, {
-      label: '自定义',
-      value: 1
-    }, {
-      label: '本级及子级',
-      value: 2
-    }, {
-      label: '本级',
-      value: 3
-    }]
-  }, {
-    label: '',
-    prop: 'dsScope',
+  },
+  // {
+  //   width: 180,
+  //   label: '数据权限',
+  //   prop: 'dsType',
+  //   type: 'select',
+  //   span: 24,
+  //   rules: [
+  //     { required: true, message: '请选择数据权限类型', trigger: 'blur'}
+  //   ],
+  //   dicData: [{
+  //     label: '全部',
+  //     value: 0
+  //   }, {
+  //     label: '自定义',
+  //     value: 1
+  //   }, {
+  //     label: '本级及子级',
+  //     value: 2
+  //   }, {
+  //     label: '本级',
+  //     value: 3
+  //   }]
+  // },
+  {
+    label: '所属城市',
+    prop: 'cityId',
     formslot: true,
-    showClomnu: false,
-    hide: true
+    span: 24,
+    type: 'tree',
+    props: {
+      label: 'regionName',
+      value: 'id'
+    },
+    dicUrl: '/admin/city/tree'
   }, {
     label: '创建时间',
     prop: 'createTime',

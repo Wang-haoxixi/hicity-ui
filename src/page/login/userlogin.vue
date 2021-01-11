@@ -99,7 +99,7 @@ export default {
       },
       checked: false,
       code: {
-        src: '/code',
+        src: '/api/code',
         value: '',
         len: 4,
         type: 'image'

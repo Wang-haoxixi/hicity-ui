@@ -1,4 +1,5 @@
 import {getDetails} from '@/api/admin/user'
+import { getDic } from '@/util/dic.js'
 
 
 var validateUsername = (rule, value, callback) => {
@@ -14,24 +15,33 @@ var validateUsername = (rule, value, callback) => {
 }
 export const tableOption = {
   border: true,
-  index: true,
-  indexLabel: '序号',
+  // index: true,
+  // indexLabel: '序号', 
   stripe: true,
   menuAlign: 'center',
   editBtn: false,
   delBtn: false,
   align: 'center',
   addBtn: false,
+  labelWidth: 160,
+  menuWidth: 160,
   column: [{
-    fixed: true,
     label: 'id',
     prop: 'userId',
     span: 24,
-    hide: true,
-    editDisabled: true,
-    addDisplay: false
+    display: false,
   }, {
-    fixed: true,
+    label: '管理员名称',
+    prop: 'realName',
+    span: 24,
+    maxlength: 20,
+    rules: [{
+      required: true,
+      message: '请输入管理员名称',
+      trigger: 'blur'
+    }]
+  }, 
+  {
     label: '用户名',
     prop: 'username',
     editDisabled: true,
@@ -76,31 +86,52 @@ export const tableOption = {
       message: '请选择部门',
       trigger: 'change'
     }]
-  }, {
+  },
+  {
     label: '手机号',
     prop: 'phone',
-    // type: 'tel',
     value: '',
     span: 24,
+    hide: true,
     rules: [{
       min: 11,
       max: 11,
       message: '长度在 11 个字符',
       trigger: 'blur'
     }]
-  }, {
+  },
+  {
     label: '角色',
     prop: 'role',
     formslot: true,
     slot: true,
     overHidden: true,
     span: 24,
+    hide: true,
     rules: [{
       required: true,
       message: '请选择角色',
       trigger: 'blur'
     }]
-  }, {
+  },
+  {
+    label: '用户类型',
+    prop: 'userType',
+    hide: true,
+    type: 'select',
+    dicData: getDic('user_type'),
+    props: {
+      label: 'label',
+      value: 'value'
+    },
+    span: 24,
+    rules: [{
+      required: true,
+      message: '请选择用户类型',
+      trigger: 'blur'
+    }]
+  },
+  {
     label: '状态',
     prop: 'lockFlag',
     type: 'radio',
@@ -119,15 +150,15 @@ export const tableOption = {
       label: '锁定',
       value: '9'
     }]
-  }, {
+  },
+  {
     width: 180,
     label: '创建时间',
     prop: 'createTime',
     type: 'datetime',
     format: 'yyyy-MM-dd HH:mm',
     valueFormat: 'yyyy-MM-dd HH:mm:ss',
-    editDisabled: true,
-    addDisplay: false,
+    display: false,
     span: 24
   }]
 }

@@ -70,14 +70,14 @@
               slot="menu"
               slot-scope="scope">
               <el-button
-                v-if="sys_user_edit"
+                v-if="sys_user_edit && scope.row.userType != 4"
                 type="text"
                 size="mini"
                 icon="el-icon-edit"
                 @click="handleUpdate(scope.row,scope.index)">编辑
               </el-button>
               <el-button
-                v-if="sys_user_del"
+                v-if="sys_user_del && scope.row.userType != 4"
                 type="text"
                 size="mini"
                 icon="el-icon-delete"
@@ -87,7 +87,7 @@
             <template
               slot="deptIdForm"
               slot-scope="scope">
-              <avue-input-tree
+              <avue-input
                 v-model="form.deptId"
                 :node-click="getNodeData"
                 :dic="treeDeptData"

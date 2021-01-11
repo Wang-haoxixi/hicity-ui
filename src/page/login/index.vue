@@ -1,6 +1,5 @@
 <template>
-  <div class="login-container"
-       @keyup.enter.native="handleLogin">
+  <div class="login-container">
     <div class="login-weaper  animated bounceInDown">
       <div class="login-logo">
         <img src="/img/logo.png" alt="">
@@ -8,7 +7,7 @@
       <p class="login-tip">{{ website.infoTitle}} v 3.0</p>
       <div class="login-border">
         <div class="login-main">
-          <h4 class="login-title">
+          <!-- <h4 class="login-title">
             <el-select v-model="active"
                        class="login-select animated fadeIn"
                        placeholder="点击请选择组织"
@@ -18,7 +17,7 @@
                          :label="tenant.name"
                          :value="tenant.id"></el-option>
             </el-select>
-          </h4>
+          </h4> -->
           <userLogin v-if="activeName==='user'" />
           <codeLogin v-else-if="activeName==='code'" />
           <thirdLogin v-else-if="activeName==='third'" />
@@ -37,7 +36,7 @@
     <div class="login-copyright">
       Copyright © 2019 govmade.com. All rights reserved.
     </div>
-    <top-color v-show="false" />
+    <top-color />
   </div>
 </template>
 <script>
@@ -92,7 +91,7 @@ export default {
   },
   created () {
     this.watermark()
-    this.getTenantList()
+    // this.getTenantList()
     this.active = getStore({ name: 'tenantId' })
   },
   mounted () {

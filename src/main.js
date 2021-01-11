@@ -15,7 +15,6 @@ import * as filters from './filters' // 全局filter
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import './styles/common.scss'
-import avueFormDesign from 'avue-plugin-formdesign'
 import basicContainer from './components/basic-container/main'
 import Avue from '@smallwei/avue'
 import '@smallwei/avue/lib/index.css'
@@ -24,7 +23,6 @@ import vueJsonTreeView from 'vue-json-tree-view'
 
 Vue.use(router)
 
-Vue.use(avueFormDesign);
 Vue.use(vueJsonTreeView)
 
 Vue.use(VueAxios, axios)

@@ -19,10 +19,10 @@ const Router = new VueRouter({
       }
     }
   },
-  // mode: 'history',
+  mode: 'history',
   routes: [].concat([])
 })
 AvueRouter.install(Router, Store)
-// Router.$avueRouter.formatRoutes(Store.state.user.menu, true)
+Router.$avueRouter.formatRoutes(Store.state.user.menu, true)
 Router.addRoutes([...PageRouter, ...ViewsRouter])
 export default Router

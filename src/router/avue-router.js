@@ -140,7 +140,6 @@ RouterPlugin.install = function(router, store) {
         }
         aRouter.push(oRouter)
       }
-      console.log(123321, aRouter)
       if (first) {
         if (!this.routerList.includes(aRouter[0][propsDefault.path])) {
           this.safe.$router.addRoutes(aRouter)
