@@ -7,3 +7,11 @@ export function getTagList(params) {
   })
 }
 
+export function setTagSort(data) {
+  return request({
+    url: '/tms/city/tag/sort',
+    method: 'post',
+    data
+  })
+}
+

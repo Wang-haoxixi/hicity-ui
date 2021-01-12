@@ -11,6 +11,7 @@
       @refresh-change="refreshChange">
       <template slot="menu" slot-scope="scope">
         <el-button
+          v-if="(userInfo.userType != 3 && userInfo.userType != 4) || scope.row.editable"
           type="text"
           size="mini"
           icon="el-icon-edit"
@@ -24,19 +25,25 @@
           @click="handleUpdate(scope.row,scope.index)">{{scope.row.isopen ? '停用' : '启用'}}
         </el-button>
         <el-button
+          v-if="userInfo.userType != 3 && userInfo.userType != 4"
+          type="text"
+          size="mini"
+          icon="el-icon-delete"
+          @click="handleSort(scope.row, scope.index)">排序
+        </el-button>
+        <el-button
           v-if="scope.row.editable && ((userInfo.userType == 3 || userInfo.userType == 4) || !scope.row.isPlatform)"
           type="text"
           size="mini"
           icon="el-icon-delete"
-          @click="handleDel(scope.row,scope.index)">删除
+          @click="handleDel(scope.row, scope.index)">删除
         </el-button>
       </template>
       <template v-slot:city="scope">
         <el-button
           type="text"
           size="mini"
-          icon="el-icon-delete"
-          @click="cityView(scope.row,scope.index)">产看
+          @click="cityView(scope.row, scope.index)">查看
         </el-button>
       </template>
     </avue-crud>
@@ -44,7 +51,7 @@
 </template>
 
 <script>
-import { getTagList } from '@/api/tms/city'
+import { getTagList, setTagSort } from '@/api/tms/city'
 import { tableOption } from './const'
 import { mapGetters } from 'vuex'
 export default {
@@ -85,12 +92,52 @@ export default {
     handleUpdate (row, index) {
       this.$refs.crud.rowEdit(row, index)
     },
+    cityView (row) {
+      console.log(row)
+      this.$prompt('大于0的整数', '请输入排序', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        inputType: 'number',
+        inputValidator: (val) => {
+          return /^[1-9]+0*$/.test(val)
+        },
+        inputErrorMessage: '请输入大于0的整数'
+      }).then(({ value }) => {
+        if (value) {
+          setTagSort({
+            tagId: row.tagId,
+            sort: value,
+          }).then(({data}) => {
+            if (data.code === 0) {
+              this.$message.success('操作成功')
+              this.getList()
+            }
+          })
+        }
+      })
+      console.log(row.tagId)
+    },
+    handleSort (row, index) {
+      this.$prompt('', '请输入清洗范围', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        // inputValidator: (val) => {
+        //   if (cleanScopeReg.test(val)) {
+        //     let numArr = val.substring(0, val.length - 1).split('-')
+        //     return !(parseInt(numArr[0]) > parseInt(numArr[1]))
+        //   } else {
+        //     return false
+        //   }
+        // },
+        // inputErrorMessage: '格式不正确'
+      }).then(({ value }) => {
+        console.log(val)
+      })
+    },
     handleDel () {
 
     },
-    cityView (row) {
-      console.log(row.tagId)
-    },
+    
     searchChange (form) {
       this.page = {
         currentPage: 1,
