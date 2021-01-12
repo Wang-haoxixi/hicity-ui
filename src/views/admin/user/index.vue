@@ -89,7 +89,6 @@
               slot-scope="scope">
               <avue-input
                 v-model="form.deptId"
-                :node-click="getNodeData"
                 :dic="treeDeptData"
                 :props="defaultProps"
                 type="tree"
@@ -115,7 +114,6 @@
 
 <script>
     import {addObj, delObj, fetchList, putObj} from '@/api/admin/user'
-    import {deptRoleList} from '@/api/admin/role'
     import {fetchTree} from '@/api/admin/dept'
     import {tableOption} from '@/const/crud/admin/user'
     import {mapGetters} from 'vuex'
@@ -194,11 +192,6 @@
                     this.listLoading = false
                 })
             },
-            getNodeData() {
-                deptRoleList().then(response => {
-                    this.rolesOptions = response.data.data
-                })
-            },
             handleDept() {
                 fetchTree().then(response => {
                     this.treeDeptData = response.data.data
@@ -217,17 +210,6 @@
             handleOpenBefore(show, type) {
                 window.boxType = type
                 this.handleDept()
-                if (['edit', 'views'].includes(type)) {
-                    this.role = []
-                    for (var i = 0; i < this.form.roleList.length; i++) {
-                        this.role[i] = this.form.roleList[i].roleId
-                    }
-                    deptRoleList().then(response => {
-                        this.rolesOptions = response.data.data
-                    })
-                } else if (type === 'add') {
-                    this.role = []
-                }
                 show()
             },
             handleUpdate(row, index) {

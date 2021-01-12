@@ -10,7 +10,7 @@ export function fetchList(query) {
 
 export function fetchItemList(query) {
   return request({
-    url: '/admin/dict/item/page',
+    url: '/admin/sysDictItem/page',
     method: 'get',
     params: query
   })

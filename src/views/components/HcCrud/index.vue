@@ -1,6 +1,6 @@
 <template>
   <avue-crud
-    :option="option"
+    :option="tableOption"
     :page="page"
     :table-loading="tableLoading"
     @on-load="getList"
@@ -21,10 +21,6 @@ export default {
     tableData: {
       type: Array,
       required: true
-    },
-    formOption: {
-      type: Object,
-      default: () => null
     },
     page: {
       type: Object,

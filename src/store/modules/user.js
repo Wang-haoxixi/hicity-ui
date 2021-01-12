@@ -105,7 +105,7 @@ const user = {
       return new Promise((resolve, reject) => {
         getUserInfo().then((res) => {
           const data = res.data.data || {}
-          commit('SET_USER_INFO', data.sysUser)
+          commit('SET_USER_INFO', {...data.sysUser, manageCityId: data.manageCityId})
           commit('SET_ROLES', data.roles || [])
           commit('SET_PERMISSIONS', data.permissions || [])
           resolve(data)

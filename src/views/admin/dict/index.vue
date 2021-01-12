@@ -97,8 +97,8 @@ export default {
         current: page.currentPage,
         size: page.pageSize
       }, params, this.searchForm)).then(response => {
-        this.tableData = response.data.data.records
-        this.page.total = response.data.data.total
+        this.tableData = response.data.data.data.records
+        this.page.total = response.data.data.data.total
         this.tableLoading = false
       })
     },
@@ -112,7 +112,7 @@ export default {
         current: this.page.currentPage,
         size: this.page.pageSize
       }, { dictId: dictId })).then(response => {
-        this.tableDictItemData = response.data.data.records
+        this.tableDictItemData = response.data.data.data.records
         this.tableLoading = false
       })
     },

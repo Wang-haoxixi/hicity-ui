@@ -52,3 +52,11 @@ export function getDetails(obj) {
     method: 'get'
   })
 }
+
+export function updateRole (data) {
+  return request({
+    url: '/admin/user/edit/role',
+    method: 'post',
+    data
+  })
+}

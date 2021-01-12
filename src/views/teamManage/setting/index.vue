@@ -3,7 +3,7 @@
     <basic-container>
       <avue-crud
         ref="crud"
-        :option="option"
+        :option="tableOption"
         v-model="form"
         :page="page"
         :table-loading="listLoading"
@@ -23,11 +23,6 @@
             icon="el-icon-edit"
             @click="handleCreate">添加
           </el-button>
-        </template>
-        <template
-          slot="username"
-          slot-scope="scope">
-          <span>{{ scope.row.username }}</span>
         </template>
         <template
           slot="role"
@@ -59,6 +54,12 @@
             @click="handleUpdate(scope.row,scope.index)">编辑
           </el-button>
           <el-button
+            v-if="permissions['sys_user_role'] && scope.row.userType != 4"
+            type="text"
+            size="mini"
+            @click="handleRole(scope.row,scope.index)">配置角色
+          </el-button>
+          <el-button
             v-if="sys_user_del && scope.row.userType != 4"
             type="text"
             size="mini"
@@ -71,71 +72,89 @@
           slot-scope="scope">
           <avue-input
             v-model="form.deptId"
-            :node-click="getNodeData"
             :dic="treeDeptData"
             :props="defaultProps"
             type="tree"
             placeholder="请选择所属部门"/>
         </template>
-        <template
-          slot="roleForm"
-          slot-scope="scope">
-          <avue-select
-            v-model="role"
-            :dic="rolesOptions"
-            :props="roleProps"
-            multiple
-            placeholder="请选择角色"/>
-        </template>
       </avue-crud>
     </basic-container>
+
+    <el-dialog
+      :visible.sync="dialogRoleVisible"
+      :close-on-click-modal="false"
+      append-to-body
+      title="配置角色">
+      <div class="dialog-main-tree">
+        <avue-select
+          v-model="role"
+          :dic="rolesOptions"
+          :props="roleProps"
+          multiple
+          placeholder="请选择角色"/>
+      </div>
+      <div slot="footer"
+        class="dialog-footer">
+        <el-button
+          type="primary"
+                   size="small"
+          @click="updateRole()">更 新
+        </el-button>
+        <el-button
+	        type="default"
+                   size="small"
+          @click="cancal()">取消</el-button>
+      </div>
+    </el-dialog>
   </div>
 
 </template>
 
 <script>
-    import {addObj, delObj, manageList, putObj} from '@/api/admin/user'
+    import {addObj, delObj, manageList, putObj, updateRole} from '@/api/admin/user'
     import {deptRoleList} from '@/api/admin/role'
     import {fetchTree} from '@/api/admin/dept'
-    import {tableOption} from '@/const/crud/admin/user'
+    import {tableOption} from './const'
     import {mapGetters} from 'vuex'
 
     export default {
         name: 'SysUser',
         data() {
-            return {
-              searchForm: {},
-              option: tableOption,
-              treeDeptData: [],
-              checkedKeys: [],
-              roleProps: {
-                label: 'roleName',
-                value: 'roleId'
-              },
-              defaultProps: {
-                label: 'name',
-                value: 'id'
-              },
-              page: {
-                total: 0, // 总页数
-                currentPage: 1, // 当前页数
-                pageSize: 20, // 每页显示多少条,
-                isAsc: false// 是否倒序
-              },
-              list: [],
-              listLoading: true,
-              role: [],
-              form: {},
-              rolesOptions: []
-            }
+          return {
+            searchForm: {},
+            treeDeptData: [],
+            checkedKeys: [],
+            roleProps: {
+              label: 'roleName',
+              value: 'roleId'
+            },
+            defaultProps: {
+              label: 'name',
+              value: 'id'
+            },
+            page: {
+              total: 0, // 总页数
+              currentPage: 1, // 当前页数
+              pageSize: 20, // 每页显示多少条,
+              isAsc: false// 是否倒序
+            },
+            list: [],
+            listLoading: true,
+            role: [],
+            form: {},
+            rolesOptions: [],
+            dialogRoleVisible: false,
+            edit: false,
+            handleId: null,
+          }
         },
         computed: {
-          ...mapGetters(['permissions'])
+          ...mapGetters(['permissions', 'userInfo']),
+          tableOption() {
+            return tableOption(this.edit, this.userInfo.userType == 4)
+          }
         },
         watch: {
-          role() {
-            this.form.role = this.role
-          }
         },
         created() {
           this.sys_user_add = this.permissions['sys_user_add']
@@ -154,11 +173,6 @@
                     this.listLoading = false
                 })
             },
-            getNodeData() {
-                deptRoleList().then(response => {
-                    this.rolesOptions = response.data.data
-                })
-            },
             handleDept() {
                 fetchTree().then(response => {
                     this.treeDeptData = response.data.data
@@ -172,61 +186,82 @@
                 this.getList(this.page)
             },
             handleCreate() {
+              this.edit = false
                 this.$refs.crud.rowAdd()
+              this.$nextTick(() => {
+              })
             },
             handleOpenBefore(show, type) {
-                window.boxType = type
-                this.handleDept()
-                if (['edit', 'views'].includes(type)) {
-                    this.role = []
-                    for (var i = 0; i < this.form.roleList.length; i++) {
-                        this.role[i] = this.form.roleList[i].roleId
-                    }
-                    deptRoleList().then(response => {
-                        this.rolesOptions = response.data.data
-                    })
-                } else if (type === 'add') {
-                    this.role = []
-                }
-                show()
+              window.boxType = type
+              this.handleDept()
+              show()
             },
             handleUpdate(row, index) {
-                console.log(row)
+              this.edit = true
                 this.$refs.crud.rowEdit(row, index)
                 this.form.password = undefined
+              this.$nextTick(() => {
+              })
+            },
+            handleRole (row, index) {
+              this.handleId = row.userId
+              deptRoleList().then(response => {
+                this.role = []
+                for (var i = 0; i < row.roleList.length; i++) {
+                  this.role.push(row.roleList[i].roleId)
+                }
+                this.rolesOptions = response.data.data.data
+                this.dialogRoleVisible = true
+              })
+            },
+            updateRole () {
+              let data = {
+                userId: this.handleId,
+                role: this.role
+              }
+              updateRole(data).then(() => {
+                this.getList(this.page)
+                this.dialogRoleVisible = false
+                this.$notify({
+                    title: '成功',
+                    message: '修改成功',
+                    type: 'success',
+                    duration: 2000
+                })
+              })
+            },
+            cancal () {
+              this.dialogRoleVisible = false
             },
             create(row, done, loading) {
-                if (this.form.phone.indexOf('*') > 0) {
-                    this.form.phone = undefined
-                }
-                addObj(this.form).then(() => {
-                    this.getList(this.page)
-                    done()
-                    this.$notify({
-                        title: '成功',
-                        message: '创建成功',
-                        type: 'success',
-                        duration: 2000
-                    })
+                addObj({...this.form, lockFlag: '0'}).then(() => {
+                  this.getList(this.page)
+                  done()
+                  this.$notify({
+                    title: '成功',
+                    message: '创建成功',
+                    type: 'success',
+                    duration: 2000
+                  })
                 }).catch(() => {
-                    loading()
+                  loading()
                 })
             },
             update(row, index, done, loading) {
                 if (this.form.phone && this.form.phone.indexOf('*') > 0) {
-                    this.form.phone = undefined
+                  this.form.phone = undefined
                 }
                 putObj(this.form).then(() => {
-                    this.getList(this.page)
-                    done()
-                    this.$notify({
-                        title: '成功',
-                        message: '修改成功',
-                        type: 'success',
-                        duration: 2000
-                    })
+                  this.getList(this.page)
+                  done()
+                  this.$notify({
+                      title: '成功',
+                      message: '修改成功',
+                      type: 'success',
+                      duration: 2000
+                  })
                 }).catch(() => {
-                    loading()
+                  loading()
                 })
             },
             deletes(row, index) {

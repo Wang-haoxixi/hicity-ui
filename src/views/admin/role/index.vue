@@ -148,17 +148,18 @@ export default {
     this.roleManager_btn_perm = this.permissions['sys_role_perm']
   },
   computed: {
-    ...mapGetters(['elements', 'permissions'])
+    ...mapGetters(['elements', 'permissions', 'userInfo'])
   },
   methods: {
     getList(page, params) {
       this.listLoading = true
       fetchList(Object.assign({
         current: page.currentPage,
-        size: page.pageSize
+        size: page.pageSize,
+        cityId: this.userInfo.manageCityId
       }, params, this.searchForm)).then(response => {
-        this.list = response.data.data.records
-        this.page.total = response.data.data.total
+        this.list = response.data.data.data.records
+        this.page.total = response.data.data.data.total
         this.listLoading = false
       }).catch(() => {
         this.listLoading = false
