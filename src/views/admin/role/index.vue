@@ -99,7 +99,7 @@
 
 <script>
 import { addObj, delObj, fetchList, fetchRoleTree, permissionUpd, putObj } from '@/api/admin/role'
-import { tableOption } from '@/const/crud/admin/role'
+import { tableOption } from './const'
 import { getCityTree } from '@/api/admin/city'
 import { fetchMenuTree } from '@/api/admin/menu'
 import { mapGetters } from 'vuex'
@@ -109,7 +109,6 @@ export default {
   data() {
     return {
       searchForm: {},
-      tableOption: tableOption,
       treeCityData: [],
       treeData: [],
       checkedKeys: [],
@@ -148,7 +147,10 @@ export default {
     this.roleManager_btn_perm = this.permissions['sys_role_perm']
   },
   computed: {
-    ...mapGetters(['elements', 'permissions', 'userInfo'])
+    ...mapGetters(['elements', 'permissions', 'userInfo']),
+    tableOption() {
+      return tableOption(this.userInfo.userType == 3 || this.userInfo.userType == 4)
+    }
   },
   methods: {
     getList(page, params) {

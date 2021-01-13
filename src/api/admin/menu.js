@@ -9,7 +9,7 @@ export function GetMenu() {
 
 export function fetchMenuTree(query) {
   return request({
-    url: '/admin/menu/tree',
+    url: '/admin/menu/treeSelf',
     method: 'get',
     params: query
   })

@@ -47,20 +47,20 @@
           slot="menu"
           slot-scope="scope">
           <el-button
-            v-if="sys_user_edit && scope.row.userType != 4"
+            v-if="sys_user_edit && userInfo.userType > scope.row.userType"
             type="text"
             size="mini"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row,scope.index)">编辑
           </el-button>
           <el-button
-            v-if="permissions['sys_user_role'] && scope.row.userType != 4"
+            v-if="permissions['sys_user_role'] && userInfo.userType > scope.row.userType"
             type="text"
             size="mini"
             @click="handleRole(scope.row,scope.index)">配置角色
           </el-button>
           <el-button
-            v-if="sys_user_del && scope.row.userType != 4"
+            v-if="sys_user_del && userInfo.userType > scope.row.userType"
             type="text"
             size="mini"
             icon="el-icon-delete"
