@@ -21,14 +21,6 @@
           <userLogin v-if="activeName==='user'" />
           <codeLogin v-else-if="activeName==='code'" />
           <thirdLogin v-else-if="activeName==='third'" />
-          <div class="login-menu">
-            <a href="#"
-               @click.stop="activeName='user'">账号密码</a>
-            <a href="#"
-               @click.stop="activeName='code'">手机号登录</a>
-            <a href="#"
-               @click.stop="activeName='third'">第三方登录</a>
-          </div>
         </div>
 
       </div>

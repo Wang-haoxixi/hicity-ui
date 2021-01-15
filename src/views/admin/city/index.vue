@@ -47,7 +47,7 @@
                 <el-input v-model="form.abbreviation" :disabled="formEdit" placeholder="行政区域简称"></el-input>
               </el-form-item>
               <el-form-item label="区划编码" prop="regionNumber">
-                <el-input v-model="form.regionNumber" :disabled="formEdit" placeholder="请输入区划编码" type="number" :min="0"
+                <el-input v-model="form.regionNumber" maxlength="12" :disabled="formEdit" placeholder="请输入区划编码" type="number" :min="0"
                   :max="10000"></el-input>
               </el-form-item>
               <el-form-item label="行政区域描述" prop="regionDesc"

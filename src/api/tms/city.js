@@ -15,3 +15,40 @@ export function setTagSort(data) {
   })
 }
 
+export function tagEnable (data) {
+  return request({
+    url: '/tms/city/tag/enable',
+    method: 'post',
+    data
+  })
+}
+
+export function addTag (data) {
+  return request({
+    url: '/tms/city/tag/create',
+    method: 'post',
+    data
+  })
+}
+
+export function updateTag (data) {
+  return request({
+    url: '/tms/city/tag/edit',
+    method: 'post',
+    data
+  })
+}
+
+export function deleteTag (data) {
+  return request({
+    url: '/tms/city/tag/delete',
+    method: 'post',
+    data
+  })
+}
+
+export function tagOpenList (tagId) {
+  return request({
+    url: `/tms/city/tag/open_list/${tagId}`,
+  })
+}

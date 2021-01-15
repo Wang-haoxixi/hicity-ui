@@ -244,10 +244,10 @@ export default {
       })
     },
     create(row, done, loading) {
-      if (this.form.dsType === 1) {
-        this.form.dsScope = this.$refs.scopeTree.getCheckedKeys().join(',')
-      }
-      addObj({...this.form, dsType: 2}).then(() => {
+      // if (this.form.dsType === 1) {
+      //   this.form.dsScope = this.$refs.scopeTree.getCheckedKeys().join(',')
+      // }
+      addObj(this.form).then(() => {
         this.getList(this.page)
         done()
         this.$notify.success('创建成功')
@@ -255,11 +255,11 @@ export default {
         loading()
       })
     },
-    update(row, index, done, loading) {
-      if (this.form.dsType === 1) {
-        this.form.dsScope = this.$refs.scopeTree.getCheckedKeys().join(',')
-      }
-      putObj({...this.form, dsType: 2}).then(() => {
+    update(row, index, done , loading) {
+      // if (this.form.dsType === 1) {
+      //   this.form.dsScope = this.$refs.scopeTree.getCheckedKeys().join(',')
+      // }
+      putObj(this.form).then(() => {
         this.getList(this.page)
         done()
         this.$notify.success('修改成功')

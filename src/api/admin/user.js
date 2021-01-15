@@ -33,8 +33,8 @@ export function getObj(id) {
 
 export function delObj(id) {
   return request({
-    url: '/admin/user/' + id,
-    method: 'delete'
+    url: '/admin/user/delete/' + id,
+    method: 'post',
   })
 }
 

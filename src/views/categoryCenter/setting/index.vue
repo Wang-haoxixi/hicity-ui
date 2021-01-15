@@ -1,99 +1,215 @@
 <template>
   <basic-container>
-    <avue-crud
-      ref="crud"
-      :page="page"
-      :data="tableData"
-      :table-loading="tableLoading"
-      :option="tableOption"
-      @on-load="getList"
-      @search-change="searchChange"
-      @refresh-change="refreshChange">
-      <template slot="menu" slot-scope="scope">
+    <el-form inline :model="tempSearch" class="demo-form-inline">
+      <el-form-item label="标签名称：">
+        <el-input v-model="tempSearch.name" placeholder="请输入标签名称"></el-input>
+      </el-form-item>
+      <el-form-item label="标签编码：">
+        <el-input v-model="tempSearch.tagCode" placeholder="请输入标签编码"></el-input>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="toSearch()">查询</el-button>
+      </el-form-item>
+      <div>
         <el-button
-          v-if="(userInfo.userType != 3 && userInfo.userType != 4) || scope.row.editable"
-          type="text"
+          class="filter-item"
+          type="primary"
           size="mini"
-          icon="el-icon-edit"
-          @click="handleUpdate(scope.row,scope.index)">编辑
+          icon="el-icon-plus"
+          @click="handleCreate">添加
         </el-button>
-        <el-button
-          v-if="userInfo.userType != 3 && userInfo.userType != 4 && scope.row.editable"
-          type="text"
-          size="mini"
-          icon="el-icon-edit"
-          @click="handleUpdate(scope.row,scope.index)">{{scope.row.isopen ? '停用' : '启用'}}
-        </el-button>
-        <el-button
-          v-if="userInfo.userType != 3 && userInfo.userType != 4"
-          type="text"
-          size="mini"
-          icon="el-icon-delete"
-          @click="handleSort(scope.row, scope.index)">排序
-        </el-button>
-        <el-button
-          v-if="scope.row.editable && ((userInfo.userType == 3 || userInfo.userType == 4) || !scope.row.isPlatform)"
-          type="text"
-          size="mini"
-          icon="el-icon-delete"
-          @click="handleDel(scope.row, scope.index)">删除
-        </el-button>
-      </template>
-      <template v-slot:city="scope">
-        <el-button
-          type="text"
-          size="mini"
-          @click="cityView(scope.row, scope.index)">查看
-        </el-button>
-      </template>
-    </avue-crud>
+      </div>
+    </el-form>
+
+    <div class="tag-box">
+      <div v-for="tag in tagList" :key="tag.tagId" class="tag-item">
+        <div class="tag-item-info">
+          <div class="tag-item-name">{{tag.name}}</div>
+          <div class="tag-item-sort" v-if="tag.isOpening && tag.sort">No.{{tag.sort}}</div>
+        </div>
+        <div class="tag-item-option">
+          <div class="tag-item-option-left">
+            <el-button v-if="userInfo.userType == 3 && userInfo.userType == 4" type="text" size="mini" @click="cityView(tag.tagId)">查看配置城市</el-button>
+            <el-button v-else-if="tag.editable" type="text" size="mini" @click="handleStart(tag)">{{tag.isOpening ? '停用' : '启用'}}</el-button>
+          </div>
+          <div class="tag-item-option-right">
+            <el-button v-if="!isAdmin" type="text" size="mini" @click="handleSort(tag)">排序</el-button>
+            <template v-if="isAdmin || !tag.isPlatform">
+              <el-button type="text" size="mini" @click="handleUpdate(tag)">编辑</el-button>
+              <el-button type="text" size="mini" @click="handleDel(tag.tagId)">删除</el-button>
+            </template>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pagination-box">
+      <el-pagination
+        style="display: inline-block"
+        @size-change="sizeChange"
+        @current-change="currentChange"
+        :current-page="page.currentPage"
+        :page-sizes="[10, 20, 30,, 40, 50, 100]"
+        background
+        :page-size="page.pageSize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="page.total">
+      </el-pagination>
+    </div>
+    
+
+    <el-dialog
+      :title="formTitle"
+      :visible.sync="formDialogVisible"
+      width="70%">
+      <el-form :model="formData" labelWidth="150px">
+        <el-form-item label="标签名称：">
+          <el-input v-model="formData.name"></el-input>
+        </el-form-item>
+        <el-form-item label="标签编码：">
+          <el-input v-model="formData.tagCode"></el-input>
+        </el-form-item>
+        <el-form-item v-if="isAdmin" label="是否允许城市停用：">
+          <el-switch v-model="formData.editable" active-text="允许" inactive-text="不允许"></el-switch>
+        </el-form-item>
+      </el-form>
+      <div slot="footer">
+        <el-button v-show="formType == 'add'" type="primary" @click="create">保 存</el-button>
+        <el-button v-show="formType == 'edit'" type="primary" @click="update">修 改</el-button>
+
+        <el-button @click="formDialogVisible = false">取 消</el-button>
+      </div>
+    </el-dialog>
   </basic-container>
 </template>
 
 <script>
-import { getTagList, setTagSort } from '@/api/tms/city'
+import { getTagList, setTagSort, tagEnable, addTag, updateTag, deleteTag, tagOpenList } from '@/api/tms/city'
 import { tableOption } from './const'
 import { mapGetters } from 'vuex'
 export default {
   data () {
     return {
-      tableLoading: false,
-      tableData: [],
+      tempSearch: {
+        name: ''
+      },
+      searchForm: {},
+      formData: {},
+      formType: 'add',
+      formDialogVisible: false,
+      tagList: [],
       page: {
         currentPage: 1,
         pageSize: 20,
+        total: 0,
       },
     }
   },
   computed: {
     ...mapGetters(['userInfo']),
+    isAdmin () {
+      return this.userInfo.userType == 3 || this.userInfo.userType == 4
+    },
+    formTitle () {
+      if (this.formType == 'add') {
+        return '新 增'
+      } else if (this.formType == 'edit') {
+        return '编 辑'
+      }
+    },
     tableOption () {
-      console.log(this.userInfo)
       return tableOption(this.userInfo.userType == 4 || this.userInfo.userType == 3)
     }
   },
+  created () {
+    this.getList()
+  },
   methods: {
-    getList (page = this.page) {
+    getList (page = this.page, form = this.searchForm) {
       this.tableLoading = true
       getTagList({
         current: page.currentPage,
         size: page.pageSize,
-        ...this.searchForm,
+        ...form,
       }).then(({data}) => {
         if (data.code === 0) {
-          console.log(data.data.data.records)
-          this.tableData = data.data.data.records
+          this.tagList = data.data.data.records
+          this.page = {
+            ...page,
+            total: data.data.data.total
+          }
         }
-        console.log(data)
       }).finally(() => {
         this.tableLoading = false
       })
     },
-    handleUpdate (row, index) {
-      this.$refs.crud.rowEdit(row, index)
+    handleCreate () {
+      this.formData = {
+        editable: false
+      }
+      this.formType = 'add'
+      this.formDialogVisible = true
     },
-    cityView (row) {
-      console.log(row)
+    create() {
+      addTag(this.formData).then(({data}) => {
+        this.formDialogVisible = false
+        this.$notify({
+          title: '成功',
+          message: '创建成功',
+          type: 'success',
+          duration: 2000
+        })
+        this.page.currentPage = 1
+        this.getList()
+      }).catch(() => {
+        loading()
+      })
+    },
+    handleUpdate (row) {
+      this.formData = row
+      this.formType = 'edit'
+      this.formDialogVisible = true
+    },
+    update() {
+      updateTag(this.formData).then(({data}) => {
+        this.formDialogVisible = false
+        this.$notify({
+          title: '成功',
+          message: '修改成功',
+          type: 'success',
+          duration: 2000
+        })
+        this.getList()
+      }).catch(() => {
+        loading()
+      })
+    },
+    cityView (tagId) {
+      tagOpenList(tagId).then(({data}) => {
+        console.log(data)
+      })
+    },
+    handleDel (tagId) {
+      deleteTag({tagId}).then(({data}) => {
+        if (data.code === 0) {
+          this.$message.success('删除成功')
+          this.getList()
+        }
+      })
+    },
+    handleStart (row) {
+      let enable = row.isOpening ? 0 : 1
+      tagEnable({
+        tagId: row.tagId,
+        enable
+      }).then(({data}) => {
+        if (data.code === 0) {
+          this.$message.success('操作成功')
+          this.getList()
+        }
+      })
+    }, 
+    handleSort (row, index) {
       this.$prompt('大于0的整数', '请输入排序', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -106,7 +222,7 @@ export default {
         if (value) {
           setTagSort({
             tagId: row.tagId,
-            sort: value,
+            sort: parseInt(value),
           }).then(({data}) => {
             if (data.code === 0) {
               this.$message.success('操作成功')
@@ -115,42 +231,77 @@ export default {
           })
         }
       })
-      console.log(row.tagId)
     },
-    handleSort (row, index) {
-      this.$prompt('', '请输入清洗范围', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        // inputValidator: (val) => {
-        //   if (cleanScopeReg.test(val)) {
-        //     let numArr = val.substring(0, val.length - 1).split('-')
-        //     return !(parseInt(numArr[0]) > parseInt(numArr[1]))
-        //   } else {
-        //     return false
-        //   }
-        // },
-        // inputErrorMessage: '格式不正确'
-      }).then(({ value }) => {
-        console.log(val)
-      })
+    toSearch () {
+      this.searchForm = this.tempSearch
+      this.page.currentPage = 1
+      this.getList()
     },
-    handleDel () {
-
+    currentChange (current) {
+      this.page.currentPage = current
+      this.getList()
     },
-    
-    searchChange (form) {
-      this.page = {
-        currentPage: 1,
-        pageSize: 20,
-      }
-      this.getList(form)   
-    },
-    refreshChange () {
-      this.getList(this.page)
-    },
+    sizeChange (size) {
+      this.page.pageSize = size
+      this.page.currentPage = 1
+      this.getList()
+    }
   }
 }
 </script>
 
-<style lang="" scoped>
+<style lang="scss" scoped>
+.tag-box {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 250px);
+  grid-template-rows: repeat(auto-fill, 90px);
+  grid-gap: 24px;
+  .tag-item {
+    border-radius: 2px;
+    border: 1px solid #E9E9E9;
+    padding: 16px 13px;
+    .tag-item-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 22px;
+      .tag-item-name {
+        height: 22px;
+        line-height: 22px;
+        flex: 1 1 10px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+      .tag-item-sort {
+        flex: 50px 0 0;
+        height: 22px;
+        line-height: 22px;
+        text-align: right;
+      }
+    }
+    .tag-item-option {
+      margin-top: 16px;
+      height: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      .mune-item {
+        font-size: 14px;
+        
+      }
+      .tag-item-option-left {
+      }
+      .tag-item-option-right {
+
+      }
+    }
+  }
+}
+.pagination-box {
+  padding: 10px 20px;
+  margin: 15px 0 10px;
+  text-align: right;
+}
 </style>

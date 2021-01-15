@@ -47,20 +47,20 @@
           slot="menu"
           slot-scope="scope">
           <el-button
-            v-if="sys_user_edit && userInfo.userType > scope.row.userType"
+            v-if="sys_user_edit && userInfo.userType >= scope.row.userType"
             type="text"
             size="mini"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row,scope.index)">编辑
           </el-button>
           <el-button
-            v-if="permissions['sys_user_role'] && userInfo.userType > scope.row.userType"
+            v-if="permissions['sys_user_role'] && userInfo.userType >= scope.row.userType"
             type="text"
             size="mini"
             @click="handleRole(scope.row,scope.index)">配置角色
           </el-button>
           <el-button
-            v-if="sys_user_del && userInfo.userType > scope.row.userType"
+            v-if="sys_user_del && userInfo.userType >= scope.row.userType"
             type="text"
             size="mini"
             icon="el-icon-delete"
@@ -151,7 +151,7 @@
         computed: {
           ...mapGetters(['permissions', 'userInfo']),
           tableOption() {
-            return tableOption(this.edit, this.userInfo.userType == 4)
+            return tableOption(this.edit, this.userInfo.userType == 3 || this.userInfo.userType == 4)
           }
         },
         watch: {
@@ -187,7 +187,7 @@
             },
             handleCreate() {
               this.edit = false
-                this.$refs.crud.rowAdd()
+              this.$refs.crud.rowAdd()
               this.$nextTick(() => {
               })
             },
@@ -207,10 +207,31 @@
               this.handleId = row.userId
               deptRoleList().then(response => {
                 this.role = []
+                let newUser = false
                 for (var i = 0; i < row.roleList.length; i++) {
+                  if (row.roleList[i].roleCode == 'ROLE_NEW_USER') {
+                    newUser = true
+                  }
                   this.role.push(row.roleList[i].roleId)
                 }
-                this.rolesOptions = response.data.data.data
+                let rolesOptions = response.data.data.data
+                let hasNewUser = false
+                if (newUser) {
+                  for (let i = 0; i < rolesOptions.length; i++) {
+                    if (rolesOptions[i].roleCode == 'ROLE_NEW_USER') {
+                      hasNewUser = true
+                      break;
+                    }
+                  }
+                  if (!hasNewUser) {
+                    rolesOptions.unshift({
+                      roleId: 8,
+                      roleCode: 'ROLE_NEW_USER',
+                      roleName: '新用户默认角色'
+                    })
+                  }
+                }
+                this.rolesOptions = rolesOptions
                 this.dialogRoleVisible = true
               })
             },
@@ -234,18 +255,18 @@
               this.dialogRoleVisible = false
             },
             create(row, done, loading) {
-                addObj({...this.form, lockFlag: '0'}).then(() => {
-                  this.getList(this.page)
-                  done()
-                  this.$notify({
-                    title: '成功',
-                    message: '创建成功',
-                    type: 'success',
-                    duration: 2000
-                  })
-                }).catch(() => {
-                  loading()
+              addObj({...this.form, lockFlag: '0'}).then(() => {
+                this.getList(this.page)
+                done()
+                this.$notify({
+                  title: '成功',
+                  message: '创建成功',
+                  type: 'success',
+                  duration: 2000
                 })
+              }).catch(() => {
+                loading()
+              })
             },
             update(row, index, done, loading) {
                 if (this.form.phone && this.form.phone.indexOf('*') > 0) {
