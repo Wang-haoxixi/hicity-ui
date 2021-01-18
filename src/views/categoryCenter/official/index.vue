@@ -2,7 +2,7 @@
   <basic-container>
     <el-form inline :model="tempSearch" class="demo-form-inline">
       <el-form-item label="栏目名称：">
-        <el-input v-model="tempSearch.name" placeholder="请输入标签名称"></el-input>
+        <el-input v-model="tempSearch.officialColumnName" placeholder="请输入标签名称"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="toSearch()">查询</el-button>
@@ -18,22 +18,22 @@
       </div>
     </el-form>
 
-    <div class="tag-box">
-      <div v-for="tag in tagList" :key="tag.tagId" class="tag-item">
-        <div class="tag-item-info">
-          <div class="tag-item-name">{{tag.name}}</div>
-          <div class="tag-item-sort" v-if="tag.isOpening && tag.sort">No.{{tag.sort}}</div>
+    <div class="column-box">
+      <div v-for="column in columnList" :key="column.tagId" class="column-item">
+        <div class="column-item-info">
+          <div class="column-item-name">{{column.officialColumnName}}</div>
+          <div class="column-item-sort" v-if="column.isOpening && column.sort">No.{{column.sort}}</div>
         </div>
-        <div class="tag-item-option">
-          <div class="tag-item-option-left">
-            <el-button v-if="userInfo.userType == 3 && userInfo.userType == 4" type="text" size="mini" @click="cityView(tag.tagId)">查看配置城市</el-button>
-            <el-button v-else-if="tag.editable" type="text" size="mini" @click="handleStart(tag)">{{tag.isOpening ? '停用' : '启用'}}</el-button>
+        <div class="column-item-option">
+          <div class="column-item-option-left">
+            <el-button v-if="userInfo.userType == 3 && userInfo.userType == 4" type="text" size="mini" @click="cityView(column.tagId)">查看配置城市</el-button>
+            <el-button v-else-if="column.editable" type="text" size="mini" @click="handleStart(column)">{{column.isOpening ? '停用' : '启用'}}</el-button>
           </div>
-          <div class="tag-item-option-right">
-            <el-button v-if="!isAdmin" type="text" size="mini" @click="handleSort(tag)">排序</el-button>
-            <template v-if="isAdmin || !tag.isPlatform">
-              <el-button type="text" size="mini" @click="handleUpdate(tag)">编辑</el-button>
-              <el-button type="text" size="mini" @click="handleDel(tag.tagId)">删除</el-button>
+          <div class="column-item-option-right">
+            <el-button v-if="!isAdmin" type="text" size="mini" @click="handleSort(column)">排序</el-button>
+            <template v-if="isAdmin || !column.isPlatform">
+              <el-button type="text" size="mini" @click="handleUpdate(column)">编辑</el-button>
+              <el-button type="text" size="mini" @click="handleDel(column.officialColumnId)">删除</el-button>
             </template>
           </div>
         </div>
@@ -61,11 +61,12 @@
       width="70%">
       <el-form :model="formData" labelWidth="150px">
         <el-form-item label="栏目名称：">
-          <el-input v-model="formData.name"></el-input>
+          <el-input v-model="formData.officialColumnName"></el-input>
         </el-form-item>
         <el-form-item v-if="isAdmin" label="是否允许城市停用：">
-          <el-switch v-model="formData.editable" active-text="允许" inactive-text="不允许"></el-switch>
+          <el-switch v-model="formData.closeAllowed" :active-value="1" active-text="允许" inactive-text="不允许" :inactive-value="0"></el-switch>
         </el-form-item>
+        
       </el-form>
       <div slot="footer">
         <el-button v-show="formType == 'add'" type="primary" @click="create">保 存</el-button>
@@ -78,7 +79,7 @@
 </template>
 
 <script>
-import { getColumnList, addNewsColumn, updateNewsColumn, deleteNewsColumn } from '@/api/cms/newsColumn'
+import { getColumnList, addColumn, updateColumn, deleteColumn } from '@/api/cms/officialColumn'
 import { mapGetters } from 'vuex'
 export default {
   data () {
@@ -90,12 +91,14 @@ export default {
       formData: {},
       formType: 'add',
       formDialogVisible: false,
+      columnList: [],
       tagList: [],
       page: {
         currentPage: 1,
         pageSize: 20,
         total: 0,
       },
+
     }
   },
   computed: {
@@ -113,6 +116,7 @@ export default {
   },
   created () {
     this.getList()
+    
   },
   methods: {
     getList (page = this.page, form = this.searchForm) {
@@ -123,7 +127,7 @@ export default {
         ...form,
       }).then(({data}) => {
         if (data.code === 0) {
-          this.tagList = data.data.data.records
+          this.columnList = data.data.data.records
           this.page = {
             ...page,
             total: data.data.data.total
@@ -134,14 +138,16 @@ export default {
       })
     },
     handleCreate () {
+      console.log(this.userInfo)
       this.formData = {
-        editable: false
+        cityIdList: [this.userInfo.manageCityId],
+        closeAllowed: 0,
       }
       this.formType = 'add'
       this.formDialogVisible = true
     },
     create() {
-      addTag(this.formData).then(({data}) => {
+      addColumn(this.formData).then(({data}) => {
         this.formDialogVisible = false
         this.$notify({
           title: '成功',
@@ -161,7 +167,7 @@ export default {
       this.formDialogVisible = true
     },
     update() {
-      updateTag(this.formData).then(({data}) => {
+      updateColumn(this.formData).then(({data}) => {
         this.formDialogVisible = false
         this.$notify({
           title: '成功',
@@ -179,8 +185,8 @@ export default {
         console.log(data)
       })
     },
-    handleDel (tagId) {
-      deleteTag({tagId}).then(({data}) => {
+    handleDel (officialColumnId) {
+      deleteColumn({cityId: this.userInfo.manageCityId, officialColumnId}).then(({data}) => {
         if (data.code === 0) {
           this.$message.success('删除成功')
           this.getList()
@@ -241,22 +247,22 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.tag-box {
+.column-box {
   margin-top: 24px;
   display: grid;
   grid-template-columns: repeat(auto-fill, 250px);
   grid-template-rows: repeat(auto-fill, 90px);
   grid-gap: 24px;
-  .tag-item {
+  .column-item {
     border-radius: 2px;
     border: 1px solid #E9E9E9;
     padding: 16px 13px;
-    .tag-item-info {
+    .column-item-info {
       display: flex;
       justify-content: space-between;
       align-items: center;
       height: 22px;
-      .tag-item-name {
+      .column-item-name {
         height: 22px;
         line-height: 22px;
         flex: 1 1 10px;
@@ -264,14 +270,14 @@ export default {
         white-space: nowrap;
         text-overflow: ellipsis;
       }
-      .tag-item-sort {
+      .column-item-sort {
         flex: 50px 0 0;
         height: 22px;
         line-height: 22px;
         text-align: right;
       }
     }
-    .tag-item-option {
+    .column-item-option {
       margin-top: 16px;
       height: 20px;
       display: flex;
@@ -281,9 +287,9 @@ export default {
         font-size: 14px;
         
       }
-      .tag-item-option-left {
+      .column-item-option-left {
       }
-      .tag-item-option-right {
+      .column-item-option-right {
 
       }
     }

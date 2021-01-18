@@ -46,6 +46,10 @@ export default {
     this.load()
     this.resize()
   },
+  destroyed () {
+    console.log('1 destroyed')
+    window.onresize = null
+  },
   methods: {
     // 显示等待框
     show() {

@@ -29,7 +29,7 @@
         </div>
         <div class="tag-item-option">
           <div class="tag-item-option-left">
-            <el-button v-if="userInfo.userType == 3 && userInfo.userType == 4" type="text" size="mini" @click="cityView(tag.tagId)">查看配置城市</el-button>
+            <el-button v-if="userInfo.userType == 3 || userInfo.userType == 4" type="text" size="mini" @click="cityView(tag.tagId)">查看配置城市</el-button>
             <el-button v-else-if="tag.editable" type="text" size="mini" @click="handleStart(tag)">{{tag.isOpening ? '停用' : '启用'}}</el-button>
           </div>
           <div class="tag-item-option-right">
@@ -42,6 +42,8 @@
         </div>
       </div>
     </div>
+
+    <city-box view-only :city-list="cityList"></city-box>
 
     <div class="pagination-box">
       <el-pagination
@@ -87,7 +89,9 @@
 import { getTagList, setTagSort, tagEnable, addTag, updateTag, deleteTag, tagOpenList } from '@/api/tms/city'
 import { tableOption } from './const'
 import { mapGetters } from 'vuex'
+import CityBox from '@/views/components/CityBox/index'
 export default {
+  components: { CityBox },
   data () {
     return {
       tempSearch: {
@@ -103,6 +107,7 @@ export default {
         pageSize: 20,
         total: 0,
       },
+      cityList: []
     }
   },
   computed: {
@@ -123,6 +128,9 @@ export default {
   },
   created () {
     this.getList()
+  },
+  destroyed () {
+    console.log('destroyed')
   },
   methods: {
     getList (page = this.page, form = this.searchForm) {

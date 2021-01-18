@@ -52,3 +52,10 @@ export function tagOpenList (tagId) {
     url: `/tms/city/tag/open_list/${tagId}`,
   })
 }
+
+export function getAllTagList (params) {
+  return request({
+    url: '/tms/city/tag/city_tag_list',
+    params
+  })
+}
