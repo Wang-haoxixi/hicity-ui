@@ -2,7 +2,7 @@
   <basic-container>
     <el-form inline :model="tempSearch" class="demo-form-inline">
       <el-form-item label="栏目名称：">
-        <el-input v-model="tempSearch.newsColumnName" placeholder="请输入标签名称"></el-input>
+        <el-input v-model="tempSearch.newsColumnName" placeholder="请输入栏目名称"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="toSearch()">查询</el-button>
@@ -19,19 +19,19 @@
     </el-form>
 
     <div class="column-box">
-      <div v-for="column in columnList" :key="column.tagId" class="column-item">
+      <div v-for="column in columnList" :key="column.newsColumnId" class="column-item">
         <div class="column-item-info">
           <div class="column-item-name">{{column.newsColumnName}}</div>
-          <div class="column-item-sort" v-if="column.isOpening && column.sort">No.{{column.sort}}</div>
+          <!-- <div class="column-item-sort" v-if="column.isOpening && column.sort">No.{{column.sort}}</div> -->
         </div>
         <div class="column-item-option">
           <div class="column-item-option-left">
-            <el-button v-if="userInfo.userType == 3 && userInfo.userType == 4" type="text" size="mini" @click="cityView(column.tagId)">查看配置城市</el-button>
-            <el-button v-else-if="column.editable" type="text" size="mini" @click="handleStart(column)">{{column.isOpening ? '停用' : '启用'}}</el-button>
+            <el-button v-if="isAdmin" type="text" size="mini" @click="cityView(column.newsColumnId)">查看配置城市</el-button>
+            <el-button v-else-if="column.closeAllowed == '0'" type="text" size="mini" @click="handleStart(column)">{{column.havEnable ? '启用' : '停用'}}</el-button>
           </div>
           <div class="column-item-option-right">
-            <el-button v-if="!isAdmin" type="text" size="mini" @click="handleSort(column)">排序</el-button>
-            <template v-if="isAdmin || !column.isPlatform">
+            <!-- <el-button v-if="!isAdmin" type="text" size="mini" @click="handleSort(column)">排序</el-button> -->
+            <template v-if="isAdmin && column.source == 1 || !isAdmin && column.source == 2">
               <el-button type="text" size="mini" @click="handleUpdate(column)">编辑</el-button>
               <el-button type="text" size="mini" @click="handleDel(column.newsColumnId)">删除</el-button>
             </template>
@@ -53,6 +53,18 @@
         :total="page.total">
       </el-pagination>
     </div>
+
+    <el-dialog
+      title="展示城市"
+      :visible.sync="cityViewDialogVisible"
+      width="70%">
+      <city-box view-only :city-list="cityList"></city-box>
+      <!-- <city-box :city-list="cityList"></city-box> -->
+      <div slot="footer">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+      </div>
+    </el-dialog>
     
 
     <el-dialog
@@ -64,7 +76,7 @@
           <el-input v-model="formData.newsColumnName"></el-input>
         </el-form-item>
         <el-form-item label="关联标签：">
-          <el-select style="width: 100%" v-model="formData.lableList" multiple filterable placeholder="请选择">
+          <el-select style="width: 100%" v-model="formData.lableIdList" multiple filterable placeholder="请选择">
             <el-option
               v-for="tag in tagList"
               :key="tag.tagId"
@@ -74,7 +86,7 @@
           </el-select>
         </el-form-item>
         <el-form-item v-if="isAdmin" label="是否允许城市停用：">
-          <el-switch v-model="formData.closeAllowed" :active-value="1" active-text="允许" inactive-text="不允许" :inactive-value="0"></el-switch>
+          <el-switch v-model="formData.closeAllowed" active-value="0" active-text="允许" inactive-text="不允许" inactive-value="1"></el-switch>
         </el-form-item>
         
       </el-form>
@@ -89,15 +101,16 @@
 </template>
 
 <script>
-import { getColumnList, addNewsColumn, updateNewsColumn, deleteNewsColumn } from '@/api/cms/newsColumn'
+import { getColumnList, addColumn, updateColumn, deleteColumn, columnEnable, columnOpenList } from '@/api/cms/newsColumn'
 import { getAllTagList } from '@/api/tms/city'
 import { mapGetters } from 'vuex'
-import pinyin from 'pinyin'
+import CityBox from '@/views/components/CityBox/index'
 export default {
+  components: { CityBox },
   data () {
     return {
       tempSearch: {
-        name: ''
+        newsColumnName: ''
       },
       searchForm: {},
       formData: {},
@@ -110,24 +123,8 @@ export default {
         pageSize: 20,
         total: 0,
       },
-
-      options: [{
-        value: '选项1',
-        label: '黄金糕'
-      }, {
-        value: '选项2',
-        label: '双皮奶'
-      }, {
-        value: '选项3',
-        label: '蚵仔煎'
-      }, {
-        value: '选项4',
-        label: '龙须面'
-      }, {
-        value: '选项5',
-        label: '北京烤鸭'
-      }],
-      value: ''
+      cityList: [],
+      cityViewDialogVisible: false
     }
   },
   computed: {
@@ -149,20 +146,23 @@ export default {
     
   },
   methods: {
-
     initTagList () {
       getAllTagList({cityId: this.userInfo.manageCityId}).then(({data}) => {
         this.tagList = data.data.data
-        console.log(data)
       })
     },
     getList (page = this.page, form = this.searchForm) {
       this.tableLoading = true
-      getColumnList({
+      let formData = {
         current: page.currentPage,
         size: page.pageSize,
         ...form,
-      }).then(({data}) => {
+        cityId: this.userInfo.manageCityId
+      }
+      if (this.isAdmin) {
+        formData.source = 1
+      }
+      getColumnList(formData).then(({data}) => {
         if (data.code === 0) {
           this.columnList = data.data.data.records
           this.page = {
@@ -175,17 +175,14 @@ export default {
       })
     },
     handleCreate () {
-      console.log(this.userInfo)
       this.formData = {
         cityIdList: [this.userInfo.manageCityId],
-        closeAllowed: 0,
-        newsColumnType: "2"
       }
       this.formType = 'add'
       this.formDialogVisible = true
     },
     create() {
-      addNewsColumn(this.formData).then(({data}) => {
+      addColumn(this.formData).then(({data}) => {
         this.formDialogVisible = false
         this.$notify({
           title: '成功',
@@ -205,7 +202,7 @@ export default {
       this.formDialogVisible = true
     },
     update() {
-      updateNewsColumn(this.formData).then(({data}) => {
+      updateColumn(this.formData).then(({data}) => {
         this.formDialogVisible = false
         this.$notify({
           title: '成功',
@@ -218,13 +215,21 @@ export default {
         loading()
       })
     },
-    cityView (tagId) {
-      tagOpenList(tagId).then(({data}) => {
-        console.log(data)
+    cityView (columnId) {
+      columnOpenList(columnId).then(({data}) => {
+        let cityList = data.data.data
+        for (let i = 0; i < cityList.length; i++) {
+          this.cityList.push({
+            cityId: cityList[i].cityId,
+            cityNname: cityList[i].cityNname
+          })
+        }
+        this.cityList = data.data.data
+        this.cityViewDialogVisible = true
       })
     },
     handleDel (newsColumnId) {
-      deleteNewsColumn({cityId: this.userInfo.manageCityId, newsColumnId}).then(({data}) => {
+      deleteColumn({cityId: this.userInfo.manageCityId, newsColumnId}).then(({data}) => {
         if (data.code === 0) {
           this.$message.success('删除成功')
           this.getList()
@@ -232,10 +237,11 @@ export default {
       })
     },
     handleStart (row) {
-      let enable = row.isOpening ? 0 : 1
-      tagEnable({
-        tagId: row.tagId,
-        enable
+      let havEnable = row.havEnable ? 0 : 1
+      columnEnable({
+        newsColumnId: row.newsColumnId,
+        havEnable,
+        cityId: this.userInfo.manageCityId
       }).then(({data}) => {
         if (data.code === 0) {
           this.$message.success('操作成功')
@@ -243,29 +249,6 @@ export default {
         }
       })
     }, 
-    handleSort (row, index) {
-      this.$prompt('大于0的整数', '请输入排序', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        inputType: 'number',
-        inputValidator: (val) => {
-          return /^[1-9]+0*$/.test(val)
-        },
-        inputErrorMessage: '请输入大于0的整数'
-      }).then(({ value }) => {
-        if (value) {
-          setTagSort({
-            tagId: row.tagId,
-            sort: parseInt(value),
-          }).then(({data}) => {
-            if (data.code === 0) {
-              this.$message.success('操作成功')
-              this.getList()
-            }
-          })
-        }
-      })
-    },
     toSearch () {
       this.searchForm = this.tempSearch
       this.page.currentPage = 1

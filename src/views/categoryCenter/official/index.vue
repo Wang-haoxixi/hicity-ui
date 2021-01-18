@@ -2,7 +2,7 @@
   <basic-container>
     <el-form inline :model="tempSearch" class="demo-form-inline">
       <el-form-item label="栏目名称：">
-        <el-input v-model="tempSearch.officialColumnName" placeholder="请输入标签名称"></el-input>
+        <el-input v-model="tempSearch.officialColumnName" placeholder="请输入栏目名称"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="toSearch()">查询</el-button>
@@ -19,19 +19,19 @@
     </el-form>
 
     <div class="column-box">
-      <div v-for="column in columnList" :key="column.tagId" class="column-item">
+      <div v-for="column in columnList" :key="column.officialColumnId" class="column-item">
         <div class="column-item-info">
           <div class="column-item-name">{{column.officialColumnName}}</div>
-          <div class="column-item-sort" v-if="column.isOpening && column.sort">No.{{column.sort}}</div>
+          <!-- <div class="column-item-sort" v-if="column.isOpening && column.sort">No.{{column.sort}}</div> -->
         </div>
         <div class="column-item-option">
           <div class="column-item-option-left">
-            <el-button v-if="userInfo.userType == 3 && userInfo.userType == 4" type="text" size="mini" @click="cityView(column.tagId)">查看配置城市</el-button>
-            <el-button v-else-if="column.editable" type="text" size="mini" @click="handleStart(column)">{{column.isOpening ? '停用' : '启用'}}</el-button>
+            <el-button v-if="isAdmin" type="text" size="mini" @click="cityView(column.officialColumnId)">查看配置城市</el-button>
+            <el-button v-else-if="column.closeAllowed == '0'" type="text" size="mini" @click="handleStart(column)">{{column.havEnable ? '启用' : '停用'}}</el-button>
           </div>
           <div class="column-item-option-right">
-            <el-button v-if="!isAdmin" type="text" size="mini" @click="handleSort(column)">排序</el-button>
-            <template v-if="isAdmin || !column.isPlatform">
+            <!-- <el-button v-if="!isAdmin" type="text" size="mini" @click="handleSort(column)">排序</el-button> -->
+            <template v-if="isAdmin && column.source == 1 || !isAdmin && column.source == 2">
               <el-button type="text" size="mini" @click="handleUpdate(column)">编辑</el-button>
               <el-button type="text" size="mini" @click="handleDel(column.officialColumnId)">删除</el-button>
             </template>
@@ -53,6 +53,18 @@
         :total="page.total">
       </el-pagination>
     </div>
+
+    <el-dialog
+      title="展示城市"
+      :visible.sync="cityViewDialogVisible"
+      width="70%">
+      <city-box view-only :city-list="cityList"></city-box>
+      <!-- <city-box :city-list="cityList"></city-box> -->
+      <div slot="footer">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+      </div>
+    </el-dialog>
     
 
     <el-dialog
@@ -64,14 +76,13 @@
           <el-input v-model="formData.officialColumnName"></el-input>
         </el-form-item>
         <el-form-item v-if="isAdmin" label="是否允许城市停用：">
-          <el-switch v-model="formData.closeAllowed" :active-value="1" active-text="允许" inactive-text="不允许" :inactive-value="0"></el-switch>
+          <el-switch v-model="formData.closeAllowed" active-value="0" active-text="允许" inactive-text="不允许" inactive-value="1"></el-switch>
         </el-form-item>
         
       </el-form>
       <div slot="footer">
         <el-button v-show="formType == 'add'" type="primary" @click="create">保 存</el-button>
         <el-button v-show="formType == 'edit'" type="primary" @click="update">修 改</el-button>
-
         <el-button @click="formDialogVisible = false">取 消</el-button>
       </div>
     </el-dialog>
@@ -79,26 +90,28 @@
 </template>
 
 <script>
-import { getColumnList, addColumn, updateColumn, deleteColumn } from '@/api/cms/officialColumn'
+import { getColumnList, addColumn, updateColumn, deleteColumn, columnEnable, columnOpenList } from '@/api/cms/officialColumn'
 import { mapGetters } from 'vuex'
+import CityBox from '@/views/components/CityBox/index'
 export default {
+  components: { CityBox },
   data () {
     return {
       tempSearch: {
-        name: ''
+        officialColumnName: ''
       },
       searchForm: {},
       formData: {},
       formType: 'add',
       formDialogVisible: false,
       columnList: [],
-      tagList: [],
       page: {
         currentPage: 1,
         pageSize: 20,
         total: 0,
       },
-
+      cityList: [],
+      cityViewDialogVisible: false
     }
   },
   computed: {
@@ -121,11 +134,16 @@ export default {
   methods: {
     getList (page = this.page, form = this.searchForm) {
       this.tableLoading = true
-      getColumnList({
+      let formData = {
         current: page.currentPage,
         size: page.pageSize,
         ...form,
-      }).then(({data}) => {
+        cityId: this.userInfo.manageCityId
+      }
+      if (this.isAdmin) {
+        formData.source = 1
+      }
+      getColumnList(formData).then(({data}) => {
         if (data.code === 0) {
           this.columnList = data.data.data.records
           this.page = {
@@ -138,10 +156,9 @@ export default {
       })
     },
     handleCreate () {
-      console.log(this.userInfo)
       this.formData = {
         cityIdList: [this.userInfo.manageCityId],
-        closeAllowed: 0,
+        closeAllowed: 1,
       }
       this.formType = 'add'
       this.formDialogVisible = true
@@ -180,9 +197,18 @@ export default {
         loading()
       })
     },
-    cityView (tagId) {
-      tagOpenList(tagId).then(({data}) => {
-        console.log(data)
+    cityView (columnId) {
+      columnOpenList(columnId).then(({data}) => {
+        let cityList = data.data.data
+        for (let i = 0; i < cityList.length; i++) {
+          this.cityList.push({
+            cityId: cityList[i].cityId,
+            cityNname: cityList[i].cityNname
+          })
+        }
+        this.cityList = data.data.data
+        // this.cityList = []
+        this.cityViewDialogVisible = true
       })
     },
     handleDel (officialColumnId) {
@@ -194,10 +220,11 @@ export default {
       })
     },
     handleStart (row) {
-      let enable = row.isOpening ? 0 : 1
-      tagEnable({
-        tagId: row.tagId,
-        enable
+      let havEnable = row.havEnable ? 0 : 1
+      columnEnable({
+        officialColumnId: row.officialColumnId,
+        havEnable,
+        cityId: this.userInfo.manageCityId
       }).then(({data}) => {
         if (data.code === 0) {
           this.$message.success('操作成功')
@@ -205,29 +232,6 @@ export default {
         }
       })
     }, 
-    handleSort (row, index) {
-      this.$prompt('大于0的整数', '请输入排序', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        inputType: 'number',
-        inputValidator: (val) => {
-          return /^[1-9]+0*$/.test(val)
-        },
-        inputErrorMessage: '请输入大于0的整数'
-      }).then(({ value }) => {
-        if (value) {
-          setTagSort({
-            tagId: row.tagId,
-            sort: parseInt(value),
-          }).then(({data}) => {
-            if (data.code === 0) {
-              this.$message.success('操作成功')
-              this.getList()
-            }
-          })
-        }
-      })
-    },
     toSearch () {
       this.searchForm = this.tempSearch
       this.page.currentPage = 1

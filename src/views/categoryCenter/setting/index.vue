@@ -43,7 +43,19 @@
       </div>
     </div>
 
-    <city-box view-only :city-list="cityList"></city-box>
+    <el-dialog
+      title="展示城市"
+      :visible.sync="cityViewDialogVisible"
+      width="70%">
+      <!-- <city-box view-only :city-list="cityList"></city-box> -->
+      <city-box :city-list="cityList"></city-box>
+      <div slot="footer">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+      </div>
+    </el-dialog>
+
+    
 
     <div class="pagination-box">
       <el-pagination
@@ -87,7 +99,6 @@
 
 <script>
 import { getTagList, setTagSort, tagEnable, addTag, updateTag, deleteTag, tagOpenList } from '@/api/tms/city'
-import { tableOption } from './const'
 import { mapGetters } from 'vuex'
 import CityBox from '@/views/components/CityBox/index'
 export default {
@@ -107,7 +118,8 @@ export default {
         pageSize: 20,
         total: 0,
       },
-      cityList: []
+      cityList: [],
+      cityViewDialogVisible: false
     }
   },
   computed: {
@@ -121,9 +133,6 @@ export default {
       } else if (this.formType == 'edit') {
         return '编 辑'
       }
-    },
-    tableOption () {
-      return tableOption(this.userInfo.userType == 4 || this.userInfo.userType == 3)
     }
   },
   created () {
@@ -194,7 +203,18 @@ export default {
     },
     cityView (tagId) {
       tagOpenList(tagId).then(({data}) => {
-        console.log(data)
+        console.log(123312, data.data.data)
+        let cityList = data.data.data
+        for (let i = 0; i < cityList.length; i++) {
+          this.cityList.push({
+            cityId: cityList[i].cityId,
+            cityNname: cityList[i].cityNname
+          })
+        }
+        this.cityList = data.data.data
+        this.cityList = []
+        this.cityViewDialogVisible = true
+        console.log(3333333, this.cityList)
       })
     },
     handleDel (tagId) {

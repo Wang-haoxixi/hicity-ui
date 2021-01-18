@@ -30,10 +30,10 @@ export function delObj(id) {
   })
 }
 
-export function putObj(obj) {
+export function putObj(data) {
   return request({
-    url: '/admin/dept/',
-    method: 'put',
-    data: obj
+    url: '/admin/dept/update',
+    method: 'post',
+    data
   })
 }

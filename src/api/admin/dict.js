@@ -33,15 +33,15 @@ export function getItemObj(id) {
 
 export function delItemObj(id) {
   return request({
-    url: '/admin/dict/item/' + id,
-    method: 'delete'
+    url: '/admin/dict/removeDictItem/' + id,
+    method: 'post'
   })
 }
 
 export function putItemObj(obj) {
   return request({
-    url: '/admin/dict/item',
-    method: 'put',
+    url: '/admin/dict/updateDictItem',
+    method: 'post',
     data: obj
   })
 }

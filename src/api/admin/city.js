@@ -105,3 +105,9 @@ export function downloadColumns() {
     method: "get"
   })
 }
+
+export function adminCityList () {
+  return request({
+    url: '/admin/city/admin_list'
+  })
+}
