@@ -60,7 +60,7 @@
             @click="handleRole(scope.row,scope.index)">配置角色
           </el-button>
           <el-button
-            v-if="sys_user_del && userInfo.userType >= scope.row.userType"
+            v-if="sys_user_del && notAdmin(scope.row)"
             type="text"
             size="mini"
             icon="el-icon-delete"
@@ -75,6 +75,7 @@
             :dic="treeDeptData"
             :props="defaultProps"
             type="tree"
+            :disabled="!notAdmin(scope.row)"
             placeholder="请选择所属部门"/>
         </template>
       </avue-crud>
@@ -162,6 +163,18 @@
           this.sys_user_del = this.permissions['sys_user_del']
         },
         methods: {
+          notAdmin (data) {
+            let roleList = data.roleList
+            if (!roleList) {
+              return 
+            }
+            for (let i = 0; i < roleList.length; i++) {
+              if (roleList[i].roleCode == 'ROLE_CITY_ADMIN' || roleList[i].roleCode == 'ROLE_ADMIN') {
+                return false
+              }
+            }
+            return true
+          },
             getList(page, params) {
                 this.listLoading = true
                 manageList(Object.assign({

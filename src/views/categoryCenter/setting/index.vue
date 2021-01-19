@@ -43,20 +43,6 @@
       </div>
     </div>
 
-    <el-dialog
-      title="展示城市"
-      :visible.sync="cityViewDialogVisible"
-      width="70%">
-      <!-- <city-box view-only :city-list="cityList"></city-box> -->
-      <city-box :city-list="cityList"></city-box>
-      <div slot="footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
-      </div>
-    </el-dialog>
-
-    
-
     <div class="pagination-box">
       <el-pagination
         style="display: inline-block"
@@ -70,6 +56,19 @@
         :total="page.total">
       </el-pagination>
     </div>
+
+
+    <el-dialog
+      title="展示城市"
+      :visible.sync="cityViewDialogVisible"
+      width="70%">
+      <!-- <city-box view-only :city-list="cityList"></city-box> -->
+      <city-box :city-list="cityList"></city-box>
+      <div slot="footer">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+      </div>
+    </el-dialog>
     
 
     <el-dialog

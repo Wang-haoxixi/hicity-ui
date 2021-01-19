@@ -111,3 +111,43 @@ export function adminCityList () {
     url: '/admin/city/admin_list'
   })
 }
+
+
+// 城市业务开通分页
+export function adminCityOpenList (params) {
+  return request({
+    url: '/admin/city/opening_list',
+    params
+  })
+}
+
+
+// 城市业务开通
+export function adminCityOpen (data) {
+  return request({
+    url: '/admin/city/opening',
+    method: 'post',
+    data
+  })
+}
+
+
+// 城市业务锁定状态改变
+export function adminCityLock (data) {
+  return request({
+    url: '/admin/city/locking',
+    method: 'post',
+    data
+  })
+}
+
+// 城市业务模块列表
+export function adminCityModule (params) {
+  return request({
+    url: '/admin/module/list',
+    params
+  })
+}
+
+
+

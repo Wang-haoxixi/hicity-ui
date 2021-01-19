@@ -86,7 +86,7 @@ export const tableOption = (edit = false, admin = false) => {
         ]
       },
       {
-        label: '管理城市',
+        label: '所属部门',
         prop: 'deptId',
         formatter: (row) => {
           return row.deptName
@@ -96,27 +96,27 @@ export const tableOption = (edit = false, admin = false) => {
         dataType:"number",
         rules: [{
           required: true,
-          message: '请选择管理城市',
+          message: '请选择所属部门',
           trigger: 'change'
         }]
       },
-      {
-        label: '用户类型',
-        prop: 'userType',
-        hide: true,
-        type: 'select',
-        dicData: getDic('user_type'),
-        props: {
-          label: 'label',
-          value: 'value'
-        },
-        span: 24,
-        rules: [{
-          required: true,
-          message: '请选择用户类型',
-          trigger: 'blur'
-        }]
-      },
+      // {
+      //   label: '用户类型',
+      //   prop: 'userType',
+      //   hide: true,
+      //   type: 'select',
+      //   dicData: getDic('user_type'),
+      //   props: {
+      //     label: 'label',
+      //     value: 'value'
+      //   },
+      //   span: 24,
+      //   rules: [{
+      //     required: true,
+      //     message: '请选择用户类型',
+      //     trigger: 'blur'
+      //   }]
+      // },
       {
         width: 180,
         label: '创建时间',

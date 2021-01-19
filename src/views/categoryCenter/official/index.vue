@@ -129,7 +129,6 @@ export default {
   },
   created () {
     this.getList()
-    
   },
   methods: {
     getList (page = this.page, form = this.searchForm) {
