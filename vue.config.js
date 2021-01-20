@@ -1,30 +1,29 @@
-const url = 'http://192.168.0.153:9999'
+// const url = 'http://192.168.0.153:9999'
+// const url = 'http://192.168.0.107:9999'//郑旭
+// const url = 'http://192.168.0.116:9999'//张云生
+const url = "http://192.168.0.181:9999"; //司泉鑫
 module.exports = {
   lintOnSave: true,
   productionSourceMap: false,
   chainWebpack: config => {
     // 忽略的打包文件
     config.externals({
-      'axios': 'axios'
-    })
-    const entry = config.entry('app')
-    entry
-      .add('babel-polyfill')
-      .end()
-    entry
-      .add('classlist-polyfill')
-      .end()
+      axios: "axios"
+    });
+    const entry = config.entry("app");
+    entry.add("babel-polyfill").end();
+    entry.add("classlist-polyfill").end();
   },
   // 配置转发代理
   devServer: {
     disableHostCheck: true,
     port: 8080,
     proxy: {
-      '/api': {
+      "/api": {
         target: url,
         ws: true,
         pathRewrite: {
-          '^/api': ''
+          "^/api": ""
         }
       },
       // '/admin': {
@@ -34,13 +33,13 @@ module.exports = {
       //     '^/admin': '/admin'
       //   }
       // },
-      '/code': {
+      "/code": {
         target: url,
         ws: true,
         pathRewrite: {
-          '^/code': '/code'
+          "^/code": "/code"
         }
-      },
+      }
       // '/gen': {
       //   target: url,
       //   ws: true,
@@ -106,4 +105,4 @@ module.exports = {
       // }
     }
   }
-}
+};
