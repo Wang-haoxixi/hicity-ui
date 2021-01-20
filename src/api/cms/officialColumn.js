@@ -2,14 +2,14 @@ import request from "@/router/axios"
 
 export function getColumnList(params) {
   return new request({
-    url: '/cms/news_column/news_column',
+    url: '/cms/official_column/page',
     params
   })
 }
 
 export function addColumn(data) {
   return new request({
-    url: '/cms/news_column/create',
+    url: '/cms/official_column/create',
     method: 'post',
     data
   })
@@ -17,7 +17,7 @@ export function addColumn(data) {
 
 export function deleteColumn(data) {
   return new request({
-    url: '/cms/news_column/delete',
+    url: '/cms/official_column/delete',
     method: 'post',
     data
   })
@@ -25,7 +25,7 @@ export function deleteColumn(data) {
 
 export function updateColumn(data) {
   return new request({
-    url: '/cms/news_column/update',
+    url: '/cms/official_column/update',
     method: 'post',
     data
   })
@@ -33,7 +33,7 @@ export function updateColumn(data) {
 
 export function columnEnable (data) {
   return request({
-    url: '/cms/news_column/enable_stop',
+    url: '/cms/official_column/enable_stop',
     method: 'post',
     data
   })
@@ -41,9 +41,9 @@ export function columnEnable (data) {
 
 export function columnOpenList (columnId) {
   return request({
-    url: '/cms/news_column/city_open_list',
+    url: '/cms/official_column/city_open_list',
     params: {
-      newsColumnId: columnId
+      officialColumnId: columnId
     }
   })
 }

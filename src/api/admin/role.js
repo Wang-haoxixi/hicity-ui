@@ -37,11 +37,11 @@ export function addObj(obj) {
   })
 }
 
-export function putObj(obj) {
+export function putObj(data) {
   return request({
-    url: '/admin/role',
-    method: 'put',
-    data: obj
+    url: '/admin/role/update',
+    method: 'post',
+    data
   })
 }
 

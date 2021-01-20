@@ -59,9 +59,9 @@
               <el-form-item
                 v-if="formEdit"
                 label="节点编号"
-                prop="deptId">
+                prop="id">
                 <el-input
-                  v-model="form.deptId"
+                  v-model="form.id"
                   :disabled="formEdit"
                   placeholder="节点编号"/>
               </el-form-item>
@@ -149,9 +149,6 @@ export default {
         parentId: [
           { required: true, message: '请输入父级节点', trigger: 'blur' }
         ],
-        deptId: [
-          { required: true, message: '请输入节点编号', trigger: 'blur' }
-        ],
         deptName: [
           { required: true, message: '请输入部门名称', trigger: 'blur' },
           { min: 3, max: 32, message: '长度在 3 到 32 个字符', trigger: 'blur'}
@@ -165,7 +162,6 @@ export default {
         deptName: undefined,
         orderNum: undefined,
         parentId: undefined,
-        deptId: undefined
       },
       currentId: 0,
       deptManager_btn_add: false,
@@ -206,7 +202,7 @@ export default {
       this.showElement = true
     },
     handlerEdit() {
-      if (this.form.deptId) {
+      if (this.form.id) {
         this.formEdit = false
         this.formStatus = 'update'
       }

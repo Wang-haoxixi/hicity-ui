@@ -25,15 +25,15 @@ export function getObj(id) {
 
 export function delObj(id) {
   return request({
-    url: '/admin/dept/' + id,
-    method: 'delete'
+    url: '/admin/dept/delete/' + id,
+    method: 'post'
   })
 }
 
-export function putObj(obj) {
+export function putObj(data) {
   return request({
-    url: '/admin/dept/',
-    method: 'put',
-    data: obj
+    url: '/admin/dept/update',
+    method: 'post',
+    data
   })
 }

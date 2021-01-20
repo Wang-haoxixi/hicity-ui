@@ -99,7 +99,7 @@
 
 <script>
 import { addObj, delObj, fetchList, fetchRoleTree, permissionUpd, putObj } from '@/api/admin/role'
-import { tableOption } from '@/const/crud/admin/role'
+import { tableOption } from './const'
 import { getCityTree } from '@/api/admin/city'
 import { fetchMenuTree } from '@/api/admin/menu'
 import { mapGetters } from 'vuex'
@@ -109,7 +109,6 @@ export default {
   data() {
     return {
       searchForm: {},
-      tableOption: tableOption,
       treeCityData: [],
       treeData: [],
       checkedKeys: [],
@@ -148,17 +147,21 @@ export default {
     this.roleManager_btn_perm = this.permissions['sys_role_perm']
   },
   computed: {
-    ...mapGetters(['elements', 'permissions'])
+    ...mapGetters(['elements', 'permissions', 'userInfo']),
+    tableOption() {
+      return tableOption(this.userInfo.userType == 3 || this.userInfo.userType == 4)
+    }
   },
   methods: {
     getList(page, params) {
       this.listLoading = true
       fetchList(Object.assign({
         current: page.currentPage,
-        size: page.pageSize
+        size: page.pageSize,
+        cityId: this.userInfo.manageCityId
       }, params, this.searchForm)).then(response => {
-        this.list = response.data.data.records
-        this.page.total = response.data.data.total
+        this.list = response.data.data.data.records
+        this.page.total = response.data.data.data.total
         this.listLoading = false
       }).catch(() => {
         this.listLoading = false
@@ -241,10 +244,10 @@ export default {
       })
     },
     create(row, done, loading) {
-      if (this.form.dsType === 1) {
-        this.form.dsScope = this.$refs.scopeTree.getCheckedKeys().join(',')
-      }
-      addObj({...this.form, dsType: 2}).then(() => {
+      // if (this.form.dsType === 1) {
+      //   this.form.dsScope = this.$refs.scopeTree.getCheckedKeys().join(',')
+      // }
+      addObj(this.form).then(() => {
         this.getList(this.page)
         done()
         this.$notify.success('创建成功')
@@ -252,11 +255,11 @@ export default {
         loading()
       })
     },
-    update(row, index, done, loading) {
-      if (this.form.dsType === 1) {
-        this.form.dsScope = this.$refs.scopeTree.getCheckedKeys().join(',')
-      }
-      putObj({...this.form, dsType: 2}).then(() => {
+    update(row, index, done , loading) {
+      // if (this.form.dsType === 1) {
+      //   this.form.dsScope = this.$refs.scopeTree.getCheckedKeys().join(',')
+      // }
+      putObj(this.form).then(() => {
         this.getList(this.page)
         done()
         this.$notify.success('修改成功')

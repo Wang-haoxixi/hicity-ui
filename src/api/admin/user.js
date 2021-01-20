@@ -33,8 +33,8 @@ export function getObj(id) {
 
 export function delObj(id) {
   return request({
-    url: '/admin/user/' + id,
-    method: 'delete'
+    url: '/admin/user/delete/' + id,
+    method: 'post',
   })
 }
 
@@ -50,5 +50,13 @@ export function getDetails(obj) {
   return request({
     url: '/admin/user/details/' + obj,
     method: 'get'
+  })
+}
+
+export function updateRole (data) {
+  return request({
+    url: '/admin/user/edit/role',
+    method: 'post',
+    data
   })
 }

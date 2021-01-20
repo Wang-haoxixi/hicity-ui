@@ -24,6 +24,7 @@ axios.interceptors.request.use(config => {
   const TENANT_ID = getStore({ name: 'tenantId' })
   const isToken = (config.headers || {}).isToken === false
   const token = store.getters.access_token
+  config.headers['source'] = 'HI_CITY_WEB'
   if (token && !isToken) {
     config.headers['Authorization'] = 'Bearer ' + token// token
   }
@@ -46,7 +47,7 @@ axios.interceptors.request.use(config => {
 axios.interceptors.response.use(res => {
   NProgress.done()
   const status = Number(res.status) || 200
-  const message = res.data.msg || errorCode[status] || errorCode['default']
+  const message = (res.data.data && res.data.data.msg) || res.data.msg || errorCode[status] || errorCode['default']
   if (status === 401) {
     Message({
       message: message,

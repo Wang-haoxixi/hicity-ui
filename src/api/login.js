@@ -9,7 +9,7 @@ export const loginByUsername = (username, password, code, randomStr) => {
     headers: {
       isToken: false,
       'TENANT-ID': '1',
-      'Authorization': 'Basic Z2RzOmdkcw=='
+      'Authorization': 'Basic Z2RzOmdkcw==',
     },
     method: 'post',
     params: { username, password, randomStr, code, grant_type, scope }

@@ -32,13 +32,13 @@ export const tableOption = {
     display: false,
     width: 100,
   }, {
-    label: '管理员名称',
+    label: '真实姓名',
     prop: 'realName',
     span: 24,
     maxlength: 20,
     rules: [{
       required: true,
-      message: '请输入管理员名称',
+      message: '请输入真实姓名',
       trigger: 'blur'
     }]
   }, 
@@ -74,74 +74,41 @@ export const tableOption = {
       message: '长度在 6 到 20 个字符',
       trigger: 'blur'
     }]
-  }, {
-    label: '管理城市',
-    prop: 'deptId',
-    formslot: true,
-    slot: true,
-    span: 24,
-    dataType:"number",
-    rules: [{
-      required: true,
-      message: '请选择管理城市',
-      trigger: 'change'
-    }]
   },
   {
-    label: '角色',
-    prop: 'role',
-    formslot: true,
-    slot: true,
-    overHidden: true,
+    label: '手机号',
+    prop: 'phone',
+    value: '',
     span: 24,
     hide: true,
     rules: [{
-      required: true,
-      message: '请选择角色',
+      min: 11,
+      max: 11,
+      message: '长度在 11 个字符',
       trigger: 'blur'
     }]
   },
   {
-    label: '用户类型',
-    prop: 'userType',
-    hide: true,
-    type: 'select',
-    dicData: getDic('user_type'),
-    props: {
-      label: 'label',
-      value: 'value'
-    },
+    label: '状态',
+    prop: 'lockFlag',
+    type: 'radio',
+    slot: true,
+    border:true,
     span: 24,
+    width: 150,
     rules: [{
       required: true,
-      message: '请选择用户类型',
+      message: '请选择状态',
       trigger: 'blur'
+    }],
+    dicData: [{
+      label: '有效',
+      value: '0'
+    }, {
+      label: '锁定',
+      value: '9'
     }]
   },
-  // {
-  //   label: '状态',
-  //   prop: 'lockFlag',
-  //   type: 'radio',
-  //   slot: true,
-  //   border:true,
-  //   span: 24,
-  //   width: 150,
-  //   value: '0',
-  //   display: false,  
-  //   hide: true,
-  //   // rules: [{
-  //   //   required: true,
-  //   //   message: '请选择状态',
-  //   //   trigger: 'blur'
-  //   // }],
-  //   // dicData: [{
-  //   //   label: '有效',
-  //   //   value: '0'
-  //   // }, {
-  //   //   label: '锁定',
-  //   //   value: '9'
-  //   // }]
-  // },
   {
     width: 180,
     label: '创建时间',
