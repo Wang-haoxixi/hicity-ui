@@ -1,5 +1,5 @@
 <template>
-  <div class="city-box">
+  <div class="hc-city-box">
     <div class="city-result">
       <div class="city-result-label">展示范围：</div>
       <div class="city-result-list">
@@ -8,7 +8,7 @@
     </div>
     <div class="city-select">
       <div class="city-select-nav">
-        <div v-for="city in citys" :key="city.key" class="city-select-nav-item" :class="{'checked': selectKey == city.key}" @click="cityArangeSelect(city)">{{city.key}}</div>
+        <div v-for="city in cityMapList" :key="city.key" class="city-select-nav-item" :class="{'checked': selectKey == city.key}" @click="cityArangeSelect(city)">{{city.key}}</div>
       </div>
       <div class="city-select-list">
         <div v-for="city in cityArange" :key="city.cityId" class="city-select-list-item"  :class="{'checked': hasSelected(city.cityId).checked}" @click="selectCity(city)">{{city.cityName}}</div>
@@ -29,7 +29,7 @@ function formatCitys (tempCityList) {
   })
   let data = {}
   for (let i = 0; i < cityList.length; i++) {
-    let firstLetter = pinyin(cityList[i].cityName, {style: pinyin.STYLE_INITIALS, segment: true})[0][0][0].toUpperCase()
+    let firstLetter = pinyin(cityList[i].cityName, {style: pinyin.STYLE_FIRST_LETTER, segment: true})[0][0][0].toUpperCase()
     if (data.key) {
       if ( data.key.includes(firstLetter) ) {
         data.cityList.push(cityList[i])
@@ -59,26 +59,17 @@ function formatCitys (tempCityList) {
   return dataList
 }
 
-function getSelected (cityList) {
-  let selectedList = []
-  for (let i = 0; i < cityList.length; i++) {
-    if (cityList[i].isOpening) {
-      selectedList.push({
-        cityId: cityList[i].cityId,
-        cityName: cityList[i].cityName
-      })
-    }
-  }
-  return selectedList
-}
-
 export default {
   props: {
     viewOnly: {
       type: Boolean,
       default: false,
     },
-    cityList: {
+    allCityList: {
+      type: Array,
+      default: () => []
+    },
+    initCityList: {
       type: Array,
       default: () => []
     }
@@ -86,45 +77,42 @@ export default {
   data () {
     return {
       selectKey: '',
-      allCityList: [],
       cityArange: [],
       citySelected: [],
-      citys: []
+      cityMapList: []
     }
   },
   created () {
     this.init()
   },
   watch: {
-    cityList () {
+    initCityList () {
       this.init()
     }
   },
   methods: {
     init () {
+      this.citySelected = []
+      let allCityList = [...this.allCityList]
+      this.cityMapList = formatCitys(this.allCityList)
       if (!this.viewOnly) {
-        adminCityList().then(({data}) => {
-          let cityList = data.data.data
-          let allCityList = []
-          for (let i = 0; i < cityList.length; i++) {
-            allCityList.push({
-              cityId: cityList[i].id,
-              cityName: cityList[i].regionName
-            })
-          }
-          this.citys = formatCitys(allCityList)
-          this.citys.push({
+        this.cityMapList.push({
           key: '全国',
           cityList: [{
             cityId: 1,
             cityName: '全国'
           }]
         })
-          this.citySelected = Object.assign([], this.cityList)
+        allCityList.push({
+          cityId: 1,
+          cityName: '全国'
         })
-      } else {
-        this.citySelected = getSelected(this.cityList)
-        this.citys = formatCitys(this.cityList)
+      }
+      this.cityArangeSelect(this.cityMapList[0])
+      for (let i = 0; i < allCityList.length; i++) {
+        if (this.initCityList.includes(allCityList[i].cityId)) {
+          this.citySelected.push(allCityList[i])
+        }
       }
     },
     cityArangeSelect ({key, cityList}) {
@@ -148,7 +136,12 @@ export default {
         if (hasSelected.checked) {
           this.citySelected.splice(hasSelected.index, 1)
         } else {
-          this.citySelected.push(city)
+          let countrySelected = this.hasSelected(1)
+          if (countrySelected.checked || city.cityId == 1) {
+            this.citySelected = [city]
+          } else {
+            this.citySelected.push(city)
+          }
         }
       }
     }
@@ -157,10 +150,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.city-box {
+.hc-city-box {
   .city-result {
     display: flex;
-    padding: 20px 0;
+    padding: 0 0 20px;
     justify-content: flex-start;
     align-items: flex-start;
     .city-result-label {

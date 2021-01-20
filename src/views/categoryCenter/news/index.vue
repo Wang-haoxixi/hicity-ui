@@ -58,11 +58,9 @@
       title="展示城市"
       :visible.sync="cityViewDialogVisible"
       width="70%">
-      <city-box view-only :city-list="cityList"></city-box>
-      <!-- <city-box :city-list="cityList"></city-box> -->
+      <hc-city-box view-only :init-city-list="initCityList" :all-city-list="allCityList"></hc-city-box>
       <div slot="footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+        <el-button @click="cityViewDialogVisible = false">取 消</el-button>
       </div>
     </el-dialog>
     
@@ -104,9 +102,9 @@
 import { getColumnList, addColumn, updateColumn, deleteColumn, columnEnable, columnOpenList } from '@/api/cms/newsColumn'
 import { getAllTagList } from '@/api/tms/city'
 import { mapGetters } from 'vuex'
-import CityBox from '@/views/components/CityBox/index'
+import HcCityBox from '@/views/components/HcCityBox/index'
 export default {
-  components: { CityBox },
+  components: { HcCityBox },
   data () {
     return {
       tempSearch: {
@@ -123,7 +121,8 @@ export default {
         pageSize: 20,
         total: 0,
       },
-      cityList: [],
+      allCityList: [],
+      initCityList: [],
       cityViewDialogVisible: false
     }
   },
@@ -218,13 +217,19 @@ export default {
     cityView (columnId) {
       columnOpenList(columnId).then(({data}) => {
         let cityList = data.data.data
+        let allCityList = []
+        let initCityList = []
         for (let i = 0; i < cityList.length; i++) {
-          this.cityList.push({
+          allCityList.push({
             cityId: cityList[i].cityId,
-            cityNname: cityList[i].cityNname
+            cityName: cityList[i].cityName
           })
+          if (cityList[i].isOpening) {
+            initCityList.push(cityList[i].cityId)
+          }
         }
-        this.cityList = data.data.data
+        this.initCityList = initCityList
+        this.allCityList = allCityList
         this.cityViewDialogVisible = true
       })
     },

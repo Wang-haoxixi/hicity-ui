@@ -108,7 +108,10 @@ export function downloadColumns() {
 
 export function adminCityList () {
   return request({
-    url: '/admin/city/admin_list'
+    url: '/admin/city/admin_list',
+    params: {
+      regionLvl: '3'
+    }
   })
 }
 
