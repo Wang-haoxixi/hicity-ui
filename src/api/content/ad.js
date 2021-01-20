@@ -25,12 +25,36 @@ export function adDetails(data) {
   });
 }
 
-// /sys-file/oss/upload
-// oss上传文件
-export function filePic(data) {
+// 通过字典类型(唯一)查找字典
+export function getDictByType(data) {
   return request({
-    url: "/admin/sys-file/oss/upload",
+    url: "/admin/dict/getDictByType/" + data,
+    method: "get"
+  });
+}
+
+// 会议大厅分页查询
+export function activitiePage(data) {
+  return request({
+    url: "/qms/activity_publish/activitie_page",
+    method: "get"
+  });
+}
+
+// 添加广告
+export function addAd(data) {
+  return request({
+    url: "/ims/info_ad/create",
     method: "post",
-    data:data
+    data: data
+  });
+}
+
+// 更新广告
+export function updateAd(data) {
+  return request({
+    url: "/ims/info_ad/update",
+    method: "post",
+    data: data
   });
 }

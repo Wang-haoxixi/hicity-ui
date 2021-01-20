@@ -9,10 +9,10 @@ export function officialReleaseList(data) {
   });
 }
 
-// 栏目管理-官方栏目创建（官方）
-export function officialColumnCreate(data) {
+// 资讯管理-官方资讯发布（官方）
+export function officaialNewsCreate(data) {
   return request({
-    url: "/cms/official_column/create",
+    url: "/cms/officaial_news/create",
     method: "post",
     data: data
   });

@@ -84,31 +84,44 @@
             prop="type"
             :label-width="formLabelWidth"
           >
-            <el-select v-model="form.type" placeholder="请选择广告类型">
-              <el-option label="魔方" value="魔方"></el-option>
-              <el-option label="能聘" value="能聘"></el-option>
-              <el-option label="问卷" value="问卷"></el-option>
-              <el-option label="活动" value="活动"></el-option>
+            <el-select
+              @change="typeChange"
+              v-model="form.type"
+              placeholder="请选择广告类型"
+            >
+              <el-option
+                v-for="(item, index) in adType"
+                :key="index"
+                :label="item.description"
+                :value="item.label"
+              ></el-option>
             </el-select>
           </el-form-item>
 
           <!-- 跳转类型 -->
-          <el-form-item
+          <!-- <el-form-item
             label="跳转类型 :"
             prop="jumpType"
             :label-width="formLabelWidth"
           >
             <el-select v-model="form.jumpType" placeholder="请选择跳转类型">
             </el-select>
-          </el-form-item>
+          </el-form-item> -->
 
           <!-- 跳转对象 -->
           <el-form-item
+            v-if="form.type"
             label="跳转对象 :"
             prop="jumpObj"
             :label-width="formLabelWidth"
           >
             <el-select v-model="form.jumpObj" placeholder="请选择跳转对象">
+              <el-option
+                v-for="(item, index) in jumpObjArr"
+                :key="index"
+                :label="item.name"
+                :value="item.id"
+              ></el-option>
             </el-select>
           </el-form-item>
 
@@ -229,22 +242,24 @@
             :label-width="formLabelWidth"
           >
             <el-select v-model="editForm.type" placeholder="请选择广告类型">
-              <el-option label="魔方" value="魔方"></el-option>
-              <el-option label="能聘" value="能聘"></el-option>
-              <el-option label="问卷" value="问卷"></el-option>
-              <el-option label="活动" value="活动"></el-option>
+              <el-option
+                v-for="(item, index) in adType"
+                :key="index"
+                :label="item.description"
+                :value="item.label"
+              ></el-option>
             </el-select>
           </el-form-item>
 
           <!-- 跳转类型 -->
-          <el-form-item
+          <!-- <el-form-item
             label="跳转类型 :"
             prop="jumpType"
             :label-width="formLabelWidth"
           >
             <el-select v-model="editForm.jumpType" placeholder="请选择跳转类型">
             </el-select>
-          </el-form-item>
+          </el-form-item> -->
 
           <!-- 跳转对象 -->
           <el-form-item
@@ -253,6 +268,12 @@
             :label-width="formLabelWidth"
           >
             <el-select v-model="editForm.jumpObj" placeholder="请选择跳转对象">
+              <el-option
+                v-for="(item, index) in jumpObjArr"
+                :key="index"
+                :label="item.name"
+                :value="item.id"
+              ></el-option>
             </el-select>
           </el-form-item>
 
@@ -273,9 +294,10 @@
           >
             <el-upload
               class="avatar-uploader"
-              action="https://jsonplaceholder.typicode.com/posts/"
+              :action="baseUrl"
               :show-file-list="false"
-              :on-success="handleAvatarSuccess"
+              :on-success="handleEditPicSuccess"
+              :headers="headersOpt"
             >
               <img v-if="imageUrl" :src="editForm.imageUrl" class="avatar" />
               <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -345,7 +367,15 @@
 </template>
 
 <script>
-import { ads, delAd, adDetails, filePic } from "@/api/content/ad";
+import {
+  ads,
+  delAd,
+  adDetails,
+  getDictByType,
+  activitiePage,
+  addAd,
+  updateAd,
+} from "@/api/content/ad";
 import { adPosition } from "@/api/content/ad-position";
 import store from "@/store";
 export default {
@@ -369,7 +399,7 @@ export default {
         beginDate: "", //开始时间
         endDate: "", //结束时间
         type: "", //广告类型
-        jumpType: "", //跳转类型
+        // jumpType: "", //跳转类型
         jumpObj: "", //跳转对象
         text: "", //广告文字
         imageUrl: "", //广告图片
@@ -378,6 +408,8 @@ export default {
       // 编辑广告表单
       editForm: {},
       adslotGroup: [], //广告位数据
+      adType: [], //广告类型数据
+      jumpObjArr: [], //跳转对象数据
 
       formLabelWidth: "120px",
 
@@ -437,17 +469,81 @@ export default {
       });
     },
 
+    // 获取广告类型数据
+    getDictByTypeFn() {
+      getDictByType("ad_type").then((res) => {
+        this.adType = res.data.data.dictItemList;
+        console.log("获取广告类型数据", this.adType);
+      });
+    },
+
+    // 获取活动数据
+    getActivitiePageFn() {
+      activitiePage().then((res) => {
+        console.log("获取活动数据", res);
+        this.jumpObjArr = res.data.data.data.records;
+      });
+    },
+
+    // 新增广告
+    addAdFn() {
+      addAd(this.form).then((res) => {
+        // console.log("新增", res);
+        if (res.data.code !== 0) {
+          return this.$message.error("新增广告失败！");
+        }
+        this.$message({
+          message: "新增广告成功！",
+          type: "success",
+        });
+        this.dialogFormVisible = false;
+        this.getList();
+      });
+    },
+
     // 编辑按钮
     handleEdit(row) {
       console.log("row", row);
+
       this.editForm = { ...row };
-      console.log("editForm", this.editForm);
+      this.adslotGroup.forEach((item) => {
+        if (item.cityId === row.cityId) {
+          this.editForm.cityName = item.cityName;
+          // this.editForm.cityId = item.cityId;
+        }
+      });
+      if (row.type === "activity") {
+        this.getActivitiePageFn();
+      }
+      // console.log("editForm", this.editForm);
+
       this.dialogEditFormVisible = true;
-      this.imageUrl = this.form.imageUrl;
+
+      this.imageUrl = this.editForm.imageUrl;
+    },
+
+    // 监听广告类型变化
+    typeChange(val) {
+      if (val === "activity") {
+        this.getActivitiePageFn();
+      }
     },
 
     // 广告编辑 提交
-    editSubmit() {},
+    editSubmit() {
+      updateAd(this.editForm).then((res) => {
+        console.log("submit edit", res);
+        if (res.data.code !== 0) {
+          return this.$message.error("广告编辑失败！");
+        }
+        this.$message({
+          message: "广告编辑成功！",
+          type: "success",
+        });
+        this.dialogEditFormVisible = false;
+        this.getList();
+      });
+    },
 
     // 删除
     handleDelete(row) {
@@ -487,14 +583,11 @@ export default {
     // 广告新增 提交
     submit() {
       this.$refs.ruleForm.validate((valid) => {
-        // if (valid) {
-        //   console.log(this.form);
-        // } else {
-        // }
         if (!valid) {
           return this.$message.error("请填写必填信息！");
         }
         console.log(this.form);
+        this.addAdFn();
       });
     },
 
@@ -504,11 +597,19 @@ export default {
       this.imageUrl = res.data.data.url;
       this.form.imageUrl = res.data.data.url;
     },
+
+    //编辑图片上传成功时的钩子
+    handleEditPicSuccess(res) {
+      console.log("编辑上传成功", res);
+      this.imageUrl = res.data.data.url;
+      this.editForm.imageUrl = res.data.data.url;
+    },
   },
 
   created() {
     this.getList();
     this.getAdPosition();
+    this.getDictByTypeFn();
   },
 };
 </script>
