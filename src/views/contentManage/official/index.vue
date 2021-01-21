@@ -7,11 +7,17 @@
 
       <div class="add-inp-more">
         <!-- 新建按钮 -->
-        <el-button @click="toCreate" type="primary" class="el-icon-plus">
+        <el-button
+          size="mini"
+          @click="toCreate"
+          type="primary"
+          class="el-icon-plus"
+        >
           新建</el-button
         >
         <div class="inp-more">
           <el-input
+            size="mini"
             class="inp"
             placeholder="请输入"
             suffix-icon="el-icon-search"
@@ -23,7 +29,13 @@
       </div>
 
       <!-- 表格 -->
-      <el-table :data="tableData" style="width: 100%">
+      <el-table
+        :data="tableData"
+        border
+        stripe
+        :header-cell-style="{ background: '#FAFAFA' }"
+        style="width: 100%"
+      >
         <el-table-column prop="officialNewsName" label="名称">
         </el-table-column>
         <el-table-column
@@ -37,7 +49,8 @@
           width="180"
         ></el-table-column>
         <el-table-column prop="createTime" label="创建时间"></el-table-column>
-        <el-table-column label="展示范围" width="180">
+        <!-- 平台可见 -->
+        <el-table-column label="展示范围" width="180" v-if="isAdmin">
           <template slot-scope="scope">
             <span @click="check(scope.row.officialNewsId)" class="isClick"
               >查看</span
@@ -46,24 +59,24 @@
         </el-table-column>
         <el-table-column label="操作">
           <template slot-scope="scope">
-            <el-button
+            <!-- <el-button
               @click="handleDetails(scope.row)"
               type="text"
               size="small"
               >详情</el-button
-            >
+            > -->
             <el-button @click="handleEdit(scope.row)" type="text" size="small"
               >编辑</el-button
             >
             <el-button @click="handleDel(scope.row)" type="text" size="small"
               >删除</el-button
             >
-            <el-button
+            <!-- <el-button
               @click="handleCopylink(scope.row)"
               type="text"
               size="small"
               >复制链接</el-button
-            >
+            > -->
           </template>
         </el-table-column>
       </el-table>
@@ -85,10 +98,11 @@
       </el-dialog>
 
       <el-pagination
+        background
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         :current-page="currentPage"
-        :page-sizes="[2, 5, 10, 15]"
+        :page-sizes="[10, 20, 30, 40, 50, 100]"
         :page-size="pageSize"
         :total="total"
         class="paging"
@@ -123,8 +137,8 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <!-- 发布城市 -->
-            <el-form-item label="发布城市">
+            <!-- 发布城市 平台可见 -->
+            <el-form-item label="发布城市" v-if="isAdmin">
               <hc-city-select v-model="addform.cityIdList"></hc-city-select>
             </el-form-item>
           </el-col>
@@ -150,21 +164,19 @@
             <el-radio
               v-for="(item, index) in dicList.NEWS_IMAGE_SIZE_TYPE"
               :key="index"
-              label="0"
-              >16:9</el-radio
+              :label="item.value"
+              >{{ item.label }}</el-radio
             >
-            <!-- <el-radio label="1">4:3</el-radio> -->
           </el-radio-group>
         </el-form-item>
 
         <!-- 详情 -->
         <el-form-item label="详情">
-          <!-- <el-input v-model="addform.officialNewsContent"></el-input> -->
           <hc-quill v-model="quillContent"></hc-quill>
         </el-form-item>
 
         <!-- 是否允许城市停用 -->
-        <!-- <el-form-item label="是否允许城市停用" label-width="140px">
+        <el-form-item label="是否允许城市停用" label-width="140px">
           <el-switch
             v-model="addform.closeAllowed"
             active-value="0"
@@ -172,7 +184,7 @@
             inactive-text="不允许"
             inactive-value="1"
           ></el-switch>
-        </el-form-item> -->
+        </el-form-item>
 
         <!-- 事件按钮 -->
         <el-form-item>
@@ -186,7 +198,6 @@
 </template>
 
 <script>
-// import Quill from "quill";
 import {
   officialReleaseList,
   officaialNewsCreate,
@@ -220,11 +231,9 @@ export default {
         cityIdList: [],
       },
       currentPage: 1,
-      pageSize: 5,
+      pageSize: 20,
       total: 0,
-      currentPage: 1,
-      pageSize: 5,
-
+      // 预览的图片数组
       fileList: [],
       urlList: [], //图片墙数组
       quillContent: {
@@ -239,6 +248,7 @@ export default {
       initCityList: [],
       tagList: [],
       allCity: [],
+      publishType: "",
     };
   },
   methods: {
@@ -260,13 +270,17 @@ export default {
         cityIdList: [1],
       };
       this.isShow = false;
+      this.publishType = "add";
     },
     // 获取官方发布列表
     getOfficialReleaseList() {
+      if (this.isAdmin) {
+        this.addform.source = 1;
+      }
       officialReleaseList({
         current: this.currentPage,
         size: this.pageSize,
-        source: this.source, //1平台，2城市
+        source: this.addform.source, //1平台，2城市
       }).then((res) => {
         console.log("官方发布列表", res);
         this.total = res.data.data.data.total;
@@ -298,9 +312,9 @@ export default {
       this.cityViewDialogVisible = true;
     },
     // 详情
-    handleDetails(row) {
-      console.log("详情", row);
-    },
+    // handleDetails(row) {
+    //   console.log("详情", row);
+    // },
     // 编辑
     handleEdit(row) {
       console.log("编辑", row);
@@ -316,10 +330,22 @@ export default {
         this.isShow = false;
         console.log("addform", this.addform);
       });
+      row.urlList.forEach((item, index) => {
+        this.fileList.push({
+          name: index,
+          url: item,
+        });
+      });
+      this.addform.urlList = this.fileList;
+      this.publishType = "edit";
     },
     // 删除
     handleDel(row) {
       console.log("删除", row);
+      // if (!this.isAdmin) {
+      //   this.formData.cityIdList = [this.userInfor.manageCityId];
+      // }
+
       officialDel({
         officialNewsId: row.officialNewsId,
         cityId: this.userInfo.manageCityId,
@@ -332,12 +358,13 @@ export default {
           message: "删除成功！",
           type: "success",
         });
+        this.getOfficialReleaseList();
       });
     },
     // 复制链接
-    handleCopylink(row) {
-      console.log("复制链接", row);
-    },
+    // handleCopylink(row) {
+    //   console.log("复制链接", row);
+    // },
     handleSizeChange(val) {
       this.pageSize = val;
       this.getOfficialReleaseList();
@@ -363,7 +390,6 @@ export default {
         newsUrl: res.data.data.url,
         imageSizeType: "1",
       });
-      // console.log(this.urlList);
       this.addform.urlList = this.urlList;
     },
     // 预览
@@ -372,22 +398,27 @@ export default {
     handleDraft() {},
     // 直接发布
     handleCreate() {
-      // console.log(this.quillContent);
       let addform = this.addform;
       addform.officialNewsContent = this.quillContent.content;
       addform.structuredContent = this.quillContent.structuredContent;
       console.log("addform", addform);
 
-      // officaialNewsCreate(addform).then((res) => {
-      //   // console.log("直接发布", res);
-      //   if (res.data.code !== 0) {
-      //     return this.$message.error("发布失败");
-      //   }
-      //   this.$message({
-      //     message: "发布成功！",
-      //     type: "success",
-      //   });
-      // });
+      if (this.publishType == "add") {
+        officaialNewsCreate(addform).then((res) => {
+          // console.log("直接发布", res);
+          if (res.data.code !== 0) {
+            return this.$message.error("发布失败");
+          }
+          this.$message({
+            message: "发布成功！",
+            type: "success",
+          });
+          this.getOfficialReleaseList();
+          this.isShow = true;
+        });
+      } else {
+        console.log(this.addform);
+      }
     },
     // 栏目
     getCityColumn() {
@@ -404,9 +435,9 @@ export default {
   },
   computed: {
     ...mapGetters(["userInfo", "dicList"]),
-    // 是否是平台  //1平台，2城市
-    source() {
-      if (this.userInfo.userType == 3 || this.userInfo.userType == 4) return 1;
+    // 3/4平台
+    isAdmin() {
+      return this.userInfo.userType == 3 || this.userInfo.userType == 4;
     },
   },
   created() {
@@ -414,22 +445,10 @@ export default {
     this.getCityColumn();
     this.init();
     console.log("userInfo", this.userInfo);
-    console.log("source", this.source);
+    console.log("isAdmin", this.isAdmin);
     console.log("dicList", this.dicList);
+    console.log("source", this.addform.source);
   },
-
-  // mounted() {
-  //   var options = {
-  //     debug: "info",
-  //     modules: {
-  //       toolbar: "#toolbar",
-  //     },
-  //     placeholder: "Compose an epic...",
-  //     readOnly: true,
-  //     theme: "snow",
-  //   };
-  //   var editor = new Quill("#editor");
-  // },
 };
 </script>
 
