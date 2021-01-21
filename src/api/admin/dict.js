@@ -10,7 +10,7 @@ export function fetchList(query) {
 
 export function fetchItemList(query) {
   return request({
-    url: '/admin/sysDictItem/page',
+    url: '/admin/sys_dict_item/page',
     method: 'get',
     params: query
   })
@@ -18,29 +18,22 @@ export function fetchItemList(query) {
 
 export function addItemObj(obj) {
   return request({
-    url: '/admin/dict/item',
+    url: '/admin/dict/save_dict_item',
     method: 'post',
     data: obj
   })
 }
 
-export function getItemObj(id) {
-  return request({
-    url: '/admin/dict/item/' + id,
-    method: 'get'
-  })
-}
-
 export function delItemObj(id) {
   return request({
-    url: '/admin/dict/removeDictItem/' + id,
+    url: '/admin/dict/remove_dict_item/' + id,
     method: 'post'
   })
 }
 
 export function putItemObj(obj) {
   return request({
-    url: '/admin/dict/updateDictItem',
+    url: '/admin/dict/update_dict_item',
     method: 'post',
     data: obj
   })
@@ -48,7 +41,7 @@ export function putItemObj(obj) {
 
 export function addObj(obj) {
   return request({
-    url: '/admin/dict/',
+    url: '/admin/dict/save_dict',
     method: 'post',
     data: obj
   })
@@ -63,15 +56,15 @@ export function getObj(id) {
 
 export function delObj(row) {
   return request({
-    url: '/admin/dict/' + row.id,
-    method: 'delete'
+    url: '/admin/dict/remove_dict/' + row.id,
+    method: 'post'
   })
 }
 
 export function putObj(obj) {
   return request({
-    url: '/admin/dict/',
-    method: 'put',
+    url: '/admin/dict/update_dict',
+    method: 'post',
     data: obj
   })
 }

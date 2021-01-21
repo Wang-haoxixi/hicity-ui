@@ -12,12 +12,23 @@ export const tableOption = (admin = false) => {
     },
     {
       label: '发布者',
-      prop: 'createBy',
+      prop: 'createByName',
     },
     {
       label: '状态',
       prop: 'state',
-      width: 90
+      width: 90,
+      formatter: function (data) {
+        if (data == 0) {
+          return '草稿'
+        } else if (data.state == 1) {
+          return '已生效'
+        } else if (data.state == 2) {
+          return '已失效'
+        } else {
+          return ''
+        }
+      }
     },
     {
       label: '创建时间',

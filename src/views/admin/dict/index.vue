@@ -73,7 +73,7 @@ export default {
       },
       tableLoading: false,
       tableOption: tableOption,
-      tableDictItemOption: tableDictItemOption
+      tableDictItemOption: tableDictItemOption,
     }
   },
   created() {
@@ -105,7 +105,7 @@ export default {
 
     getDictItemList(dictId, type) {
       this.dictType = type
-      this.dictId = dictId
+      // this.dictId = dictId
       this.dialogFormVisible = true
       this.tableLoading = true
       fetchItemList(Object.assign({
@@ -168,7 +168,7 @@ export default {
           message: '添加成功',
           type: 'success'
         })
-        this.getDictItemList(row.dictId, row.type)
+        this.getDictItemList(this.dictId, row.type)
         done()
       })
     },
@@ -179,7 +179,7 @@ export default {
           message: '修改成功',
           type: 'success'
         })
-        this.getDictItemList(row.dictId, row.type)
+        this.getDictItemList(this.dictId, row.type)
         done()
       })
     },
@@ -188,6 +188,7 @@ export default {
       this.getList(this.page, form)
     },
     handleItem: function(row) {
+      this.dictId = row.id
       this.getDictItemList(row.id, row.type)
     },
     rowItemDel: function(row) {
@@ -199,7 +200,7 @@ export default {
       }).then(function() {
         return delItemObj(row.id)
       }).then(() => {
-        this.getDictItemList(row.dictId, row.type)
+        this.getDictItemList(this.dictId, row.type)
         _this.$message({
           showClose: true,
           message: '删除成功',

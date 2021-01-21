@@ -20,7 +20,7 @@
           </el-button>
         </template>
         <template slot="tagList" slot-scope="scope">
-          <el-button type="text" size="mini" @click="tagView(scope.row.newsId)">查看</el-button>
+          <el-button type="text" size="mini" @click="tagView(scope.row)">查看</el-button>
         </template>
         <template slot="cityList" slot-scope="scope">
           <el-button type="text" size="mini" @click="cityView(scope.row.newsId)">查看</el-button>
@@ -28,10 +28,10 @@
         <template
           slot="menu"
           slot-scope="scope">
-          <el-button
+          <!-- <el-button
             v-if="!isAdmin && scope.row.closeAllowed == '0'"
             type="text" size="mini"
-            @click="handleStart(scope.row)">{{scope.row.havEnable ? '启用' : '停用'}}</el-button>
+            @click="handleStart(scope.row)">{{scope.row.havEnable ? '启用' : '停用'}}</el-button> -->
           <template v-if="isAdmin || !isAdmin && scope.row.source == 2">
             <el-button
               type="text" size="mini"
@@ -44,7 +44,10 @@
       </avue-crud>
 
       <div v-if="publish">
-        <div class="form-title">城市新闻-</div>
+        <div class="form-title">
+          <div class="form-title-name">城市新闻-{{publishType == 'add' ? '新增' : publishType == 'edit' ? '编辑' : ''}}</div>
+          <el-button @click="publish = false">返 回</el-button>
+        </div>
         <el-form ref="form" class="dialog-main-tree" :model="formData" label-width="180px">
           <el-form-item label="名称：">
             <el-input v-model="formData.title"></el-input>
@@ -59,14 +62,20 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="发布城市：">
+          <el-form-item v-if="isAdmin" label="发布城市：">
             <!-- <el-select style="width: 100%" v-model="formData.cityIdList" multiple filterable  placeholder="请选择城市" @change="cityChange">
               <el-option v-for="city in allCity" :key="city.id" :label="city.regionName" :value="city.id"></el-option>
             </el-select> -->
             <hc-city-select v-model="formData.cityIdList"></hc-city-select>
           </el-form-item>
           <el-form-item label="标题图：">
-            <el-input v-model="formData.password"></el-input>
+            <hc-image-upload v-model="titleImage" :limit="50"></hc-image-upload>
+          </el-form-item>
+          <el-form-item label="图片展示比例：">
+            <el-radio-group v-model="formData.imageSizeType">
+              <el-radio v-for="size in dicList['NEWS_IMAGE_SIZE_TYPE']" :key="size.id" :label="size.value">{{size.label}}</el-radio>
+            </el-radio-group>
+
           </el-form-item>
           <el-form-item label="详情：">
             <!-- <el-input type="textarea" v-model="quillContent.content"></el-input>
@@ -94,25 +103,35 @@
         <el-button @click="cityViewDialogVisible = false">取 消</el-button>
       </div>
     </el-dialog>
-    
 
+    <el-dialog
+      title="关联标签"
+      :visible.sync="tagViewDialogVisible"
+      width="70%">
+      <div class="tag-list">
+        <div v-for="tag in newsTagList" :key="tag.lableId" class="tag-list-item">{{tag.lable}}</div>
+      </div>
+      <div slot="footer">
+        <el-button @click="tagViewDialogVisible = false">取 消</el-button>
+      </div>
+    </el-dialog>
   </div>
-
 </template>
 
 <script>
 import { tableOption } from './const'
 import { mapGetters } from 'vuex'
-import { getNewsList, addNews, getNewsDetail, updateNews, newsOpenList } from '@/api/cms/news'
+import { getNewsList, addNews, getNewsDetail, updateNews, newsOpenList, deleteNews, newsEnable } from '@/api/cms/news'
 import { getAllTagList } from '@/api/tms/city'
 import { adminCityList } from '@/api/admin/city'
 import HcQuill from '@/views/components/HcQuill'
 import HcCityBox from '@/views/components/HcCityBox/index'
 import HcCitySelect from '@/views/components/HcCitySelect/index'
+import HcImageUpload from '@/views/components/HcImageUpload/index'
 
 export default {
   name: 'SysUser',
-  components: { HcQuill, HcCityBox, HcCitySelect },
+  components: { HcQuill, HcCityBox, HcCitySelect, HcImageUpload },
   data() {
     return {
       page: {
@@ -137,10 +156,13 @@ export default {
         structuredContent: ''
       },
       cityChooseDialogVisible: false,
+      newsTagList: [],
+      tagViewDialogVisible: false,
+      titleImage: [],
     }
   },
   computed: {
-    ...mapGetters(['permissions', 'userInfo']),
+    ...mapGetters(['permissions', 'userInfo', 'dicList']),
     tableOption() {
       return tableOption(this.isAdmin)
     },
@@ -152,18 +174,8 @@ export default {
   },
   created() {
     this.init()
-    console.log(this.userInfo)
   },
   methods: {
-    // cityChange (data) {
-    //   if (data[data.length - 1] == 1) {
-    //     console.log(123)
-    //     this.formData.cityIdList = [1]
-    //   } else if (data.includes(1)) {
-    //     this.formData.cityIdList.splice(data.indexOf(1), 1)
-    //   }
-    //   console.log(data)
-    // },
     init () {
       getAllTagList({cityId: this.userInfo.manageCityId}).then(({data}) => {
         this.tagList = data.data.data
@@ -178,11 +190,14 @@ export default {
     },
     getList(page = this.page, params) {
       this.tableLoading = true
-      getNewsList({
+      let form = {
         current: page.currentPage,
         size: page.pageSize,
-      }).then(({data}) => {
-        console.log(data)
+      }
+      if (this.isAdmin) {
+        form.source = 1
+      }
+      getNewsList(form).then(({data}) => {
         this.tableData = data.data.data.records
         this.page.total = data.data.data.total
       }).finally(() => {
@@ -191,16 +206,26 @@ export default {
     },
     toCreate () {
       this.formData = {
-        cityIdList: [1]
+        cityIdList: []
+      }
+      if (!this.isAdmin) {
+        this.formData.cityIdList = [this.userInfor.manageCityId]
       }
       this.publish = true
       this.publishType = 'add'
     },
     handleCreate() {
-      console.log(this.quillContent)
       let formData = this.formData
       formData.content = this.quillContent.content
       formData.structuredContent = this.quillContent.structuredContent
+      let titleImage = []
+      for (let i = 0; i < this.titleImage.length; i++) {
+        titleImage.push({
+          type: 'image',
+          newsUrl: this.titleImage[i]
+        })
+      }
+      formData.urlList = titleImage
       if (this.publishType == 'add') {
         addNews({...formData, state: 1}).then(({data}) => {
           this.publish = false
@@ -210,6 +235,7 @@ export default {
             type: 'success',
             duration: 2000
           })
+          this.getList()
         })
       } else {
         updateNews({...formData, state: 1}).then(({data}) => {
@@ -220,17 +246,25 @@ export default {
             type: 'success',
             duration: 2000
           })
+          this.getList()
         })
       }
     },
     toUpdate ({newsId}) {
       getNewsDetail({newsId}).then(({data}) => {
-        console.log(data)
         this.formData = data.data.data
         this.quillContent = {
           content: data.data.data.content,
           structuredContent: data.data.data.structuredContent
         }
+        let urlList = data.data.data.newsUrlList
+        let titleImage = []
+        for (let i = 0; i < urlList.length; i++) {
+          if (urlList[i].type == 'image') {
+            titleImage.push(urlList[i].newsUrl)
+          }
+        }
+        this.titleImage = titleImage
         this.publish = true
         this.publishType = 'edit'
       })
@@ -243,6 +277,41 @@ export default {
     },
     preview () {
 
+    },
+    toDelete ({newsId}) {
+      this.$confirm('是否确认删除该条咨询?', '警告', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deleteNews({
+          newsId,
+          cityId: this.userInfo.manageCityId
+        }).then(({data}) => {
+          this.publish = false
+          this.$notify({
+            title: '成功',
+            message: '发布成功',
+            type: 'success',
+            duration: 2000
+          })
+          this.getList()
+        })
+      }).catch(function() {
+      })
+    },
+    handleStart (row) {
+      let havEnable = row.havEnable ? 0 : 1
+      newsEnable({
+        newsId: row.newsId,
+        havEnable,
+        cityId: this.userInfo.manageCityId
+      }).then(({data}) => {
+        if (data.code === 0) {
+          this.$message.success('操作成功')
+          this.getList()
+        }
+      })
     },
     handleRefreshChange() {
       this.getList(this.page)
@@ -266,6 +335,10 @@ export default {
         this.cityViewDialogVisible = true
       })
     },
+    tagView (row) {
+      this.newsTagList = row.lableList
+      this.tagViewDialogVisible = true
+    }
   }
 }
 </script>
@@ -282,6 +355,33 @@ export default {
       .el-card__body {
         padding-top: 0;
       }
+    }
+  }
+  .tag-list {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    .tag-list-item {
+      margin-bottom: 10px;
+      height: 30px;
+      line-height: 30px;
+      padding: 0 15px;
+      border: 1px solid #E9E9E9;
+      border-radius: 4px;
+      margin-right: 20px;
+    }
+  }
+
+  .form-title {
+    height: 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 20px;
+    .form-title-name {
+      height: 60px;
+      line-height: 60px;
+      font-size: 20px;
     }
   }
 </style>

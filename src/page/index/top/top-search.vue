@@ -55,11 +55,13 @@ export default {
   methods: {
     getMenuList() {
       const findMenu = list => {
-        for (let i = 0; i < list.length; i++) {
-          const ele = Object.assign({}, list[i])
-          if (ele[this.childrenKey]) findMenu(ele[this.childrenKey])
-          delete ele[this.childrenKey]
-          this.menuList.push(ele)
+        if (list) {
+          for (let i = 0; i < list.length; i++) {
+            const ele = Object.assign({}, list[i])
+            if (ele[this.childrenKey]) findMenu(ele[this.childrenKey])
+            delete ele[this.childrenKey]
+            this.menuList.push(ele)
+          }
         }
       }
       this.menuList = []

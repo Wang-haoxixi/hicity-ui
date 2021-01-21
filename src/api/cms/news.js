@@ -41,3 +41,21 @@ export function newsOpenList(params) {
     params
   })
 }
+
+// 删除咨询
+export function deleteNews(data) {
+  return new request({
+    url: '/cms/news/delete',
+    method: 'post',
+    data
+  })
+}
+
+// 咨询启停
+export function newsEnable (data) {
+  return request({
+    url: '/cms/news/enable_stop',
+    method: 'post',
+    data
+  })
+}
