@@ -74,7 +74,7 @@ export const logout = () => {
 //获取全部字典
 export const getDicList = () => {
   return request({
-    url: '/admin/dict/allMap',
+    url: '/admin/dict/all_map',
     method: 'get',
   })
 }
