@@ -7,7 +7,7 @@
 
       <div class="add-inp-more">
         <!-- 新建按钮 -->
-        <el-button @click="isShow = false" type="primary" class="el-icon-plus">
+        <el-button @click="toCreate" type="primary" class="el-icon-plus">
           新建</el-button
         >
         <div class="inp-more">
@@ -39,7 +39,9 @@
         <el-table-column prop="createTime" label="创建时间"></el-table-column>
         <el-table-column label="展示范围" width="180">
           <template slot-scope="scope">
-            <span @click="check(scope.row)" class="isClick">查看</span>
+            <span @click="check(scope.row.officialNewsId)" class="isClick"
+              >查看</span
+            >
           </template>
         </el-table-column>
         <el-table-column label="操作">
@@ -66,6 +68,22 @@
         </el-table-column>
       </el-table>
 
+      <!-- 展示城市 -->
+      <el-dialog
+        title="展示城市"
+        :visible.sync="cityViewDialogVisible"
+        width="70%"
+      >
+        <hc-city-box
+          view-only
+          :init-city-list="initCityList"
+          :all-city-list="allCityList"
+        ></hc-city-box>
+        <div slot="footer">
+          <el-button @click="cityViewDialogVisible = false">取 消</el-button>
+        </div>
+      </el-dialog>
+
       <el-pagination
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
@@ -80,10 +98,7 @@
 
     <!-- 官方发布 - 新增 -->
     <basic-container v-else>
-      <div class="title">
-        官方发布 - 新增
-        <el-button @click="isShow = true">返回</el-button>
-      </div>
+      <div class="title">官方发布 - 新增</div>
       <el-form ref="addformRef" :model="addform" label-width="80px">
         <!-- 名称 -->
         <el-form-item label="名称">
@@ -98,20 +113,18 @@
                 v-model="addform.officialColumnId"
                 placeholder="请选择"
               >
-                <el-option label="公告" value="0"></el-option>
-                <el-option label="咨询" value="1"></el-option>
-                <el-option label="活动" value="2"></el-option>
+                <el-option
+                  v-for="(item, index) in columnData"
+                  :key="index"
+                  :label="item.officialColumnName"
+                  :value="item.officialColumnId"
+                ></el-option>
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <!-- 发布城市 -->
             <el-form-item label="发布城市">
-              <!-- <el-select v-model="addform.cityIdList" placeholder="请选择">
-                <el-option label="公告" value="0"></el-option>
-                <el-option label="咨询" value="1"></el-option>
-                <el-option label="活动" value="2"></el-option>
-              </el-select> -->
               <hc-city-select v-model="addform.cityIdList"></hc-city-select>
             </el-form-item>
           </el-col>
@@ -131,6 +144,19 @@
           </el-upload>
         </el-form-item>
 
+        <!-- 图片展示比例 -->
+        <el-form-item label="图片展示比例" label-width="100px">
+          <el-radio-group v-model="addform.imageSizeType">
+            <el-radio
+              v-for="(item, index) in dicList.NEWS_IMAGE_SIZE_TYPE"
+              :key="index"
+              label="0"
+              >16:9</el-radio
+            >
+            <!-- <el-radio label="1">4:3</el-radio> -->
+          </el-radio-group>
+        </el-form-item>
+
         <!-- 详情 -->
         <el-form-item label="详情">
           <!-- <el-input v-model="addform.officialNewsContent"></el-input> -->
@@ -138,15 +164,15 @@
         </el-form-item>
 
         <!-- 是否允许城市停用 -->
-        <el-form-item v-if="isAdmin" label="是否允许城市停用：">
+        <!-- <el-form-item label="是否允许城市停用" label-width="140px">
           <el-switch
-            v-model="formData.closeAllowed"
+            v-model="addform.closeAllowed"
             active-value="0"
             active-text="允许"
             inactive-text="不允许"
             inactive-value="1"
           ></el-switch>
-        </el-form-item>
+        </el-form-item> -->
 
         <!-- 事件按钮 -->
         <el-form-item>
@@ -164,17 +190,23 @@
 import {
   officialReleaseList,
   officaialNewsCreate,
+  cityColumn,
+  checkCity,
+  officialDetail,
+  officialDel,
 } from "@/api/officialRelease/officialRelease.js";
 import HcQuill from "@/views/components/HcQuill";
 import HcCityBox from "@/views/components/HcCityBox/index";
 import HcCitySelect from "@/views/components/HcCitySelect/index";
 import { mapGetters } from "vuex";
 import store from "@/store";
+import { getAllTagList } from "@/api/tms/city";
+import { adminCityList } from "@/api/admin/city";
 export default {
   components: { HcQuill, HcCityBox, HcCitySelect },
   data() {
     return {
-      isShow: false, //是否显示咨询列表
+      isShow: true, //是否显示咨询列表
       uploadPicUrl: "/api/admin/sys-file/oss/upload",
       headersOpt: {
         Authorization: "Bearer " + store.getters.access_token,
@@ -184,10 +216,14 @@ export default {
       // 发布列表
       tableData: [],
       // 官方发布 - 新增
-      addform: {},
+      addform: {
+        cityIdList: [],
+      },
       currentPage: 1,
       pageSize: 5,
-      total: 30,
+      total: 0,
+      currentPage: 1,
+      pageSize: 5,
 
       fileList: [],
       urlList: [], //图片墙数组
@@ -195,22 +231,71 @@ export default {
         content: "",
         structuredContent: "",
       },
+      // 栏目数据
+      columnData: [],
+      cityViewDialogVisible: false, //展示城市弹窗
+      cityList: [],
+      allCityList: [],
+      initCityList: [],
+      tagList: [],
+      allCity: [],
     };
   },
   methods: {
+    init() {
+      getAllTagList({ cityId: this.userInfo.manageCityId }).then(({ data }) => {
+        this.tagList = data.data.data;
+      });
+      adminCityList().then(({ data }) => {
+        this.allCity = data.data.data;
+        this.allCity.unshift({
+          id: 1,
+          regionName: "全国",
+        });
+      });
+    },
+    // 新建
+    toCreate() {
+      this.addform = {
+        cityIdList: [1],
+      };
+      this.isShow = false;
+    },
     // 获取官方发布列表
     getOfficialReleaseList() {
       officialReleaseList({
         current: this.currentPage,
         size: this.pageSize,
+        source: this.source, //1平台，2城市
       }).then((res) => {
         console.log("官方发布列表", res);
+        this.total = res.data.data.data.total;
         this.tableData = res.data.data.data.records;
       });
     },
     // 查看
-    check(row) {
-      console.log("查看", row);
+    check(id) {
+      console.log("查看", id);
+      checkCity({
+        officialNewsId: id,
+      }).then((res) => {
+        console.log("res", res);
+        let cityList = res.data.data.data;
+        let allCityList = [];
+        let initCityList = [];
+        for (let i = 0; i < cityList.length; i++) {
+          allCityList.push({
+            cityId: cityList[i].cityId,
+            cityName: cityList[i].cityName,
+          });
+          if (cityList[i].isOpening) {
+            initCityList.push(cityList[i].cityId);
+          }
+        }
+        this.initCityList = initCityList;
+        this.allCityList = allCityList;
+      });
+      this.cityViewDialogVisible = true;
     },
     // 详情
     handleDetails(row) {
@@ -219,17 +304,48 @@ export default {
     // 编辑
     handleEdit(row) {
       console.log("编辑", row);
+      officialDetail({
+        officialNewsId: row.officialNewsId,
+      }).then((res) => {
+        console.log(res);
+        this.addform = res.data.data.data;
+        this.quillContent = {
+          content: res.data.data.data.officialNewsContent,
+          structuredContent: res.data.data.data.structuredContent,
+        };
+        this.isShow = false;
+        console.log("addform", this.addform);
+      });
     },
     // 删除
     handleDel(row) {
       console.log("删除", row);
+      officialDel({
+        officialNewsId: row.officialNewsId,
+        cityId: this.userInfo.manageCityId,
+      }).then((res) => {
+        console.log(res);
+        if (res.data.code !== 0) {
+          return this.$message.error("删除失败！");
+        }
+        this.$message({
+          message: "删除成功！",
+          type: "success",
+        });
+      });
     },
     // 复制链接
     handleCopylink(row) {
       console.log("复制链接", row);
     },
-    handleSizeChange(val) {},
-    handleCurrentChange(val) {},
+    handleSizeChange(val) {
+      this.pageSize = val;
+      this.getOfficialReleaseList();
+    },
+    handleCurrentChange(val) {
+      this.currentPage = val;
+      this.getOfficialReleaseList();
+    },
     // 保存
     save() {
       console.log("新增数据", this.addform);
@@ -242,19 +358,64 @@ export default {
     // 图片上传成功的钩子
     handlePicSuccess(res) {
       console.log("图片上传成功的钩子", res);
+      this.urlList.push({
+        type: "image",
+        newsUrl: res.data.data.url,
+        imageSizeType: "1",
+      });
+      // console.log(this.urlList);
+      this.addform.urlList = this.urlList;
     },
     // 预览
     preview() {},
     // 保存草稿
     handleDraft() {},
     // 直接发布
-    handleCreate() {},
+    handleCreate() {
+      // console.log(this.quillContent);
+      let addform = this.addform;
+      addform.officialNewsContent = this.quillContent.content;
+      addform.structuredContent = this.quillContent.structuredContent;
+      console.log("addform", addform);
+
+      // officaialNewsCreate(addform).then((res) => {
+      //   // console.log("直接发布", res);
+      //   if (res.data.code !== 0) {
+      //     return this.$message.error("发布失败");
+      //   }
+      //   this.$message({
+      //     message: "发布成功！",
+      //     type: "success",
+      //   });
+      // });
+    },
+    // 栏目
+    getCityColumn() {
+      cityColumn({
+        cityId: this.userInfo.manageCityId,
+      }).then((res) => {
+        if (res.data.code !== 0) {
+          return this.$message.error("获取栏目失败！");
+        }
+        this.columnData = res.data.data.data;
+        console.log("栏目", this.columnData);
+      });
+    },
   },
   computed: {
-    ...mapGetters(["userInfo"]),
+    ...mapGetters(["userInfo", "dicList"]),
+    // 是否是平台  //1平台，2城市
+    source() {
+      if (this.userInfo.userType == 3 || this.userInfo.userType == 4) return 1;
+    },
   },
   created() {
     this.getOfficialReleaseList();
+    this.getCityColumn();
+    this.init();
+    console.log("userInfo", this.userInfo);
+    console.log("source", this.source);
+    console.log("dicList", this.dicList);
   },
 
   // mounted() {

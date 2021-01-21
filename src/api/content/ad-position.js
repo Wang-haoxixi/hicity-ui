@@ -11,7 +11,7 @@ export function citys(data) {
 // 分页查询广告位
 export function adPosition(query) {
   return request({
-    url: "/ims/info_adslot/page",
+    url: "/cms/info_adslot/page",
     method: "get",
     params: query
   });
@@ -20,7 +20,7 @@ export function adPosition(query) {
 // 添加广告位
 export function addAdPosition(obj) {
   return request({
-    url: "/ims/info_adslot/create",
+    url: "/cms/info_adslot/create",
     method: "post",
     data: obj
   });
@@ -29,7 +29,7 @@ export function addAdPosition(obj) {
 // 更新广告位
 export function editPlace(data) {
   return request({
-    url: "/ims/info_adslot/update",
+    url: "/cms/info_adslot/update",
     method: "post",
     data: data
   });
@@ -38,7 +38,7 @@ export function editPlace(data) {
 // 删除广告位
 export function delAdP(data) {
   return request({
-    url: "/ims/info_adslot/delete/" + data,
+    url: "/cms/info_adslot/delete/" + data,
     method: "post"
   });
 }

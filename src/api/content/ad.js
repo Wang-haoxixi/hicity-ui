@@ -3,7 +3,7 @@ import request from "@/router/axios";
 // 分页查询广告
 export function ads(data) {
   return request({
-    url: "/ims/info_ad/page",
+    url: "/cms/info_ad/page",
     method: "get",
     params: data
   });
@@ -12,7 +12,7 @@ export function ads(data) {
 // 删除广告
 export function delAd(data) {
   return request({
-    url: "/ims/info_ad/delete/" + data,
+    url: "/cms/info_ad/delete/" + data,
     method: "post"
   });
 }
@@ -20,7 +20,7 @@ export function delAd(data) {
 // 查询广告详情
 export function adDetails(data) {
   return request({
-    url: "/ims/info_ad/" + data,
+    url: "/cms/info_ad/" + data,
     method: "get"
   });
 }
@@ -44,7 +44,7 @@ export function activitiePage(data) {
 // 添加广告
 export function addAd(data) {
   return request({
-    url: "/ims/info_ad/create",
+    url: "/cms/info_ad/create",
     method: "post",
     data: data
   });
@@ -53,7 +53,7 @@ export function addAd(data) {
 // 更新广告
 export function updateAd(data) {
   return request({
-    url: "/ims/info_ad/update",
+    url: "/cms/info_ad/update",
     method: "post",
     data: data
   });
