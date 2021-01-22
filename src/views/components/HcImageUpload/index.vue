@@ -48,19 +48,6 @@ export default {
     }
     this.fileList = fileList
   },
-  watch: {
-    value (val) {
-      if (!this.dataMatch(this.fileList, val)) {
-        let fileList = []
-        for (let i = 0; i < val.length; i++) {
-          fileList.push({
-            url: val[i]
-          })
-        }
-        this.fileList = fileList
-      }
-    },
-  },
   methods: {
     dataMatch (fileList, dataList) {
       if (fileList.length != dataList.length) {
@@ -102,26 +89,20 @@ export default {
         this.$emit("input", []);
       } else {
         const url = res.data.data.url;
-        const formatFile = {
-          url,
-        };
-        this.fileList.push(formatFile)
-        let data = []
-        for (let i = 0; i < this.fileList.length; i++) {
-          data.push(this.fileList[i].url)
-        }
-        this.$emit("input", data)
+        this.$emit("input", [...this.value, url])
         this.$message.success("上传成功");
       }
     },
-    handleRemove(file) {
-      const newData = this.fileList.filter(item => item.url !== file.url);
-      this.fileList = newData;
-      let data = []
-      for (let i = 0; i < this.fileList.length; i++) {
-        data.push(this.fileList[i].url)
+    handleRemove(res) {
+      let tempData = [...this.value]
+      let url = ''
+      if (res.response) {
+        url = res.response.data.data.url
+      } else {
+        url = res.url
       }
-      this.$emit("input", data)
+      tempData.splice(tempData.indexOf(url), 1)
+      this.$emit("input", tempData)
     },
     handleExceed(files, fileList) {
       this.$message.warning(
