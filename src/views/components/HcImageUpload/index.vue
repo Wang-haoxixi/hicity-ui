@@ -67,7 +67,7 @@ export default {
         return false
       } else {
         for (let i = 0; i < fileList.length; i++) {
-          if (!dataList.includes(fileList[i]).url) {
+          if (!dataList.includes(fileList[i].url)) {
             return false
           }
         }
@@ -121,6 +121,7 @@ export default {
       for (let i = 0; i < this.fileList.length; i++) {
         data.push(this.fileList[i].url)
       }
+      this.$emit("input", data)
     },
     handleExceed(files, fileList) {
       this.$message.warning(
