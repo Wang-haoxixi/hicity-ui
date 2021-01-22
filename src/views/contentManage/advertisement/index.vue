@@ -152,7 +152,14 @@
         </div>
       </el-dialog>
 
-      <el-table :data="tableData" style="width: 100%" ref="multipleTable">
+      <el-table
+        :data="tableData"
+        border
+        stripe
+        :header-cell-style="{ background: '#FAFAFA' }"
+        style="width: 100%;margin-top:10px"
+        ref="multipleTable"
+      >
         <el-table-column type="selection" width="55"></el-table-column>
         <el-table-column
           prop="adslotId"
@@ -189,10 +196,11 @@
       </el-table>
 
       <el-pagination
+        background
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         :current-page="currentPage"
-        :page-sizes="[2, 5, 10]"
+        :page-sizes="[10, 20, 30, 40, 50, 100]"
         :page-size="pageSize"
         :total="total"
         class="paging"
@@ -251,7 +259,7 @@ export default {
 
       currentPage: 1,
       pageSize: 5,
-      total: 30,
+      total: 0,
       cityGroup: [], //城市数组
     };
   },

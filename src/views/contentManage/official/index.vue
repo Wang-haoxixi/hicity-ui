@@ -43,14 +43,11 @@
           label="栏目"
         ></el-table-column>
         <el-table-column prop="createByName" label="发布者"></el-table-column>
-        <el-table-column
-          prop="state"
-          label="状态"
-          width="180"
-        ></el-table-column>
+        <el-table-column prop="state" label="状态" width="100">
+        </el-table-column>
         <el-table-column prop="createTime" label="创建时间"></el-table-column>
         <!-- 平台可见 -->
-        <el-table-column label="展示范围" width="180" v-if="isAdmin">
+        <el-table-column label="展示范围" width="80" v-if="isAdmin">
           <template slot-scope="scope">
             <span @click="check(scope.row.officialNewsId)" class="isClick"
               >查看</span
@@ -58,7 +55,10 @@
           </template>
         </el-table-column>
         <el-table-column label="操作">
-          <template slot-scope="scope">
+          <template
+            slot-scope="scope"
+            v-if="isAdmin || (!isAdmin && scope.row.source == 2)"
+          >
             <!-- <el-button
               @click="handleDetails(scope.row)"
               type="text"
@@ -205,6 +205,7 @@ import {
   checkCity,
   officialDetail,
   officialDel,
+  officaialNewsUpdate,
 } from "@/api/officialRelease/officialRelease.js";
 import HcQuill from "@/views/components/HcQuill";
 import HcCityBox from "@/views/components/HcCityBox/index";
@@ -282,6 +283,15 @@ export default {
         size: this.pageSize,
         source: this.addform.source, //1平台，2城市
       }).then((res) => {
+        res.data.data.data.records.forEach((item) => {
+          if (item.state === 0) {
+            item.state = "草稿状态";
+          } else if (item.state === 1) {
+            item.state = "已生效";
+          } else {
+            item.state = "已失效";
+          }
+        });
         console.log("官方发布列表", res);
         this.total = res.data.data.data.total;
         this.tableData = res.data.data.data.records;
@@ -321,7 +331,7 @@ export default {
       officialDetail({
         officialNewsId: row.officialNewsId,
       }).then((res) => {
-        console.log(res);
+        console.log("res", res);
         this.addform = res.data.data.data;
         this.quillContent = {
           content: res.data.data.data.officialNewsContent,
@@ -329,22 +339,27 @@ export default {
         };
         this.isShow = false;
         console.log("addform", this.addform);
-      });
-      row.urlList.forEach((item, index) => {
-        this.fileList.push({
-          name: index,
-          url: item,
+        this.urlList = [];
+        this.addform.urlList.forEach((item, index) => {
+          this.fileList.push({
+            name: index,
+            url: item,
+          });
+          this.urlList.push({
+            type: "image",
+            newsUrl: item,
+            imageSizeType: "1",
+          });
         });
+        console.log("urlList", this.urlList);
       });
-      this.addform.urlList = this.fileList;
+      // this.addform.urlList = this.fileList;
       this.publishType = "edit";
+      // console.log('this.addform.urlList',this.addform.urlList)
     },
     // 删除
     handleDel(row) {
       console.log("删除", row);
-      // if (!this.isAdmin) {
-      //   this.formData.cityIdList = [this.userInfor.manageCityId];
-      // }
 
       officialDel({
         officialNewsId: row.officialNewsId,
@@ -381,7 +396,23 @@ export default {
       });
     },
     // 图片移除
-    handleRemove() {},
+    handleRemove(res, file) {
+      console.log("ree", res);
+      if (!res.response) {
+        this.urlList.forEach((item, index) => {
+          if (res.url === item.newsUrl) {
+            this.urlList.splice(index, 1);
+          }
+        });
+      } else {
+        this.urlList.forEach((item, index) => {
+          if (res.response.data.data.url === item.newsUrl) {
+            this.urlList.splice(index, 1);
+          }
+        });
+      }
+      console.log("urlList", this.urlList);
+    },
     // 图片上传成功的钩子
     handlePicSuccess(res) {
       console.log("图片上传成功的钩子", res);
@@ -390,7 +421,6 @@ export default {
         newsUrl: res.data.data.url,
         imageSizeType: "1",
       });
-      this.addform.urlList = this.urlList;
     },
     // 预览
     preview() {},
@@ -398,7 +428,12 @@ export default {
     handleDraft() {},
     // 直接发布
     handleCreate() {
+      this.addform.urlList = this.urlList;
+      console.log(this.addform);
+
       let addform = this.addform;
+      console.log(addform);
+
       addform.officialNewsContent = this.quillContent.content;
       addform.structuredContent = this.quillContent.structuredContent;
       console.log("addform", addform);
@@ -418,6 +453,18 @@ export default {
         });
       } else {
         console.log(this.addform);
+        officaialNewsUpdate(addform).then((res) => {
+          if (res.data.code !== 0) {
+            return this.$message.error("编辑失败");
+          }
+          this.$message({
+            message: "编辑成功！",
+            type: "success",
+          });
+          this.getOfficialReleaseList();
+          this.isShow = true;
+          this.fileList = [];
+        });
       }
     },
     // 栏目
@@ -429,7 +476,6 @@ export default {
           return this.$message.error("获取栏目失败！");
         }
         this.columnData = res.data.data.data;
-        console.log("栏目", this.columnData);
       });
     },
   },
@@ -444,10 +490,10 @@ export default {
     this.getOfficialReleaseList();
     this.getCityColumn();
     this.init();
-    console.log("userInfo", this.userInfo);
-    console.log("isAdmin", this.isAdmin);
-    console.log("dicList", this.dicList);
-    console.log("source", this.addform.source);
+    // console.log("userInfo", this.userInfo);
+    // console.log("isAdmin", this.isAdmin);
+    // console.log("dicList", this.dicList);
+    // console.log("source", this.addform.source);
   },
 };
 </script>

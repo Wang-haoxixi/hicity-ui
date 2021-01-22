@@ -53,3 +53,12 @@ export function officialDel(data) {
     data: data
   });
 }
+
+// 资讯管理-官方资讯发布（官方）
+export function officaialNewsUpdate(data) {
+  return request({
+    url: "/cms/official_news/update",
+    method: "post",
+    data: data
+  });
+}

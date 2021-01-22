@@ -319,7 +319,14 @@
         </div>
       </el-dialog>
 
-      <el-table :data="tableData" style="width: 100%" ref="multipleTable">
+      <el-table
+        :data="tableData"
+        border
+        stripe
+        :header-cell-style="{ background: '#FAFAFA' }"
+        style="width: 100%; margin-top: 10px"
+        ref="multipleTable"
+      >
         <el-table-column type="selection" width="55"></el-table-column>
         <el-table-column
           prop="seq"
