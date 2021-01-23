@@ -47,7 +47,8 @@ axios.interceptors.request.use(config => {
 axios.interceptors.response.use(res => {
   NProgress.done()
   const status = Number(res.status) || 200
-  const message = (res.data.data && res.data.data.msg) || res.data.msg || errorCode[status] || errorCode['default']
+  let isBusiness = res.data && res.data.data && res.data.data.businessCode
+  const message = (isBusiness && res.data.data.msg) || res.data.msg || errorCode[status] || errorCode['default']
   if (status === 401) {
     Message({
       message: message,
@@ -59,7 +60,7 @@ axios.interceptors.response.use(res => {
     return
   }
 
-  if (status !== 200 || res.data.code === 1) {
+  if (status !== 200 || res.data.code === 1 || (isBusiness && res.data.data.businessCode !== 1000)) {
     Message({
       message: message,
       type: 'error'

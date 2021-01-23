@@ -363,3 +363,31 @@ export function getQueryString(url, paraName) {
     return ''
   }
 }
+
+export function customTree(origin, oOpt = { label: "name", value: "menuId" }) {
+
+  const target = [];
+  const rOpt = { label: "label", value: "value" };
+  const myTree = _.cloneDeep(origin);
+  function addPath(myTree) {
+    myTree.forEach((element) => {
+      const myLabel = element[oOpt.label];
+      const myValue = element[oOpt.value];
+      const obj = {
+        [rOpt.label]: myLabel,
+        [rOpt.value]: myValue,
+        parentId: element.parentId,
+      };
+      const isChild = element.children && element.children.length !== 0;
+      if (isChild) {
+        addPath(element.children);
+        target.push(obj);
+      } else {
+        target.push(obj);
+      }
+    });
+  }
+  addPath(myTree);
+  return target;
+
+}

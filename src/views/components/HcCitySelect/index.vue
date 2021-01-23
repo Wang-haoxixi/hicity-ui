@@ -58,7 +58,6 @@ export default {
   },
   watch: {
     value (val) {
-      console.log(123)
       this.initCityList = val
       this.initSelect()
     }

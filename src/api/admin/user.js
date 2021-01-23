@@ -40,8 +40,8 @@ export function delObj(id) {
 
 export function putObj(obj) {
   return request({
-    url: '/admin/user',
-    method: 'put',
+    url: '/admin/user/update',
+    method: 'post',
     data: obj
   })
 }
