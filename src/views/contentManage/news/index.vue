@@ -82,9 +82,9 @@
             <el-input type="textarea" v-model="quillContent.structuredContent"></el-input> -->
             <hc-quill v-model="quillContent"></hc-quill>
           </el-form-item>
-          <el-form-item v-if="isAdmin" label="是否允许城市停用：">
+          <!-- <el-form-item v-if="isAdmin" label="是否允许城市停用：">
             <el-switch v-model="formData.closeAllowed" active-value="0" active-text="允许" inactive-text="不允许" inactive-value="1"></el-switch>
-          </el-form-item>
+          </el-form-item> -->
           <el-form-item>
             <el-button @click="preview">预览</el-button>
             <el-button @click="handleDraft">保存草稿</el-button>
@@ -206,8 +206,14 @@ export default {
     },
     toCreate () {
       this.formData = {
-        cityIdList: []
+        cityIdList: [],
+        closeAllowed: '0'
       }
+      this.quillContent = {
+        content: '',
+        structuredContent: ''
+      }
+      this.titleImage = []
       if (!this.isAdmin) {
         this.formData.cityIdList = [this.userInfor.manageCityId]
       }
