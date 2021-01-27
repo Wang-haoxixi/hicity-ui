@@ -28,7 +28,7 @@ export default {
     },
     action: {
       type: String,
-      default: `/api/admin/sys-file/oss/upload`,
+      default: `/api/admin/sys_file/oss/upload`,
     },
   },
   data() {

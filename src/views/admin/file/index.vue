@@ -36,7 +36,7 @@ import { handleDown } from '@/util/util'
 
 
 export default {
-  name: 'sys-file',
+  name: 'sys_file',
   data() {
     return {
       searchForm: {},

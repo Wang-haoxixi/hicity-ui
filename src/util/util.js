@@ -314,7 +314,7 @@ export const openWindow = (url, title, w, h) => {
  */
 export function handleImg(fileName, id) {
   return validatenull(fileName) ? null : request({
-    url: '/admin/sys-file/' + fileName,
+    url: '/admin/sys_file/' + fileName,
     method: 'get',
     responseType: 'blob'
   }).then((response) => { // 处理返回的文件流
@@ -329,7 +329,7 @@ export function handleImg(fileName, id) {
 
 export function handleDown(filename, bucket) {
   return request({
-    url: '/admin/sys-file/' + bucket + '-' + filename,
+    url: '/admin/sys_file/' + bucket + '-' + filename,
     method: 'get',
     responseType: 'blob'
   }).then((response) => { // 处理返回的文件流

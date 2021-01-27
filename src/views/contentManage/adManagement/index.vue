@@ -390,7 +390,7 @@ export default {
     return {
       tableData: [],
       imageUrl: "",
-      baseUrl: "/api/admin/sys-file/oss/upload", //oss上传文件
+      baseUrl: "/api/admin/sys_file/oss/upload", //oss上传文件
       headersOpt: {
         Authorization: "Bearer " + store.getters.access_token,
       },

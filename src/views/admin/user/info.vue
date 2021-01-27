@@ -34,7 +34,7 @@
                   :show-file-list="false"
                   :on-success="handleAvatarSuccess"
                   class="avatar-uploader"
-                  action="/admin/sys-file/upload">
+                  action="/admin/sys_file/upload">
                   <img v-if="ruleForm2.avatar" id="avatar" :src="avatarUrl" class="avatar">
                   <i v-else class="el-icon-plus avatar-uploader-icon"/>
                 </el-upload>

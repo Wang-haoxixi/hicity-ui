@@ -176,7 +176,11 @@
         </el-form-item>
 
         <!-- 是否允许城市停用 -->
-        <el-form-item label="是否允许城市停用" label-width="140px">
+        <el-form-item
+          label="是否允许城市停用"
+          label-width="140px"
+          v-if="isAdmin"
+        >
           <el-switch
             v-model="addform.closeAllowed"
             active-value="0"
@@ -219,7 +223,7 @@ export default {
   data() {
     return {
       isShow: true, //是否显示咨询列表
-      uploadPicUrl: "/api/admin/sys-file/oss/upload",
+      uploadPicUrl: "/api/admin/sys_file/oss/upload",
       headersOpt: {
         Authorization: "Bearer " + store.getters.access_token,
       },
@@ -230,6 +234,7 @@ export default {
       // 官方发布 - 新增
       addform: {
         cityIdList: [],
+        closeAllowed: "0", //启停
       },
       currentPage: 1,
       pageSize: 20,
@@ -267,8 +272,18 @@ export default {
     },
     // 新建
     toCreate() {
+      if (!this.isAdmin) {
+        this.addform = {
+          cityIdList: [this.userInfo.manageCityId],
+          closeAllowed: "0", //启停
+        };
+        this.isShow = false;
+        this.publishType = "add";
+        return false;
+      }
       this.addform = {
         cityIdList: [1],
+        closeAllowed: "0", //启停
       };
       this.isShow = false;
       this.publishType = "add";
@@ -281,7 +296,7 @@ export default {
       officialReleaseList({
         current: this.currentPage,
         size: this.pageSize,
-        source: this.addform.source, //1平台，2城市
+        // source: this.addform.source, //1平台，2城市
       }).then((res) => {
         res.data.data.data.records.forEach((item) => {
           if (item.state === 0) {
@@ -348,12 +363,11 @@ export default {
           this.urlList.push({
             type: "image",
             newsUrl: item,
-            imageSizeType: "1",
+            imageSizeType: this.addform.imageSizeType,
           });
         });
         console.log("urlList", this.urlList);
       });
-      // this.addform.urlList = this.fileList;
       this.publishType = "edit";
       // console.log('this.addform.urlList',this.addform.urlList)
     },
@@ -419,7 +433,7 @@ export default {
       this.urlList.push({
         type: "image",
         newsUrl: res.data.data.url,
-        imageSizeType: "1",
+        imageSizeType: this.addform.imageSizeType,
       });
     },
     // 预览
@@ -428,8 +442,11 @@ export default {
     handleDraft() {},
     // 直接发布
     handleCreate() {
+      this.urlList.forEach((item) => {
+        item.imageSizeType = this.addform.imageSizeType;
+      });
       this.addform.urlList = this.urlList;
-      console.log(this.addform);
+      console.log("aaa", this.addform);
 
       let addform = this.addform;
       console.log(addform);
@@ -452,7 +469,7 @@ export default {
           this.isShow = true;
         });
       } else {
-        console.log(this.addform);
+        console.log('sss',addform);
         officaialNewsUpdate(addform).then((res) => {
           if (res.data.code !== 0) {
             return this.$message.error("编辑失败");
@@ -490,9 +507,9 @@ export default {
     this.getOfficialReleaseList();
     this.getCityColumn();
     this.init();
-    // console.log("userInfo", this.userInfo);
+    console.log("userInfo", this.userInfo);
     // console.log("isAdmin", this.isAdmin);
-    // console.log("dicList", this.dicList);
+    console.log("dicList", this.dicList);
     // console.log("source", this.addform.source);
   },
 };
