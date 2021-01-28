@@ -2,9 +2,30 @@
   <basic-container>
     <div class="title">活动列表</div>
 
-    <el-button @click="addCreate" type="primary" class="el-icon-plus">
-      新增</el-button
-    >
+    <el-row>
+      <el-col :span="2">
+        <el-button
+          @click="addCreate"
+          type="primary"
+          size="mini"
+          class="el-icon-plus"
+        >
+          新增</el-button
+        >
+      </el-col>
+      <el-col :span="6">
+        <el-input
+          clearable
+          prefix-icon="el-icon-search"
+          size="mini"
+          v-model="name"
+          placeholder="请输入"
+          @keyup.enter.native="enterCheck"
+          @clear="clearName"
+          @input="inputVal"
+        ></el-input>
+      </el-col>
+    </el-row>
 
     <el-table
       style="margin-top: 10px"
@@ -60,9 +81,18 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="活动状态" width="100">
+      <el-table-column label="活动状态" width="130">
         <template slot-scope="scope">
-          {{ scope.row.statusFlag | actStateFilter }}
+          <el-tag v-if="scope.row.statusFlag === '0'">草稿</el-tag>
+          <el-tag v-if="scope.row.statusFlag === '1'" type="success"
+            >进行中</el-tag
+          >
+          <el-tag v-if="scope.row.statusFlag === '2'" type="info"
+            >已结束</el-tag
+          >
+          <el-tag v-if="scope.row.statusFlag === '3'" type="warning"
+            >被下架</el-tag
+          >
         </template>
       </el-table-column>
       <el-table-column prop="exhibits" label="展示范围" width="100">
@@ -90,7 +120,7 @@
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
       :current-page="currentPage"
-      :page-sizes="[2, 5, 10, 15]"
+      :page-sizes="[10, 20, 30, 40, 50, 100]"
       :page-size="pageSize"
       :total="total"
       background
@@ -120,52 +150,35 @@
 </template>
 
 <script>
-import { activitiesList } from "@/api/activity/activity";
+import {
+  activitiesList,
+  activityDelete,
+  checkCity,
+} from "@/api/activity/activity";
 import HcCityBox from "@/views/components/HcCityBox/index";
 export default {
   components: { HcCityBox },
   data() {
     return {
-      tableData: [
-        {
-          id: 1,
-          poster: "xxx",
-          name: "",
-          createTime: "",
-          endTime: "",
-          field: "",
-          statusFlag: "", //活动状态标志（0草稿、1进行中、2已结束 3被下架）
-          joinNumber: "",
-        },
-      ],
+      tableData: [],
       currentPage: 1,
-      pageSize: 5,
+      pageSize: 10,
       total: 0,
       expends: [], // 展开行数组id
       showCityDialogVisible: false, //控制展示城市
       allCityList: [],
       initCityList: [],
+
+      name: "", //活动名称
     };
   },
   computed: {},
-  filters: {
-    // 活动状态过滤
-    actStateFilter(val) {
-      if (val === 0) {
-        return "草稿";
-      } else if (val === 1) {
-        return "进行中";
-      } else if (val === 2) {
-        return "已结束";
-      } else {
-        return "被下架";
-      }
-    },
-  },
+  filters: {},
   methods: {
     // 获取活动列表数据
     getActivitiesListFn() {
       activitiesList({
+        name: this.name,
         current: this.currentPage,
         size: this.pageSize,
       }).then((res) => {
@@ -180,10 +193,30 @@ export default {
         console.log(this.tableData);
       });
     },
+    // 根据活动名搜索查询
+    enterCheck(e) {
+      console.log(e.target.value);
+      this.getActivitiesListFn();
+    },
+    // 清空
+    clearName() {
+      this.getActivitiesListFn();
+    },
+    // 输入框值改变触发
+    inputVal(e) {
+      if (e.trim().length == 0) {
+        this.getActivitiesListFn();
+      }
+    },
     // 编辑
     handleEdit(res) {
-      console.log("编辑", res);
-      this.$router.push("/publish");
+      // console.log("编辑", res);
+      this.$router.push({
+        path: "/publish",
+        query: {
+          id: res.id,
+        },
+      });
     },
     // 删除
     handleDelete(res) {
@@ -195,37 +228,51 @@ export default {
       })
         .then(() => {
           console.log("确定");
+          activityDelete(res.id).then((data) => {
+            console.log("删除成功", data);
+            if (data.data.code !== 0) {
+              this.$message.error("删除活动失败!");
+            }
+            this.$message.success("删除活动成功!");
+            this.getActivitiesListFn();
+          });
         })
         .catch(() => {
-          console.log("取消");
+          this.$message("取消删除成功!");
         });
     },
     // 查看
     check(id) {
       console.log(id);
-      // checkCity({
-      //   officialNewsId: id,
-      // }).then((res) => {
-      //   console.log("res", res);
-      //   let cityList = res.data.data.data;
-      //   let allCityList = [];
-      //   let initCityList = [];
-      //   for (let i = 0; i < cityList.length; i++) {
-      //     allCityList.push({
-      //       cityId: cityList[i].cityId,
-      //       cityName: cityList[i].cityName,
-      //     });
-      //     if (cityList[i].isOpening) {
-      //       initCityList.push(cityList[i].cityId);
-      //     }
-      //   }
-      //   this.initCityList = initCityList;
-      //   this.allCityList = allCityList;
-      // });
-      // this.showCityDialogVisible = true;
+      checkCity({
+        activityId: id,
+      }).then((res) => {
+        console.log("res", res);
+        let cityList = res.data.data.data;
+        let allCityList = [];
+        let initCityList = [];
+        for (let i = 0; i < cityList.length; i++) {
+          allCityList.push({
+            cityId: cityList[i].cityId,
+            cityName: cityList[i].cityName,
+          });
+          if (cityList[i].isOpening) {
+            initCityList.push(cityList[i].cityId);
+          }
+        }
+        this.initCityList = initCityList;
+        this.allCityList = allCityList;
+      });
+      this.showCityDialogVisible = true;
     },
-    handleSizeChange(val) {},
-    handleCurrentChange(val) {},
+    handleSizeChange(val) {
+      this.pageSize = val;
+      this.getActivitiesListFn();
+    },
+    handleCurrentChange(val) {
+      this.currentPage = val;
+      this.getActivitiesListFn();
+    },
     // 新增
     addCreate() {
       this.$router.push("/publish");
@@ -236,8 +283,10 @@ export default {
     ticketManagement() {},
     // 遍历数据获取展开列id
     getExpends() {
-      var Id = this.tableData.map((item) => item.id);
+      let Id = this.tableData.map((item) => item.id);
       this.expends = Id;
+      console.log("tableData", this.tableData);
+      console.log(this.expends);
     },
     // 行数据的 Key
     getRowKeys(row) {
@@ -248,6 +297,7 @@ export default {
     this.getActivitiesListFn();
     this.getExpends();
   },
+  mounted() {},
 };
 </script>
 

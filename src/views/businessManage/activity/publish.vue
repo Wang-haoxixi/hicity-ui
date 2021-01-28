@@ -11,12 +11,7 @@
       >
         <!-- 所属城市 -->
         <el-form-item label="所属城市：">
-          <!-- <el-cascader
-            v-model="baseFormData.city"
-            :options="holdAddressArr"
-            :props="defaultCityTreeParams"
-            @change="handleChangeCity"
-          ></el-cascader> -->
+          <!-- {{baseFormData.cityIdList}} -->
           <hc-city-select v-model="baseFormData.cityIdList"></hc-city-select>
         </el-form-item>
 
@@ -78,6 +73,16 @@
             <el-button icon="el-icon-picture" @click="showPosters"
               >海报图库</el-button
             >
+            <el-popover
+              popper-class="popperName"
+              ref="popover"
+              placement="top"
+              width="300"
+              trigger="hover"
+              content="精致的海报让活动锦上添花，更便于传播与吸引报名，也将提升在我能平台的推荐机会。"
+            >
+            </el-popover>
+            <i class="el-icon-info" v-popover:popover></i>
           </div>
           <div
             class="poster-box"
@@ -86,7 +91,7 @@
           >
             <!-- 删除蒙层 -->
             <div class="mengcheng" v-if="showDelete">
-              <i class="el-icon-delete"></i>
+              <i class="el-icon-delete" @click="deletePoster"></i>
             </div>
             <div v-if="!baseFormData.poster" class="noImage">
               <div style="text-align: center">
@@ -111,7 +116,6 @@
               v-model="baseFormData.cityId"
               :options="holdAddressArr"
               :props="defaultCityTreeParams"
-              @change="handleChangeHoldAddress"
             ></el-cascader>
 
             <!-- 活动地址 -->
@@ -131,7 +135,6 @@
             v-model="classification"
             :options="activityClassifyArr"
             :props="defaultActivityClassifyParams"
-            @change="handleChangeActivityClassify"
           ></el-cascader>
         </el-form-item>
 
@@ -177,6 +180,7 @@
         <!-- 活动亮点 -->
         <el-form-item label="活动亮点：">
           <el-input
+            :rows="4"
             placeholder="请填写几句活动核心亮点，便于分享摘要以及百度等搜索引擎搜索（150个字）"
             type="textarea"
             v-model="baseFormData.spot"
@@ -185,17 +189,22 @@
 
         <!-- 活动详情 -->
         <el-form-item label="活动详情：">
-          <hc-quill v-model="quillContent"></hc-quill>
+          <hc-quill
+            v-model="quillContent"
+            v-if="!$route.query.id || contentShow"
+          ></hc-quill>
         </el-form-item>
 
         <!-- 活动附件 -->
         <el-form-item label="活动附件：">
           <el-upload
             class="upload-demo"
+            :limit="3"
             :action="uploadPicUrl"
             :file-list="fileList"
             :headers="headersOpt"
             :on-success="handleAccessorySuccess"
+            :on-change="onChange"
           >
             <el-button size="small">点击上传</el-button>
           </el-upload>
@@ -204,6 +213,7 @@
 
       <!-- 设置票种 -->
       <el-form
+        v-if="!$route.query.id"
         ref="setTicketDataRef"
         :model="setTicketData"
         label-width="120px"
@@ -212,101 +222,129 @@
           <el-button @click="addTic" type="danger" plain>新增</el-button>
           <!-- 卡片 -->
           <el-card
-            v-for="(item, i) in 1"
+            v-for="(item, i) in baseFormData.ticketingManagements"
             :key="i"
             class="box-card"
             :body-style="cardStyle"
           >
             <!-- 设置票种表单 -->
-            <el-form ref="setTicketDataRef" :model="setTicketData">
-              <el-form-item label="票务种类：" label-width="100">
-                <el-select
-                  @change="changeTicketingType"
-                  v-model="setTicketData.ticketingType"
-                  placeholder="请选择票务种类"
-                >
-                  <el-option label="免费票" value="1"></el-option>
-                  <el-option label="付费票" value="2"></el-option>
-                </el-select>
-              </el-form-item>
+            <el-form ref="setTicketDataRef" :model="item">
+              <el-row>
+                <el-col :span="8">
+                  <!-- 票务种类 -->
+                  <el-form-item label="票务种类：" label-width="100">
+                    <el-select
+                      @change="changeTicketingType"
+                      v-model="item.ticketingType"
+                      placeholder="请选择票务种类"
+                    >
+                      <el-option label="免费票" value="1"></el-option>
+                      <el-option label="付费票" value="2"></el-option>
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="10">
+                  <!-- 票务名称 -->
+                  <el-form-item label="票务名称：" label-width="100">
+                    <el-input
+                      style="width: 300px"
+                      v-model="item.ticketingName"
+                      placeholder="如早餐票、普通票、VIP票"
+                    ></el-input>
+                  </el-form-item>
+                </el-col>
+              </el-row>
 
-              <el-form-item label="票务名称：" label-width="100">
-                <el-input
-                  style="width: 300px"
-                  v-model="setTicketData.ticketingName"
-                  placeholder="如早餐票、普通票、VIP票"
-                ></el-input>
-              </el-form-item>
-
-              <!-- 票种数量 -->
-              <el-form-item label="票种数量：" label-width="100">
-                <el-input-number
-                  v-model="setTicketData.number"
-                  controls-position="right"
-                  :min="1"
-                ></el-input-number>
-              </el-form-item>
-              <!-- 单次购票数量 -->
-              <el-form-item label="单次购票数量：" label-width="100">
-                <el-input-number
-                  v-model="setTicketData.limitTicket"
-                  controls-position="right"
-                  :min="1"
-                ></el-input-number>
-              </el-form-item>
-              <!-- 票种审核 -->
+              <el-row>
+                <el-col :span="8">
+                  <!-- 票种数量 -->
+                  <el-form-item label="票种数量：" label-width="100">
+                    <el-input-number
+                      v-model="item.number"
+                      controls-position="right"
+                      :min="1"
+                    ></el-input-number>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                  <!-- 单次购票数量 -->
+                  <el-form-item label="单次购票数量：" label-width="100">
+                    <el-input-number
+                      v-model="item.limitTicket"
+                      controls-position="right"
+                      :min="1"
+                    ></el-input-number>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="5">
+                  <!-- 票种审核 -->
+                  <el-form-item
+                    v-if="item.ticketingType === '1'"
+                    label="票种审核："
+                    label-width="100"
+                  >
+                    <el-switch
+                      v-model="item.needAudit"
+                      active-color="#13ce66"
+                      inactive-color="#cccccc"
+                    >
+                    </el-switch>
+                  </el-form-item>
+                  <!-- 允许退票 -->
+                  <el-form-item
+                    v-if="item.ticketingType === '2'"
+                    label="允许退票："
+                    label-width="100"
+                  >
+                    <el-switch
+                      v-model="item.allowedRefund"
+                      active-color="#13ce66"
+                      inactive-color="#cccccc"
+                    >
+                    </el-switch>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+              <!-- 票务金额  付费票时显示 -->
               <el-form-item
-                v-if="setTicketData.ticketingType === '1'"
-                label="票种审核："
-                label-width="100"
+                label="票务金额："
+                v-if="item.ticketingType === '2'"
               >
-                <el-switch
-                  v-model="setTicketData.needAudit"
-                  active-color="#13ce66"
-                  inactive-color="#cccccc"
-                >
-                </el-switch>
-              </el-form-item>
-              <!-- 允许退票 -->
-              <el-form-item
-                v-else-if="setTicketData.ticketingType === '2'"
-                label="允许退票："
-                label-width="100"
-              >
-                <el-switch
-                  v-model="setTicketData.allowedRefund"
-                  active-color="#13ce66"
-                  inactive-color="#cccccc"
-                >
-                </el-switch>
-              </el-form-item>
-              <!-- 票务金额 -->
-              <el-form-item label="票务金额：">
-                <el-checkbox-group v-model="priceType" class="checkGroup">
+                <el-checkbox-group v-model="item.priceType" class="checkGroup">
                   <el-checkbox label="能贝" name="nb" class="elcheck"
-                    >能贝 <el-input v-model="payWeCanPay.amount"></el-input
+                    >能贝 <el-input v-model="item.payWeCanPay.amount"></el-input
                   ></el-checkbox>
                   <el-checkbox label="人民币" name="rmb"
-                    >人民币 <el-input v-model="payOfflinePay.amount"></el-input
+                    >人民币
+                    <el-input v-model="item.payOfflinePay.amount"></el-input
                   ></el-checkbox>
                 </el-checkbox-group>
               </el-form-item>
-              <!-- 票种备注 -->
-              <el-form-item label="票种备注：" label-width="100">
-                <el-input
-                  type="textarea"
-                  v-model="setTicketData.remarks"
-                ></el-input>
-              </el-form-item>
+              <el-row>
+                <el-col>
+                  <!-- 票种备注 -->
+                  <el-form-item label="票种备注：" label-width="200">
+                    <el-input
+                      style="width: 650px"
+                      placeholder="请输入备注内容"
+                      type="textarea"
+                      v-model="item.remarks"
+                      :rows="4"
+                    ></el-input>
+                  </el-form-item>
+                </el-col>
+              </el-row>
             </el-form>
           </el-card>
         </el-form-item>
       </el-form>
 
-      <!-- 底部按钮 -->
-      <el-button @click="publish" type="danger">发布活动</el-button>
-      <el-button @click="saveManuscript">保存草稿</el-button>
-      <el-button @click="cancel">取消</el-button>
+      <div class="footer-btn">
+        <!-- 底部按钮 -->
+        <el-button @click="publish" type="danger">发布活动</el-button>
+        <el-button @click="saveManuscript">保存草稿</el-button>
+        <el-button @click="cancel">取消</el-button>
+      </div>
 
       <!-- 海报弹窗 -->
       <el-dialog
@@ -340,6 +378,7 @@ import {
   activityType,
   tagsPage,
   savePublish,
+  activityInfo,
 } from "@/api/activity/publish";
 export default {
   components: { HcQuill, HcCitySelect },
@@ -350,6 +389,8 @@ export default {
         "border-radius": "10px",
         "margin-top": "20px",
       },
+      // 控制富文本显示隐藏
+      contentShow: false,
       // 请求头
       headersOpt: {
         Authorization: "Bearer " + store.getters.access_token,
@@ -374,8 +415,37 @@ export default {
         spot: "", //亮点
         details: "", //活动详情
         fileList: [], //附件
+        //票种设置
+        ticketingManagements: [
+          {
+            ticketingType: "1", //票务种类
+            ticketingName: "", //票务名称
+            number: 1, //票种数量
+            limitTicket: 1, //单次购票数量
+            allowedRefund: false, //是否允许退款
+            needAudit: false, //是否审核
+            remarks: "",
+            //支付方式列表
+            payMethodList: [],
 
-        ticketingManagements: [], //票种设置
+            // 票务金额类型数组
+            priceType: [],
+            // 能贝支付方式
+            payWeCanPay: {
+              type: "WeCanPay", //支付类型
+              amount: 1, //金额
+              // name: [],
+              // typeBoolean: false,
+            },
+            // 人民币支付方式
+            payOfflinePay: {
+              type: "OfflinePay", //支付类型
+              amount: 1, //金额
+              // name: [],
+              // typeBoolean: false,
+            },
+          },
+        ],
       },
       // 设置票种数据
       setTicketData: {
@@ -386,31 +456,23 @@ export default {
         allowedRefund: false, //是否允许退款
         needAudit: false, //是否审核
         remarks: "",
-        payMethodList: [
-          // {
-          //   type: "OfflinePay", //支付类型
-          //   amount: 1, //金额
-          //   name: "人民币",
-          //   typeBoolean: false,
-          // },
-        ], //支付方式列表
+        //支付方式列表
+        payMethodList: [],
+
+        // 票务金额类型数组
+        priceType: [],
+        // 能贝支付方式
+        payWeCanPay: {
+          type: "WeCanPay", //支付类型
+          amount: 1, //金额
+        },
+        // 人民币支付方式
+        payOfflinePay: {
+          type: "OfflinePay", //支付类型
+          amount: 1, //金额
+        },
       },
-      // 票务金额类型数组
-      priceType: [],
-      // 能贝支付方式
-      payWeCanPay: {
-        type: "WeCanPay", //支付类型
-        amount: 1, //金额
-        // name: [],
-        // typeBoolean: false,
-      },
-      // 人民币支付方式
-      payOfflinePay: {
-        type: "OfflinePay", //支付类型
-        amount: 1, //金额
-        // name: [],
-        // typeBoolean: false,
-      },
+
       //活动分类
       classification: [],
       // 是否有输入标签内容
@@ -456,7 +518,7 @@ export default {
     };
   },
   methods: {
-    // 处理活动类型数据的递归函数
+    // 处理数据的递归函数
     handleRecurve(arr) {
       arr.forEach((item) => {
         // children为空则删除
@@ -475,6 +537,46 @@ export default {
         this.handleRecurve(res.data.data.data);
         this.activityClassifyArr = res.data.data.data;
         console.log("活动分类", this.activityClassifyArr);
+      });
+    },
+    // 获取活动详情
+    getActivityInfo(id) {
+      if (!id) {
+        return;
+      }
+
+      activityInfo(id).then((res) => {
+        if (res.data.code !== 0) {
+          this.$message.error("获取活动详情失败！");
+        }
+        let data = res.data.data.data;
+        console.log("活动详情", data.city.split(","));
+        // this.baseFormData = res.data.data.data;
+        // console.log("活动详情", this.baseFormData);
+        this.baseFormData.cityIdList = data.cityIdList;
+        this.baseFormData.name = data.name;
+        this.baseFormData.startTime = data.startTime;
+        this.baseFormData.endTime = data.endTime;
+        this.baseFormData.type = data.type;
+        this.baseFormData.poster = data.poster;
+        this.baseFormData.cityId = data.cityId;
+        this.baseFormData.field = data.field;
+        this.classification.push(data.classification, data.subClassification);
+        this.baseFormData.label = data.label;
+        this.baseFormData.spot = data.spot;
+        this.quillContent.content = data.details;
+        this.contentShow = true;
+
+        data.fileList.forEach((item) => {
+          this.fileList.push({
+            name: item.original,
+            url: item.attachFile,
+          });
+          this.baseFormData.fileList.push({
+            original: item.original,
+            attachFile: item.attachFile,
+          });
+        });
       });
     },
     // 获取活动类型
@@ -534,9 +636,39 @@ export default {
       }
       this.baseFormData.poster = res.data.data.url;
     },
+    // 移除海报
+    deletePoster() {
+      this.baseFormData.poster = "";
+    },
 
     // 新增票种
-    addTic() {},
+    addTic() {
+      let setTicketData = {
+        ticketingType: "1", //票务种类
+        ticketingName: "", //票务名称
+        number: 1, //票种数量
+        limitTicket: 1, //单次购票数量
+        allowedRefund: false, //是否允许退款
+        needAudit: false, //是否审核
+        remarks: "",
+        //支付方式列表
+        payMethodList: [],
+
+        // 票务金额类型数组
+        priceType: [],
+        // 能贝支付方式
+        payWeCanPay: {
+          type: "WeCanPay", //支付类型
+          amount: 1, //金额
+        },
+        // 人民币支付方式
+        payOfflinePay: {
+          type: "OfflinePay", //支付类型
+          amount: 1, //金额
+        },
+      };
+      this.baseFormData.ticketingManagements.push(setTicketData);
+    },
 
     // 返回输入建议
     querySearch(queryString, cb) {
@@ -552,7 +684,6 @@ export default {
       }
       // 输入有值
       results = this.allTagArr.filter((item) => {
-        // console.log(item)
         return (
           //返回 有数据的项
           item.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0
@@ -574,60 +705,54 @@ export default {
       console.log(tag);
     },
     // 活动附件上传成功的钩子
-    handleAccessorySuccess(res) {
-      console.log("活动附件上传成功", res);
+    handleAccessorySuccess(res, file) {
+      console.log("res", res);
+      console.log("file", file);
       this.fileList.push({
-        name: res.data.data.fileName,
-        url: res.data.data.url,
+        name: file.name,
+        url: file.response.data.data.url,
       });
-      this.baseFormData.fileList = this.fileList;
+      this.baseFormData.fileList.push({
+        original: file.name,
+        attachFile: file.response.data.data.url,
+      });
       console.log("fileList", this.fileList);
+      console.log("baseFormData.fileList", this.baseFormData.fileList);
+    },
+    onChange(res) {
+      // console.log("onChange", res);
     },
     // 发布活动
     publish() {
-      // 保存时将支付方式列表清空并重新
-      this.setTicketData.payMethodList = [];
-      if (this.priceType.includes("能贝")) {
-        this.setTicketData.payMethodList.push(this.payWeCanPay);
-      }
-      if (this.priceType.includes("人民币")) {
-        this.setTicketData.payMethodList.push(this.payOfflinePay);
-      }
+      this.fileList = [];
 
-      this.baseFormData.ticketingManagements.push(this.setTicketData);
       this.baseFormData.details = this.quillContent.content;
 
-      console.log("params", { ...this.baseFormData, ...this.setTicketData });
+      // 遍历票种数组
+      this.baseFormData.ticketingManagements.forEach((item) => {
+        // 保存时将支付方式列表清空并重新
+        item.payMethodList = [];
+        if (item.priceType.includes("能贝")) {
+          item.payMethodList.push(item.payWeCanPay);
+        }
+        if (item.priceType.includes("人民币")) {
+          item.payMethodList.push(item.payOfflinePay);
+        }
+      });
+      console.log(this.baseFormData);
 
       savePublish(this.baseFormData).then((res) => {
-        console.log("发布", res);
         if (res.data.code !== 0) {
           this.$message.error("发布活动失败！");
         }
-        this.$$message.success("发布活动成功！");
+        this.$message.success("发布活动成功！");
+        this.$router.go(-1);
       });
     },
     // 取消
     cancel() {},
     // 保存草稿
-    saveManuscript() {
-      console.log("payMethodList", this.setTicketData.payMethodList);
-    },
-    // 监听所属城市改变
-    handleChangeCity(val) {
-      console.log("所属城市改变", val);
-    },
-    // 监听举办地址改变
-    handleChangeHoldAddress(val) {
-      console.log("活动地址改变", val);
-    },
-
-    // 监听活动分类改变
-    handleChangeActivityClassify(val) {
-      console.log("活动分类改变", val);
-      this.baseFormData.classification = val[0];
-      this.baseFormData.subClassification = val[1];
-    },
+    saveManuscript() {},
     // 移入
     mouseOver() {
       this.showDelete = true;
@@ -638,12 +763,12 @@ export default {
     },
     changeTicketingType(val) {},
   },
-
   created() {
     this.getActivityClassify();
     this.getCityTree();
     this.getActivityType();
     this.getTagsPage();
+    this.getActivityInfo(this.$route.query.id);
   },
 };
 </script>
@@ -675,6 +800,7 @@ export default {
     line-height: 240px;
     .el-icon-delete {
       font-size: 30px;
+      cursor: pointer;
     }
   }
   .noImage {
@@ -725,5 +851,14 @@ export default {
 }
 .elcheck {
   margin-right: 60px;
+}
+.box-card {
+  width: 1100px;
+}
+.footer-btn {
+  margin-left: 120px;
+}
+::v-deep .popperName {
+  background: rgb(48, 48, 49);
 }
 </style>

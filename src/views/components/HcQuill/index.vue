@@ -59,9 +59,9 @@ export default {
         toolbar: toolbarOptions,
       },
     });
-
+    console.log(this.value)
     this.quill.root.innerHTML = this.value.content
-    // this.quill.setContents(this.quill)
+    // this.quill.setContents(this.value.structuredContent)
 
     this.quill.on('text-change', (delta, oldDelta, source) => {
       this.$emit('input', {content: this.quill.root.innerHTML, structuredContent: JSON.stringify(this.quill.getContents().ops)})

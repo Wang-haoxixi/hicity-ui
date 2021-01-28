@@ -49,3 +49,11 @@ export function savePublish(data) {
     data: data
   });
 }
+
+// 根据活动ID查询活动信息
+export function activityInfo(data) {
+  return request({
+    url: "/qms/activity_publish/" + data,
+    method: "get"
+  });
+}
