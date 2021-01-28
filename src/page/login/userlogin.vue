@@ -92,8 +92,8 @@ export default {
         state: ''
       },
       loginForm: {
-        username: 'admin',
-        password: '123456',
+        username: '',
+        password: '',
         code: '',
         redomStr: ''
       },
