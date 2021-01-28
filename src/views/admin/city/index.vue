@@ -293,7 +293,7 @@
         getCityById(data.id).then(({
           data
         }) => {
-          this.form = data.data
+          this.form = data.data.data
           if (!this.form.parentName) {
             this.$set(this.form, 'parentName', '最上级')
           }

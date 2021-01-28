@@ -3,12 +3,14 @@
     <basic-container>
       <avue-crud
         ref="crud"
+        v-model="form"
         :option="tableOption"
         :page="page"
         :table-loading="tableLoading"
         :data="tableData"
         @on-load="getList"
-        @refresh-change="handleRefreshChange" >
+        @refresh-change="handleRefreshChange"
+        @search-change="handleFilter" >
         <template
           slot="menu"
           slot-scope="scope">
@@ -79,7 +81,9 @@ export default {
       tableLoading: false,
       tableData: [],
       dialogRoleVisible: false,
-      formData: {}
+      formData: {},
+      searchForm: {},
+      form: {}
     }
   },
   computed: {
@@ -93,17 +97,22 @@ export default {
   created() {
   },
   methods: {
-    getList(page = this.page, params) {
+    getList(page = this.page) {
       this.tableLoading = true
       adminCityOpenList({
         current: page.currentPage,
-        size: page.pageSize
+        size: page.pageSize,
+        ...this.searchForm
       }).then(({data}) => {
         this.tableData = data.data.data.records
         this.page.total = data.data.data.total
       }).finally(() => {
         this.tableLoading = false
       })
+    },
+    handleFilter(param) {
+      this.searchForm = param
+      this.getList(this.page, param)
     },
     toOpen(row) {
       this.formData = {

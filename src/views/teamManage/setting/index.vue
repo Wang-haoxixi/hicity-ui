@@ -86,13 +86,20 @@
       :close-on-click-modal="false"
       append-to-body
       title="配置角色">
-      <div class="dialog-main-tree">
-        <avue-select
+      <div class="dialog-main-tree role-setting">
+        <el-select v-model="role" placeholder="请选择角色" multiple :clearable="false">
+          <el-option v-for="item in rolesOptions" :key="item.roleId"
+            :label="item.roleName"
+            :value="item.roleId"
+            :disabled="item.roleId == 1 || item.roleId == 2"></el-option>
+        </el-select>
+
+        <!-- <avue-select
           v-model="role"
           :dic="rolesOptions"
           :props="roleProps"
           multiple
-          placeholder="请选择角色"/>
+          placeholder="请选择角色"/> -->
       </div>
       <div slot="footer"
         class="dialog-footer">
@@ -166,7 +173,7 @@
           notAdmin (data) {
             let roleList = data.roleList
             if (!roleList) {
-              return 
+              return true
             }
             for (let i = 0; i < roleList.length; i++) {
               if (roleList[i].roleCode == 'ROLE_CITY_ADMIN' || roleList[i].roleCode == 'ROLE_ADMIN') {
@@ -245,6 +252,7 @@
                   }
                 }
                 this.rolesOptions = rolesOptions
+                console.log(123, rolesOptions)
                 this.dialogRoleVisible = true
               })
             },
@@ -331,7 +339,7 @@
         }
     }
 </script>
-<style lang="scss">
+<style lang="scss" scope>
   .user {
     height: 100%;
 
@@ -345,6 +353,13 @@
         padding-top: 0;
       }
     }
+    
   }
+  .role-setting {
+    .el-tag__close {
+      display: none;
+    }
+  }
+ 
 </style>
 
