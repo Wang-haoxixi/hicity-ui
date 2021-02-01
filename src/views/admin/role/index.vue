@@ -32,6 +32,7 @@
               v-model="form.cityId"
               :dic="treeCityData"
               :props="cityProps"
+              :default-expand-all="false"
               type="tree"
               placeholder="请选择所属部门"/>
           </template>

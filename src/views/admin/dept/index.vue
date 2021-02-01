@@ -1,7 +1,7 @@
 <template>
   <div class="app-container calendar-list-container">
     <basic-container>
-      <div class="filter-container">
+      <!-- <div class="filter-container">
         <el-button-group>
           <el-button
             v-if="deptManager_btn_add"
@@ -22,7 +22,7 @@
             @click="handleDelete">删除
           </el-button>
         </el-button-group>
-      </div>
+      </div> -->
 
       <el-row>
         <el-col
@@ -35,7 +35,6 @@
             class="filter-tree"
             node-key="id"
             highlight-current
-            default-expand-all
             @node-click="getNodeData"/>
         </el-col>
         <el-col
@@ -73,7 +72,7 @@
                   :disabled="formEdit"
                   placeholder="请输入名称"/>
               </el-form-item>
-              <el-form-item
+              <!-- <el-form-item
                 label="统一社会信用代码"
                 prop="creditCode">
                 <el-input
@@ -89,7 +88,7 @@
                   v-model="form.orgCode"
                   :disabled="formEdit"
                   placeholder="请输入组织机构代码"/>
-              </el-form-item>
+              </el-form-item> -->
               <el-form-item
                 label="排序"
                 prop="orderNum">

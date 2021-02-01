@@ -44,6 +44,7 @@
           <el-tag>{{ scope.label }}</el-tag>
         </template>
         <template
+          v-if="userInfo.userId !== scope.row.userId"
           slot="menu"
           slot-scope="scope">
           <el-button
