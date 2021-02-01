@@ -7,7 +7,7 @@ import request from "@/router/axios";
 // 管理活动列表
 export function activitiesList(data) {
   return request({
-    url: "/qms/activity_publish/pc/management_page",
+    url: "/dms/activity_publish/pc/management_page",
     method: "get",
     params: data
   });
@@ -16,7 +16,7 @@ export function activitiesList(data) {
 // 删除活动信息
 export function activityDelete(data) {
   return request({
-    url: "/qms/activity_publish/delete/" + data,
+    url: "/dms/activity_publish/delete/" + data,
     method: "post"
   });
 }
@@ -24,7 +24,7 @@ export function activityDelete(data) {
 // 获取城市是否开启列表
 export function checkCity(data) {
   return request({
-    url: "/qms/activity_publish/city_open_list",
+    url: "/dms/activity_publish/city_open_list",
     method: "get",
     params: data
   });

@@ -73,16 +73,18 @@
             <el-button icon="el-icon-picture" @click="showPosters"
               >海报图库</el-button
             >
-            <el-popover
-              popper-class="popperName"
-              ref="popover"
-              placement="top"
-              width="300"
-              trigger="hover"
-              content="精致的海报让活动锦上添花，更便于传播与吸引报名，也将提升在我能平台的推荐机会。"
-            >
-            </el-popover>
-            <i class="el-icon-info" v-popover:popover></i>
+            <div style="margin-left: 15px">
+              <el-popover
+                popper-class="popperName"
+                ref="popoverPoster"
+                placement="top"
+                width="300"
+                trigger="hover"
+                content="精致的海报让活动锦上添花，更便于传播与吸引报名，也将提升在我能平台的推荐机会。"
+              >
+              </el-popover>
+              <i class="el-icon-info" v-popover:popoverPoster></i>
+            </div>
           </div>
           <div
             class="poster-box"
@@ -132,6 +134,7 @@
         <!-- 活动分类 -->
         <el-form-item label="活动分类：">
           <el-cascader
+            @change="changeClassification"
             v-model="classification"
             :options="activityClassifyArr"
             :props="defaultActivityClassifyParams"
@@ -276,7 +279,7 @@
                     ></el-input-number>
                   </el-form-item>
                 </el-col>
-                <el-col :span="5">
+                <el-col :span="7">
                   <!-- 票种审核 -->
                   <el-form-item
                     v-if="item.ticketingType === '1'"
@@ -518,6 +521,11 @@ export default {
     };
   },
   methods: {
+    // 活动分类改变触发
+    changeClassification(e) {
+      this.baseFormData.classification = this.classification[0];
+      this.baseFormData.subClassification = this.classification[1];
+    },
     // 处理数据的递归函数
     handleRecurve(arr) {
       arr.forEach((item) => {

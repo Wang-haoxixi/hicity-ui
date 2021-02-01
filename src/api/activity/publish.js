@@ -21,7 +21,7 @@ export function cityTree(data) {
 // getPoster
 export function posters(data) {
   return request({
-    url: "/qms/activity_publish/get_poster",
+    url: "/dms/activity_publish/get_poster",
     method: "get"
   });
 }
@@ -44,7 +44,7 @@ export function tagsPage(data) {
 // 创建活动信息
 export function savePublish(data) {
   return request({
-    url: "/qms/activity_publish/save",
+    url: "/dms/activity_publish/save",
     method: "post",
     data: data
   });
@@ -53,7 +53,7 @@ export function savePublish(data) {
 // 根据活动ID查询活动信息
 export function activityInfo(data) {
   return request({
-    url: "/qms/activity_publish/" + data,
+    url: "/dms/activity_publish/" + data,
     method: "get"
   });
 }
