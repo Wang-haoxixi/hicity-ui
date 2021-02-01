@@ -36,7 +36,7 @@ export function getDictByType(data) {
 // 会议大厅分页查询
 export function activitiePage(data) {
   return request({
-    url: "/qms/activity_publish/activitie_page",
+    url: "/dms/activity_publish/activitie_page",
     method: "get"
   });
 }
