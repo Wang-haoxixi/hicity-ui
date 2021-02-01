@@ -16,7 +16,7 @@ var validateUsername = (rule, value, callback) => {
 
 export const initForm = () => {
   return {
-    parentId: -1, // 父ID
+    parentId: 0, // 父ID
     name: "", // 类型名称
     number: "", // 类型编码
     sort: 0, // 排序

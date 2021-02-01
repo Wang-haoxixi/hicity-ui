@@ -75,6 +75,7 @@ export default {
         size: page.pageSize
       }, params, this.searchForm)).then(response => {
         this.tableData = response.data.data.records
+        this.page.total = response.data.data.total
       }).finally(() => {
         this.tableLoading = false
       })

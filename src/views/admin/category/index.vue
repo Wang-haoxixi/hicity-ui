@@ -4,7 +4,6 @@
       <avue-crud
         ref="crud"
         :option="tableOption"
-        :page="page"
         :table-loading="tableLoading"
         :data="tableData"
         @on-load="getList"
@@ -67,13 +66,13 @@ export default {
       tableLoading: false,
     };
   },
+  created () {
+    this.getList()
+  },
   methods: {
-    getList(page = this.page, params) {
+    getList() {
       this.tableLoading = true
-      getCategoryTree(Object.assign({
-        current: page.currentPage,
-        size: page.pageSize
-      }, params, this.searchForm)).then(response => {
+      getCategoryTree().then(response => {
         this.tableData = response.data.data.data
       }).finally(() => {
         this.tableLoading = false
@@ -81,10 +80,10 @@ export default {
     },
     handleFilter(param) {
       this.searchForm = param
-      this.getList(this.page, param)
+      this.getList()
     },
     handleRefreshChange() {
-      this.getList(this.page)
+      this.getList()
     },
     toCreate () {
       this.$refs.DialogForm.open(customTree(this.tableData, { label: "name", value: "id" }))

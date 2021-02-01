@@ -41,7 +41,7 @@ export default {
     open (options = [], data, edit = false, isChild = false) {
       this.dialogShow = true
       this.options = [
-        {value: -1, label: '最高级'},
+        {value: 0, label: '最高级'},
         ...options
       ]
       this.isChild = isChild
@@ -65,7 +65,8 @@ export default {
           introduction: this.form.introduction,
           name: this.form.name,
           parentId: this.form.parentId,
-          type: this.form.type
+          type: this.form.type,
+          spell: this.form.spell
         }
       } else {
         fn = addIndustry
