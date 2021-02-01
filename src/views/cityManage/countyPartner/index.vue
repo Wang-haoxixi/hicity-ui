@@ -2,6 +2,7 @@
   <div class="user">
     <basic-container>
       <avue-crud
+        v-model="form"
         ref="crud"
         :option="tableOption"
         :page="page"
@@ -9,6 +10,7 @@
         :data="tableData"
         @on-load="getList"
         @refresh-change="handleRefreshChange"
+        @search-change="handleFilter"
       >
         <template slot="menu" slot-scope="scope">
           <el-button
@@ -86,6 +88,8 @@ export default {
       tableData: [],
       dialogRoleVisible: false,
       formData: {},
+      searchForm: {},
+      form: {}
     };
   },
   computed: {
@@ -100,11 +104,12 @@ export default {
   watch: {},
   created() {},
   methods: {
-    getList(page = this.page, params) {
+    getList(page = this.page) {
       this.tableLoading = true;
       adminOpeningCountyList({
         current: page.currentPage,
         size: page.pageSize,
+        ...this.searchForm
       })
         .then(({ data }) => {
           this.tableData = data.data.data.records;
@@ -113,6 +118,10 @@ export default {
         .finally(() => {
           this.tableLoading = false;
         });
+    },
+    handleFilter(param) {
+      this.searchForm = param
+      this.getList(this.page, param)
     },
     toOpen(row) {
       this.formData = {

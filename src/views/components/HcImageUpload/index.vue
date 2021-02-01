@@ -5,13 +5,15 @@
     :on-remove="handleRemove"
     :on-success="handleSuccess"
     :on-error="handleError"
-    :limit="limit"
+    :limit="!multiple ? 0 : limit"
     list-type="picture-card"
+    :show-file-list="multiple"
     :on-exceed="handleExceed"
     :file-list="fileList"
     :before-upload="onBeforeUpload"
   >
-    <i class="el-icon-plus"></i>
+    <el-image v-if="!multiple && fileList.length > 0" :src="fileList[0].url" class="avatar" />
+    <i v-else class="el-icon-plus"></i>
   </el-upload>
 </template>
 <script>
@@ -19,7 +21,7 @@ import store from "@/store";
 export default {
   props: {
     value: {
-      type: Array,
+      type: [Array, String],
       required: true,
     },
     limit: {
@@ -39,14 +41,23 @@ export default {
       fileList: []
     };
   },
+  computed: {
+    multiple() {
+      return this.limit > 1
+    }
+  },
   created () {
     let fileList = []
-    for (let i = 0; i < this.value.length; i++) {
-      fileList.push({
-        url: this.value[i]
-      })
+    if (this.multiple) {
+      for (let i = 0; i < this.value.length; i++) {
+        fileList.push({
+          url: this.value[i]
+        })
+      }
+      this.fileList = fileList
+    } else if (this.value) {
+      this.fileList = [{url: this.value}]
     }
-    this.fileList = fileList
   },
   methods: {
     dataMatch (fileList, dataList) {
@@ -89,7 +100,12 @@ export default {
         this.$emit("input", []);
       } else {
         const url = res.data.data.url;
-        this.$emit("input", [...this.value, url])
+        if (this.multiple) {
+          this.$emit("input", [...this.value, url])
+        } else {
+          this.fileList = [{url}]
+          this.$emit("input", url)
+        }
         this.$message.success("上传成功");
       }
     },
@@ -115,4 +131,9 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+.avatar {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+}
 </style>

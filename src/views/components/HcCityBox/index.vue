@@ -120,8 +120,9 @@ export default {
       this.cityArange = cityList
     },
     hasSelected (cityId) {
-      for (let i = 0; i < this.citySelected.length; i++) {
-        if (this.citySelected[i].cityId == cityId) {
+      let citySelected = this.citySelected
+      for (let i = 0; i < citySelected.length; i++) {
+        if (citySelected[i].cityId == cityId) {
           return {
             checked: true,
             index: i

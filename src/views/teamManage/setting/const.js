@@ -86,7 +86,7 @@ export const tableOption = (edit = false, admin = false) => {
         ]
       },
       {
-        label: '所属部门',
+        label: '所属平台',
         prop: 'deptId',
         formatter: (row) => {
           return row.deptName

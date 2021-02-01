@@ -4,6 +4,7 @@
       <avue-crud
         ref="crud"
         :option="tableOption"
+        :page="page"
         :table-loading="tableLoading"
         :data="tableData"
         @on-load="getList"
@@ -28,7 +29,7 @@
           <el-button
             type="text"
             size="mini"
-            @click="toAddChild(scope.row,scope.index)">添加子字典
+            @click="toAddChild(scope.row,scope.index)">添加子级
           </el-button>
           <el-button
             type="text"
@@ -45,9 +46,9 @@
 import { tableOption, initForm } from './const'
 import DialogForm from "./DialogForm.vue";
 import {
-  getCategoryTree,
-  delCategoryById,
-} from "@/api/admin/category";
+  getPositionTree,
+  delPositionById,
+} from "@/api/admin/position";
 import { customTree } from "@/util/util";
 export default {
   components: {
@@ -66,24 +67,26 @@ export default {
       tableLoading: false,
     };
   },
-  created () {
-    this.getList()
-  },
   methods: {
-    getList() {
+    getList(page = this.page, params) {
       this.tableLoading = true
-      getCategoryTree().then(response => {
-        this.tableData = response.data.data.data
+      console.log(getPositionTree)
+      getPositionTree(Object.assign({
+        current: page.currentPage,
+        size: page.pageSize
+      }, params, this.searchForm)).then(response => {
+        this.tableData = response.data.data.records
+        this.page.total = response.data.data.total
       }).finally(() => {
         this.tableLoading = false
       })
     },
     handleFilter(param) {
       this.searchForm = param
-      this.getList()
+      this.getList(this.page, param)
     },
     handleRefreshChange() {
-      this.getList()
+      this.getList(this.page)
     },
     toCreate () {
       this.$refs.DialogForm.open(customTree(this.tableData, { label: "name", value: "id" }))
@@ -92,7 +95,7 @@ export default {
       this.$refs.DialogForm.open(customTree(this.tableData, { label: "name", value: "id" }), row, true)
     },
     toAddChild (row) {
-      this.$refs.DialogForm.open(customTree(this.tableData, { label: "name", value: "id" }), {parentId: row.id}, false, true)
+      this.$refs.DialogForm.open(customTree(this.tableData, { label: "name", value: "id" }), {parentId: row.id, type: row.type - 0 + 1}, false, true)
     },
     toDelete (row) {
       this.$confirm('是否确认删除该条数据?', '警告', {
@@ -100,7 +103,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(function() {
-        return delCategoryById(row.id)
+        return delPositionById(row.id)
       }).then(() => {
         this.getList()
         this.$message({
