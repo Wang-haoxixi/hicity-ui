@@ -26,6 +26,8 @@ export function adDetails(data) {
 }
 
 // 通过字典类型(唯一)查找字典
+// /dict/getDictByType/{type}
+// 通过字典类型(唯一)查找字典
 export function getDictByType(data) {
   return request({
     url: "/admin/dict/getDictByType/" + data,
@@ -36,7 +38,7 @@ export function getDictByType(data) {
 // 会议大厅分页查询
 export function activitiePage(data) {
   return request({
-    url: "/dms/activity_publish/activitie_page",
+    url: "/dms/activity_publish/activity_page",
     method: "get"
   });
 }

@@ -258,7 +258,7 @@ export default {
       },
 
       currentPage: 1,
-      pageSize: 5,
+      pageSize: 10,
       total: 0,
       cityGroup: [], //城市数组
     };

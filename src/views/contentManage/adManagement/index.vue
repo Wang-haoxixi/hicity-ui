@@ -11,7 +11,11 @@
       >
 
       <!-- 广告新增 -->
-      <el-dialog title="广告新增" :visible.sync="dialogFormVisible">
+      <el-dialog
+        title="广告新增"
+        :visible.sync="dialogFormVisible"
+        @close="dialogFormVisibleClose"
+      >
         <el-form :model="form" ref="ruleForm">
           <!-- 城市 -->
           <el-form-item label="城市 :" :label-width="formLabelWidth">
@@ -437,11 +441,15 @@ export default {
       },
 
       currentPage: 1,
-      pageSize: 5,
+      pageSize: 10,
       total: 30,
     };
   },
   methods: {
+    dialogFormVisibleClose() {
+      // 重置表单
+      this.$refs.ruleForm.resetFields();
+    },
     // 选中值发生变化时触发
     valChange(data) {
       console.log(data);
