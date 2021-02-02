@@ -108,7 +108,7 @@
           <el-form-item label="详情：">
             <!-- <el-input type="textarea" v-model="quillContent.content"></el-input>
             <el-input type="textarea" v-model="quillContent.structuredContent"></el-input> -->
-            <hc-quill v-model="quillContent"></hc-quill>
+            <hc-quill ref="quill" v-model="quillContent"></hc-quill>
           </el-form-item>
           <!-- <el-form-item v-if="isAdmin" label="是否允许城市停用：">
             <el-switch v-model="formData.closeAllowed" active-value="0" active-text="允许" inactive-text="不允许" inactive-value="1"></el-switch>
@@ -326,7 +326,10 @@ export default {
     },
     handleUpdate() {},
     handleDraft() {},
-    preview() {},
+    preview() {
+      // this.$refs.quill.getData()
+      // console.log()
+    },
     toDelete({ newsId }) {
       this.$confirm("是否确认删除该条咨询?", "警告", {
         confirmButtonText: "确定",
@@ -392,7 +395,7 @@ export default {
   },
 };
 </script>
-<style lang="scss">
+<style lang="scss" scope>
 .user {
   height: 100%;
 
