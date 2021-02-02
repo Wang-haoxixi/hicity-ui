@@ -18,7 +18,7 @@ RouterPlugin.install = function(router, store) {
   this.$router.$avueRouter = {
     // 全局配置
     $website: this.$store.getters.website,
-    $defaultTitle: 'Gds微服务底层框架',
+    $defaultTitle: '超能城市后台',
     routerList: [],
     group: '',
     safe: this,

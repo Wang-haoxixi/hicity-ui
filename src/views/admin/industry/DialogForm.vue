@@ -39,6 +39,7 @@ export default {
   },
   methods: {
     open (options = [], data, edit = false, isChild = false) {
+      this.methodName = edit ? '编辑' : '创建'
       this.dialogShow = true
       this.options = [
         {value: 0, label: '最高级'},
