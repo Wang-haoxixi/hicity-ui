@@ -39,7 +39,8 @@ export function getDictByType(data) {
 export function activitiePage(data) {
   return request({
     url: "/dms/activity_publish/activity_page",
-    method: "get"
+    method: "get",
+    params: data
   });
 }
 

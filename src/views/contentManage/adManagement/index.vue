@@ -245,7 +245,7 @@
             prop="type"
             :label-width="formLabelWidth"
           >
-            <el-select v-model="editForm.type" placeholder="请选择广告类型">
+            <el-select v-model="editForm.type" placeholder="请选择广告类型" @change="editTypeValChange()">
               <el-option
                 v-for="(item, index) in adType"
                 :key="index"
@@ -350,7 +350,7 @@
         <el-table-column prop="endDate" label="结束时间"></el-table-column>
         <el-table-column label="操作">
           <template slot-scope="scope">
-            <el-button size="mini" @click="handleEdit(scope.row)"
+            <el-button v-if="scope.row.authority" size="mini" @click="handleEdit(scope.row)"
               >编辑</el-button
             >
             <el-button
@@ -416,17 +416,16 @@ export default {
         imageUrl: "", //广告图片
         seq: "", //广告排序
       },
-      // 编辑广告表单
-      editForm: {},
+      editForm: {}, // 编辑广告表单
       adslotGroup: [], //广告位数据
       adType: [], //广告类型数据
       jumpObjArr: [], //跳转对象数据
 
       formLabelWidth: "120px",
 
-      rules: {
+      ruleForm: {
         cityId: [{ required: true, message: "请选择", trigger: "change" }],
-        adslot: [
+        adslotId: [
           { required: true, message: "请输入广告位", trigger: "blur" },
           { min: 1, message: "请输入", trigger: "blur" },
         ],
@@ -449,8 +448,12 @@ export default {
     dialogFormVisibleClose() {
       // 重置表单
       this.$refs.ruleForm.resetFields();
+      this.form.cityName = "";
+      this.form.cityId = "";
+      this.form.adslotId = "";
+      this.imageUrl = "";
     },
-    // 选中值发生变化时触发
+    // 新增 选中值发生变化时触发
     valChange(data) {
       console.log(data);
       if (this.adslotGroup) {
@@ -461,6 +464,10 @@ export default {
           }
         });
       }
+    },
+    // 编辑 选中值发生变化时触发
+    editTypeValChange(data){
+      console.log('选中值发生变化时触发',data)
     },
 
     // 获取广告位分页
@@ -487,14 +494,14 @@ export default {
     // 获取广告类型数据
     getDictByTypeFn() {
       getDictByType("ad_type").then((res) => {
-        this.adType = res.data.data.dictItemList;
+        this.adType = res.data.data.data.dictItemList;
         console.log("获取广告类型数据", this.adType);
       });
     },
 
     // 获取活动数据
-    getActivitiePageFn() {
-      activitiePage().then((res) => {
+    getActivitiePageFn(cityId) {
+      activitiePage({ cityId: cityId }).then((res) => {
         console.log("获取活动数据", res);
         this.jumpObjArr = res.data.data.data.records;
       });
@@ -519,16 +526,15 @@ export default {
     // 编辑按钮
     handleEdit(row) {
       console.log("row", row);
-
       this.editForm = { ...row };
       this.adslotGroup.forEach((item) => {
         if (item.cityId === row.cityId) {
           this.editForm.cityName = item.cityName;
-          // this.editForm.cityId = item.cityId;
+          this.editForm.cityId = item.cityId;
         }
       });
       if (row.type === "activity") {
-        this.getActivitiePageFn();
+        this.getActivitiePageFn(row.cityId);
       }
       // console.log("editForm", this.editForm);
 
@@ -539,8 +545,15 @@ export default {
 
     // 监听广告类型变化
     typeChange(val) {
+      console.log(val);
+      if (!this.form.cityId) {
+        this.$message.error("请先选择广告位");
+        this.form.type = "";
+        return;
+      }
+      // 活动
       if (val === "activity") {
-        this.getActivitiePageFn();
+        this.getActivitiePageFn(this.form.cityId);
       }
     },
 
