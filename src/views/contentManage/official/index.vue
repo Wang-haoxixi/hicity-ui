@@ -499,34 +499,34 @@ export default {
       addform.structuredContent = this.quillContent.structuredContent;
       console.log("addform", addform);
 
-      // if (this.publishType == "add") {
-      //   officaialNewsCreate(addform).then((res) => {
-      //     // console.log("直接发布", res);
-      //     if (res.data.code !== 0) {
-      //       return this.$message.error("发布失败");
-      //     }
-      //     this.$message({
-      //       message: "发布成功！",
-      //       type: "success",
-      //     });
-      //     this.getOfficialReleaseList();
-      //     this.isShow = true;
-      //   });
-      // } else {
-      //   console.log("sss", addform);
-      //   officaialNewsUpdate(addform).then((res) => {
-      //     if (res.data.code !== 0) {
-      //       return this.$message.error("编辑失败");
-      //     }
-      //     this.$message({
-      //       message: "编辑成功！",
-      //       type: "success",
-      //     });
-      //     this.getOfficialReleaseList();
-      //     this.isShow = true;
-      //     this.fileList = [];
-      //   });
-      // }
+      if (this.publishType == "add") {
+        officaialNewsCreate(addform).then((res) => {
+          // console.log("直接发布", res);
+          if (res.data.code !== 0) {
+            return this.$message.error("发布失败");
+          }
+          this.$message({
+            message: "发布成功！",
+            type: "success",
+          });
+          this.getOfficialReleaseList();
+          this.isShow = true;
+        });
+      } else {
+        console.log("sss", addform);
+        officaialNewsUpdate(addform).then((res) => {
+          if (res.data.code !== 0) {
+            return this.$message.error("编辑失败");
+          }
+          this.$message({
+            message: "编辑成功！",
+            type: "success",
+          });
+          this.getOfficialReleaseList();
+          this.isShow = true;
+          this.fileList = [];
+        });
+      }
     },
     // 栏目
     getCityColumn() {

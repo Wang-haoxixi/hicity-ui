@@ -83,14 +83,14 @@
       </el-table-column>
       <el-table-column label="活动状态" width="130">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.statusFlag === '0'">草稿</el-tag>
-          <el-tag v-if="scope.row.statusFlag === '1'" type="success"
+          <el-tag v-if="scope.row.statusFlag == '0'">草稿</el-tag>
+          <el-tag v-if="scope.row.statusFlag == '1'" type="success"
             >进行中</el-tag
           >
-          <el-tag v-if="scope.row.statusFlag === '2'" type="info"
+          <el-tag v-if="scope.row.statusFlag == '2'" type="info"
             >已结束</el-tag
           >
-          <el-tag v-if="scope.row.statusFlag === '3'" type="warning"
+          <el-tag v-if="scope.row.statusFlag == '3'" type="warning"
             >被下架</el-tag
           >
         </template>

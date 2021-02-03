@@ -1,7 +1,10 @@
 <template>
   <div>
     <basic-container>
-      <div class="title">基本信息</div>
+      <div class="title">
+        <div>基本信息</div>
+        <el-button @click="backClick">返回</el-button>
+      </div>
 
       <el-form
         class="elForm"
@@ -215,12 +218,8 @@
       </el-form>
 
       <!-- 设置票种 -->
-      <el-form
-        v-if="!$route.query.id"
-        ref="setTicketDataRef"
-        :model="setTicketData"
-        label-width="120px"
-      >
+      <!-- :model="setTicketData" -->
+      <el-form v-if="!$route.query.id" label-width="120px">
         <el-form-item label="设置票种：">
           <el-button @click="addTic" type="danger" plain>新增</el-button>
           <!-- 卡片 -->
@@ -237,7 +236,6 @@
                   <!-- 票务种类 -->
                   <el-form-item label="票务种类：" label-width="100">
                     <el-select
-                      @change="changeTicketingType"
                       v-model="item.ticketingType"
                       placeholder="请选择票务种类"
                     >
@@ -314,13 +312,49 @@
                 v-if="item.ticketingType === '2'"
               >
                 <el-checkbox-group v-model="item.priceType" class="checkGroup">
-                  <el-checkbox label="能贝" name="nb" class="elcheck"
-                    >能贝 <el-input v-model="item.payWeCanPay.amount"></el-input
-                  ></el-checkbox>
-                  <el-checkbox label="人民币" name="rmb"
-                    >人民币
-                    <el-input v-model="item.payOfflinePay.amount"></el-input
-                  ></el-checkbox>
+                  <el-checkbox
+                    label="能贝"
+                    name="nb"
+                    class="elcheck"
+                    :disabled="
+                      item.priceType.includes('能贝') &&
+                      item.priceType.length == 1
+                        ? true
+                        : false
+                    "
+                  >
+                    能贝：
+                    <el-input
+                      v-model="item.payWeCanPay.amount"
+                      :disabled="
+                        item.priceType.includes('能贝') &&
+                        item.priceType.length == 1
+                          ? true
+                          : false
+                      "
+                    ></el-input>
+                  </el-checkbox>
+                  <el-checkbox
+                    label="人民币"
+                    name="rmb"
+                    :disabled="
+                      item.priceType.includes('人民币') &&
+                      item.priceType.length == 1
+                        ? true
+                        : false
+                    "
+                  >
+                    人民币：
+                    <el-input
+                      v-model="item.payOfflinePay.amount"
+                      :disabled="
+                        item.priceType.includes('人民币') &&
+                        item.priceType.length == 1
+                          ? true
+                          : false
+                      "
+                    ></el-input>
+                  </el-checkbox>
                 </el-checkbox-group>
               </el-form-item>
               <el-row>
@@ -346,7 +380,7 @@
         <!-- 底部按钮 -->
         <el-button @click="publish" type="danger">发布活动</el-button>
         <el-button @click="saveManuscript">保存草稿</el-button>
-        <el-button @click="cancel">取消</el-button>
+        <el-button @click="backClick">取消</el-button>
       </div>
 
       <!-- 海报弹窗 -->
@@ -430,50 +464,20 @@ export default {
             remarks: "",
             //支付方式列表
             payMethodList: [],
-
             // 票务金额类型数组
-            priceType: [],
+            priceType: ["能贝", "人民币"],
             // 能贝支付方式
             payWeCanPay: {
               type: "WeCanPay", //支付类型
-              amount: 1, //金额
-              // name: [],
-              // typeBoolean: false,
+              amount: 0.01, //金额
             },
             // 人民币支付方式
             payOfflinePay: {
               type: "OfflinePay", //支付类型
-              amount: 1, //金额
-              // name: [],
-              // typeBoolean: false,
+              amount: 0.01, //金额
             },
           },
         ],
-      },
-      // 设置票种数据
-      setTicketData: {
-        ticketingType: "1", //票务种类
-        ticketingName: "", //票务名称
-        number: 1, //票种数量
-        limitTicket: 1, //单次购票数量
-        allowedRefund: false, //是否允许退款
-        needAudit: false, //是否审核
-        remarks: "",
-        //支付方式列表
-        payMethodList: [],
-
-        // 票务金额类型数组
-        priceType: [],
-        // 能贝支付方式
-        payWeCanPay: {
-          type: "WeCanPay", //支付类型
-          amount: 1, //金额
-        },
-        // 人民币支付方式
-        payOfflinePay: {
-          type: "OfflinePay", //支付类型
-          amount: 1, //金额
-        },
       },
 
       //活动分类
@@ -521,6 +525,22 @@ export default {
     };
   },
   methods: {
+    // 返回
+    backClick() {
+      this.$confirm(
+        "此操作将不会保存您所编辑的活动内容, 是否确认退出?",
+        "提示",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
+      )
+        .then(() => {
+          this.$router.go(-1);
+        })
+        .catch(() => {});
+    },
     // 活动分类改变触发
     changeClassification(e) {
       this.baseFormData.classification = this.classification[0];
@@ -591,7 +611,7 @@ export default {
     getActivityType() {
       activityType("qms_activity_type").then((res) => {
         console.log("活动类型", res);
-        this.activityTypeArr = res.data.data.dictItemList;
+        this.activityTypeArr = res.data.data.data.dictItemList;
       });
     },
     // 获取城市树
@@ -662,16 +682,16 @@ export default {
         //支付方式列表
         payMethodList: [],
         // 票务金额类型数组
-        priceType: [],
+        priceType: ["能贝", "人民币"],
         // 能贝支付方式
         payWeCanPay: {
           type: "WeCanPay", //支付类型
-          amount: 1, //金额
+          amount: 0.01, //金额
         },
         // 人民币支付方式
         payOfflinePay: {
           type: "OfflinePay", //支付类型
-          amount: 1, //金额
+          amount: 0.01, //金额
         },
       };
       this.baseFormData.ticketingManagements.push(setTicketData);
@@ -746,18 +766,43 @@ export default {
       });
       console.log(this.baseFormData);
 
-      // savePublish(this.baseFormData).then((res) => {
-      //   if (res.data.code !== 0) {
-      //     this.$message.error("发布活动失败！");
-      //   }
-      //   this.$message.success("发布活动成功！");
-      //   this.$router.go(-1);
-      // });
+      savePublish(this.baseFormData).then((res) => {
+        if (res.data.code !== 0) {
+          return this.$message.error("发布活动失败");
+        }
+        this.$message.success("发布活动成功");
+        this.$router.go(-1);
+      });
     },
-    // 取消
-    cancel() {},
     // 保存草稿
-    saveManuscript() {},
+    saveManuscript() {
+      this.fileList = [];
+
+      this.baseFormData.details = this.quillContent.content;
+
+      // 遍历票种数组
+      this.baseFormData.ticketingManagements.forEach((item) => {
+        // 保存时将支付方式列表清空并重新
+        item.payMethodList = [];
+        if (item.priceType.includes("能贝")) {
+          item.payMethodList.push(item.payWeCanPay);
+        }
+        if (item.priceType.includes("人民币")) {
+          item.payMethodList.push(item.payOfflinePay);
+        }
+      });
+      this.baseFormData.statusFlag = 0
+      console.log(this.baseFormData);
+
+
+      savePublish(this.baseFormData).then((res) => {
+        if (res.data.code !== 0) {
+          return this.$message.error("发布活动失败");
+        }
+        this.$message.success("发布活动成功");
+        this.$router.go(-1);
+      });
+    },
     // 移入
     mouseOver() {
       this.showDelete = true;
@@ -766,7 +811,6 @@ export default {
     mouseLeave() {
       this.showDelete = false;
     },
-    changeTicketingType(val) {},
   },
   created() {
     this.getActivityClassify();
@@ -780,9 +824,15 @@ export default {
 
 <style lang="scss" scoped>
 .title {
-  padding-bottom: 5px;
+  padding-bottom: 20px;
   font-size: 18px;
   font-weight: 400;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.elForm {
+  width: 1100px;
 }
 .poster-box {
   width: 400px;
