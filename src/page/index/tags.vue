@@ -131,13 +131,16 @@
         } else {
           tag = item
         }
-        this.$router.push({
-          path: this.$router.$avueRouter.getPath({
-            name: tag.label,
-            src: tag.value
-          }),
-          query: tag.query
-        })
+        if (tag.value !== this.$route.path) {
+          this.$router.push({
+            path: this.$router.$avueRouter.getPath({
+              name: tag.label,
+              src: tag.value
+            }),
+            query: tag.query
+          })
+        }
+        
       },
       closeOthersTags() {
         this.contextmenuFlag = false
