@@ -1,5 +1,5 @@
 <template>
-  <basic-container>
+  <div>
     <div class="mod-list-item">
       <div class="mod-list-item-title">城市首页基础配置一</div>
       <div class="mod-box">
@@ -69,7 +69,7 @@
         <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
       </div>
     </el-dialog>
-  </basic-container>
+  </div>
 </template>
 
 <script>

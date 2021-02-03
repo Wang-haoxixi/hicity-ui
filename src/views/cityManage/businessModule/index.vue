@@ -1,66 +1,71 @@
 <template>
-  <div>
-    <basic-container v-show="!setModule">
-      <el-form inline :model="tempSearch">
-        <div class="search-box">
-          <div class="serach-box-left">
-            <el-form-item label="城市搜索：">
-              <el-select v-model="tempSearch.cityId" placeholder="请选择城市" clearable="">
-                <el-option v-for="city in allCity" :key="city.id" :label="city.regionName" :value="city.id"></el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item>
-              <el-button type="primary" @click="toSearch()">查询</el-button>
-            </el-form-item>
+  <basic-container>
+    <hc-table-form
+      title="城市模块配置"
+      :formVisible="setModule"
+      @go-back="setModule = false">
+      <template>
+        <el-form inline :model="tempSearch">
+          <div class="search-box">
+            <div class="serach-box-left">
+              <el-form-item label="城市搜索：">
+                <el-select v-model="tempSearch.cityId" placeholder="请选择城市" clearable="">
+                  <el-option v-for="city in allCity" :key="city.id" :label="city.regionName" :value="city.id"></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item>
+                <el-button type="primary" @click="toSearch()">查询</el-button>
+              </el-form-item>
+            </div>
+            <div class="serach-box-right">
+              <el-form-item>
+                <el-radio-group v-model="cityStatus" style="margin-bottom: 30px;">
+                  <el-radio-button plain label="all">全部</el-radio-button>
+                  <el-radio-button plain label="1">已开通</el-radio-button>
+                  <el-radio-button plain label="2">已锁定</el-radio-button>
+                  <el-radio-button plain label="3">未开通</el-radio-button>
+                </el-radio-group>
+              </el-form-item>
+            </div>
           </div>
-          <div class="serach-box-right">
-            <el-form-item>
-              <el-radio-group v-model="cityStatus" style="margin-bottom: 30px;">
-                <el-radio-button plain label="all">全部</el-radio-button>
-                <el-radio-button plain label="1">已开通</el-radio-button>
-                <el-radio-button plain label="2">已锁定</el-radio-button>
-                <el-radio-button plain label="3">未开通</el-radio-button>
-              </el-radio-group>
-            </el-form-item>
-          </div>
-        </div>
-        
-      </el-form>
-
-      <div class="city-box">
-        <div v-for="city in cityList" :key="city.cityId" class="city-item">
-          <div class="city-item-info">
-            <div class="city-item-name">{{city.cityName}}</div>
-          </div>
-          <div class="city-item-option">
-            <city-state :state="city.state || ''" :is-opening="city.isOpening"></city-state>
-            <div class="city-item-option-right">
-              <template v-if="isAdmin || !city.isPlatform">
-                <el-button type="text" size="mini" @click="handleModule(city)">配置</el-button>
-              </template>
+          
+        </el-form>
+        <div class="city-box">
+          <div v-for="city in cityList" :key="city.cityId" class="city-item">
+            <div class="city-item-info">
+              <div class="city-item-name">{{city.cityName}}</div>
+            </div>
+            <div class="city-item-option">
+              <city-state :state="city.state || ''" :is-opening="city.isOpening"></city-state>
+              <div class="city-item-option-right">
+                <template v-if="isAdmin || !city.isPlatform">
+                  <el-button type="text" size="mini" @click="handleModule(city)">配置</el-button>
+                </template>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+        <div class="pagination-box">
+          <el-pagination
+            style="display: inline-block"
+            @size-change="sizeChange"
+            @current-change="currentChange"
+            :current-page="page.currentPage"
+            :page-sizes="[10, 20, 30,, 40, 50, 100]"
+            background
+            :page-size="page.pageSize"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="page.total">
+          </el-pagination>
+        </div>
+      </template>
 
-      <div class="pagination-box">
-        <el-pagination
-          style="display: inline-block"
-          @size-change="sizeChange"
-          @current-change="currentChange"
-          :current-page="page.currentPage"
-          :page-sizes="[10, 20, 30,, 40, 50, 100]"
-          background
-          :page-size="page.pageSize"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="page.total">
-        </el-pagination>
-      </div>
-    </basic-container>
+      <template slot="form">
+        <module-list module-list :city-id="handleCityId"></module-list>
 
-    <module-list v-if="setModule" :city-id="handleCityId"></module-list>
-
-  </div>
+      </template>
+    </hc-table-form>
+  </basic-container>
   
 </template>
 
@@ -69,8 +74,9 @@ import { adminCityList, adminCityOpenList } from '@/api/admin/city'
 import { mapGetters } from 'vuex'
 import CityState from '../CityState.vue'
 import ModuleList from './moduleList/index'
+import HcTableForm from "@/views/components/HcTableForm/index";
 export default {
-  components: { CityState, ModuleList },
+  components: { CityState, ModuleList, HcTableForm },
   data () {
     return {
       tempSearch: {
@@ -97,13 +103,6 @@ export default {
     isAdmin () {
       return this.userInfo.userType == 3 || this.userInfo.userType == 4
     },
-    formTitle () {
-      if (this.formType == 'add') {
-        return '新 增'
-      } else if (this.formType == 'edit') {
-        return '编 辑'
-      }
-    }
   },
   watch: {
     cityStatus (val) {

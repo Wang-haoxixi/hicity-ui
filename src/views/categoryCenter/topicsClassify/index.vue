@@ -1,126 +1,100 @@
 <template>
   <basic-container>
-    <div v-show="!publish">
-      <!-- <el-form inline :model="tempSearch" class="demo-form-inline">
-        <el-form-item label="标签名称：">
-          <el-input v-model="tempSearch.name" placeholder="请输入标签名称"></el-input>
-        </el-form-item>
-        <el-form-item label="标签编码：">
-          <el-input v-model="tempSearch.classifyCode" placeholder="请输入标签编码"></el-input>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="toSearch()">查询</el-button>
-        </el-form-item>
-      </el-form> -->
-      <div>
-        <el-button
-          class="filter-item"
-          type="primary"
-          size="mini"
-          icon="el-icon-plus"
-          @click="toCreate">添加
-        </el-button>
-      </div>
-
-      <div class="classify-box">
-        <div v-for="classify in classifyList" :key="classify.classifyId" class="classify-item">
-          <div class="classify-item-name">{{classify.classifyName}}</div>
-          <el-image class="classify-item-cover" :src="classify.imageUrl"></el-image>
-          <div class="classify-item-topic-view" @click="topicView(classify.id)">关联话题</div>
-          <div class="classify-item-option">
-            <el-button type="text" size="mini" @click="toUpdate(classify)">编辑</el-button>
-            <el-button type="text" size="mini" @click="handleDel(classify.id)">删除</el-button>
-          </div>
-        </div>
-      </div>
-
-      <div class="pagination-box">
-        <el-pagination
-          style="display: inline-block"
-          @size-change="sizeChange"
-          @current-change="currentChange"
-          :current-page="page.currentPage"
-          :page-sizes="[10, 20, 30,, 40, 50, 100]"
-          background
-          :page-size="page.pageSize"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="page.total">
-        </el-pagination>
-      </div>
-    </div>
-
-    <div v-if="publish">
-      <div class="form-title">
-        <div class="form-title-name">
-          游记话题-{{
-            publishType == "add"
-              ? "新增"
-              : publishType == "edit"
-              ? "编辑"
-              : ""
-          }}
-        </div>
-        <el-button @click="publish = false">返 回</el-button>
-      </div>
-      <el-form ref="form"
-        class="dialog-main-tree"
-        :model="formData"
-        :rules="formRule"
-        label-width="180px">
-        <el-form-item label="分类名称：" prop="classifyName">
-          <el-input v-model="formData.classifyName"></el-input>
-        </el-form-item>
-        <el-form-item label="图片：">
-          <hc-image-upload :limit="1" v-model="formData.imageUrl"></hc-image-upload>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="handleSave">保存</el-button>
-        </el-form-item>
-      </el-form>
-
-      <avue-crud
-        :option="tableOption"
-        :table-loading="tableLoading"
-        :data="tableData">
-        <template slot="menuLeft">
-          关联话题
-        </template>
-        <template slot="menuRight">
+    <hc-table-form
+      :title="title"
+      :formVisible="publish"
+      @go-back="publish = false">
+      <template>
+        <div>
           <el-button
             class="filter-item"
             type="primary"
             size="mini"
             icon="el-icon-plus"
-            @click="toAddTopic">添加
+            @click="toCreate">添加
           </el-button>
-        </template>
-        <template slot="menu" slot-scope="scope">
-          <template>
-            <el-button type="text" size="mini" @click="toDeleteTopic(scope.row)" >删除</el-button>
-          </template>
-        </template>
-      </avue-crud>
-
-      <el-dialog
-        title="新增关联"
-        :visible.sync="topicDialogVisible"
-        width="70%">
-        <el-form :model="formData" labelWidth="150px">
-          <el-form-item label="选择话题：">
-            <el-select v-model="topicAdd" multiple value-key="id">
-              <el-option v-for="item in topicSelectList" :key="item.id" :value="item" :label="item.topicsName">{{item.topicsName}}</el-option>
-            </el-select>
+        </div>
+        <div class="classify-box">
+          <div v-for="classify in classifyList" :key="classify.id" class="classify-item">
+            <div class="classify-item-name">{{classify.classifyName}}</div>
+            <el-image class="classify-item-cover" :src="classify.imageUrl"></el-image>
+            <div class="classify-item-topic-view" @click="topicView(classify.id)">关联话题</div>
+            <div class="classify-item-option">
+              <el-button type="text" size="mini" @click="toUpdate(classify)">编辑</el-button>
+              <el-button type="text" size="mini" @click="handleDel(classify.id)">删除</el-button>
+            </div>
+          </div>
+        </div>
+        <div class="pagination-box">
+          <el-pagination
+            style="display: inline-block"
+            @size-change="sizeChange"
+            @current-change="currentChange"
+            :current-page="page.currentPage"
+            :page-sizes="[10, 20, 30,, 40, 50, 100]"
+            background
+            :page-size="page.pageSize"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="page.total">
+          </el-pagination>
+        </div>
+      </template>
+      <template slot="form">
+        <el-form ref="form"
+          class="dialog-main-tree"
+          :model="formData"
+          :rules="formRule"
+          label-width="180px">
+          <el-form-item label="分类名称：" prop="classifyName">
+            <el-input v-model="formData.classifyName"></el-input>
+          </el-form-item>
+          <el-form-item label="图片：">
+            <hc-image-upload :limit="1" v-model="formData.imageUrl"></hc-image-upload>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="handleSave">保存</el-button>
           </el-form-item>
         </el-form>
-        <div slot="footer">
-          <el-button v-show="formType == 'add'" type="primary" @click="addTopic">保 存</el-button>
-          <el-button @click="topicDialogVisible = false">取 消</el-button>
-        </div>
-      </el-dialog>
-
-    </div>
-    
-
+        <avue-crud
+          :option="tableOption"
+          :table-loading="tableLoading"
+          :data="tableData">
+          <template slot="menuLeft">
+            关联话题
+          </template>
+          <template slot="menuRight">
+            <el-button
+              class="filter-item"
+              type="primary"
+              size="mini"
+              icon="el-icon-plus"
+              @click="toAddTopic">添加
+            </el-button>
+          </template>
+          <template slot="menu" slot-scope="scope">
+            <template>
+              <el-button type="text" size="mini" @click="toDeleteTopic(scope.row)" >删除</el-button>
+            </template>
+          </template>
+        </avue-crud>
+        <el-dialog
+          title="新增关联"
+          :visible.sync="topicDialogVisible"
+          width="70%">
+          <el-form :model="formData" labelWidth="150px">
+            <el-form-item label="选择话题：">
+              <el-select v-model="topicAdd" multiple value-key="id">
+                <el-option v-for="item in topicSelectList" :key="item.id" :value="item" :label="item.topicsName">{{item.topicsName}}</el-option>
+              </el-select>
+            </el-form-item>
+          </el-form>
+          <div slot="footer">
+            <el-button v-show="formType == 'add'" type="primary" @click="addTopic">保 存</el-button>
+            <el-button @click="topicDialogVisible = false">取 消</el-button>
+          </div>
+        </el-dialog>
+      </template>
+    </hc-table-form>
     <el-dialog
       title="关联话题"
       :visible.sync="topicViewDialogVisible"
@@ -144,9 +118,9 @@
 import { getClassifyList, addClassify, getTopicList, updateClassify, deleteClassify, deleteRelation } from '@/api/cms/travel'
 import { mapGetters } from 'vuex'
 import HcImageUpload from '@/views/components/HcImageUpload/index'
-import { adminCityList } from '@/api/admin/city'
+import HcTableForm from "@/views/components/HcTableForm/index";
 export default {
-  components: { HcImageUpload },
+  components: { HcImageUpload, HcTableForm },
   data () {
     return {
       tempSearch: {
@@ -207,11 +181,15 @@ export default {
     isAdmin () {
       return this.userInfo.userType == 3 || this.userInfo.userType == 4
     },
-    formTitle () {
-      if (this.formType == 'add') {
-        return '新 增'
-      } else if (this.formType == 'edit') {
-        return '编 辑'
+    title () {
+      if (!this.publish) {
+        return '游记话题'
+      } else {
+        if (this.publishType == 'add') {
+          return '游记话题-新增'
+        } else {
+          return '游记话题-编辑'
+        }
       }
     }
   },

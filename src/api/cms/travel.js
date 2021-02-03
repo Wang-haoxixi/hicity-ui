@@ -85,3 +85,35 @@ export function deleteRelation (id) {
   })
 }
 
+// 获取游记列表
+export function getTravelList (params) {
+  return request({
+    url: `${prefix}/pc/page_list`,
+    params
+  })
+}
+
+// 获取游记列表
+export function saveTravel (data) {
+  return request({
+    url: `${prefix}/save_pc`,
+    method: 'POST',
+    data
+  })
+}
+
+// 获取游记列表
+export function getTravelDetail (id) {
+  return request({
+    url: `${prefix}/detail/${id}`,
+  })
+}
+
+// 获取游记列表
+export function deleteTravel (id) {
+  return request({
+    url: `${prefix}/delete/${id}`,
+    method: 'post'
+  })
+}
+

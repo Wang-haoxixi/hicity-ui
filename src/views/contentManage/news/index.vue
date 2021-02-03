@@ -1,8 +1,10 @@
 <template>
-  <div class="user">
-    <basic-container>
+  <basic-container>
+    <hc-table-form
+      :title="title"
+      :formVisible="publish"
+      @go-back="publish = false">
       <avue-crud
-        v-show="!publish"
         ref="crud"
         :option="tableOption"
         :page="page"
@@ -46,20 +48,7 @@
           </template>
         </template>
       </avue-crud>
-
-      <div v-if="publish">
-        <div class="form-title">
-          <div class="form-title-name">
-            城市新闻-{{
-              publishType == "add"
-                ? "新增"
-                : publishType == "edit"
-                ? "编辑"
-                : ""
-            }}
-          </div>
-          <el-button @click="publish = false">返 回</el-button>
-        </div>
+      <tempalte slot="form">
         <el-form
           ref="form"
           class="dialog-main-tree"
@@ -119,8 +108,11 @@
             <el-button @click="handleCreate">直接发布</el-button>
           </el-form-item>
         </el-form>
-      </div>
-    </basic-container>
+      </tempalte>
+      
+    </hc-table-form>
+
+
 
     <el-dialog
       title="展示城市"
@@ -155,7 +147,7 @@
         <el-button @click="tagViewDialogVisible = false">取 消</el-button>
       </div>
     </el-dialog>
-  </div>
+  </basic-container>
 </template>
 
 <script>
@@ -176,10 +168,11 @@ import HcQuill from "@/views/components/HcQuill";
 import HcCityBox from "@/views/components/HcCityBox/index";
 import HcCitySelect from "@/views/components/HcCitySelect/index";
 import HcImageUpload from "@/views/components/HcImageUpload/index";
+import HcTableForm from "@/views/components/HcTableForm/index";
 
 export default {
   name: "SysUser",
-  components: { HcQuill, HcCityBox, HcCitySelect, HcImageUpload },
+  components: { HcQuill, HcCityBox, HcCitySelect, HcImageUpload, HcTableForm },
   data() {
     return {
       page: {
@@ -217,6 +210,17 @@ export default {
     isAdmin() {
       return this.userInfo.userType == 3 || this.userInfo.userType == 4;
     },
+    title () {
+      if (!this.publish) {
+        return '城市新闻'
+      } else {
+        if (this.publishType == 'add') {
+          return '城市新闻-新增'
+        } else {
+          return '城市新闻-编辑'
+        }
+      }
+    }
   },
   watch: {},
   created() {

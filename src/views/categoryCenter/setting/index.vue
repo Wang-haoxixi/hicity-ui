@@ -98,7 +98,6 @@
 import { getTagList, setTagSort, tagEnable, addTag, updateTag, deleteTag, tagOpenList } from '@/api/tms/city'
 import { mapGetters } from 'vuex'
 import HcCityBox from '@/views/components/HcCityBox/index'
-import { adminCityList } from '@/api/admin/city'
 export default {
   components: { HcCityBox },
   data () {

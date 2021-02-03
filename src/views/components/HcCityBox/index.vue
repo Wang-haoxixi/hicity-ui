@@ -19,7 +19,6 @@
 
 <script>
 import pinyin from 'pinyin'
-import { adminCityList } from '@/api/admin/city'
 
 function formatCitys (tempCityList) {
   let cityList = Object.assign([], tempCityList)

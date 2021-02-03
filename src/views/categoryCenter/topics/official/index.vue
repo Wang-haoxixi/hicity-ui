@@ -22,7 +22,7 @@
         </el-button>
       </template>
       <template slot="classifyIdForm" slot-scope="scope">
-        <el-select v-model="scope.row.classifyId">
+        <el-select v-model="scope.row.classifyId" clearable>
           <el-option v-for="item in classifyList" :key="item.id" :label="item.classifyName" :value="item.id"></el-option>
         </el-select>
       </template>
@@ -93,13 +93,13 @@ export default {
         isQuote: 1,
       };
       getTopicList(form)
-        .then(({ data }) => {
-          this.tableData = data.data.data.records;
-          this.page.total = data.data.data.total;
-        })
-        .finally(() => {
-          this.tableLoading = false;
-        });
+      .then(({ data }) => {
+        this.tableData = data.data.data.records;
+        this.page.total = data.data.data.total;
+      })
+      .finally(() => {
+        this.tableLoading = false;
+      });
     },
     toCreate() {
       this.$refs.crud.rowAdd()
