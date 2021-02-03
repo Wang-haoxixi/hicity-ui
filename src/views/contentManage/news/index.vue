@@ -12,16 +12,15 @@
         :data="tableData"
         @on-load="getList"
         @refresh-change="handleRefreshChange"
+        style="margin-left: 0;"
       >
         <template slot="menuLeft">
           <el-button
-            class="filter-item"
             type="primary"
             size="mini"
             icon="el-icon-plus"
             @click="toCreate"
-            >添加
-          </el-button>
+            >新建</el-button>
         </template>
         <template slot="tagList" slot-scope="scope">
           <el-button type="text" size="mini" @click="tagView(scope.row)"
@@ -48,7 +47,7 @@
           </template>
         </template>
       </avue-crud>
-      <tempalte slot="form">
+      <template slot="form">
         <el-form
           ref="form"
           class="dialog-main-tree"
@@ -108,7 +107,7 @@
             <el-button @click="handleCreate">直接发布</el-button>
           </el-form-item>
         </el-form>
-      </tempalte>
+      </template>
       
     </hc-table-form>
 

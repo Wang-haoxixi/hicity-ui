@@ -95,7 +95,8 @@ export default {
       allCity: [],
       cityViewDialogVisible: false,
       cityStatus: 'all',
-      setModule: false
+      setModule: false,
+      handleCityId: '',
     }
   },
   computed: {

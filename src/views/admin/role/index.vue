@@ -20,7 +20,8 @@
             v-if="roleManager_btn_add"
             class="filter-item"
             type="primary"
-            icon="el-icon-edit"
+            size="mini"
+            icon="el-icon-plus"
             @click="handleCreate">添加
           </el-button>
         </template>

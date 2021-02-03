@@ -12,6 +12,7 @@
         :data="tableData"
         @on-load="getList"
         @refresh-change="handleRefreshChange"
+        style="margin-left: 0;"
       >
         <template slot="menuLeft">
           <el-button
@@ -20,8 +21,7 @@
             size="mini"
             icon="el-icon-plus"
             @click="toCreate"
-            >添加
-          </el-button>
+            >新建</el-button>
         </template>
         <template slot="cityList" slot-scope="scope">
           <el-button type="text" size="mini"

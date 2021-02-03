@@ -20,7 +20,7 @@
             class="filter-item"
             type="primary"
             size="mini"
-            icon="el-icon-edit"
+            icon="el-icon-plus"
             @click="handleCreate">添加
           </el-button>
         </template>

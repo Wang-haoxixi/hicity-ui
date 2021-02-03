@@ -1,384 +1,382 @@
 <template>
-  <div>
-    <basic-container>
-      <div class="title">广告管理</div>
-      <el-button
-        @click="dialogFormVisible = true"
-        type="primary"
-        class="el-icon-plus"
-      >
-        新增</el-button
-      >
+  <basic-container>
+    <hc-table-form
+      title="广告管理">
+      <template>
+        <el-button
+          @click="dialogFormVisible = true"
+          type="primary"
+          size="mini"
+          icon="el-icon-plus"
+        >新建</el-button>
+        <el-table
+          :data="tableData"
+          border
+          stripe
+          :header-cell-style="{ background: '#FAFAFA' }"
+          style="width: 100%; margin-top: 10px"
+          ref="multipleTable"
+        >
+          <el-table-column type="selection" width="55"></el-table-column>
+          <el-table-column
+            prop="seq"
+            label="广告排序"
+            width="100"
+          ></el-table-column>
+          <el-table-column prop="imageUrl" label="广告缩略图" width="180">
+            <template slot-scope="scope">
+              <div class="picbox">
+                <img :src="scope.row.imageUrl" class="pic" />
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column prop="adName" label="广告名称"></el-table-column>
+          <el-table-column prop="adslotName" label="广告位"></el-table-column>
+          <el-table-column prop="beginDate" label="开始时间"></el-table-column>
+          <el-table-column prop="endDate" label="结束时间"></el-table-column>
+          <el-table-column label="操作">
+            <template slot-scope="scope" v-if="scope.row.authority">
+              <el-button size="mini" type="text" @click="handleEdit(scope.row)"
+                >编辑</el-button
+              >
+              <el-button
+                size="mini"
+                type="text"
+                @click="handleDelete(scope.row)"
+                >删除</el-button
+              >
+            </template>
+          </el-table-column>
+        </el-table>
+        <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page="currentPage"
+          :page-sizes="[10, 20, 30, 40, 50, 100]"
+          :page-size="pageSize"
+          :total="total"
+          class="paging"
+          layout="total, sizes, prev, pager, next, jumper"
+        ></el-pagination>
+      </template>
 
-      <!-- 广告新增 -->
-      <el-dialog
-        title="广告新增"
-        :visible.sync="dialogFormVisible"
-        @close="dialogFormVisibleClose"
-      >
-        <el-form :model="form" ref="ruleForm">
-          <!-- 城市 -->
-          <el-form-item label="城市 :" :label-width="formLabelWidth">
-            <el-input
-              v-model="form.cityName"
-              disabled
-              autocomplete="off"
-            ></el-input>
-          </el-form-item>
-          <!-- 广告位 -->
-          <el-form-item
-            label="广告位 :"
-            prop="adslot"
-            :label-width="formLabelWidth"
+    </hc-table-form>
+    <!-- 广告新增 -->
+    <el-dialog
+      title="广告新增"
+      :visible.sync="dialogFormVisible"
+      @close="dialogFormVisibleClose"
+    >
+      <el-form :model="form" ref="ruleForm">
+        <!-- 城市 -->
+        <el-form-item label="城市 :" :label-width="formLabelWidth">
+          <el-input
+            v-model="form.cityName"
+            disabled
+            autocomplete="off"
+          ></el-input>
+        </el-form-item>
+        <!-- 广告位 -->
+        <el-form-item
+          label="广告位 :"
+          prop="adslot"
+          :label-width="formLabelWidth"
+        >
+          <el-select
+            v-model="form.adslotId"
+            placeholder="请选择广告位"
+            @change="valChange"
           >
-            <el-select
-              v-model="form.adslotId"
-              placeholder="请选择广告位"
-              @change="valChange"
-            >
-              <el-option
-                v-for="(item, index) in adslotGroup"
-                :key="index"
-                :label="item.adslotName"
-                :value="item.adslotId"
-              ></el-option>
-            </el-select>
-          </el-form-item>
-          <!-- 广告名称 -->
-          <el-form-item
-            label="广告名称 :"
-            prop="adName"
-            :label-width="formLabelWidth"
+            <el-option
+              v-for="(item, index) in adslotGroup"
+              :key="index"
+              :label="item.adslotName"
+              :value="item.adslotId"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <!-- 广告名称 -->
+        <el-form-item
+          label="广告名称 :"
+          prop="adName"
+          :label-width="formLabelWidth"
+        >
+          <el-input v-model="form.adName" autocomplete="off"></el-input>
+        </el-form-item>
+        <!-- 开始时间 -->
+        <el-form-item
+          label="开始时间 :"
+          prop="beginDate"
+          :label-width="formLabelWidth"
+        >
+          <el-date-picker
+            value-format="yyyy-MM-dd HH:mm:ss"
+            v-model="form.beginDate"
+            type="datetime"
+            placeholder="选择日期时间"
           >
-            <el-input v-model="form.adName" autocomplete="off"></el-input>
-          </el-form-item>
-          <!-- 开始时间 -->
-          <el-form-item
-            label="开始时间 :"
-            prop="beginDate"
-            :label-width="formLabelWidth"
-          >
-            <el-date-picker
-              value-format="yyyy-MM-dd HH:mm:ss"
-              v-model="form.beginDate"
-              type="datetime"
-              placeholder="选择日期时间"
-            >
-            </el-date-picker>
-          </el-form-item>
+          </el-date-picker>
+        </el-form-item>
 
-          <!-- 结束时间 -->
-          <el-form-item
-            label="结束时间 :"
-            prop="endDate"
-            :label-width="formLabelWidth"
+        <!-- 结束时间 -->
+        <el-form-item
+          label="结束时间 :"
+          prop="endDate"
+          :label-width="formLabelWidth"
+        >
+          <el-date-picker
+            value-format="yyyy-MM-dd HH:mm:ss"
+            v-model="form.endDate"
+            type="datetime"
+            placeholder="选择日期时间"
           >
-            <el-date-picker
-              value-format="yyyy-MM-dd HH:mm:ss"
-              v-model="form.endDate"
-              type="datetime"
-              placeholder="选择日期时间"
-            >
-            </el-date-picker>
-          </el-form-item>
+          </el-date-picker>
+        </el-form-item>
 
-          <!-- 广告类型 -->
-          <el-form-item
-            label="广告类型 :"
-            prop="type"
-            :label-width="formLabelWidth"
+        <!-- 广告类型 -->
+        <el-form-item
+          label="广告类型 :"
+          prop="type"
+          :label-width="formLabelWidth"
+        >
+          <el-select
+            @change="typeChange"
+            v-model="form.type"
+            placeholder="请选择广告类型"
           >
-            <el-select
-              @change="typeChange"
-              v-model="form.type"
-              placeholder="请选择广告类型"
-            >
-              <el-option
-                v-for="(item, index) in adType"
-                :key="index"
-                :label="item.description"
-                :value="item.label"
-              ></el-option>
-            </el-select>
-          </el-form-item>
+            <el-option
+              v-for="(item, index) in adType"
+              :key="index"
+              :label="item.description"
+              :value="item.label"
+            ></el-option>
+          </el-select>
+        </el-form-item>
 
-          <!-- 跳转类型 -->
-          <!-- <el-form-item
-            label="跳转类型 :"
-            prop="jumpType"
-            :label-width="formLabelWidth"
+        <!-- 跳转类型 -->
+        <!-- <el-form-item
+          label="跳转类型 :"
+          prop="jumpType"
+          :label-width="formLabelWidth"
+        >
+          <el-select v-model="form.jumpType" placeholder="请选择跳转类型">
+          </el-select>
+        </el-form-item> -->
+
+        <!-- 跳转对象 -->
+        <el-form-item
+          v-if="form.type"
+          label="跳转对象 :"
+          prop="jumpObj"
+          :label-width="formLabelWidth"
+        >
+          <el-select v-model="form.jumpObj" placeholder="请选择跳转对象">
+            <el-option
+              v-for="(item, index) in jumpObjArr"
+              :key="index"
+              :label="item.name"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+
+        <!-- 广告文字 -->
+        <el-form-item
+          label="广告文字 :"
+          prop="text"
+          :label-width="formLabelWidth"
+        >
+          <el-input type="textarea" v-model="form.text"></el-input>
+        </el-form-item>
+
+        <!-- 广告图片 -->
+        <el-form-item
+          label="广告图片 :"
+          prop="imageUrl"
+          :label-width="formLabelWidth"
+        >
+          <el-upload
+            class="avatar-uploader"
+            :action="baseUrl"
+            :show-file-list="false"
+            :on-success="handleAvatarSuccess"
+            :headers="headersOpt"
           >
-            <el-select v-model="form.jumpType" placeholder="请选择跳转类型">
-            </el-select>
-          </el-form-item> -->
+            <img v-if="imageUrl" :src="form.imageUrl" class="avatar" />
+            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+          </el-upload>
+        </el-form-item>
 
-          <!-- 跳转对象 -->
-          <el-form-item
-            v-if="form.type"
-            label="跳转对象 :"
-            prop="jumpObj"
-            :label-width="formLabelWidth"
+        <!-- 排序 -->
+        <el-form-item label="排序 :" prop="seq" :label-width="formLabelWidth">
+          <el-input-number
+            v-model="form.seq"
+            controls-position="right"
+            :min="1"
+          ></el-input-number>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="submit">确 定</el-button>
+      </div>
+    </el-dialog>
+    <!-- 广告编辑 -->
+    <el-dialog title="广告编辑" :visible.sync="dialogEditFormVisible">
+      <el-form :model="editForm" ref="ruleForm">
+        <!-- 城市 -->
+        <el-form-item label="城市 :" :label-width="formLabelWidth">
+          <el-input
+            v-model="editForm.cityName"
+            disabled
+            autocomplete="off"
+          ></el-input>
+        </el-form-item>
+        <!-- 广告位 -->
+        <el-form-item
+          label="广告位 :"
+          prop="adslot"
+          :label-width="formLabelWidth"
+        >
+          <el-select
+            v-model="editForm.adslotId"
+            placeholder="请选择广告位"
+            @change="valChange"
           >
-            <el-select v-model="form.jumpObj" placeholder="请选择跳转对象">
-              <el-option
-                v-for="(item, index) in jumpObjArr"
-                :key="index"
-                :label="item.name"
-                :value="item.id"
-              ></el-option>
-            </el-select>
-          </el-form-item>
-
-          <!-- 广告文字 -->
-          <el-form-item
-            label="广告文字 :"
-            prop="text"
-            :label-width="formLabelWidth"
+            <el-option
+              v-for="(item, index) in adslotGroup"
+              :key="index"
+              :label="item.adslotName"
+              :value="item.adslotId"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <!-- 广告名称 -->
+        <el-form-item
+          label="广告名称 :"
+          prop="adName"
+          :label-width="formLabelWidth"
+        >
+          <el-input v-model="editForm.adName" autocomplete="off"></el-input>
+        </el-form-item>
+        <!-- 开始时间 -->
+        <el-form-item
+          label="开始时间 :"
+          prop="beginDate"
+          :label-width="formLabelWidth"
+        >
+          <el-date-picker
+            value-format="yyyy-MM-dd HH:mm:ss"
+            v-model="editForm.beginDate"
+            type="datetime"
+            placeholder="选择日期时间"
           >
-            <el-input type="textarea" v-model="form.text"></el-input>
-          </el-form-item>
+          </el-date-picker>
+        </el-form-item>
 
-          <!-- 广告图片 -->
-          <el-form-item
-            label="广告图片 :"
-            prop="imageUrl"
-            :label-width="formLabelWidth"
+        <!-- 结束时间 -->
+        <el-form-item
+          label="结束时间 :"
+          prop="endDate"
+          :label-width="formLabelWidth"
+        >
+          <el-date-picker
+            value-format="yyyy-MM-dd HH:mm:ss"
+            v-model="editForm.endDate"
+            type="datetime"
+            placeholder="选择日期时间"
           >
-            <el-upload
-              class="avatar-uploader"
-              :action="baseUrl"
-              :show-file-list="false"
-              :on-success="handleAvatarSuccess"
-              :headers="headersOpt"
-            >
-              <img v-if="imageUrl" :src="form.imageUrl" class="avatar" />
-              <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-            </el-upload>
-          </el-form-item>
+          </el-date-picker>
+        </el-form-item>
 
-          <!-- 排序 -->
-          <el-form-item label="排序 :" prop="seq" :label-width="formLabelWidth">
-            <el-input-number
-              v-model="form.seq"
-              controls-position="right"
-              :min="1"
-            ></el-input-number>
-          </el-form-item>
-        </el-form>
-        <div slot="footer" class="dialog-footer">
-          <el-button @click="dialogFormVisible = false">取 消</el-button>
-          <el-button type="primary" @click="submit">确 定</el-button>
-        </div>
-      </el-dialog>
-
-      <!-- 广告编辑 -->
-      <el-dialog title="广告编辑" :visible.sync="dialogEditFormVisible">
-        <el-form :model="editForm" ref="ruleForm">
-          <!-- 城市 -->
-          <el-form-item label="城市 :" :label-width="formLabelWidth">
-            <el-input
-              v-model="editForm.cityName"
-              disabled
-              autocomplete="off"
-            ></el-input>
-          </el-form-item>
-          <!-- 广告位 -->
-          <el-form-item
-            label="广告位 :"
-            prop="adslot"
-            :label-width="formLabelWidth"
+        <!-- 广告类型 -->
+        <el-form-item
+          label="广告类型 :"
+          prop="type"
+          :label-width="formLabelWidth"
+        >
+          <el-select
+            v-model="editForm.type"
+            placeholder="请选择广告类型"
+            @change="editTypeValChange()"
           >
-            <el-select
-              v-model="editForm.adslotId"
-              placeholder="请选择广告位"
-              @change="valChange"
-            >
-              <el-option
-                v-for="(item, index) in adslotGroup"
-                :key="index"
-                :label="item.adslotName"
-                :value="item.adslotId"
-              ></el-option>
-            </el-select>
-          </el-form-item>
-          <!-- 广告名称 -->
-          <el-form-item
-            label="广告名称 :"
-            prop="adName"
-            :label-width="formLabelWidth"
+            <el-option
+              v-for="(item, index) in adType"
+              :key="index"
+              :label="item.description"
+              :value="item.label"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+
+        <!-- 跳转类型 -->
+        <!-- <el-form-item
+          label="跳转类型 :"
+          prop="jumpType"
+          :label-width="formLabelWidth"
+        >
+          <el-select v-model="editForm.jumpType" placeholder="请选择跳转类型">
+          </el-select>
+        </el-form-item> -->
+
+        <!-- 跳转对象 -->
+        <el-form-item
+          label="跳转对象 :"
+          prop="jumpObj"
+          :label-width="formLabelWidth"
+        >
+          <el-select v-model="editForm.jumpObj" placeholder="请选择跳转对象">
+            <el-option
+              v-for="(item, index) in jumpObjArr"
+              :key="index"
+              :label="item.name"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+
+        <!-- 广告文字 -->
+        <el-form-item
+          label="广告文字 :"
+          prop="text"
+          :label-width="formLabelWidth"
+        >
+          <el-input type="textarea" v-model="editForm.text"></el-input>
+        </el-form-item>
+
+        <!-- 广告图片 -->
+        <el-form-item
+          label="广告图片 :"
+          prop="imageUrl"
+          :label-width="formLabelWidth"
+        >
+          <el-upload
+            class="avatar-uploader"
+            :action="baseUrl"
+            :show-file-list="false"
+            :on-success="handleEditPicSuccess"
+            :headers="headersOpt"
           >
-            <el-input v-model="editForm.adName" autocomplete="off"></el-input>
-          </el-form-item>
-          <!-- 开始时间 -->
-          <el-form-item
-            label="开始时间 :"
-            prop="beginDate"
-            :label-width="formLabelWidth"
-          >
-            <el-date-picker
-              value-format="yyyy-MM-dd HH:mm:ss"
-              v-model="editForm.beginDate"
-              type="datetime"
-              placeholder="选择日期时间"
-            >
-            </el-date-picker>
-          </el-form-item>
+            <img v-if="imageUrl" :src="editForm.imageUrl" class="avatar" />
+            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+          </el-upload>
+        </el-form-item>
 
-          <!-- 结束时间 -->
-          <el-form-item
-            label="结束时间 :"
-            prop="endDate"
-            :label-width="formLabelWidth"
-          >
-            <el-date-picker
-              value-format="yyyy-MM-dd HH:mm:ss"
-              v-model="editForm.endDate"
-              type="datetime"
-              placeholder="选择日期时间"
-            >
-            </el-date-picker>
-          </el-form-item>
-
-          <!-- 广告类型 -->
-          <el-form-item
-            label="广告类型 :"
-            prop="type"
-            :label-width="formLabelWidth"
-          >
-            <el-select
-              v-model="editForm.type"
-              placeholder="请选择广告类型"
-              @change="editTypeValChange()"
-            >
-              <el-option
-                v-for="(item, index) in adType"
-                :key="index"
-                :label="item.description"
-                :value="item.label"
-              ></el-option>
-            </el-select>
-          </el-form-item>
-
-          <!-- 跳转类型 -->
-          <!-- <el-form-item
-            label="跳转类型 :"
-            prop="jumpType"
-            :label-width="formLabelWidth"
-          >
-            <el-select v-model="editForm.jumpType" placeholder="请选择跳转类型">
-            </el-select>
-          </el-form-item> -->
-
-          <!-- 跳转对象 -->
-          <el-form-item
-            label="跳转对象 :"
-            prop="jumpObj"
-            :label-width="formLabelWidth"
-          >
-            <el-select v-model="editForm.jumpObj" placeholder="请选择跳转对象">
-              <el-option
-                v-for="(item, index) in jumpObjArr"
-                :key="index"
-                :label="item.name"
-                :value="item.id"
-              ></el-option>
-            </el-select>
-          </el-form-item>
-
-          <!-- 广告文字 -->
-          <el-form-item
-            label="广告文字 :"
-            prop="text"
-            :label-width="formLabelWidth"
-          >
-            <el-input type="textarea" v-model="editForm.text"></el-input>
-          </el-form-item>
-
-          <!-- 广告图片 -->
-          <el-form-item
-            label="广告图片 :"
-            prop="imageUrl"
-            :label-width="formLabelWidth"
-          >
-            <el-upload
-              class="avatar-uploader"
-              :action="baseUrl"
-              :show-file-list="false"
-              :on-success="handleEditPicSuccess"
-              :headers="headersOpt"
-            >
-              <img v-if="imageUrl" :src="editForm.imageUrl" class="avatar" />
-              <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-            </el-upload>
-          </el-form-item>
-
-          <!-- 排序 -->
-          <el-form-item label="排序 :" prop="seq" :label-width="formLabelWidth">
-            <el-input-number
-              v-model="editForm.seq"
-              controls-position="right"
-              :min="1"
-            ></el-input-number>
-          </el-form-item>
-        </el-form>
-        <div slot="footer" class="dialog-footer">
-          <el-button @click="dialogEditFormVisible = false">取 消</el-button>
-          <el-button type="primary" @click="editSubmit">确 定</el-button>
-        </div>
-      </el-dialog>
-
-      <el-table
-        :data="tableData"
-        border
-        stripe
-        :header-cell-style="{ background: '#FAFAFA' }"
-        style="width: 100%; margin-top: 10px"
-        ref="multipleTable"
-      >
-        <el-table-column type="selection" width="55"></el-table-column>
-        <el-table-column
-          prop="seq"
-          label="广告排序"
-          width="100"
-        ></el-table-column>
-        <el-table-column prop="imageUrl" label="广告缩略图" width="180">
-          <template slot-scope="scope">
-            <div class="picbox">
-              <img :src="scope.row.imageUrl" class="pic" />
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column prop="adName" label="广告名称"></el-table-column>
-        <el-table-column prop="adslotName" label="广告位"></el-table-column>
-        <el-table-column prop="beginDate" label="开始时间"></el-table-column>
-        <el-table-column prop="endDate" label="结束时间"></el-table-column>
-        <el-table-column label="操作">
-          <template slot-scope="scope" v-if="scope.row.authority">
-            <el-button size="mini" @click="handleEdit(scope.row)"
-              >编辑</el-button
-            >
-            <el-button
-              size="mini"
-              type="primary"
-              @click="handleDelete(scope.row)"
-              >删除</el-button
-            >
-          </template>
-        </el-table-column>
-      </el-table>
-
-      <el-pagination
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        :current-page="currentPage"
-        :page-sizes="[10, 20, 30, 40, 50, 100]"
-        :page-size="pageSize"
-        :total="total"
-        class="paging"
-        layout="total, sizes, prev, pager, next, jumper"
-      ></el-pagination>
-    </basic-container>
-  </div>
+        <!-- 排序 -->
+        <el-form-item label="排序 :" prop="seq" :label-width="formLabelWidth">
+          <el-input-number
+            v-model="editForm.seq"
+            controls-position="right"
+            :min="1"
+          ></el-input-number>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogEditFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="editSubmit">确 定</el-button>
+      </div>
+    </el-dialog>
+  </basic-container>
 </template>
 
 <script>
