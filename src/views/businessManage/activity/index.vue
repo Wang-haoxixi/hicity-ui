@@ -27,11 +27,11 @@
       </el-col>
     </el-row>
 
+      <!-- :row-key="getRowKeys" -->
+      <!-- :expand-row-keys="expends" -->
     <el-table
       style="margin-top: 10px"
       :header-cell-style="{ background: '#FAFAFA' }"
-      :row-key="getRowKeys"
-      :expand-row-keys="expends"
       :data="tableData"
     >
       <!-- 展开列 -->
@@ -106,7 +106,7 @@
         width="100"
       ></el-table-column>
       <el-table-column label="操作" width="140">
-        <template slot-scope="scope">
+        <template slot-scope="scope" v-if="scope.row.authority">
           <el-button type="text" @click="handleEdit(scope.row)">编辑</el-button>
           <el-button type="text" @click="handleDelete(scope.row)"
             >删除</el-button
@@ -289,13 +289,13 @@ export default {
       console.log(this.expends);
     },
     // 行数据的 Key
-    getRowKeys(row) {
-      return row.id;
-    },
+    // getRowKeys(row) {
+    //   return row.id;
+    // },
   },
   created() {
     this.getActivitiesListFn();
-    this.getExpends();
+    // this.getExpends();
   },
   mounted() {},
 };

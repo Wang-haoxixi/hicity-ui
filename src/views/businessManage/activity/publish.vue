@@ -661,7 +661,6 @@ export default {
         remarks: "",
         //支付方式列表
         payMethodList: [],
-
         // 票务金额类型数组
         priceType: [],
         // 能贝支付方式
@@ -727,9 +726,7 @@ export default {
       console.log("fileList", this.fileList);
       console.log("baseFormData.fileList", this.baseFormData.fileList);
     },
-    onChange(res) {
-      // console.log("onChange", res);
-    },
+    onChange(res) {},
     // 发布活动
     publish() {
       this.fileList = [];
@@ -749,13 +746,13 @@ export default {
       });
       console.log(this.baseFormData);
 
-      savePublish(this.baseFormData).then((res) => {
-        if (res.data.code !== 0) {
-          this.$message.error("发布活动失败！");
-        }
-        this.$message.success("发布活动成功！");
-        this.$router.go(-1);
-      });
+      // savePublish(this.baseFormData).then((res) => {
+      //   if (res.data.code !== 0) {
+      //     this.$message.error("发布活动失败！");
+      //   }
+      //   this.$message.success("发布活动成功！");
+      //   this.$router.go(-1);
+      // });
     },
     // 取消
     cancel() {},

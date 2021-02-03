@@ -1,5 +1,4 @@
 <template>
-  <!-- 官方发布 -->
   <div>
     <!-- 官方发布 -->
     <basic-container v-if="isShow">
@@ -112,7 +111,10 @@
 
     <!-- 官方发布 - 新增 -->
     <basic-container v-else>
-      <div class="title">官方发布 - 新增</div>
+      <div class="title">
+        <div>官方发布 - 新增</div>
+        <el-button @click="backClisk">返回</el-button>
+      </div>
       <el-form ref="addformRef" :model="addform" label-width="80px">
         <!-- 名称 -->
         <el-form-item label="名称">
@@ -176,7 +178,7 @@
         </el-form-item>
 
         <!-- 是否允许城市停用 -->
-        <el-form-item
+        <!-- <el-form-item
           label="是否允许城市停用"
           label-width="140px"
           v-if="isAdmin"
@@ -188,7 +190,7 @@
             inactive-text="不允许"
             inactive-value="1"
           ></el-switch>
-        </el-form-item>
+        </el-form-item> -->
 
         <!-- 事件按钮 -->
         <el-form-item>
@@ -258,6 +260,9 @@ export default {
     };
   },
   methods: {
+    backClisk(){
+      this.isShow = true;
+    },
     init() {
       getAllTagList({ cityId: this.userInfo.manageCityId }).then(({ data }) => {
         this.tagList = data.data.data;
@@ -439,37 +444,34 @@ export default {
     // 预览
     preview() {},
     // 保存草稿
-    handleDraft() {},
-    // 直接发布
-    handleCreate() {
+    handleDraft() {
       this.urlList.forEach((item) => {
         item.imageSizeType = this.addform.imageSizeType;
       });
       this.addform.urlList = this.urlList;
-      console.log("aaa", this.addform);
-
       let addform = this.addform;
       console.log(addform);
 
       addform.officialNewsContent = this.quillContent.content;
       addform.structuredContent = this.quillContent.structuredContent;
+      addform.state = 0
       console.log("addform", addform);
 
       if (this.publishType == "add") {
         officaialNewsCreate(addform).then((res) => {
           // console.log("直接发布", res);
           if (res.data.code !== 0) {
-            return this.$message.error("发布失败");
+            return this.$message.error("保存失败");
           }
           this.$message({
-            message: "发布成功！",
+            message: "保存成功！",
             type: "success",
           });
           this.getOfficialReleaseList();
           this.isShow = true;
         });
       } else {
-        console.log('sss',addform);
+        console.log("sss", addform);
         officaialNewsUpdate(addform).then((res) => {
           if (res.data.code !== 0) {
             return this.$message.error("编辑失败");
@@ -483,6 +485,48 @@ export default {
           this.fileList = [];
         });
       }
+    },
+    // 直接发布
+    handleCreate() {
+      this.urlList.forEach((item) => {
+        item.imageSizeType = this.addform.imageSizeType;
+      });
+      this.addform.urlList = this.urlList;
+      let addform = this.addform;
+      console.log(addform);
+
+      addform.officialNewsContent = this.quillContent.content;
+      addform.structuredContent = this.quillContent.structuredContent;
+      console.log("addform", addform);
+
+      // if (this.publishType == "add") {
+      //   officaialNewsCreate(addform).then((res) => {
+      //     // console.log("直接发布", res);
+      //     if (res.data.code !== 0) {
+      //       return this.$message.error("发布失败");
+      //     }
+      //     this.$message({
+      //       message: "发布成功！",
+      //       type: "success",
+      //     });
+      //     this.getOfficialReleaseList();
+      //     this.isShow = true;
+      //   });
+      // } else {
+      //   console.log("sss", addform);
+      //   officaialNewsUpdate(addform).then((res) => {
+      //     if (res.data.code !== 0) {
+      //       return this.$message.error("编辑失败");
+      //     }
+      //     this.$message({
+      //       message: "编辑成功！",
+      //       type: "success",
+      //     });
+      //     this.getOfficialReleaseList();
+      //     this.isShow = true;
+      //     this.fileList = [];
+      //   });
+      // }
     },
     // 栏目
     getCityColumn() {
@@ -517,9 +561,12 @@ export default {
 
 <style lang="scss" scoped>
 .title {
-  padding-bottom: 5px;
+  padding-bottom: 20px;
   font-size: 18px;
   font-weight: 400;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 .add-inp-more {
   display: flex;

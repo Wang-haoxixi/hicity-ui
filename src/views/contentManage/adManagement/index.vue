@@ -245,7 +245,11 @@
             prop="type"
             :label-width="formLabelWidth"
           >
-            <el-select v-model="editForm.type" placeholder="请选择广告类型" @change="editTypeValChange()">
+            <el-select
+              v-model="editForm.type"
+              placeholder="请选择广告类型"
+              @change="editTypeValChange()"
+            >
               <el-option
                 v-for="(item, index) in adType"
                 :key="index"
@@ -349,8 +353,8 @@
         <el-table-column prop="beginDate" label="开始时间"></el-table-column>
         <el-table-column prop="endDate" label="结束时间"></el-table-column>
         <el-table-column label="操作">
-          <template slot-scope="scope">
-            <el-button v-if="scope.row.authority" size="mini" @click="handleEdit(scope.row)"
+          <template slot-scope="scope" v-if="scope.row.authority">
+            <el-button size="mini" @click="handleEdit(scope.row)"
               >编辑</el-button
             >
             <el-button
@@ -367,7 +371,7 @@
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         :current-page="currentPage"
-        :page-sizes="[2, 5, 10, 15]"
+        :page-sizes="[10, 20, 30, 40, 50, 100]"
         :page-size="pageSize"
         :total="total"
         class="paging"
@@ -466,14 +470,16 @@ export default {
       }
     },
     // 编辑 选中值发生变化时触发
-    editTypeValChange(data){
-      console.log('选中值发生变化时触发',data)
+    editTypeValChange(data) {
+      console.log("选中值发生变化时触发", data);
     },
 
     // 获取广告位分页
     getAdPosition() {
       adPosition().then((res) => {
-        this.adslotGroup = res.data.data.data.records;
+        this.adslotGroup = res.data.data.data.records.filter((item) => {
+          return item.authority == true;
+        });
         console.log("adslotGroup", this.adslotGroup);
       });
     },

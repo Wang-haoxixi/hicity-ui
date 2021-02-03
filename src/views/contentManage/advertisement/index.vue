@@ -181,8 +181,8 @@
         ></el-table-column>
         <el-table-column prop="cityName" label="城市"></el-table-column>
         <el-table-column label="操作">
-          <template slot-scope="scope">
-            <el-button v-if="scope.row.authority" size="mini" @click="handleEdit(scope.row)"
+          <template slot-scope="scope" v-if="scope.row.authority">
+            <el-button  size="mini" @click="handleEdit(scope.row)"
               >编辑</el-button
             >
             <el-button
