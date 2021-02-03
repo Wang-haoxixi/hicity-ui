@@ -279,7 +279,7 @@
         getCityTree(this.listQuery).then(({
           data
         }) => {
-          this.treeData = data.data
+          this.treeData = data.data.data
           // console.log('treedata',this.treeData)
         })
         this.$nextTick(() => {

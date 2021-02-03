@@ -75,6 +75,7 @@
             v-model="form.deptId"
             :dic="treeDeptData"
             :props="defaultProps"
+            :default-expand-all="false"
             type="tree"
             :disabled="!notAdmin(scope.row)"
             placeholder="请选择所属部门"/>

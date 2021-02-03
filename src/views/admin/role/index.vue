@@ -181,7 +181,7 @@ export default {
     },
     handleOpenBefore(show) {
       getCityTree().then(response => {
-        this.treeCityData = response.data.data
+        this.treeCityData = response.data.data.data
       })
       show()
     },
