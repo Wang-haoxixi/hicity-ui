@@ -48,20 +48,20 @@
           slot="menu"
           slot-scope="scope">
           <el-button
-            v-if="sys_user_edit && userInfo.userType >= scope.row.userType"
+            v-if="sys_user_edit && editAuth(scope.row.userType)"
             type="text"
             size="mini"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row,scope.index)">编辑
           </el-button>
           <el-button
-            v-if="permissions['sys_user_role'] && userInfo.userType >= scope.row.userType"
+            v-if="permissions['sys_user_role'] && editAuth(scope.row.userType)"
             type="text"
             size="mini"
             @click="handleRole(scope.row,scope.index)">配置角色
           </el-button>
           <el-button
-            v-if="sys_user_del && notAdmin(scope.row)"
+            v-if="sys_user_del && notAdmin(scope.row) && editAuth(scope.row.userType)"
             type="text"
             size="mini"
             icon="el-icon-delete"
@@ -93,7 +93,7 @@
           <el-option v-for="item in rolesOptions" :key="item.roleId"
             :label="item.roleName"
             :value="item.roleId"
-            :disabled="item.roleId == 1 || item.roleId == 2"></el-option>
+            :disabled="item.roleId == 1 || item.roleId == 2 || item.roleId == 4"></el-option>
         </el-select>
 
         <!-- <avue-select
@@ -194,6 +194,10 @@
                     this.page.total = response.data.data.data.total
                     this.listLoading = false
                 })
+            },
+            editAuth (userType) {
+              userType = userType == '5' ? '2.5' : userType
+              return this.userInfo.userType >= userType
             },
             handleDept() {
                 fetchTree().then(response => {
