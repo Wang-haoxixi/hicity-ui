@@ -618,8 +618,8 @@ export default {
     getCityTree() {
       cityTree().then((res) => {
         // 删除城市树中children为空的属性
-        this.handleRecurve(res.data.data[0].children);
-        this.holdAddressArr = res.data.data[0].children;
+        this.handleRecurve(res.data.data.data[0].children);
+        this.holdAddressArr = res.data.data.data[0].children;
         console.log("城市树", res);
       });
     },

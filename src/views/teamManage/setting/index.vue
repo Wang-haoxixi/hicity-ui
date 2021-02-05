@@ -20,7 +20,7 @@
             class="filter-item"
             type="primary"
             size="mini"
-            icon="el-icon-edit"
+            icon="el-icon-plus"
             @click="handleCreate">添加
           </el-button>
         </template>
@@ -75,6 +75,7 @@
             v-model="form.deptId"
             :dic="treeDeptData"
             :props="defaultProps"
+            :default-expand-all="false"
             type="tree"
             :disabled="!notAdmin(scope.row)"
             placeholder="请选择所属部门"/>

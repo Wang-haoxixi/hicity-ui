@@ -1,156 +1,12 @@
 <template>
-  <div>
-    <basic-container>
-      <div class="title">广告位管理</div>
-      <!-- 新增按钮 -->
+  <basic-container>
+    <hc-table-form title="广告位管理">
       <el-button
         @click="dialogFormVisible = true"
         type="primary"
-        class="el-icon-plus"
-      >
-        新增</el-button
-      >
-
-      <!-- 广告位新增弹窗 -->
-      <el-dialog
-        title="广告位新增"
-        :visible.sync="dialogFormVisible"
-        @close="dialogFormVisibleClose"
-      >
-        <el-form :model="form" :rules="rules" ref="ruleForm">
-          <!-- 城市 -->
-          <el-form-item
-            label="城市 :"
-            prop="cityId"
-            :label-width="formLabelWidth"
-          >
-            <el-select
-              v-model="form.cityId"
-              placeholder="请选择城市"
-              filterable
-              @change="valChange"
-            >
-              <el-option
-                v-for="(item, index) in cityGroup"
-                :key="index"
-                :label="item.regionName"
-                :value="item.id"
-              ></el-option>
-            </el-select>
-          </el-form-item>
-          <!-- 广告位名称 -->
-          <el-form-item
-            label="广告位名称 :"
-            prop="adslotName"
-            :label-width="formLabelWidth"
-          >
-            <el-input v-model="form.adslotName" autocomplete="off"></el-input>
-          </el-form-item>
-          <!-- 广告位编码 -->
-          <el-form-item
-            label="广告位编码 :"
-            prop="adslotNumber"
-            :label-width="formLabelWidth"
-          >
-            <el-input v-model="form.adslotNumber" autocomplete="off"></el-input>
-          </el-form-item>
-          <!-- 广告位描述 -->
-          <el-form-item
-            label="广告位描述 :"
-            prop="adslotDescription"
-            :label-width="formLabelWidth"
-          >
-            <el-input
-              type="textarea"
-              v-model="form.adslotDescription"
-            ></el-input>
-          </el-form-item>
-          <!-- 类型 -->
-          <el-form-item
-            label="类型 :"
-            prop="type"
-            :label-width="formLabelWidth"
-          >
-            <el-radio-group v-model="form.type">
-              <el-radio :label="1">文字</el-radio>
-              <el-radio :label="2">图片</el-radio>
-            </el-radio-group>
-          </el-form-item>
-        </el-form>
-        <div slot="footer" class="dialog-footer">
-          <el-button @click="dialogFormVisible = false">取 消</el-button>
-          <el-button type="primary" @click="submit">确 定</el-button>
-        </div>
-      </el-dialog>
-
-      <!-- 广告位编辑 -->
-      <el-dialog title="广告位编辑" :visible.sync="dialogEditFormVisible">
-        <el-form :model="editForm" :rules="rules" ref="ruleEditForm">
-          <el-form-item
-            label="城市 :"
-            prop="cityId"
-            :label-width="formLabelWidth"
-          >
-            <el-select
-              v-model="editForm.cityId"
-              placeholder="请选择城市"
-              @change="valChange"
-              filterable
-            >
-              <el-option
-                v-for="(item, index) in cityGroup"
-                :key="index"
-                :label="item.regionName"
-                :value="item.id"
-              ></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item
-            label="广告位名称 :"
-            prop="adslotName"
-            :label-width="formLabelWidth"
-          >
-            <el-input
-              v-model="editForm.adslotName"
-              autocomplete="off"
-            ></el-input>
-          </el-form-item>
-          <el-form-item
-            label="广告位编码 :"
-            prop="adslotNumber"
-            :label-width="formLabelWidth"
-          >
-            <el-input
-              v-model="editForm.adslotNumber"
-              autocomplete="off"
-            ></el-input>
-          </el-form-item>
-          <el-form-item
-            label="广告位描述 :"
-            prop="adslotDescription"
-            :label-width="formLabelWidth"
-          >
-            <el-input
-              type="textarea"
-              v-model="editForm.adslotDescription"
-            ></el-input>
-          </el-form-item>
-          <el-form-item
-            label="类型 :"
-            prop="type"
-            :label-width="formLabelWidth"
-          >
-            <el-radio-group v-model="editForm.type">
-              <el-radio :label="1">文字</el-radio>
-              <el-radio :label="2">图片</el-radio>
-            </el-radio-group>
-          </el-form-item>
-        </el-form>
-        <div slot="footer" class="dialog-footer">
-          <el-button @click="dialogEditFormVisible = false">取 消</el-button>
-          <el-button type="primary" @click="editSubmit">确 定</el-button>
-        </div>
-      </el-dialog>
+        icon="el-icon-plus"
+        size="mini"
+      >新建</el-button>
 
       <el-table
         :data="tableData"
@@ -182,12 +38,12 @@
         <el-table-column prop="cityName" label="城市"></el-table-column>
         <el-table-column label="操作">
           <template slot-scope="scope" v-if="scope.row.authority">
-            <el-button  size="mini" @click="handleEdit(scope.row)"
+            <el-button  size="mini" type="text" @click="handleEdit(scope.row)"
               >编辑</el-button
             >
             <el-button
               size="mini"
-              type="primary"
+              type="text"
               @click="handleDelete(scope.row)"
               >删除</el-button
             >
@@ -206,8 +62,151 @@
         class="paging"
         layout="total, sizes, prev, pager, next, jumper"
       ></el-pagination>
-    </basic-container>
-  </div>
+
+    </hc-table-form>
+
+
+    <!-- 广告位新增弹窗 -->
+    <el-dialog
+      title="广告位新增"
+      :visible.sync="dialogFormVisible"
+      @close="dialogFormVisibleClose"
+    >
+      <el-form :model="form" :rules="rules" ref="ruleForm">
+        <!-- 城市 -->
+        <el-form-item
+          label="城市 :"
+          prop="cityId"
+          :label-width="formLabelWidth"
+        >
+          <el-select
+            v-model="form.cityId"
+            placeholder="请选择城市"
+            filterable
+            @change="valChange"
+          >
+            <el-option
+              v-for="(item, index) in cityGroup"
+              :key="index"
+              :label="item.regionName"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <!-- 广告位名称 -->
+        <el-form-item
+          label="广告位名称 :"
+          prop="adslotName"
+          :label-width="formLabelWidth"
+        >
+          <el-input v-model="form.adslotName" autocomplete="off"></el-input>
+        </el-form-item>
+        <!-- 广告位编码 -->
+        <el-form-item
+          label="广告位编码 :"
+          prop="adslotNumber"
+          :label-width="formLabelWidth"
+        >
+          <el-input v-model="form.adslotNumber" autocomplete="off"></el-input>
+        </el-form-item>
+        <!-- 广告位描述 -->
+        <el-form-item
+          label="广告位描述 :"
+          prop="adslotDescription"
+          :label-width="formLabelWidth"
+        >
+          <el-input
+            type="textarea"
+            v-model="form.adslotDescription"
+          ></el-input>
+        </el-form-item>
+        <!-- 类型 -->
+        <el-form-item
+          label="类型 :"
+          prop="type"
+          :label-width="formLabelWidth"
+        >
+          <el-radio-group v-model="form.type">
+            <el-radio :label="1">文字</el-radio>
+            <el-radio :label="2">图片</el-radio>
+          </el-radio-group>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="submit">确 定</el-button>
+      </div>
+    </el-dialog>
+
+    <!-- 广告位编辑 -->
+    <el-dialog title="广告位编辑" :visible.sync="dialogEditFormVisible">
+      <el-form :model="editForm" :rules="rules" ref="ruleEditForm">
+        <el-form-item
+          label="城市 :"
+          prop="cityId"
+          :label-width="formLabelWidth"
+        >
+          <el-select
+            v-model="editForm.cityId"
+            placeholder="请选择城市"
+            @change="valChange"
+            filterable
+          >
+            <el-option
+              v-for="(item, index) in cityGroup"
+              :key="index"
+              :label="item.regionName"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item
+          label="广告位名称 :"
+          prop="adslotName"
+          :label-width="formLabelWidth"
+        >
+          <el-input
+            v-model="editForm.adslotName"
+            autocomplete="off"
+          ></el-input>
+        </el-form-item>
+        <el-form-item
+          label="广告位编码 :"
+          prop="adslotNumber"
+          :label-width="formLabelWidth"
+        >
+          <el-input
+            v-model="editForm.adslotNumber"
+            autocomplete="off"
+          ></el-input>
+        </el-form-item>
+        <el-form-item
+          label="广告位描述 :"
+          prop="adslotDescription"
+          :label-width="formLabelWidth"
+        >
+          <el-input
+            type="textarea"
+            v-model="editForm.adslotDescription"
+          ></el-input>
+        </el-form-item>
+        <el-form-item
+          label="类型 :"
+          prop="type"
+          :label-width="formLabelWidth"
+        >
+          <el-radio-group v-model="editForm.type">
+            <el-radio :label="1">文字</el-radio>
+            <el-radio :label="2">图片</el-radio>
+          </el-radio-group>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogEditFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="editSubmit">确 定</el-button>
+      </div>
+    </el-dialog>
+  </basic-container>
 </template>
 
 <script>

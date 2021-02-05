@@ -20,7 +20,8 @@
             v-if="roleManager_btn_add"
             class="filter-item"
             type="primary"
-            icon="el-icon-edit"
+            size="mini"
+            icon="el-icon-plus"
             @click="handleCreate">添加
           </el-button>
         </template>
@@ -180,7 +181,7 @@ export default {
     },
     handleOpenBefore(show) {
       getCityTree().then(response => {
-        this.treeCityData = response.data.data
+        this.treeCityData = response.data.data.data
       })
       show()
     },

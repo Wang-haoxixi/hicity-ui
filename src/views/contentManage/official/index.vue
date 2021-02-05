@@ -1,19 +1,19 @@
 <template>
-  <div>
+  <basic-container>
     <!-- 官方发布 -->
-    <basic-container v-if="isShow">
-      <div class="title">官方发布</div>
-
-      <div class="add-inp-more">
+    <hc-table-form
+      :title="title"
+      :formVisible="!isShow"
+      @go-back="isShow = true">
+      <template>
+        <div class="add-inp-more">
         <!-- 新建按钮 -->
         <el-button
           size="mini"
           @click="toCreate"
           type="primary"
-          class="el-icon-plus"
-        >
-          新建</el-button
-        >
+          icon="el-icon-plus"
+        >新建</el-button>
         <div class="inp-more">
           <el-input
             size="mini"
@@ -26,96 +26,72 @@
           <el-button icon="el-icon-more" class="more"></el-button>
         </div>
       </div>
-
-      <!-- 表格 -->
-      <el-table
-        :data="tableData"
-        border
-        stripe
-        :header-cell-style="{ background: '#FAFAFA' }"
-        style="width: 100%"
-      >
-        <el-table-column prop="officialNewsName" label="名称">
-        </el-table-column>
-        <el-table-column
-          prop="officialColumnName"
-          label="栏目"
-        ></el-table-column>
-        <el-table-column prop="createByName" label="发布者"></el-table-column>
-        <el-table-column prop="state" label="状态" width="100">
-        </el-table-column>
-        <el-table-column prop="createTime" label="创建时间"></el-table-column>
-        <!-- 平台可见 -->
-        <el-table-column label="展示范围" width="80" v-if="isAdmin">
-          <template slot-scope="scope">
-            <span @click="check(scope.row.officialNewsId)" class="isClick"
-              >查看</span
+        <!-- 表格 -->
+        <el-table
+          :data="tableData"
+          border
+          stripe
+          :header-cell-style="{ background: '#FAFAFA' }"
+          style="width: 100%"
+        >
+          <el-table-column prop="officialNewsName" label="名称">
+          </el-table-column>
+          <el-table-column
+            prop="officialColumnName"
+            label="栏目"
+          ></el-table-column>
+          <el-table-column prop="createByName" label="发布者"></el-table-column>
+          <el-table-column prop="state" label="状态" width="100">
+          </el-table-column>
+          <el-table-column prop="createTime" label="创建时间"></el-table-column>
+          <!-- 平台可见 -->
+          <el-table-column label="展示范围" width="80" v-if="isAdmin">
+            <template slot-scope="scope">
+              <span @click="check(scope.row.officialNewsId)" class="isClick"
+                >查看</span
+              >
+            </template>
+          </el-table-column>
+          <el-table-column label="操作">
+            <template
+              slot-scope="scope"
+              v-if="isAdmin || (!isAdmin && scope.row.source == 2)"
             >
-          </template>
-        </el-table-column>
-        <el-table-column label="操作">
-          <template
-            slot-scope="scope"
-            v-if="isAdmin || (!isAdmin && scope.row.source == 2)"
-          >
-            <!-- <el-button
-              @click="handleDetails(scope.row)"
-              type="text"
-              size="small"
-              >详情</el-button
-            > -->
-            <el-button @click="handleEdit(scope.row)" type="text" size="small"
-              >编辑</el-button
-            >
-            <el-button @click="handleDel(scope.row)" type="text" size="small"
-              >删除</el-button
-            >
-            <!-- <el-button
-              @click="handleCopylink(scope.row)"
-              type="text"
-              size="small"
-              >复制链接</el-button
-            > -->
-          </template>
-        </el-table-column>
-      </el-table>
-
-      <!-- 展示城市 -->
-      <el-dialog
-        title="展示城市"
-        :visible.sync="cityViewDialogVisible"
-        width="70%"
-      >
-        <hc-city-box
-          view-only
-          :init-city-list="initCityList"
-          :all-city-list="allCityList"
-        ></hc-city-box>
-        <div slot="footer">
-          <el-button @click="cityViewDialogVisible = false">取 消</el-button>
-        </div>
-      </el-dialog>
-
-      <el-pagination
-        background
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        :current-page="currentPage"
-        :page-sizes="[10, 20, 30, 40, 50, 100]"
-        :page-size="pageSize"
-        :total="total"
-        class="paging"
-        layout="total, sizes, prev, pager, next, jumper"
-      ></el-pagination>
-    </basic-container>
-
-    <!-- 官方发布 - 新增 -->
-    <basic-container v-else>
-      <div class="title">
-        <div>官方发布 - 新增</div>
-        <el-button @click="backClisk">返回</el-button>
-      </div>
-      <el-form ref="addformRef" :model="addform" label-width="80px">
+              <!-- <el-button
+                @click="handleDetails(scope.row)"
+                type="text"
+                size="small"
+                >详情</el-button
+              > -->
+              <el-button @click="handleEdit(scope.row)" type="text" size="small"
+                >编辑</el-button
+              >
+              <el-button @click="handleDel(scope.row)" type="text" size="small"
+                >删除</el-button
+              >
+              <!-- <el-button
+                @click="handleCopylink(scope.row)"
+                type="text"
+                size="small"
+                >复制链接</el-button
+              > -->
+            </template>
+          </el-table-column>
+        </el-table>
+        <el-pagination
+          background
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page="currentPage"
+          :page-sizes="[10, 20, 30, 40, 50, 100]"
+          :page-size="pageSize"
+          :total="total"
+          class="paging"
+          layout="total, sizes, prev, pager, next, jumper"
+        ></el-pagination>
+      </template>
+      <template slot="form">
+        <el-form ref="addformRef" :model="addform" label-width="80px">
         <!-- 名称 -->
         <el-form-item label="名称">
           <el-input v-model="addform.officialNewsName"></el-input>
@@ -199,8 +175,25 @@
           <el-button @click="handleCreate">直接发布</el-button>
         </el-form-item>
       </el-form>
-    </basic-container>
-  </div>
+      </template>
+    </hc-table-form>
+
+    <!-- 展示城市 -->
+    <el-dialog
+      title="展示城市"
+      :visible.sync="cityViewDialogVisible"
+      width="70%"
+    >
+      <hc-city-box
+        view-only
+        :init-city-list="initCityList"
+        :all-city-list="allCityList"
+      ></hc-city-box>
+      <div slot="footer">
+        <el-button @click="cityViewDialogVisible = false">取 消</el-button>
+      </div>
+    </el-dialog>
+  </basic-container>
 </template>
 
 <script>
@@ -220,8 +213,9 @@ import { mapGetters } from "vuex";
 import store from "@/store";
 import { getAllTagList } from "@/api/tms/city";
 import { adminCityList } from "@/api/admin/city";
+import HcTableForm from "@/views/components/HcTableForm/index";
 export default {
-  components: { HcQuill, HcCityBox, HcCitySelect },
+  components: { HcQuill, HcCityBox, HcCitySelect, HcTableForm },
   data() {
     return {
       isShow: true, //是否显示咨询列表
@@ -560,6 +554,17 @@ export default {
     isAdmin() {
       return this.userInfo.userType == 3 || this.userInfo.userType == 4;
     },
+    title () {
+      if (this.isShow) {
+        return '官方发布'
+      } else {
+        if (this.publishType == 'add') {
+          return '官方发布-新增'
+        } else {
+          return '官方发布-编辑'
+        }
+      }
+    }
   },
   created() {
     this.getOfficialReleaseList();
