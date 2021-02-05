@@ -636,7 +636,7 @@ export default {
     getTagsPage() {
       tagsPage().then((res) => {
         console.log("标签页", res);
-        res.data.data.records.forEach((item) => {
+        res.data.data.data.records.forEach((item) => {
           this.allTagArr.push({
             label: item.tagId,
             value: item.name,

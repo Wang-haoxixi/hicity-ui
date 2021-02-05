@@ -19,7 +19,7 @@ export const tableOption = (admin = false) => {
       prop: 'state',
       width: 90,
       formatter: function (data) {
-        if (data == 0) {
+        if (data.state == 0) {
           return '草稿'
         } else if (data.state == 1) {
           return '已生效'

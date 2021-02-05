@@ -529,8 +529,10 @@ export default {
 
     // 编辑按钮
     handleEdit(row) {
-      console.log("row", row);
+      // console.log("row", row);
       this.editForm = { ...row };
+      console.log('aaaa',this.editForm)
+
       this.adslotGroup.forEach((item) => {
         if (item.cityId === row.cityId) {
           this.editForm.cityName = item.cityName;

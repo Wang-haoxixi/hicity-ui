@@ -237,7 +237,7 @@ export default {
       total: 0,
       // 预览的图片数组
       fileList: [],
-      urlList: [], //图片墙数组
+      urlList: [], //标题图数组
       quillContent: {
         content: "",
         structuredContent: "",
@@ -254,7 +254,7 @@ export default {
     };
   },
   methods: {
-    backClisk(){
+    backClisk() {
       this.isShow = true;
     },
     init() {
@@ -289,14 +289,15 @@ export default {
     },
     // 获取官方发布列表
     getOfficialReleaseList() {
-      if (this.isAdmin) {
-        this.addform.source = 1;
-      }
-      officialReleaseList({
+      let form = {
         current: this.currentPage,
         size: this.pageSize,
-        // source: this.addform.source, //1平台，2城市
-      }).then((res) => {
+      }
+      if (this.isAdmin) {
+        this.addform.source = 1;
+        form.source = 1
+      }
+      officialReleaseList(form).then((res) => {
         res.data.data.data.records.forEach((item) => {
           if (item.state === 0) {
             item.state = "草稿状态";
@@ -341,12 +342,22 @@ export default {
     // },
     // 编辑
     handleEdit(row) {
-      console.log("编辑", row);
       officialDetail({
         officialNewsId: row.officialNewsId,
       }).then((res) => {
-        console.log("res", res);
+        let officialColumnId = res.data.data.data.officialColumnId
+        let officialMatch = false
+        for (let i = 0; i < this.columnData.length; i++) {
+          if (this.columnData[i].officialColumnId == officialColumnId) {
+            officialMatch = true
+            break
+          }
+        }
+        if (!officialMatch) {
+          res.data.data.data.officialColumnId = ''
+        }
         this.addform = res.data.data.data;
+        console.log("this.addform", this.addform);
         this.quillContent = {
           content: res.data.data.data.officialNewsContent,
           structuredContent: res.data.data.data.structuredContent,
@@ -368,7 +379,7 @@ export default {
         console.log("urlList", this.urlList);
       });
       this.publishType = "edit";
-      // console.log('this.addform.urlList',this.addform.urlList)
+      console.log('this.addform.urlList',this.addform.urlList)
     },
     // 删除
     handleDel(row) {
@@ -432,7 +443,7 @@ export default {
       this.urlList.push({
         type: "image",
         newsUrl: res.data.data.url,
-        imageSizeType: this.addform.imageSizeType,
+        // imageSizeType: this.addform.imageSizeType,
       });
     },
     // 预览
@@ -448,7 +459,7 @@ export default {
 
       addform.officialNewsContent = this.quillContent.content;
       addform.structuredContent = this.quillContent.structuredContent;
-      addform.state = 0
+      addform.state = 0;
       console.log("addform", addform);
 
       if (this.publishType == "add") {
@@ -483,7 +494,7 @@ export default {
     // 直接发布
     handleCreate() {
       this.urlList.forEach((item) => {
-        item.imageSizeType = this.addform.imageSizeType;
+        item.imageSizeType = this.addform.imageSizeType; //标题图添加图片尺寸属性
       });
       this.addform.urlList = this.urlList;
       let addform = this.addform;
@@ -493,6 +504,7 @@ export default {
       addform.structuredContent = this.quillContent.structuredContent;
       console.log("addform", addform);
 
+      // 新增
       if (this.publishType == "add") {
         officaialNewsCreate(addform).then((res) => {
           // console.log("直接发布", res);
@@ -503,10 +515,22 @@ export default {
             message: "发布成功！",
             type: "success",
           });
+          // 清空标题图数组
+          this.urlList = [];
+          this.addform = {
+            cityIdList: [],
+            closeAllowed: "0", //启停
+          };
+          this.quillContent = {
+            content: "",
+            structuredContent: "",
+          };
           this.getOfficialReleaseList();
           this.isShow = true;
         });
-      } else {
+      }
+      // 编辑
+      else {
         console.log("sss", addform);
         officaialNewsUpdate(addform).then((res) => {
           if (res.data.code !== 0) {

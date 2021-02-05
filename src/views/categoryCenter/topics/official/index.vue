@@ -27,13 +27,12 @@
         </el-select>
       </template>
       <template slot="menu" slot-scope="scope">
-        <template>
-          <el-button type="text" size="mini" @click="toUpdate(scope.row)"
-            >编辑</el-button
-          >
-          <el-button type="text" size="mini" @click="toDelete(scope.row)"
-            >删除</el-button
-          >
+        <template v-if="scope.row.operationAuthority == 1">
+          <el-button type="text" size="mini" @click="toUpdate(scope.row)">编辑</el-button>
+          <el-button type="text" size="mini" @click="toDelete(scope.row)">删除</el-button>
+        </template>
+        <template v-if="scope.row.confAuthority == 1">
+          <el-button type="text" size="mini" @click="enableChange(scope.row)">{{scope.row.openOrClose ? '停用' : '启用'}}</el-button>
         </template>
       </template>
     </avue-crud>
@@ -48,7 +47,8 @@ import {
   getTopicList,
   addTopic,
   updateTopic,
-  deleteTopic
+  deleteTopic,
+  setEnableState
 } from "@/api/cms/travel"
 
 export default {
@@ -173,6 +173,21 @@ export default {
           });
         })
         .catch(function () {});
+    },
+    enableChange (topic) {
+      setEnableState({
+        topicsBankId: topic.id,
+        type: 1,
+        state: topic.openOrClose ? 1 : 0
+      }).then(({data}) => {
+        this.$notify({
+          title: "成功",
+          message: "操作成功",
+          type: "success",
+          duration: 2000,
+        });
+        this.getList();
+      })
     },
     handleRefreshChange() {
       this.getList(this.page);

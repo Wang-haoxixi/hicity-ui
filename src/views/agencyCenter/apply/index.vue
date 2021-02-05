@@ -7,8 +7,8 @@
         <el-table-column prop="id" label="用户ID"> </el-table-column>
         <el-table-column prop="name" label="用户账号"> </el-table-column>
         <el-table-column prop="mobile" label="联系方式"> </el-table-column>
-        <el-table-column prop="industry" label="所属行业"> </el-table-column>
-        <el-table-column prop="address" label="所属地区"> </el-table-column>
+        <el-table-column prop="cityName" label="地区"> </el-table-column>
+        <el-table-column prop="cooperationIntention" label="合作意向"> </el-table-column>
         <el-table-column label="操作">
           <template slot-scope="scope">
             <el-button size="mini" @click="handleLook(scope.row)"
@@ -26,8 +26,9 @@
       >
         <div class="item">用户ID：{{ partner.id }}</div>
         <div class="item">用户账号：{{ partner.name }}</div>
-        <div class="item">所属行业：{{ partner.mobile }}</div>
-        <div class="item">所属地区：{{ partner.industry }}</div>
+        <div class="item">联系方式：{{ partner.mobile }}</div>
+        <div class="item">地区：{{ partner.cityName }}</div>
+        <div class="item">合作意向：{{ partner.cooperationIntention }}</div>
         <span slot="footer" class="dialog-footer">
           <el-button type="primary" @click="dialogFormVisible = false"
             >确 定</el-button
