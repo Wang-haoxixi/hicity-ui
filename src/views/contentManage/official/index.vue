@@ -1,31 +1,29 @@
 <template>
   <basic-container>
     <!-- 官方发布 -->
-    <hc-table-form
-      :title="title"
-      :formVisible="!isShow"
-      @go-back="isShow = true">
+    <hc-table-form :title="title" :formVisible="!isShow" @go-back="backClisk">
       <template>
         <div class="add-inp-more">
-        <!-- 新建按钮 -->
-        <el-button
-          size="mini"
-          @click="toCreate"
-          type="primary"
-          icon="el-icon-plus"
-        >新建</el-button>
-        <div class="inp-more">
-          <el-input
+          <!-- 新建按钮 -->
+          <el-button
             size="mini"
-            class="inp"
-            placeholder="请输入"
-            suffix-icon="el-icon-search"
-            v-model="input"
+            @click="toCreate"
+            type="primary"
+            icon="el-icon-plus"
+            >新建</el-button
           >
-          </el-input>
-          <el-button icon="el-icon-more" class="more"></el-button>
+          <div class="inp-more">
+            <el-input
+              size="mini"
+              class="inp"
+              placeholder="请输入"
+              suffix-icon="el-icon-search"
+              v-model="input"
+            >
+            </el-input>
+            <el-button icon="el-icon-more" class="more"></el-button>
+          </div>
         </div>
-      </div>
         <!-- 表格 -->
         <el-table
           :data="tableData"
@@ -92,69 +90,69 @@
       </template>
       <template slot="form">
         <el-form ref="addformRef" :model="addform" label-width="80px">
-        <!-- 名称 -->
-        <el-form-item label="名称">
-          <el-input v-model="addform.officialNewsName"></el-input>
-        </el-form-item>
+          <!-- 名称 -->
+          <el-form-item label="名称">
+            <el-input v-model="addform.officialNewsName"></el-input>
+          </el-form-item>
 
-        <el-row>
-          <el-col :span="12">
-            <!-- 栏目 -->
-            <el-form-item label="栏目">
-              <el-select
-                v-model="addform.officialColumnId"
-                placeholder="请选择"
-              >
-                <el-option
-                  v-for="(item, index) in columnData"
-                  :key="index"
-                  :label="item.officialColumnName"
-                  :value="item.officialColumnId"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <!-- 发布城市 平台可见 -->
-            <el-form-item label="发布城市" v-if="isAdmin">
-              <hc-city-select v-model="addform.cityIdList"></hc-city-select>
-            </el-form-item>
-          </el-col>
-        </el-row>
+          <el-row>
+            <el-col :span="12">
+              <!-- 栏目 -->
+              <el-form-item label="栏目">
+                <el-select
+                  v-model="addform.officialColumnId"
+                  placeholder="请选择"
+                >
+                  <el-option
+                    v-for="(item, index) in columnData"
+                    :key="index"
+                    :label="item.officialColumnName"
+                    :value="item.officialColumnId"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <!-- 发布城市 平台可见 -->
+              <el-form-item label="发布城市" v-if="isAdmin">
+                <hc-city-select v-model="addform.cityIdList"></hc-city-select>
+              </el-form-item>
+            </el-col>
+          </el-row>
 
-        <!-- 标题图 -->
-        <el-form-item label="标题图">
-          <el-upload
-            :action="uploadPicUrl"
-            list-type="picture-card"
-            :on-remove="handleRemove"
-            :on-success="handlePicSuccess"
-            :file-list="fileList"
-            :headers="headersOpt"
-          >
-            <i class="el-icon-plus"></i>
-          </el-upload>
-        </el-form-item>
-
-        <!-- 图片展示比例 -->
-        <el-form-item label="图片展示比例" label-width="100px">
-          <el-radio-group v-model="addform.imageSizeType">
-            <el-radio
-              v-for="(item, index) in dicList.NEWS_IMAGE_SIZE_TYPE"
-              :key="index"
-              :label="item.value"
-              >{{ item.label }}</el-radio
+          <!-- 标题图 -->
+          <el-form-item label="标题图">
+            <el-upload
+              :action="uploadPicUrl"
+              list-type="picture-card"
+              :on-remove="handleRemove"
+              :on-success="handlePicSuccess"
+              :file-list="fileList"
+              :headers="headersOpt"
             >
-          </el-radio-group>
-        </el-form-item>
+              <i class="el-icon-plus"></i>
+            </el-upload>
+          </el-form-item>
 
-        <!-- 详情 -->
-        <el-form-item label="详情">
-          <hc-quill v-model="quillContent"></hc-quill>
-        </el-form-item>
+          <!-- 图片展示比例 -->
+          <el-form-item label="图片展示比例" label-width="100px">
+            <el-radio-group v-model="addform.imageSizeType">
+              <el-radio
+                v-for="(item, index) in dicList.NEWS_IMAGE_SIZE_TYPE"
+                :key="index"
+                :label="item.value"
+                >{{ item.label }}</el-radio
+              >
+            </el-radio-group>
+          </el-form-item>
 
-        <!-- 是否允许城市停用 -->
-        <!-- <el-form-item
+          <!-- 详情 -->
+          <el-form-item label="详情">
+            <hc-quill v-model="quillContent"></hc-quill>
+          </el-form-item>
+
+          <!-- 是否允许城市停用 -->
+          <!-- <el-form-item
           label="是否允许城市停用"
           label-width="140px"
           v-if="isAdmin"
@@ -168,13 +166,13 @@
           ></el-switch>
         </el-form-item> -->
 
-        <!-- 事件按钮 -->
-        <el-form-item>
-          <el-button @click="preview">预览</el-button>
-          <el-button @click="handleDraft">保存草稿</el-button>
-          <el-button @click="handleCreate">直接发布</el-button>
-        </el-form-item>
-      </el-form>
+          <!-- 事件按钮 -->
+          <el-form-item>
+            <!-- <el-button @click="preview">预览</el-button> -->
+            <el-button @click="handleDraft">保存草稿</el-button>
+            <el-button @click="handleCreate">直接发布</el-button>
+          </el-form-item>
+        </el-form>
       </template>
     </hc-table-form>
 
@@ -255,6 +253,17 @@ export default {
   },
   methods: {
     backClisk() {
+      // 清空标题图数组
+      this.urlList = [];
+      this.addform = {
+        cityIdList: [],
+        closeAllowed: "0", //启停
+      };
+      this.quillContent = {
+        content: "",
+        structuredContent: "",
+      };
+      this.fileList = [];
       this.isShow = true;
     },
     init() {
@@ -341,6 +350,7 @@ export default {
     // },
     // 编辑
     handleEdit(row) {
+      this.fileList = [];
       // console.log("编辑", row);
       officialDetail({
         officialNewsId: row.officialNewsId,
@@ -352,7 +362,6 @@ export default {
           content: res.data.data.data.officialNewsContent,
           structuredContent: res.data.data.data.structuredContent,
         };
-        this.isShow = false;
         console.log("addform", this.addform);
         this.urlList = [];
         this.addform.urlList.forEach((item, index) => {
@@ -366,10 +375,11 @@ export default {
             imageSizeType: this.addform.imageSizeType,
           });
         });
-        console.log("urlList", this.urlList);
+        this.addform.urlList = this.urlList;
+        this.isShow = false;
       });
+
       this.publishType = "edit";
-      console.log('this.addform.urlList',this.addform.urlList)
     },
     // 删除
     handleDel(row) {
@@ -493,7 +503,6 @@ export default {
       addform.officialNewsContent = this.quillContent.content;
       addform.structuredContent = this.quillContent.structuredContent;
       console.log("addform", addform);
-
       // 新增
       if (this.publishType == "add") {
         officaialNewsCreate(addform).then((res) => {
@@ -530,9 +539,19 @@ export default {
             message: "编辑成功！",
             type: "success",
           });
-          this.getOfficialReleaseList();
-          this.isShow = true;
+          // 清空标题图数组
+          this.urlList = [];
+          this.addform = {
+            cityIdList: [],
+            closeAllowed: "0", //启停
+          };
+          this.quillContent = {
+            content: "",
+            structuredContent: "",
+          };
           this.fileList = [];
+          this.isShow = true;
+          this.getOfficialReleaseList();
         });
       }
     },
@@ -554,17 +573,17 @@ export default {
     isAdmin() {
       return this.userInfo.userType == 3 || this.userInfo.userType == 4;
     },
-    title () {
+    title() {
       if (this.isShow) {
-        return '官方发布'
+        return "官方发布";
       } else {
-        if (this.publishType == 'add') {
-          return '官方发布-新增'
+        if (this.publishType == "add") {
+          return "官方发布-新增";
         } else {
-          return '官方发布-编辑'
+          return "官方发布-编辑";
         }
       }
-    }
+    },
   },
   created() {
     this.getOfficialReleaseList();

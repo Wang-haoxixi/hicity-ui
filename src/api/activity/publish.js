@@ -57,3 +57,14 @@ export function activityInfo(data) {
     method: "get"
   });
 }
+
+
+// /activity_publish/update
+// 修改活动信息
+export function editSaveActivity(data) {
+  return request({
+    url: "/dms/activity_publish/update",
+    method: "post",
+    data: data
+  });
+}

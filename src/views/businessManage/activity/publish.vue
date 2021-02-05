@@ -378,7 +378,8 @@
 
       <div class="footer-btn">
         <!-- 底部按钮 -->
-        <el-button @click="publish" type="danger">发布活动</el-button>
+        <el-button v-if="!this.$route.query.id" @click="publish" type="danger">发布活动</el-button>
+        <el-button v-else @click="editSave" type="danger">编辑保存活动</el-button>
         <el-button @click="saveManuscript">保存草稿</el-button>
         <el-button @click="backClick">取消</el-button>
       </div>
@@ -416,6 +417,7 @@ import {
   tagsPage,
   savePublish,
   activityInfo,
+  editSaveActivity
 } from "@/api/activity/publish";
 export default {
   components: { HcQuill, HcCitySelect },
@@ -636,7 +638,7 @@ export default {
     getTagsPage() {
       tagsPage().then((res) => {
         console.log("标签页", res);
-        res.data.data.records.forEach((item) => {
+        res.data.data.data.records.forEach((item) => {
           this.allTagArr.push({
             label: item.tagId,
             value: item.name,
@@ -747,6 +749,35 @@ export default {
       console.log("baseFormData.fileList", this.baseFormData.fileList);
     },
     onChange(res) {},
+    // 编辑保存
+    editSave(){
+      this.fileList = [];
+
+      this.baseFormData.details = this.quillContent.content;
+
+      // 遍历票种数组
+      this.baseFormData.ticketingManagements.forEach((item) => {
+        // 保存时将支付方式列表清空并重新
+        item.payMethodList = [];
+        if (item.priceType.includes("能贝")) {
+          item.payMethodList.push(item.payWeCanPay);
+        }
+        if (item.priceType.includes("人民币")) {
+          item.payMethodList.push(item.payOfflinePay);
+        }
+      });
+      this.baseFormData.submitType = 1;
+      this.baseFormData.id = this.$route.query.id
+
+      
+      editSaveActivity(this.baseFormData).then(res=>{
+        if (res.data.code !== 0) {
+          return this.$message.error("编辑活动失败");
+        }
+        this.$message.success("编辑活动成功");
+        this.$router.go(-1);
+      })
+    },
     // 发布活动
     publish() {
       this.fileList = [];
@@ -764,6 +795,7 @@ export default {
           item.payMethodList.push(item.payOfflinePay);
         }
       });
+      this.baseFormData.submitType = 1;
       console.log(this.baseFormData);
 
       savePublish(this.baseFormData).then((res) => {
@@ -791,9 +823,8 @@ export default {
           item.payMethodList.push(item.payOfflinePay);
         }
       });
-      this.baseFormData.statusFlag = 0
+      this.baseFormData.submitType = 0;
       console.log(this.baseFormData);
-
 
       savePublish(this.baseFormData).then((res) => {
         if (res.data.code !== 0) {
