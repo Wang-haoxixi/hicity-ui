@@ -131,7 +131,7 @@ export default {
       return this.userType !== 3 && this.userType <= column.source
     },
     operAuthority (column) {
-      return this.userType == column.source
+      return this.userType <= column.source
     },
     getList (page = this.page, form = this.searchForm) {
       this.tableLoading = true

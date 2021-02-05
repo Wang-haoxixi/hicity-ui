@@ -148,7 +148,7 @@ export default {
       return this.userType !== 3 && this.userType <= column.source
     },
     operAuthority (column) {
-      return this.userType == column.source
+      return this.userType <= column.source
     },
     initTagList () {
       getAllTagList({cityId: this.userInfo.manageCityId}).then(({data}) => {
