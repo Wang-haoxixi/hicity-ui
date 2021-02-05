@@ -269,13 +269,17 @@
             </el-select>
           </el-form-item> -->
 
-          <!-- 跳转对象 -->
+          <!-- 跳转对象 编辑 -->
           <el-form-item
             label="跳转对象 :"
             prop="jumpObj"
             :label-width="formLabelWidth"
           >
-            <el-select v-model="editForm.jumpObj" placeholder="请选择跳转对象">
+            <el-select
+              v-model="editForm.relationName"
+              placeholder="请选择跳转对象"
+              @change="typeChange"
+            >
               <el-option
                 v-for="(item, index) in jumpObjArr"
                 :key="index"
@@ -531,8 +535,10 @@ export default {
 
     // 编辑按钮
     handleEdit(row) {
-      console.log("row", row);
+      // console.log("row", row);
       this.editForm = { ...row };
+      console.log('aaaa',this.editForm)
+
       this.adslotGroup.forEach((item) => {
         if (item.cityId === row.cityId) {
           this.editForm.cityName = item.cityName;
