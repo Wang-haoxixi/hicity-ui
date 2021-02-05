@@ -4,7 +4,7 @@
       <div class="login-logo">
         <img src="/img/logo.png" alt="">
       </div>
-      <p class="login-tip">{{ website.infoTitle}}</p>
+      <p class="login-tip">{{ website.infoTitle}} v 1.0</p>
       <div class="login-border">
         <div class="login-main">
           <!-- <h4 class="login-title">
@@ -169,12 +169,10 @@ export default {
   border-radius: 50%;
   -webkit-box-shadow: 0 4px 40px rgba(0, 0, 0, 0.07);
   box-shadow: 0 4px 40px rgba(0, 0, 0, 0.07);
-  padding: 10px;
   background-color: #fff;
   z-index: 1;
   position: relative;
   box-sizing: border-box;
-  padding: 20px;
   img {
     width: 100%;
   }

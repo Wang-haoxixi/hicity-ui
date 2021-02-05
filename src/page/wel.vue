@@ -2,14 +2,14 @@
   <div>
     <basic-container>
       <div class="banner-text">
-        <span>
-			<b>欢迎访问GDS底层框架!</b>
-			<br/>
-			<img src="https://ioa.govmade.com/uploads/2/image/public/201909/20190926122143_rf43ij4468.gif">
-        </span>
-        <br>
-        <span>
-          <el-collapse v-model="activeNames">
+        <div>
+          <img src="../../public/img/logo.png" />
+          <div style="margin-top: 20px">
+            <b>欢迎进入超能城市后台管理系统</b>
+          </div>
+        </div>
+
+        <!-- <el-collapse v-model="activeNames">
             <el-collapse-item title="完整的微服务架构" name="1">
               <div>确保你的IDE或STS 已经安装lombok</div>
               <div>建议使用 IDEA 2018+ 启动效果会更好</div>
@@ -22,132 +22,134 @@
 			  <div>node 8.0+</div>
 			  <div>npm 6.0+</div>
             </el-collapse-item>
-          </el-collapse>
-        </span>
+          </el-collapse> -->
       </div>
-
     </basic-container>
   </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters } from "vuex";
 
 export default {
-  name: 'Wel',
+  name: "Wel",
   data() {
     return {
-      activeNames: ['1', '2', '3', '4'],
+      activeNames: ["1", "2", "3", "4"],
       DATA: [],
-      text: '',
-      actor: '',
+      text: "",
+      actor: "",
       count: 0,
-      isText: false
-    }
+      isText: false,
+    };
   },
   computed: {
-    ...mapGetters(['website'])
+    ...mapGetters(["website"]),
   },
   methods: {
     getData() {
       if (this.count < this.DATA.length - 1) {
-        this.count++
+        this.count++;
       } else {
-        this.count = 0
+        this.count = 0;
       }
-      this.isText = true
-      this.actor = this.DATA[this.count]
+      this.isText = true;
+      this.actor = this.DATA[this.count];
     },
     setData() {
-      let num = 0
-      let count = 0
-      let active = false
-      const timeoutstart = 5000
-      const timeoutend = 1000
-      const timespeed = 10
+      let num = 0;
+      let count = 0;
+      let active = false;
+      const timeoutstart = 5000;
+      const timeoutend = 1000;
+      const timespeed = 10;
       setInterval(() => {
         if (this.isText) {
           if (count == this.actor.length) {
-            active = true
+            active = true;
           } else {
-            active = false
+            active = false;
           }
           if (active) {
-            num--
-            this.text = this.actor.substr(0, num)
+            num--;
+            this.text = this.actor.substr(0, num);
             if (num == 0) {
-              this.isText = false
+              this.isText = false;
               setTimeout(() => {
-                count = 0
-                this.getData()
-              }, timeoutend)
+                count = 0;
+                this.getData();
+              }, timeoutend);
             }
           } else {
-            num++
-            this.text = this.actor.substr(0, num)
+            num++;
+            this.text = this.actor.substr(0, num);
             if (num == this.actor.length) {
-              this.isText = false
+              this.isText = false;
               setTimeout(() => {
-                this.isText = true
-                count = this.actor.length
-              }, timeoutstart)
+                this.isText = true;
+                count = this.actor.length;
+              }, timeoutstart);
             }
           }
         }
-      }, timespeed)
-    }
-  }
-}
+      }, timespeed);
+    },
+  },
+};
 </script>
 
 <style scoped="scoped" lang="scss">
-  .wel-contailer {
-    position: relative;
-  }
+.wel-contailer {
+  position: relative;
+}
 
-  .banner-text {
-    position: relative;
-    padding: 0 20px;
-    font-size: 20px;
-    text-align: center;
-    color: #333;
-  }
+.banner-text {
+  height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 20px;
+  font-size: 20px;
+  text-align: center;
+  color: #333;
+}
 
-  .banner-img {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0.8;
-    display: none;
-  }
+.banner-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.8;
+  display: none;
+}
 
-  .actor {
-    height: 250px;
-    overflow: hidden;
-    font-size: 18px;
-    color: #333;
-  }
+.actor {
+  height: 250px;
+  overflow: hidden;
+  font-size: 18px;
+  color: #333;
+}
 
-  .actor:after {
-    content: '';
-    width: 3px;
-    height: 25px;
-    vertical-align: -5px;
-    margin-left: 5px;
-    background-color: #333;
-    display: inline-block;
-    animation: blink 0.4s infinite alternate;
-  }
+.actor:after {
+  content: "";
+  width: 3px;
+  height: 25px;
+  vertical-align: -5px;
+  margin-left: 5px;
+  background-color: #333;
+  display: inline-block;
+  animation: blink 0.4s infinite alternate;
+}
 
-  .typeing:after {
-    animation: none;
-  }
+.typeing:after {
+  animation: none;
+}
 
-  @keyframes blink {
-    to {
-      opacity: 0;
-    }
+@keyframes blink {
+  to {
+    opacity: 0;
   }
+}
 </style>
