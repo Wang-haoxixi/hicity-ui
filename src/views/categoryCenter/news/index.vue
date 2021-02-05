@@ -26,12 +26,12 @@
         </div>
         <div class="column-item-option">
           <div class="column-item-option-left">
-            <el-button v-if="isAdmin" type="text" size="mini" @click="cityView(column.newsColumnId)">查看配置城市</el-button>
+            <el-button v-if="confAuthority(column)" type="text" size="mini" @click="cityView(column.newsColumnId)">查看配置城市</el-button>
             <el-button v-else-if="column.closeAllowed == '0'" type="text" size="mini" @click="handleStart(column)">{{column.havEnable ? '启用' : '停用'}}</el-button>
           </div>
           <div class="column-item-option-right">
             <!-- <el-button v-if="!isAdmin" type="text" size="mini" @click="handleSort(column)">排序</el-button> -->
-            <template v-if="isAdmin && column.source == 1 || !isAdmin && column.source == 2">
+            <template v-if="operAuthority(column)">
               <el-button type="text" size="mini" @click="handleUpdate(column)">编辑</el-button>
               <el-button type="text" size="mini" @click="handleDel(column.newsColumnId)">删除</el-button>
             </template>
@@ -83,7 +83,7 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item v-if="isAdmin" label="是否允许城市停用：">
+        <el-form-item v-if="userType == 1 || userType == 2" label="是否允许城市停用：">
           <el-switch v-model="formData.closeAllowed" active-value="0" active-text="允许" inactive-text="不允许" inactive-value="1"></el-switch>
         </el-form-item>
         
@@ -127,7 +127,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['userInfo']),
+    ...mapGetters(['userInfo', 'userType']),
     isAdmin () {
       return this.userInfo.userType == 3 || this.userInfo.userType == 4
     },
@@ -142,9 +142,14 @@ export default {
   created () {
     this.initTagList()
     this.getList()
-    
   },
   methods: {
+    confAuthority (column) {
+      return this.userType !== 3 && this.userType <= column.source
+    },
+    operAuthority (column) {
+      return this.userType <= column.source
+    },
     initTagList () {
       getAllTagList({cityId: this.userInfo.manageCityId}).then(({data}) => {
         this.tagList = data.data.data

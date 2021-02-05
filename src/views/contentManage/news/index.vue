@@ -33,11 +33,7 @@
           >
         </template>
         <template slot="menu" slot-scope="scope">
-          <!-- <el-button
-            v-if="!isAdmin && scope.row.closeAllowed == '0'"
-            type="text" size="mini"
-            @click="handleStart(scope.row)">{{scope.row.havEnable ? '启用' : '停用'}}</el-button> -->
-          <template v-if="isAdmin || (!isAdmin && scope.row.source == 2)">
+          <template v-if="userType <= scope.row.source">
             <el-button type="text" size="mini" @click="toUpdate(scope.row)"
               >编辑</el-button
             >
@@ -53,11 +49,12 @@
           class="dialog-main-tree"
           :model="formData"
           label-width="180px"
+          :rules="formRule"
         >
-          <el-form-item label="名称：">
+          <el-form-item label="名称：" prop="title">
             <el-input v-model="formData.title"></el-input>
           </el-form-item>
-          <el-form-item label="标签：">
+          <el-form-item label="标签：" prop="lableIdList">
             <el-select
               style="width: 100%"
               v-model="formData.lableIdList"
@@ -74,7 +71,7 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item v-if="isAdmin" label="发布城市：">
+          <el-form-item v-if="formData.source ? userType == formData.source : (userType == 1 || userType == 2)" label="发布城市：" prop="cityIdList">
             <!-- <el-select style="width: 100%" v-model="formData.cityIdList" multiple filterable  placeholder="请选择城市" @change="cityChange">
               <el-option v-for="city in allCity" :key="city.id" :label="city.regionName" :value="city.id"></el-option>
             </el-select> -->
@@ -93,16 +90,13 @@
               >
             </el-radio-group>
           </el-form-item>
-          <el-form-item label="详情：">
+          <el-form-item label="详情：" prop="content">
             <!-- <el-input type="textarea" v-model="quillContent.content"></el-input>
             <el-input type="textarea" v-model="quillContent.structuredContent"></el-input> -->
             <hc-quill ref="quill" v-model="quillContent"></hc-quill>
           </el-form-item>
-          <!-- <el-form-item v-if="isAdmin" label="是否允许城市停用：">
-            <el-switch v-model="formData.closeAllowed" active-value="0" active-text="允许" inactive-text="不允许" inactive-value="1"></el-switch>
-          </el-form-item> -->
           <el-form-item>
-            <el-button @click="preview">预览</el-button>
+            <!-- <el-button @click="preview">预览</el-button> -->
             <el-button @click="handleDraft">保存草稿</el-button>
             <el-button @click="handleCreate">直接发布</el-button>
           </el-form-item>
@@ -199,15 +193,18 @@ export default {
       newsTagList: [],
       tagViewDialogVisible: false,
       titleImage: [],
+      formRule: {
+        title: [{required: true, message: '请输入名称'}],
+        lableIdList: [{required: true, message: '请选择标签', trigger: 'blur'}],
+        cityIdList: [{required: true, message: '请选择城市'}],
+        content: [{validator: this.contentValidator, required: true}]
+      }
     };
   },
   computed: {
-    ...mapGetters(["permissions", "userInfo", "dicList"]),
+    ...mapGetters(["permissions", "userInfo", "dicList", "userType"]),
     tableOption() {
-      return tableOption(this.isAdmin);
-    },
-    isAdmin() {
-      return this.userInfo.userType == 3 || this.userInfo.userType == 4;
+      return tableOption(this.userType == 1 || this.userType == 2);
     },
     title () {
       if (!this.publish) {
@@ -226,6 +223,13 @@ export default {
     this.init();
   },
   methods: {
+    contentValidator (rule, value, callback) {
+      if (this.quillContent && this.quillContent.content) {
+        callback()
+      } else {
+        callback(new Error('请输入详情'))
+      }
+    },
     init() {
       getAllTagList({ cityId: this.userInfo.manageCityId }).then(({ data }) => {
         this.tagList = data.data.data;
@@ -244,9 +248,6 @@ export default {
         current: page.currentPage,
         size: page.pageSize,
       };
-      if (this.isAdmin) {
-        form.source = 1;
-      }
       getNewsList(form)
         .then(({ data }) => {
           this.tableData = data.data.data.records;
@@ -266,13 +267,20 @@ export default {
         structuredContent: "",
       };
       this.titleImage = [];
-      if (!this.isAdmin) {
+      if (this.userType == 1 || this.userType == 2) {
         this.formData.cityIdList = [this.userInfo.manageCityId];
       }
       this.publish = true;
       this.publishType = "add";
     },
     handleCreate() {
+      this.$refs.form.validate(valid => {
+        if (valid) {
+          this.save(1)
+        }
+      })
+    },
+    save (state) {
       let formData = this.formData;
       formData.content = this.quillContent.content;
       formData.structuredContent = this.quillContent.structuredContent;
@@ -285,7 +293,7 @@ export default {
       }
       formData.urlList = titleImage;
       if (this.publishType == "add") {
-        addNews({ ...formData, state: 1 }).then(({ data }) => {
+        addNews({ ...formData, state }).then(({ data }) => {
           this.publish = false;
           this.$notify({
             title: "成功",
@@ -328,7 +336,13 @@ export default {
       });
     },
     handleUpdate() {},
-    handleDraft() {},
+    handleDraft() {
+      this.$refs.form.validate(valid => {
+        if (valid) {
+          this.save(0)
+        }
+      })
+    },
     preview() {
       // this.$refs.quill.getData()
       // console.log()

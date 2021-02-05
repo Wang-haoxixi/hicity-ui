@@ -77,6 +77,14 @@ export function quoteTopic (id) {
   })
 }
 
+export function setEnableState (data) {
+  return request({
+    url: `${prefix}/conf/update/state`,
+    method: 'POST',
+    data
+  })
+}
+
 // 根据游记话题id删除话题与话题分类的关联
 export function deleteRelation (id) {
   return request({
@@ -105,7 +113,7 @@ export function saveTravel (data) {
 // 获取游记列表
 export function getTravelDetail (id) {
   return request({
-    url: `${prefix}/detail/${id}`,
+    url: `${prefix}/detail_pc/${id}`,
   })
 }
 

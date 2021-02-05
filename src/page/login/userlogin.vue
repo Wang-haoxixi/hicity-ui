@@ -145,7 +145,7 @@ export default {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.$store.dispatch('LoginByUsername', this.loginForm).then(() => {
-            console.log(1)
+            this.$store.dispatch('InitAllCityTree')
             this.$store.dispatch('InitDictMap').then(() => {
               this.$router.push({ path: this.tagWel.value })
             })

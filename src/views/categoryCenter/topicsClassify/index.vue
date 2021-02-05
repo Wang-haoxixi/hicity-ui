@@ -20,8 +20,13 @@
             <el-image class="classify-item-cover" :src="classify.imageUrl"></el-image>
             <div class="classify-item-topic-view" @click="topicView(classify.id)">关联话题</div>
             <div class="classify-item-option">
-              <el-button type="text" size="mini" @click="toUpdate(classify)">编辑</el-button>
-              <el-button type="text" size="mini" @click="handleDel(classify.id)">删除</el-button>
+              <template v-if="classify.operationAuthority == 1">
+                <el-button type="text" size="mini" @click="toUpdate(classify)">编辑</el-button>
+                <el-button type="text" size="mini" @click="handleDel(classify.id)">删除</el-button>
+              </template>
+              <template v-if="classify.confAuthority == 1">
+                <el-button type="text" size="mini" @click="enableChange(classify)">{{classify.openOrClose ? '停用' : '启用'}}</el-button>
+              </template>
             </div>
           </div>
         </div>
@@ -115,7 +120,7 @@
 </template>
 
 <script>
-import { getClassifyList, addClassify, getTopicList, updateClassify, deleteClassify, deleteRelation } from '@/api/cms/travel'
+import { getClassifyList, addClassify, getTopicList, updateClassify, deleteClassify, deleteRelation, setEnableState } from '@/api/cms/travel'
 import { mapGetters } from 'vuex'
 import HcImageUpload from '@/views/components/HcImageUpload/index'
 import HcTableForm from "@/views/components/HcTableForm/index";
@@ -197,6 +202,21 @@ export default {
     this.getList()
   },
   methods: {
+    enableChange (classify) {
+      setEnableState({
+        classifyId: classify.id,
+        type: 0,
+        state: classify.openOrClose ? 1 : 0
+      }).then(({data}) => {
+        this.$notify({
+          title: "成功",
+          message: "操作成功",
+          type: "success",
+          duration: 2000,
+        });
+        this.getList();
+      })
+    },
     getList (page = this.page, form = this.searchForm) {
       this.tableLoading = true
       getClassifyList({
@@ -447,6 +467,7 @@ export default {
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;
+  flex-wrap: wrap;
   .classify-list-item {
     margin-bottom: 10px;
     height: 30px;

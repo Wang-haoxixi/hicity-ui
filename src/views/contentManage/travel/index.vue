@@ -24,18 +24,12 @@
             >新建</el-button>
         </template>
         <template slot="cityList" slot-scope="scope">
-          <el-button type="text" size="mini"
-            >查看</el-button
-          >
+          <el-button type="text" size="mini">查看</el-button>
         </template>
         <template slot="menu" slot-scope="scope">
-          <template v-if="isAdmin || (!isAdmin && scope.row.source == 2)">
-            <el-button type="text" size="mini" @click="toUpdate(scope.row)"
-              >编辑</el-button
-            >
-            <el-button type="text" size="mini" @click="toDelete(scope.row)"
-              >删除</el-button
-            >
+          <template v-if="userType <= scope.row.publishedSources">
+            <el-button type="text" size="mini" @click="toUpdate(scope.row)">编辑</el-button>
+            <el-button type="text" size="mini" @click="toDelete(scope.row)">删除</el-button>
           </template>
         </template>
       </avue-crud>
@@ -44,24 +38,25 @@
           ref="form"
           class="dialog-main-tree"
           :model="formData"
-          label-width="180px">
-          <el-form-item label="游记名称：">
+          label-width="180px"
+          :rules="formRule">
+          <el-form-item label="游记名称：" prop="travelName">
             <el-input v-model="formData.travelName"></el-input>
           </el-form-item>
-          <el-form-item label="关联话题：">
-            <hc-topic-select v-model="formData.topicsBankIdSet" topic-name="122222"></hc-topic-select>
+          <el-form-item label="关联话题：" prop="topicsBankIdSet">
+            <hc-topic-select v-model="formData.topicsBankIdSet" :topic-name="topicName"></hc-topic-select>
           </el-form-item>
-          <el-form-item label="游记图片：">
+          <el-form-item label="游记图片：" prop="images">
             <hc-image-upload v-model="formData.images" :limit="50"></hc-image-upload>
           </el-form-item>
-          <el-form-item v-if="isAdmin" label="发布城市：">
+          <el-form-item v-if="formData.publishedSources ? userType == formData.publishedSources : (userType == 1 || userType == 2)" label="发布城市：" prop="cityList">
             <hc-city-select v-model="formData.cityList"></hc-city-select>
           </el-form-item>
-          <el-form-item label="内容：">
+          <el-form-item label="内容：" prop="content">
             <el-input type="textarea" v-model="formData.content"></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button @click="preview">预览</el-button>
+            <!-- <el-button @click="preview">预览</el-button> -->
             <el-button @click="handleDraft">保存草稿</el-button>
             <el-button @click="handleCreate">直接发布</el-button>
           </el-form-item>
@@ -154,16 +149,21 @@ export default {
             })
           }
         }
+      },
+      topicName: '',
+      formRule: {
+        travelName: [{required: true, message: '请输入名称'}],
+        topicsBankIdSet: [{required: true, message: '请选择话题'}],
+        cityList: [{required: true, message: '请选择城市'}],
+        images: [{required: true, message: '请添加游记图片'}],
+        content: [{required: true, message: '请输入内容'}],
       }
     };
   },
   computed: {
-    ...mapGetters(["permissions", "userInfo", "dicList"]),
+    ...mapGetters(["permissions", "userInfo", "dicList", "userType"]),
     tableOption() {
-      return tableOption(this.isAdmin);
-    },
-    isAdmin() {
-      return this.userInfo.userType == 3 || this.userInfo.userType == 4;
+      return tableOption(this.userType == 1 || this.userType == 2);
     },
     title () {
       if (!this.publish) {
@@ -201,15 +201,23 @@ export default {
         cityList: [],
         images: [],
       };
-      if (!this.isAdmin) {
+      this.topicName = ''
+      if (this.userType == 1 || this.userType == 2) {
         this.formData.cityList = [this.userInfo.manageCityId];
       }
       this.publish = true;
       this.publishType = "add";
     },
     handleCreate() {
+      this.$refs.form.validate(valid => {
+        if (valid) {
+          this.save(1)
+        }
+      })
+    },
+    save (state) {
       let formData = this.formData;
-      saveTravel({ ...formData, state: 1 }).then(({ data }) => {
+      saveTravel({ ...formData, state }).then(({ data }) => {
         this.publish = false;
         this.$notify({
           title: "成功",
@@ -223,20 +231,31 @@ export default {
     toUpdate({ id }) {
       getTravelDetail(id).then(({ data }) => {
         let formData = data.data.data
-        let images = []
-        for (let i = 0; i < formData.images.length; i++) {
-          images.push(formData.images[i].imageUrl)
+        let topicsBankIdSet = []
+        for (let i = 0; i < formData.topicsBankList.length; i++) {
+          topicsBankIdSet.push(formData.topicsBankList[i].id)
         }
-
         this.formData = {
-          ...formData,
-          images
-        };
+          id: formData.id,
+          travelName: formData.travelName,
+          topicsBankIdSet,
+          images: formData.imageUrls,
+          cityList: formData.cityIds,
+          content: formData.content,
+          publishedSources: formData.publishedSources
+        }
+        this.topicName = formData.topicsBankList && formData.topicsBankList[0].topicsName || ''
         this.publish = true;
         this.publishType = "edit";
       });
     },
-    handleDraft() {},
+    handleDraft() {
+      this.$refs.form.validate(valid => {
+        if (valid) {
+          this.save(0)
+        }
+      })
+    },
     preview() {
       // this.$refs.quill.getData()
       // console.log()

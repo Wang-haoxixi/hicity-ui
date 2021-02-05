@@ -42,12 +42,9 @@ export const tableOption = (admin = false) => {
       prop: 'cityId',
       formslot: true,
       span: 24,
-      type: 'tree',
-      props: {
-        label: 'regionName',
-        value: 'id'
-      },
-      dicUrl: '/admin/city/tree'
+      formatter: function (row) {
+        return row.cityName
+      }
     })
   }
   column.push({

@@ -157,3 +157,10 @@ export function adminCityModule(params) {
     params
   });
 }
+
+// 无省级城市树状
+export function getAllCityTree () {
+  return request({
+    url: '/admin/city/tree_no_province',
+  })
+}

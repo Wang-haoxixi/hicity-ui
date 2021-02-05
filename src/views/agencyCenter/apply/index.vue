@@ -4,8 +4,8 @@
       <div class="title">合伙人申请列表</div>
       <!-- 合伙人申请列表 -->
       <el-table :data="tableData" style="width: 100%">
-        <el-table-column prop="id" label="用户ID"> </el-table-column>
-        <el-table-column prop="name" label="用户账号"> </el-table-column>
+        <el-table-column prop="id" label="用户账号"> </el-table-column>
+        <el-table-column prop="name" label="姓名"> </el-table-column>
         <el-table-column prop="mobile" label="联系方式"> </el-table-column>
         <el-table-column prop="cityName" label="地区"> </el-table-column>
         <el-table-column prop="cooperationIntention" label="合作意向"> </el-table-column>
@@ -24,8 +24,8 @@
         :visible.sync="dialogFormVisible"
         width="50%"
       >
-        <div class="item">用户ID：{{ partner.id }}</div>
-        <div class="item">用户账号：{{ partner.name }}</div>
+        <div class="item">用户账号：{{ partner.id }}</div>
+        <div class="item">姓名：{{ partner.name }}</div>
         <div class="item">联系方式：{{ partner.mobile }}</div>
         <div class="item">地区：{{ partner.cityName }}</div>
         <div class="item">合作意向：{{ partner.cooperationIntention }}</div>

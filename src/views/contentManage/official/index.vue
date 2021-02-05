@@ -298,14 +298,15 @@ export default {
     },
     // 获取官方发布列表
     getOfficialReleaseList() {
-      if (this.isAdmin) {
-        this.addform.source = 1;
-      }
-      officialReleaseList({
+      let form = {
         current: this.currentPage,
         size: this.pageSize,
-        // source: this.addform.source, //1平台，2城市
-      }).then((res) => {
+      }
+      if (this.isAdmin) {
+        this.addform.source = 1;
+        form.source = 1
+      }
+      officialReleaseList(form).then((res) => {
         res.data.data.data.records.forEach((item) => {
           if (item.state === 0) {
             item.state = "草稿状态";
@@ -355,7 +356,17 @@ export default {
       officialDetail({
         officialNewsId: row.officialNewsId,
       }).then((res) => {
-        // console.log("res", res);
+        let officialColumnId = res.data.data.data.officialColumnId
+        let officialMatch = false
+        for (let i = 0; i < this.columnData.length; i++) {
+          if (this.columnData[i].officialColumnId == officialColumnId) {
+            officialMatch = true
+            break
+          }
+        }
+        if (!officialMatch) {
+          res.data.data.data.officialColumnId = ''
+        }
         this.addform = res.data.data.data;
         console.log("this.addform", this.addform);
         this.quillContent = {
