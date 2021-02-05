@@ -1,13 +1,13 @@
 export default {
-  title: 'Gds',
-  logo: 'Gds',
-  key: 'Gds', // 配置主键,目前用于存储
-  indexTitle: '超能城市后台',
+  title: 'HiCity',
+  logo: 'HiCity',
+  key: 'HiCity', // 配置主键,目前用于存储
+  indexTitle: '超能城市后台管理系统',
   whiteList: ['/login', '/404', '/401', '/lock'], // 配置无权限可以访问的页面
   whiteTagList: ['/login', '/404', '/401', '/lock'], // 配置不添加tags页面 （'/advanced-router/mutative-detail/*'——*为通配符）
   lockPage: '/lock',
   tokenTime: 6000,
-  infoTitle: '超能城市后台',
+  infoTitle: '超能城市后台管理系统',
   statusWhiteList: [428],
   // 配置首页不可关闭
   isFirstPage: false,
