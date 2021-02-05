@@ -23,6 +23,18 @@ const getters = {
   logsList: state => state.logs.logsList,
   logsLen: state => state.logs.logsList.length || 0,
   logsFlag: (state, getters) => getters.logsLen === 0,
-  dicList: state => state.user.dicList
+  dicList: state => state.user.dicList,
+  userType: state => {
+    if (state.user.userInfo.userType == 3 || state.user.userInfo.userType == 4) {
+      return 1
+    } else if (state.user.userInfo.userType == 1 || state.user.userInfo.userType == 2) {
+      return 2
+    } else if (state.user.userInfo.userType == 5) {
+      return 3
+    } else {
+      return 0
+    }
+  },
+  allCityTree: state => state.user.allCityTree,
 }
 export default getters

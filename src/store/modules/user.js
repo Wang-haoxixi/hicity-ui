@@ -1,6 +1,7 @@
 import { getStore, setStore } from '@/util/store'
 import { isURL, validatenull } from '@/util/validate'
 import { getUserInfo, loginByMobile, loginBySocial, loginByUsername, logout, refreshToken, getDicList } from '@/api/login'
+import { getAllCityTree } from '@/api/admin/city'
 import { deepClone, encryption } from '@/util/util'
 import webiste from '@/const/website'
 import { GetMenu } from '@/api/admin/menu'
@@ -49,6 +50,9 @@ const user = {
     dicList: getStore({
       name: 'dicList'
     }) || [],
+    allCityTree: getStore({
+      name: 'allCityTree'
+    }) || []
   },
   actions: {
     // 根据用户名登录
@@ -181,10 +185,18 @@ const user = {
     InitDictMap ({commit}) {
       return new Promise(resolve => {
         getDicList().then((response) => {
-          console.log(response)
           let data = response.data.data.data
 
           commit('SET_DIC_LIST', data)
+          resolve()
+        })
+      })
+    },
+    InitAllCityTree ({commit}) {
+      return new Promise(resolve => {
+        getAllCityTree().then((response) => {
+          let data = response.data.data.data
+          commit('SET_ALL_CITY_TREE', data)
           resolve()
         })
       })
@@ -246,6 +258,14 @@ const user = {
       setStore({
         name: 'dicList',
         content: state.dicList,
+        type: 'session',
+      })
+    },
+    SET_ALL_CITY_TREE: (state, cityTree) => {
+      state.allCityTree = cityTree
+      setStore({
+        name: 'allCityTree',
+        content: cityTree,
         type: 'session',
       })
     }

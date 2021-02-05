@@ -369,8 +369,8 @@
             postCity(this.form).then(({
               data
             }) => {
-              if (data.data) {
-                this.getStateList(data.data)
+              if (data.data.data) {
+                this.getStateList(data.data.data)
                 this.$notify({
                   title: '成功',
                   message: '创建成功',

@@ -24,18 +24,12 @@
             >新建</el-button>
         </template>
         <template slot="cityList" slot-scope="scope">
-          <el-button type="text" size="mini"
-            >查看</el-button
-          >
+          <el-button type="text" size="mini">查看</el-button>
         </template>
         <template slot="menu" slot-scope="scope">
           <template v-if="isAdmin || (!isAdmin && scope.row.source == 2)">
-            <el-button type="text" size="mini" @click="toUpdate(scope.row)"
-              >编辑</el-button
-            >
-            <el-button type="text" size="mini" @click="toDelete(scope.row)"
-              >删除</el-button
-            >
+            <el-button type="text" size="mini" @click="toUpdate(scope.row)">编辑</el-button>
+            <el-button type="text" size="mini" @click="toDelete(scope.row)">删除</el-button>
           </template>
         </template>
       </avue-crud>
@@ -49,7 +43,7 @@
             <el-input v-model="formData.travelName"></el-input>
           </el-form-item>
           <el-form-item label="关联话题：">
-            <hc-topic-select v-model="formData.topicsBankIdSet" topic-name="122222"></hc-topic-select>
+            <hc-topic-select v-model="formData.topicsBankIdSet" :topic-name="topicName"></hc-topic-select>
           </el-form-item>
           <el-form-item label="游记图片：">
             <hc-image-upload v-model="formData.images" :limit="50"></hc-image-upload>
@@ -154,7 +148,8 @@ export default {
             })
           }
         }
-      }
+      },
+      topicName: '',
     };
   },
   computed: {
@@ -201,6 +196,7 @@ export default {
         cityList: [],
         images: [],
       };
+      this.topicName = ''
       if (!this.isAdmin) {
         this.formData.cityList = [this.userInfo.manageCityId];
       }
@@ -223,15 +219,19 @@ export default {
     toUpdate({ id }) {
       getTravelDetail(id).then(({ data }) => {
         let formData = data.data.data
-        let images = []
-        for (let i = 0; i < formData.images.length; i++) {
-          images.push(formData.images[i].imageUrl)
+        let topicsBankIdSet = []
+        for (let i = 0; i < formData.topicsBankList.length; i++) {
+          topicsBankIdSet.push(formData.topicsBankList[i].id)
         }
-
         this.formData = {
-          ...formData,
-          images
-        };
+          id: formData.id,
+          travelName: formData.travelName,
+          topicsBankIdSet,
+          images: formData.imageUrls,
+          cityList: formData.cityIds,
+          content: formData.content
+        }
+        this.topicName = formData.topicsBankList && formData.topicsBankList[0].topicsName || ''
         this.publish = true;
         this.publishType = "edit";
       });

@@ -7,21 +7,10 @@
       :table-loading="tableLoading"
       :data="tableData"
       @on-load="getList"
-      @refresh-change="handleRefreshChange"
-    >
-      <template slot="menu" slot-scope="scope">
-        <!-- <el-button
-          v-if="!isAdmin && scope.row.closeAllowed == '0'"
-          type="text" size="mini"
-          @click="handleStart(scope.row)">{{scope.row.havEnable ? '启用' : '停用'}}</el-button> -->
-        <template>
-          <el-button type="text" size="mini" @click="handleQuote(scope.row)"
-            >引用至官方</el-button
-          >
-          <el-button type="text" size="mini" @click="toDelete(scope.row)"
-            >删除</el-button
-          >
-        </template>
+      @refresh-change="handleRefreshChange">
+      <template v-if="userType == 1" slot="menu" slot-scope="scope">
+        <el-button type="text" size="mini" @click="handleQuote(scope.row)">引用至官方</el-button>
+        <el-button type="text" size="mini" @click="toDelete(scope.row)">删除</el-button>
       </template>
     </avue-crud>
   </div>
@@ -29,6 +18,7 @@
 
 <script>
 import { tableOption } from "./const";
+import { mapGetters } from "vuex";
 import {
   getTopicList,
   quoteTopic,
@@ -49,6 +39,7 @@ export default {
     };
   },
   computed: {
+    ...mapGetters(['userType']),
     tableOption() {
       return tableOption();
     },
