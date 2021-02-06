@@ -75,7 +75,7 @@
             <!-- <el-select style="width: 100%" v-model="formData.cityIdList" multiple filterable  placeholder="请选择城市" @change="cityChange">
               <el-option v-for="city in allCity" :key="city.id" :label="city.regionName" :value="city.id"></el-option>
             </el-select> -->
-            <hc-city-select v-model="formData.cityIdList"></hc-city-select>
+            <hc-city-select v-model="formData.cityIdList" :city-id="userInfo.manageCityId"></hc-city-select>
           </el-form-item>
           <el-form-item label="标题图：">
             <hc-image-upload v-model="titleImage" :limit="50"></hc-image-upload>
@@ -106,21 +106,7 @@
     </hc-table-form>
 
 
-
-    <el-dialog
-      title="展示城市"
-      :visible.sync="cityViewDialogVisible"
-      width="70%"
-    >
-      <hc-city-box
-        view-only
-        :init-city-list="initCityList"
-        :all-city-list="allCityList"
-      ></hc-city-box>
-      <div slot="footer">
-        <el-button @click="cityViewDialogVisible = false">取 消</el-button>
-      </div>
-    </el-dialog>
+    <hc-city-box ref="hcCityBox"></hc-city-box>
 
     <el-dialog
       title="关联标签"
@@ -158,8 +144,8 @@ import {
 import { getAllTagList } from "@/api/tms/city";
 import { adminCityList } from "@/api/admin/city";
 import HcQuill from "@/views/components/HcQuill";
-import HcCityBox from "@/views/components/HcCityBox/index";
-import HcCitySelect from "@/views/components/HcCitySelect/index";
+import HcCityBox from "@/views/components/HcCity/HcCityBox/index";
+import HcCitySelect from "@/views/components/HcCity/HcCitySelect/index";
 import HcImageUpload from "@/views/components/HcImageUpload/index";
 import HcTableForm from "@/views/components/HcTableForm/index";
 
@@ -184,7 +170,6 @@ export default {
       cityList: [],
       allCityList: [],
       initCityList: [],
-      cityViewDialogVisible: false,
       quillContent: {
         content: "",
         structuredContent: "",
@@ -388,21 +373,7 @@ export default {
     },
     cityView(newsId) {
       newsOpenList({ newsId }).then(({ data }) => {
-        let cityList = data.data.data;
-        let allCityList = [];
-        let initCityList = [];
-        for (let i = 0; i < cityList.length; i++) {
-          allCityList.push({
-            cityId: cityList[i].cityId,
-            cityName: cityList[i].cityName,
-          });
-          if (cityList[i].isOpening) {
-            initCityList.push(cityList[i].cityId);
-          }
-        }
-        this.initCityList = initCityList;
-        this.allCityList = allCityList;
-        this.cityViewDialogVisible = true;
+        this.$refs.hcCityBox.open(this.userInfo.manageCityId, data.data.data || [], true)
       });
     },
     tagView(row) {

@@ -54,17 +54,8 @@
       </el-pagination>
     </div>
 
-    <el-dialog
-      title="展示城市"
-      :visible.sync="cityViewDialogVisible"
-      width="70%">
-      <hc-city-box view-only :init-city-list="initCityList" :all-city-list="allCityList"></hc-city-box>
-      <div slot="footer">
-        <el-button @click="cityViewDialogVisible = false">取 消</el-button>
-      </div>
-    </el-dialog>
+    <hc-city-box ref="hcCityBox"></hc-city-box>
     
-
     <el-dialog
       :title="formTitle"
       :visible.sync="formDialogVisible"
@@ -90,7 +81,7 @@
 <script>
 import { getColumnList, addColumn, updateColumn, deleteColumn, columnEnable, columnOpenList } from '@/api/cms/officialColumn'
 import { mapGetters } from 'vuex'
-import HcCityBox from '@/views/components/HcCityBox/index'
+import HcCityBox from '@/views/components/HcCity/HcCityBox/index'
 export default {
   components: { HcCityBox },
   data () {
@@ -110,7 +101,6 @@ export default {
       },
       allCityList: [],
       initCityList: [],
-      cityViewDialogVisible: false
     }
   },
   computed: {
@@ -200,21 +190,7 @@ export default {
     },
     cityView (columnId) {
       columnOpenList(columnId).then(({data}) => {
-        let cityList = data.data.data
-        let allCityList = []
-        let initCityList = []
-        for (let i = 0; i < cityList.length; i++) {
-          allCityList.push({
-            cityId: cityList[i].cityId,
-            cityName: cityList[i].cityName
-          })
-          if (cityList[i].isOpening) {
-            initCityList.push(cityList[i].cityId)
-          }
-        }
-        this.initCityList = initCityList
-        this.allCityList = allCityList
-        this.cityViewDialogVisible = true
+        this.$refs.hcCityBox.open(this.userInfo.manageCityId, data.data.data || [], true)
       })
     },
     handleDel (officialColumnId) {

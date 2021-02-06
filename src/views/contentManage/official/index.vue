@@ -115,7 +115,7 @@
             <el-col :span="12">
               <!-- 发布城市 平台可见 -->
               <el-form-item label="发布城市" v-if="isAdmin">
-                <hc-city-select v-model="addform.cityIdList"></hc-city-select>
+                <hc-city-select v-model="addform.cityIdList" :city-id="userInfo.manageCityId"></hc-city-select>
               </el-form-item>
             </el-col>
           </el-row>
@@ -177,20 +177,7 @@
     </hc-table-form>
 
     <!-- 展示城市 -->
-    <el-dialog
-      title="展示城市"
-      :visible.sync="cityViewDialogVisible"
-      width="70%"
-    >
-      <hc-city-box
-        view-only
-        :init-city-list="initCityList"
-        :all-city-list="allCityList"
-      ></hc-city-box>
-      <div slot="footer">
-        <el-button @click="cityViewDialogVisible = false">取 消</el-button>
-      </div>
-    </el-dialog>
+    <hc-city-box ref="hcCityBox"></hc-city-box>
   </basic-container>
 </template>
 
@@ -205,8 +192,8 @@ import {
   officaialNewsUpdate,
 } from "@/api/officialRelease/officialRelease.js";
 import HcQuill from "@/views/components/HcQuill";
-import HcCityBox from "@/views/components/HcCityBox/index";
-import HcCitySelect from "@/views/components/HcCitySelect/index";
+import HcCityBox from "@/views/components/HcCity/HcCityBox/index";
+import HcCitySelect from "@/views/components/HcCity/HcCitySelect/index";
 import { mapGetters } from "vuex";
 import store from "@/store";
 import { getAllTagList } from "@/api/tms/city";
@@ -242,7 +229,6 @@ export default {
       },
       // 栏目数据
       columnData: [],
-      cityViewDialogVisible: false, //展示城市弹窗
       cityList: [],
       allCityList: [],
       initCityList: [],
@@ -327,23 +313,8 @@ export default {
       checkCity({
         officialNewsId: id,
       }).then((res) => {
-        console.log("res", res);
-        let cityList = res.data.data.data;
-        let allCityList = [];
-        let initCityList = [];
-        for (let i = 0; i < cityList.length; i++) {
-          allCityList.push({
-            cityId: cityList[i].cityId,
-            cityName: cityList[i].cityName,
-          });
-          if (cityList[i].isOpening) {
-            initCityList.push(cityList[i].cityId);
-          }
-        }
-        this.initCityList = initCityList;
-        this.allCityList = allCityList;
+        this.$refs.hcCityBox.open(this.userInfo.manageCityId, res.data.data.data || [], true)
       });
-      this.cityViewDialogVisible = true;
     },
     // 详情
     // handleDetails(row) {

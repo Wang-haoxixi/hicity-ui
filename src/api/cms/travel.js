@@ -125,3 +125,11 @@ export function deleteTravel (id) {
   })
 }
 
+// 咨询开通城市列表
+export function travelOpenList(params) {
+  return new request({
+    url: '/cms/travel/city_scope',
+    params
+  })
+}
+

@@ -24,7 +24,7 @@
             >新建</el-button>
         </template>
         <template slot="cityList" slot-scope="scope">
-          <el-button type="text" size="mini">查看</el-button>
+          <el-button type="text" size="mini" @click="cityView(scope.row.id)">查看</el-button>
         </template>
         <template slot="menu" slot-scope="scope">
           <template v-if="userType <= scope.row.publishedSources">
@@ -50,7 +50,7 @@
             <hc-image-upload v-model="formData.images" :limit="50"></hc-image-upload>
           </el-form-item>
           <el-form-item v-if="formData.publishedSources ? userType == formData.publishedSources : (userType == 1 || userType == 2)" label="发布城市：" prop="cityList">
-            <hc-city-select v-model="formData.cityList"></hc-city-select>
+            <hc-city-select v-model="formData.cityList" :city-id="userInfo.manageCityId"></hc-city-select>
           </el-form-item>
           <el-form-item label="内容：" prop="content">
             <el-input type="textarea" v-model="formData.content"></el-input>
@@ -63,32 +63,17 @@
         </el-form>
       </template>
     </hc-table-form>
-    <el-dialog
-      title="展示城市"
-      :visible.sync="cityViewDialogVisible"
-      width="70%"
-    >
-      <hc-city-box
-        view-only
-        :init-city-list="initCityList"
-        :all-city-list="allCityList"
-      ></hc-city-box>
-      <div slot="footer">
-        <el-button @click="cityViewDialogVisible = false">取 消</el-button>
-      </div>
-    </el-dialog>
+    
+    <hc-city-box ref="hcCityBox"></hc-city-box>
   </basic-container>
 </template>
 
 <script>
 import { tableOption } from "./const";
 import { mapGetters } from "vuex";
-import {
-  newsOpenList,
-} from "@/api/cms/news";
-import { getTravelList, getClassifyList, getTopicList, saveTravel, getTravelDetail, deleteTravel } from "@/api/cms/travel"
-import HcCityBox from "@/views/components/HcCityBox/index";
-import HcCitySelect from "@/views/components/HcCitySelect/index";
+import { getTravelList, getClassifyList, getTopicList, saveTravel, getTravelDetail, deleteTravel, travelOpenList } from "@/api/cms/travel"
+import HcCityBox from "@/views/components/HcCity/HcCityBox/index";
+import HcCitySelect from "@/views/components/HcCity/HcCitySelect/index";
 import HcImageUpload from "@/views/components/HcImageUpload/index";
 import HcTopicSelect from "@/views/components/HcTopicSelect/index";
 import HcTableForm from "@/views/components/HcTableForm/index";
@@ -110,7 +95,6 @@ export default {
       publishType: "",
       allCityList: [],
       initCityList: [],
-      cityViewDialogVisible: false,
       topicProps: {
         lazy: true,
         lazyLoad (node, resolve) {
@@ -283,23 +267,9 @@ export default {
     handleRefreshChange() {
       this.getList(this.page);
     },
-    cityView(newsId) {
-      newsOpenList({ newsId }).then(({ data }) => {
-        let cityList = data.data.data;
-        let allCityList = [];
-        let initCityList = [];
-        for (let i = 0; i < cityList.length; i++) {
-          allCityList.push({
-            cityId: cityList[i].cityId,
-            cityName: cityList[i].cityName,
-          });
-          if (cityList[i].isOpening) {
-            initCityList.push(cityList[i].cityId);
-          }
-        }
-        this.initCityList = initCityList;
-        this.allCityList = allCityList;
-        this.cityViewDialogVisible = true;
+    cityView(id) {
+      travelOpenList({ id }).then(({ data }) => {
+        this.$refs.hcCityBox.open(this.userInfo.manageCityId, data.data.data || [], true)
       });
     },
   },
