@@ -301,10 +301,10 @@ export default {
       let form = {
         current: this.currentPage,
         size: this.pageSize,
-      }
+      };
       if (this.isAdmin) {
         this.addform.source = 1;
-        form.source = 1
+        form.source = 1;
       }
       officialReleaseList(form).then((res) => {
         res.data.data.data.records.forEach((item) => {
@@ -351,21 +351,20 @@ export default {
     // },
     // 编辑
     handleEdit(row) {
-      this.fileList = [];
       // console.log("编辑", row);
       officialDetail({
         officialNewsId: row.officialNewsId,
       }).then((res) => {
-        let officialColumnId = res.data.data.data.officialColumnId
-        let officialMatch = false
+        let officialColumnId = res.data.data.data.officialColumnId;
+        let officialMatch = false;
         for (let i = 0; i < this.columnData.length; i++) {
           if (this.columnData[i].officialColumnId == officialColumnId) {
-            officialMatch = true
-            break
+            officialMatch = true;
+            break;
           }
         }
         if (!officialMatch) {
-          res.data.data.data.officialColumnId = ''
+          res.data.data.data.officialColumnId = "";
         }
         this.addform = res.data.data.data;
         console.log("this.addform", this.addform);
@@ -375,6 +374,7 @@ export default {
         };
         console.log("addform", this.addform);
         this.urlList = [];
+        this.fileList = [];
         this.addform.urlList.forEach((item, index) => {
           this.fileList.push({
             name: index,
