@@ -407,8 +407,8 @@
 
 <script>
 import store from "@/store";
-import HcQuill from "@/views/components/HcQuill";
-import HcCitySelect from "@/views/components/HcCitySelect/index";
+import HcQuill from "@/views/components//HcQuill";
+import HcCitySelect from "@/views/components/HcCity/HcCitySelect/index";
 import {
   activityClassify,
   cityTree,

@@ -129,23 +129,7 @@
     ></el-pagination>
 
     <!-- 查看城市范围弹窗 -->
-    <el-dialog
-      title="展示范围"
-      :visible.sync="showCityDialogVisible"
-      width="70%"
-    >
-      <hc-city-box
-        view-only
-        :init-city-list="initCityList"
-        :all-city-list="allCityList"
-      ></hc-city-box>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="showCityDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="showCityDialogVisible = false"
-          >确 定</el-button
-        >
-      </span>
-    </el-dialog>
+    <hc-city-box ref="hcCityBox"></hc-city-box>
   </basic-container>
 </template>
 
@@ -155,7 +139,8 @@ import {
   activityDelete,
   checkCity,
 } from "@/api/activity/activity";
-import HcCityBox from "@/views/components/HcCityBox/index";
+import HcCityBox from "@/views/components/HcCity/HcCityBox/index";
+import { mapGetters } from "vuex";
 export default {
   components: { HcCityBox },
   data() {
@@ -172,7 +157,9 @@ export default {
       name: "", //活动名称
     };
   },
-  computed: {},
+  computed: {
+    ...mapGetters(['userInfo'])
+  },
   filters: {},
   methods: {
     // 获取活动列表数据
@@ -247,21 +234,7 @@ export default {
       checkCity({
         activityId: id,
       }).then((res) => {
-        console.log("res", res);
-        let cityList = res.data.data.data;
-        let allCityList = [];
-        let initCityList = [];
-        for (let i = 0; i < cityList.length; i++) {
-          allCityList.push({
-            cityId: cityList[i].cityId,
-            cityName: cityList[i].cityName,
-          });
-          if (cityList[i].isOpening) {
-            initCityList.push(cityList[i].cityId);
-          }
-        }
-        this.initCityList = initCityList;
-        this.allCityList = allCityList;
+        this.$refs.hcCityBox.open(this.userInfo.manageCityId, res.data.data.data || [], true)
       });
       this.showCityDialogVisible = true;
     },
