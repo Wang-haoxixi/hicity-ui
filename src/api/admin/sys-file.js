@@ -1,4 +1,5 @@
 import request from '@/router/axios'
+import axios1 from 'axios'
 
 export function fetchList(query) {
   return request({
@@ -36,4 +37,34 @@ export function putObj(obj) {
     method: 'put',
     data: obj
   })
+}
+
+export function ossUpload (file) {
+  let data = new FormData()
+  data.append('file', file)
+  return request({
+    url: '/admin/sys_file/oss/upload',
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+    method: 'post',
+    data
+  })
+}
+
+export function downloadUrl(url) {
+  return new Promise((resolve, reject) => {
+    var xhr = new XMLHttpRequest();
+    xhr.open("get", url, true);
+    xhr.responseType = "blob";
+    xhr.onreadystatechange = function () {
+      if (this.readyState == 4) {
+        if (this.status == 200) {
+          resolve(this.response)
+        }
+      }
+    }
+    xhr.send();
+  })
+  
 }

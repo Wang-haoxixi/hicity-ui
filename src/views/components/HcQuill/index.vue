@@ -41,7 +41,7 @@
           <line class="ql-stroke" x1="8" x2="10" y1="14" y2="4"></line>
         </svg>
       </button>
-      <button class="toolbar-item ql-header" type="button" value="1" title="二级标题">
+      <button class="toolbar-item ql-header" type="button" value="1" title="一级标题">
         <svg viewBox="0 0 18 18">
           <path class="ql-fill" d="M16.73975,13.81445v.43945a.54085.54085,0,0,1-.605.60547H11.855a.58392.58392,0,0,1-.64893-.60547V14.0127c0-2.90527,3.39941-3.42187,3.39941-4.55469a.77675.77675,0,0,0-.84717-.78125,1.17684,1.17684,0,0,0-.83594.38477c-.2749.26367-.561.374-.85791.13184l-.4292-.34082c-.30811-.24219-.38525-.51758-.1543-.81445a2.97155,2.97155,0,0,1,2.45361-1.17676,2.45393,2.45393,0,0,1,2.68408,2.40918c0,2.45312-3.1792,2.92676-3.27832,3.93848h2.79443A.54085.54085,0,0,1,16.73975,13.81445ZM9,3A.99974.99974,0,0,0,8,4V8H3V4A1,1,0,0,0,1,4V14a1,1,0,0,0,2,0V10H8v4a1,1,0,0,0,2,0V4A.99974.99974,0,0,0,9,3Z"></path>
         </svg>
@@ -74,26 +74,101 @@
       </button>
     </div>
     <div id="editor"></div>
+    <input ref="file" type="file" @change="imageSelect" style="height: 0; width: 0;" />
     <el-dialog
-      title=""
-      :visible.sync="dialogVisible"
-      width="width">
-      <div>
-        <el-input v-model="link.label"></el-input>
-        <el-input v-model="link.url"></el-input>
-      </div>
+      :visible.sync="dialogVisible" append-to-body>
+      <el-form label-width="60px" class="link-form">
+        <el-form-item label="内容：">
+          <el-input v-model="link.label"></el-input>
+        </el-form-item>
+        <el-form-item label="地址：">
+          <el-input v-model="link.url" style="margin-bottom: 0"></el-input>
+        </el-form-item>
+      </el-form>
       <div slot="footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+        <el-button @click="linkCancel">取 消</el-button>
+        <el-button type="primary" @click="linkSave">确 定</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
+import { v4 as uuidv4 } from 'uuid'
 import Quill from 'quill'
 import Delta from 'quill-delta'
 import 'quill/dist/quill.snow.css'
+import { ossUpload } from '@/api/admin/sys-file'
+import { uploadImage } from '@/util/file'
+
+const BlockEmbed = Quill.import('blots/block/embed');
+class ImageUploading extends BlockEmbed {
+  static blotName = 'ImageUploading'
+  static tagName = 'div'
+  static create(data) {
+    window.quillVm.updateImage(data.uuid, data.file, data.type)
+    let value = `
+      <div class="quill-image">
+        <div class="quill-image-box">
+          <img src="/img/quill/quill-uploading.png" />
+        </div>
+      </div>
+    `
+    const node = super.create(data.uuid);
+    node.setAttribute('contenteditable', 'false');
+    node.setAttribute('width', '100%');
+    node.setAttribute('uuid', data.uuid)
+    node.innerHTML = this.transformValue(value)
+    return node;
+  }
+  static transformValue(value) {
+    let handleArr = value.split('\n')
+    handleArr = handleArr.map(e => e.replace(/^[\s]+/, '')
+      .replace(/[\s]+$/, ''))
+    return handleArr.join('')
+  }
+  static value(value) {
+    return {
+      uuid: value.getAttribute('uuid')
+    }
+  }
+}
+Quill.register(ImageUploading);
+
+class image extends BlockEmbed {
+  static blotName = 'image'
+  static tagName = 'div'
+
+  static create(url) {
+    this.url = url
+    let value = `
+      <div class="quill-image">
+        <div class="quill-image-box">
+          <img src="${url}" />
+        </div>
+      </div>
+    `
+    const node = super.create(value);
+    node.setAttribute('contenteditable', 'false');
+    node.setAttribute('width', '100%');
+    node.innerHTML = this.transformValue(value)
+    return node;
+  }
+
+  static transformValue(value) {
+    let handleArr = value.split('\n')
+    handleArr = handleArr.map(e => e.replace(/^[\s]+/, '')
+      .replace(/[\s]+$/, ''))
+    return handleArr.join('')
+  }
+
+  // 返回节点自身的value值 用于撤销操作
+  static value() {
+    return this.url
+  }
+}
+Quill.register(image);
+
 export default {
   props: {
     value: {
@@ -110,10 +185,16 @@ export default {
     return {
       quill: null,
       dialogVisible: false,
-      link: {}
+      link: {},
+      selection: null,
     }
   },
+  destroyed () {
+    window.quillVm = null
+  },
   mounted () {
+    window.quillVm = this
+    // let that = this
     this.quill = new Quill('#editor', {
       theme: 'snow',
       modules: {
@@ -121,47 +202,171 @@ export default {
       },
     });
 
-    this.quill.root.innerHTML = this.value.content
+    // 自定义图片
+    this.quill.getModule('toolbar').addHandler('image', (value) => {
+      this.$refs.file.click()
+    })
 
+    // 自定义链接
+    this.quill.getModule('toolbar').addHandler('link', (value) => {
+      
+      
+      let selection = this.quill.getSelection() || {index: 0, length: 0}
+      if (!value && selection.length == 0) {
+        let pointerIndex = selection.index
+        let contents = this.quill.getContents()
+        let index= 0
+        let end = false
+        contents.forEach(op => {
+          if (!end) {
+            let insert = op.insert
+            if (typeof insert == 'string') {
+              if (index < pointerIndex && index + insert.length >= pointerIndex) {
+                let delta = new Delta()
+                  .retain(index)
+                  .delete(insert.length)
+                  .insert(insert)
+                this.quill.updateContents(delta)
+                end = true
+                return
+              }
+              index += insert.length
+            } else {
+              index++
+            }
+          }
+        })
+      } else {
+        this.selection = selection
+        this.link.label = this.quill.getText(this.selection.index, this.selection.length)
+        this.dialogVisible = true
+      }
+    })
+
+    this.quill.root.innerHTML = this.value.content
     this.quill.on('text-change', (delta, oldDelta, source) => {
       this.$emit('input', {content: this.quill.root.innerHTML, structuredContent: JSON.stringify(this.quill.getContents().ops)})
     });
-
+    
+    // 复制粘贴
     this.quill.clipboard.addMatcher(Node.ELEMENT_NODE, function(node, delta) {
       let deltas = new Delta()
-      let opsList = []
       delta.forEach((op) => {
         if (typeof op.insert === 'string') {
           let attributes = op.attributes
           if (attributes && attributes.link) {
             delete attributes.link
           }
-          opsList.push({
-            type: 'insert',
-            arguments: [op.insert]
-          })
           deltas.insert(op.insert)
         } else if (!op.insert.image) {
-          opsList.push({
-            type: 'insert',
-            arguments: [op.insert, op.attributes]
-          })
           deltas.insert(op.insert, op.attributes)
         } else {
-          opsList.push({
-            type: 'upload',
-            arguments: [op.insert.image]
+          let uuid = uuidv4()
+          deltas.insert({
+            'ImageUploading': {
+              uuid,
+              file: op.insert.image,
+              type: 2,
+            }
           })
         }
       })
-
       return deltas
     });
   },
+  methods: {
+    imageSelect (event) {
+      let file = event.target.files[0]
+      this.insertImage(file)
+      event.target.value = ''
+    },
+    updateImage (uuid, file, type) {
+      if (type == 1) {
+        // 选择的文件上传
+        ossUpload(file).then(({data}) => {
+          let url = data.data.data.url
+          let structuredContent = this.quill.getContents()
+          let index = 0
+          let insert
+          structuredContent.forEach(op => {
+            insert = op.insert
+            if (typeof insert == 'string') {
+              index += insert.length
+            } else if (insert.ImageUploading) {
+              if (insert.ImageUploading.uuid == uuid) {
+                let delta = new Delta()
+                .retain(index)
+                .delete(1)
+                .insert({
+                  image: url
+                })
+                this.quill.updateContents(delta)
+                return
+              }
+            } else {
+              index++
+            }
+          })
+        })
+      } else {
+        // 路径图片上传
+        uploadImage(file).then(({data}) => {
+          let url = data.data.data.url
+          let structuredContent = this.quill.getContents()
+          let index = 0
+          let insert
+          structuredContent.forEach(op => {
+            insert = op.insert
+            if (typeof insert == 'string') {
+              index += insert.length
+            } else if (insert.ImageUploading) {
+              if (insert.ImageUploading.uuid == uuid) {
+                let delta = new Delta()
+                .retain(index)
+                .delete(1)
+                .insert({
+                  image: url
+                })
+                this.quill.updateContents(delta)
+                return
+              }
+            } else {
+              index++
+            }
+          })
+        })
+      }
+    },
+    insertImage (file) {
+      // 图片上传
+      let uuid = uuidv4()
+      let selection = this.quill.getSelection()
+      this.quill.insertEmbed(selection.index || 0, 'ImageUploading', {uuid, file, type: 1});
+    },
+    linkSave () {
+      let selection = this.selection || {index: 0, length: 0}
+      let delta = new Delta()
+        .retain(selection.index)
+        .delete(selection.length)
+        .insert(this.link.label, {link: this.link.url})
+      this.quill.updateContents(delta)
+      this.dialogVisible = false
+    },
+    linkCancel () {
+      this.link = {}
+      this.dialogVisible = false
+    },
+    getData () {
+      let structuredContent = this.quill.getContents().ops
+      let haha = structuredContent.filter(op => {
+        return (typeof op.insert === 'string') || !op.insert.ImageUploading
+      })
+    }
+  }
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scope>
 #editor-toolbar {
   display: flex;
   justify-content: flex-start;
@@ -212,6 +417,19 @@ export default {
     font-size: 0;
     position: relative;
     max-width: 100%;
+    width: 200px;
+    image {
+      width: 100%;
+    }
+  }
+}
+
+.link-form {
+  /deep/.el-form-item {
+    margin: 0;
+    &:not(:first-child) {
+      margin-top: 10px;
+    }
   }
 }
 
