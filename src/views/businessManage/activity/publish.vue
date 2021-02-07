@@ -173,6 +173,7 @@
           >
           <!-- 填写标签 -->
           <el-autocomplete
+            @blur="handleBlur"
             size="small"
             autofocus
             v-if="haveInputVal"
@@ -606,7 +607,7 @@ export default {
         this.classification = [data.classification, data.subClassification];
         this.baseFormData.classification = this.classification[0];
         this.baseFormData.subClassification = this.classification[1];
-
+        // this.baseFormData.label = []
         this.baseFormData.label = data.label;
         this.baseFormData.spot = data.spot;
         this.quillContent.content = data.details;
@@ -736,6 +737,8 @@ export default {
       console.log("有值", results);
       cb(results);
     },
+    handleBlur(){
+    },
 
     // 选择活动标签
     handleTagValFn() {
@@ -849,9 +852,9 @@ export default {
 
       savePublish(this.baseFormData).then((res) => {
         if (res.data.code !== 0) {
-          return this.$message.error("发布活动失败");
+          return this.$message.error("保存草稿失败");
         }
-        this.$message.success("发布活动成功");
+        this.$message.success("保存草稿成功");
         this.fileList = [];
         this.baseFormData.fileList = [];
         this.$router.go(-1);
