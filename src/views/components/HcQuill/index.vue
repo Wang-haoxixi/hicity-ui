@@ -76,7 +76,7 @@
     <div id="editor"></div>
     <input ref="file" type="file" @change="imageSelect" style="height: 0; width: 0;" />
     <el-dialog
-      :visible.sync="dialogVisible" append-to-body>
+      :visible.sync="dialogVisibleLink" append-to-body>
       <el-form label-width="60px" class="link-form">
         <el-form-item label="内容：">
           <el-input v-model="link.label"></el-input>
@@ -90,6 +90,21 @@
         <el-button type="primary" @click="linkSave">确 定</el-button>
       </div>
     </el-dialog>
+
+    <el-dialog
+      :visible.sync="dialogVisibleVideo" append-to-body>
+      <el-form label-width="100px" class="link-form">
+        <el-form-item label="视频链接：">
+          <el-input v-model="videoUrl" style="margin-bottom: 0"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer">
+        <el-button @click="linkCancel">取 消</el-button>
+        <el-button type="primary" @click="videoSave">确 定</el-button>
+      </div>
+    </el-dialog>
+
+
   </div>
 </template>
 
@@ -169,6 +184,42 @@ class image extends BlockEmbed {
 }
 Quill.register(image);
 
+
+class video extends BlockEmbed {
+  static blotName = 'video'
+  static tagName = 'div'
+
+  static create(url) {
+    this.url = url
+    let value = `
+      <div class="quill-video">
+        <div class="quill-video-box">
+          <video src="https://vd2.bdstatic.com/mda-mb4qn692fvz9inmr/v1-cae/sc/mda-mb4qn692fvz9inmr.mp4?v_from_s=hkapp-haokan-nanjing&auth_key=1612671948-0-0-937a8fa5bb8bc76c3dc867b573aaeac2&bcevod_channel=searchbox_feed&pd=1&pt=3&abtest=8_2">
+          </video> 
+        </div>
+      </div>
+    `
+    const node = super.create(value);
+    node.setAttribute('contenteditable', 'false');
+    node.setAttribute('width', '100%');
+    node.innerHTML = this.transformValue(value)
+    return node;
+  }
+
+  static transformValue(value) {
+    let handleArr = value.split('\n')
+    handleArr = handleArr.map(e => e.replace(/^[\s]+/, '')
+      .replace(/[\s]+$/, ''))
+    return handleArr.join('')
+  }
+
+  // 返回节点自身的value值 用于撤销操作
+  static value() {
+    return this.url
+  }
+}
+// Quill.register(video);
+
 export default {
   props: {
     value: {
@@ -184,8 +235,13 @@ export default {
   data () {
     return {
       quill: null,
-      dialogVisible: false,
-      link: {},
+      dialogVisibleLink: false,
+      dialogVisibleVideo: false,
+      link: {
+        label: '',
+        url: ''
+      },
+      videoUrl: '',
       selection: null,
     }
   },
@@ -209,8 +265,6 @@ export default {
 
     // 自定义链接
     this.quill.getModule('toolbar').addHandler('link', (value) => {
-      
-      
       let selection = this.quill.getSelection() || {index: 0, length: 0}
       if (!value && selection.length == 0) {
         let pointerIndex = selection.index
@@ -239,7 +293,42 @@ export default {
       } else {
         this.selection = selection
         this.link.label = this.quill.getText(this.selection.index, this.selection.length)
-        this.dialogVisible = true
+        this.dialogVisibleLink = true
+      }
+    })
+
+     // 自定义视频
+    this.quill.getModule('toolbar').addHandler('video', (value) => {
+      console.log(value)
+      let selection = this.quill.getSelection() || {index: 0, length: 0}
+      if (!value && selection.length == 0) {
+        let pointerIndex = selection.index
+        let contents = this.quill.getContents()
+        let index= 0
+        let end = false
+        contents.forEach(op => {
+          if (!end) {
+            let insert = op.insert
+            if (typeof insert == 'string') {
+              if (index < pointerIndex && index + insert.length >= pointerIndex) {
+                let delta = new Delta()
+                  .retain(index)
+                  .delete(insert.length)
+                  .insert(insert)
+                this.quill.updateContents(delta)
+                end = true
+                return
+              }
+              index += insert.length
+            } else {
+              index++
+            }
+          }
+        })
+      } else {
+        this.selection = selection
+        this.link.label = this.quill.getText(this.selection.index, this.selection.length)
+        this.dialogVisibleVideo = true
       }
     })
 
@@ -350,11 +439,23 @@ export default {
         .delete(selection.length)
         .insert(this.link.label, {link: this.link.url})
       this.quill.updateContents(delta)
-      this.dialogVisible = false
+      this.dialogVisibleLink = false
+    },
+    videoSave () {
+      let selection = this.selection || {index: 0, length: 0}
+      let delta = new Delta()
+        .retain(selection.index)
+        .delete(selection.length)
+        .insert({video: this.videoUrl})
+      this.quill.updateContents(delta)
+      this.dialogVisibleVideo = false
     },
     linkCancel () {
-      this.link = {}
-      this.dialogVisible = false
+      this.link = {
+        label: '',
+        url: ''
+      }
+      this.dialogVisibleLink = false
     },
     getData () {
       let structuredContent = this.quill.getContents().ops
@@ -419,6 +520,24 @@ export default {
     max-width: 100%;
     width: 200px;
     image {
+      width: 100%;
+    }
+  }
+}
+
+.quill-video {
+  display: block;
+  margin: 20px 0;
+  text-align: center;
+  font-size: 0;
+  .quill-video-box {
+    display: inline-block;
+    font-size: 0;
+    position: relative;
+    width: 100%;
+    height: 300px;
+    video {
+      height: 100%;
       width: 100%;
     }
   }

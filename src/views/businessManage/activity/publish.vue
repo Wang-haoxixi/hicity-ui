@@ -13,9 +13,9 @@
         label-width="120px"
       >
         <!-- 所属城市 -->
-        <el-form-item label="所属城市：">
+        <el-form-item v-if="baseFormData.source ? userType == baseFormData.source : (userType == 1 || userType == 2)" label="所属城市：">
           <!-- {{baseFormData.cityIdList}} -->
-          <hc-city-select v-model="baseFormData.cityIdList"></hc-city-select>
+          <hc-city-select v-model="baseFormData.cityIdList" :city-id="userInfo.manageCityId"></hc-city-select>
         </el-form-item>
 
         <!-- 活动标题 -->
@@ -417,6 +417,7 @@
 import store from "@/store";
 import HcQuill from "@/views/components//HcQuill";
 import HcCitySelect from "@/views/components/HcCity/HcCitySelect/index";
+import { mapGetters } from "vuex";
 import {
   activityClassify,
   cityTree,
@@ -534,6 +535,9 @@ export default {
       showDelete: false,
     };
   },
+  computed: {
+    ...mapGetters(['userType', 'userInfo'])
+  },
   methods: {
     // 返回
     backClick() {
@@ -583,47 +587,49 @@ export default {
     // 获取活动详情
     getActivityInfo(id) {
       if (!id) {
-        return;
-      }
-
-      activityInfo(id).then((res) => {
-        if (res.data.code !== 0) {
-          this.$message.error("获取活动详情失败！");
-        }
-        let data = res.data.data.data;
-        console.log("活动详情", data);
-        // console.log("活动详情", data.city.split(","));
-        // this.baseFormData = res.data.data.data;
-        // console.log("活动详情", this.baseFormData);
-        this.baseFormData.cityIdList = data.cityIdList;
-        this.baseFormData.name = data.name;
-        this.baseFormData.startTime = data.startTime;
-        this.baseFormData.endTime = data.endTime;
-        this.baseFormData.type = data.type;
-        this.baseFormData.poster = data.poster;
-        this.baseFormData.cityId = data.cityId;
-        this.baseFormData.field = data.field;
-
-        this.classification = [data.classification, data.subClassification];
-        this.baseFormData.classification = this.classification[0];
-        this.baseFormData.subClassification = this.classification[1];
-        // this.baseFormData.label = []
-        this.baseFormData.label = data.label;
-        this.baseFormData.spot = data.spot;
-        this.quillContent.content = data.details;
-        this.contentShow = true;
-
-        data.fileList.forEach((item) => {
-          this.fileList.push({
-            name: item.original,
-            url: item.attachFile,
-          });
-          this.baseFormData.fileList.push({
-            original: item.original,
-            attachFile: item.attachFile,
+        this.baseFormData.cityIdList = [this.userInfo.manageCityId]
+      } else {
+        activityInfo(id).then((res) => {
+          if (res.data.code !== 0) {
+            this.$message.error("获取活动详情失败！");
+          }
+          let data = res.data.data.data;
+          console.log("活动详情", data);
+          // console.log("活动详情", data.city.split(","));
+          // this.baseFormData = res.data.data.data;
+          // console.log("活动详情", this.baseFormData);
+          this.baseFormData.cityIdList = data.cityIdList;
+          this.baseFormData.name = data.name;
+          this.baseFormData.startTime = data.startTime;
+          this.baseFormData.endTime = data.endTime;
+          this.baseFormData.type = data.type;
+          this.baseFormData.poster = data.poster;
+          this.baseFormData.cityId = data.cityId;
+          this.baseFormData.field = data.field;
+          this.baseFormData.source = data.source
+  
+          this.classification = [data.classification, data.subClassification];
+          this.baseFormData.classification = this.classification[0];
+          this.baseFormData.subClassification = this.classification[1];
+  
+          this.baseFormData.label = data.label;
+          this.baseFormData.spot = data.spot;
+          this.quillContent.content = data.details;
+          this.contentShow = true;
+  
+          data.fileList.forEach((item) => {
+            this.fileList.push({
+              name: item.original,
+              url: item.attachFile,
+            });
+            this.baseFormData.fileList.push({
+              original: item.original,
+              attachFile: item.attachFile,
+            });
           });
         });
-      });
+      }
+
     },
     // 获取活动类型
     getActivityType() {

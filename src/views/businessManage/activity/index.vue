@@ -73,7 +73,7 @@
           <div>{{ scope.row.name }}</div>
           <div>
             <i class="el-icon-time" style="margin-right: 5px"></i
-            >{{ scope.row.createTime }} 至 {{ scope.row.endTime }}
+            >{{ scope.row.startTime }} 至 {{ scope.row.endTime }}
           </div>
           <div>
             <i class="el-icon-location-outline" style="margin-right: 5px"></i
@@ -95,7 +95,7 @@
           >
         </template>
       </el-table-column>
-      <el-table-column prop="exhibits" label="展示范围" width="100">
+      <el-table-column v-if="userType == 1 || userType == 2" prop="exhibits" label="展示范围" width="100">
         <template slot-scope="scope">
           <el-button type="text" @click="check(scope.row.id)">查看</el-button>
         </template>
@@ -158,7 +158,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['userInfo'])
+    ...mapGetters(['userInfo', 'userType'])
   },
   filters: {},
   methods: {
