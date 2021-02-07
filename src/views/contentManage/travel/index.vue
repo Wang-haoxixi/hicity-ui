@@ -182,13 +182,10 @@ export default {
     },
     toCreate() {
       this.formData = {
-        cityList: [],
+        cityList: [this.userInfo.manageCityId],
         images: [],
       };
       this.topicName = ''
-      if (this.userType == 1 || this.userType == 2) {
-        this.formData.cityList = [this.userInfo.manageCityId];
-      }
       this.publish = true;
       this.publishType = "add";
     },

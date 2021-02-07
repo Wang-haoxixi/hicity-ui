@@ -266,17 +266,8 @@ export default {
     },
     // 新建
     toCreate() {
-      if (!this.isAdmin) {
-        this.addform = {
-          cityIdList: [this.userInfo.manageCityId],
-          closeAllowed: "0", //启停
-        };
-        this.isShow = false;
-        this.publishType = "add";
-        return false;
-      }
       this.addform = {
-        cityIdList: [1],
+        cityIdList: [this.userInfo.manageCityId],
         closeAllowed: "0", //启停
       };
       this.isShow = false;
