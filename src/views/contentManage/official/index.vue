@@ -276,7 +276,7 @@ export default {
         return false;
       }
       this.addform = {
-        cityIdList: [1],
+        cityIdList: [this.userInfo.manageCityId],
         closeAllowed: "0", //启停
       };
       this.isShow = false;

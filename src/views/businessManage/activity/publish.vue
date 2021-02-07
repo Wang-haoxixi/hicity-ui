@@ -210,7 +210,7 @@
             :file-list="fileList"
             :headers="headersOpt"
             :on-success="handleAccessorySuccess"
-            :on-change="onChange"
+            :on-remove="handleAccessoryRemove"
           >
             <el-button size="small">点击上传</el-button>
           </el-upload>
@@ -378,9 +378,16 @@
 
       <div class="footer-btn">
         <!-- 底部按钮 -->
-        <el-button v-if="!this.$route.query.id" @click="publish" type="danger">发布活动</el-button>
-        <el-button v-else @click="editSave" type="danger">编辑保存活动</el-button>
-        <el-button @click="saveManuscript">保存草稿</el-button>
+        <el-button v-if="!this.$route.query.id" @click="publish" type="danger"
+          >发布活动</el-button
+        >
+        <el-button v-else @click="editSave" type="danger">编辑保存</el-button>
+
+        <el-button v-if="!this.$route.query.id" @click="saveManuscript"
+          >保存草稿</el-button
+        >
+        <el-button v-else @click="saveManuscriptUpdate">保存草稿</el-button>
+
         <el-button @click="backClick">取消</el-button>
       </div>
 
@@ -417,7 +424,7 @@ import {
   tagsPage,
   savePublish,
   activityInfo,
-  editSaveActivity
+  editSaveActivity,
 } from "@/api/activity/publish";
 export default {
   components: { HcQuill, HcCitySelect },
@@ -539,12 +546,15 @@ export default {
         }
       )
         .then(() => {
+          this.fileList = [];
+          this.baseFormData.fileList = [];
           this.$router.go(-1);
         })
         .catch(() => {});
     },
     // 活动分类改变触发
     changeClassification(e) {
+      console.log(e);
       this.baseFormData.classification = this.classification[0];
       this.baseFormData.subClassification = this.classification[1];
     },
@@ -580,7 +590,8 @@ export default {
           this.$message.error("获取活动详情失败！");
         }
         let data = res.data.data.data;
-        console.log("活动详情", data.city.split(","));
+        console.log("活动详情", data);
+        // console.log("活动详情", data.city.split(","));
         // this.baseFormData = res.data.data.data;
         // console.log("活动详情", this.baseFormData);
         this.baseFormData.cityIdList = data.cityIdList;
@@ -591,7 +602,11 @@ export default {
         this.baseFormData.poster = data.poster;
         this.baseFormData.cityId = data.cityId;
         this.baseFormData.field = data.field;
-        this.classification.push(data.classification, data.subClassification);
+
+        this.classification = [data.classification, data.subClassification];
+        this.baseFormData.classification = this.classification[0];
+        this.baseFormData.subClassification = this.classification[1];
+
         this.baseFormData.label = data.label;
         this.baseFormData.spot = data.spot;
         this.quillContent.content = data.details;
@@ -748,11 +763,18 @@ export default {
       console.log("fileList", this.fileList);
       console.log("baseFormData.fileList", this.baseFormData.fileList);
     },
+    // 活动附件移除
+    handleAccessoryRemove(file, fileList) {
+      // console.log(file, fileList)
+      // this.fileList = fileList
+      // this.baseFormData.fileList = this.baseFormData.fileList.filter(item=>{
+      //   return item.original != file.name
+      // })
+      // console.log(111,this.baseFormData.fileList)
+    },
     onChange(res) {},
     // 编辑保存
-    editSave(){
-      this.fileList = [];
-
+    editSave() {
       this.baseFormData.details = this.quillContent.content;
 
       // 遍历票种数组
@@ -767,21 +789,20 @@ export default {
         }
       });
       this.baseFormData.submitType = 1;
-      this.baseFormData.id = this.$route.query.id
+      this.baseFormData.id = this.$route.query.id;
 
-      
-      editSaveActivity(this.baseFormData).then(res=>{
+      editSaveActivity(this.baseFormData).then((res) => {
         if (res.data.code !== 0) {
           return this.$message.error("编辑活动失败");
         }
         this.$message.success("编辑活动成功");
+        this.fileList = [];
+        this.baseFormData.fileList = [];
         this.$router.go(-1);
-      })
+      });
     },
     // 发布活动
     publish() {
-      this.fileList = [];
-
       this.baseFormData.details = this.quillContent.content;
 
       // 遍历票种数组
@@ -803,13 +824,13 @@ export default {
           return this.$message.error("发布活动失败");
         }
         this.$message.success("发布活动成功");
+        this.fileList = [];
+        this.baseFormData.fileList = [];
         this.$router.go(-1);
       });
     },
     // 保存草稿
     saveManuscript() {
-      this.fileList = [];
-
       this.baseFormData.details = this.quillContent.content;
 
       // 遍历票种数组
@@ -831,6 +852,35 @@ export default {
           return this.$message.error("发布活动失败");
         }
         this.$message.success("发布活动成功");
+        this.fileList = [];
+        this.baseFormData.fileList = [];
+        this.$router.go(-1);
+      });
+    },
+    saveManuscriptUpdate() {
+      this.baseFormData.details = this.quillContent.content;
+
+      // 遍历票种数组
+      this.baseFormData.ticketingManagements.forEach((item) => {
+        // 保存时将支付方式列表清空并重新
+        item.payMethodList = [];
+        if (item.priceType.includes("能贝")) {
+          item.payMethodList.push(item.payWeCanPay);
+        }
+        if (item.priceType.includes("人民币")) {
+          item.payMethodList.push(item.payOfflinePay);
+        }
+      });
+      this.baseFormData.submitType = 1;
+      this.baseFormData.id = this.$route.query.id;
+
+      editSaveActivity(this.baseFormData).then((res) => {
+        if (res.data.code !== 0) {
+          return this.$message.error("保存草稿失败");
+        }
+        this.$message.success("保存草稿成功");
+        this.fileList = [];
+        this.baseFormData.fileList = [];
         this.$router.go(-1);
       });
     },

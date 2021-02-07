@@ -1,14 +1,14 @@
 <template>
   <basic-container>
-    <hc-table-form
-      title="广告管理">
+    <hc-table-form title="广告管理">
       <template>
         <el-button
           @click="dialogFormVisible = true"
           type="primary"
           size="mini"
           icon="el-icon-plus"
-        >新建</el-button>
+          >新建</el-button
+        >
         <el-table
           :data="tableData"
           border
@@ -59,7 +59,6 @@
           layout="total, sizes, prev, pager, next, jumper"
         ></el-pagination>
       </template>
-
     </hc-table-form>
     <!-- 广告新增 -->
     <el-dialog
@@ -167,10 +166,10 @@
         <el-form-item
           v-if="form.type"
           label="跳转对象 :"
-          prop="jumpObj"
+          prop="relationId"
           :label-width="formLabelWidth"
         >
-          <el-select v-model="form.jumpObj" placeholder="请选择跳转对象">
+          <el-select v-model="form.relationId" placeholder="请选择跳转对象">
             <el-option
               v-for="(item, index) in jumpObjArr"
               :key="index"
@@ -241,7 +240,7 @@
           <el-select
             v-model="editForm.adslotId"
             placeholder="请选择广告位"
-            @change="valChange"
+            @change="editTypeValChange"
           >
             <el-option
               v-for="(item, index) in adslotGroup"
@@ -298,7 +297,7 @@
           <el-select
             v-model="editForm.type"
             placeholder="请选择广告类型"
-            @change="editTypeValChange()"
+            @change="editTypeChange"
           >
             <el-option
               v-for="(item, index) in adType"
@@ -322,10 +321,13 @@
         <!-- 跳转对象 -->
         <el-form-item
           label="跳转对象 :"
-          prop="jumpObj"
+          prop="adslotName"
           :label-width="formLabelWidth"
         >
-          <el-select v-model="editForm.jumpObj" placeholder="请选择跳转对象">
+          <el-select
+            v-model="editForm.relationId"
+            placeholder="请选择跳转对象"
+          >
             <el-option
               v-for="(item, index) in jumpObjArr"
               :key="index"
@@ -413,7 +415,7 @@ export default {
         endDate: "", //结束时间
         type: "", //广告类型
         // jumpType: "", //跳转类型
-        jumpObj: "", //跳转对象
+        relationId: "", //跳转对象
         text: "", //广告文字
         imageUrl: "", //广告图片
         seq: "", //广告排序
@@ -470,6 +472,14 @@ export default {
     // 编辑 选中值发生变化时触发
     editTypeValChange(data) {
       console.log("选中值发生变化时触发", data);
+      if (this.adslotGroup) {
+        this.adslotGroup.forEach((item) => {
+          if (item.adslotId === data) {
+            this.editForm.cityName = item.cityName;
+            this.editForm.cityId = item.cityId;
+          }
+        });
+      }
     },
 
     // 获取广告位分页
@@ -529,10 +539,9 @@ export default {
 
     // 编辑按钮
     handleEdit(row) {
-      // console.log("row", row);
+      console.log("row", row);
       this.editForm = { ...row };
-      console.log('aaaa',this.editForm)
-
+      console.log("aaaa", this.editForm);
       this.adslotGroup.forEach((item) => {
         if (item.cityId === row.cityId) {
           this.editForm.cityName = item.cityName;
@@ -562,9 +571,21 @@ export default {
         this.getActivitiePageFn(this.form.cityId);
       }
     },
+    editTypeChange(val) {
+      if (!this.editForm.cityId) {
+        this.$message.error("请先选择广告位");
+        this.editForm.type = "";
+        return;
+      }
+      // 活动
+      if (val === "activity") {
+        this.getActivitiePageFn(this.editForm.cityId);
+      }
+    },
 
     // 广告编辑 提交
     editSubmit() {
+      console.log(this.editForm)
       updateAd(this.editForm).then((res) => {
         console.log("submit edit", res);
         if (res.data.code !== 0) {
