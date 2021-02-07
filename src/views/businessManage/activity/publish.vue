@@ -13,7 +13,7 @@
         label-width="120px"
       >
         <!-- 所属城市 -->
-        <el-form-item v-if="baseFormData.source ? userType == baseFormData.source : (userType == 1 || userType == 2)" label="所属城市：">
+        <el-form-item v-if="baseFormData.source ? (userType != 3 && userType == baseFormData.source) : (userType == 1 || userType == 2)" label="所属城市：">
           <!-- {{baseFormData.cityIdList}} -->
           <hc-city-select v-model="baseFormData.cityIdList" :city-id="userInfo.manageCityId"></hc-city-select>
         </el-form-item>

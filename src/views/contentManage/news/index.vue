@@ -71,16 +71,16 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item v-if="formData.source ? userType == formData.source : (userType == 1 || userType == 2)" label="发布城市：" prop="cityIdList">
+          <el-form-item v-if="formData.source ? (userType != 3 && userType == formData.source) : (userType == 1 || userType == 2)" label="发布城市：" prop="cityIdList">
             <!-- <el-select style="width: 100%" v-model="formData.cityIdList" multiple filterable  placeholder="请选择城市" @change="cityChange">
               <el-option v-for="city in allCity" :key="city.id" :label="city.regionName" :value="city.id"></el-option>
             </el-select> -->
             <hc-city-select v-model="formData.cityIdList" :city-id="userInfo.manageCityId"></hc-city-select>
           </el-form-item>
-          <el-form-item label="标题图：">
+          <el-form-item label="标题图：" prop="titleImage">
             <hc-image-upload v-model="titleImage" :limit="50"></hc-image-upload>
           </el-form-item>
-          <el-form-item label="图片展示比例：">
+          <el-form-item label="图片展示比例：" prop="imageSizeType">
             <el-radio-group v-model="formData.imageSizeType">
               <el-radio
                 v-for="size in dicList['NEWS_IMAGE_SIZE_TYPE']"
@@ -104,7 +104,6 @@
       </template>
       
     </hc-table-form>
-
 
     <hc-city-box ref="hcCityBox"></hc-city-box>
 
@@ -162,7 +161,9 @@ export default {
       },
       tableLoading: false,
       tableData: [],
-      formData: {},
+      formData: {
+        lableIdList: []
+      },
       tagList: [],
       allCity: [],
       publish: false,
@@ -181,6 +182,8 @@ export default {
       formRule: {
         title: [{required: true, message: '请输入名称'}],
         lableIdList: [{required: true, message: '请选择标签', trigger: 'blur'}],
+        titleImage: [{validator: this.imageValidator, required: true, trigger: 'blur'}],
+        imageSizeType: [{required: true, message: '请选择图片展示比例'}],
         cityIdList: [{required: true, message: '请选择城市'}],
         content: [{validator: this.contentValidator, required: true}]
       }
@@ -203,11 +206,36 @@ export default {
       }
     }
   },
-  watch: {},
+  watch: {
+    titleImage () {
+      this.$nextTick(() => {
+        this.$refs.form.validateField('titleImage')
+      })
+    },
+    quillContent () {
+      this.$nextTick(() => {
+        this.$refs.form.validateField('content')
+      })
+    },
+    'formData.lableIdList': function (va1, va2) {
+      console.log(va1)
+      console.log(va2)
+      this.$nextTick(() => {
+        this.$refs.form.validateField('lableIdList')
+      })
+    }
+  },
   created() {
     this.init();
   },
   methods: {
+    imageValidator (rule, value, callback) {
+      if (this.titleImage && this.titleImage.length > 0) {
+        callback()
+      } else {
+        callback(new Error('请添加标题图'))
+      }
+    },
     contentValidator (rule, value, callback) {
       if (this.quillContent && this.quillContent.content) {
         callback()
@@ -243,17 +271,28 @@ export default {
         });
     },
     toCreate() {
-      this.formData = {
-        cityIdList: [this.userInfo.manageCityId],
-        closeAllowed: "0",
-      };
-      this.quillContent = {
-        content: "",
-        structuredContent: "",
-      };
-      this.titleImage = [];
       this.publish = true;
       this.publishType = "add";
+      if (!this.formData.lableIdList || this.formData.lableIdList && this.formData.lableIdList.length > 0) {
+        this.formData = {
+          cityIdList: [this.userInfo.manageCityId],
+          closeAllowed: "0",
+          lableIdList: []
+        };
+      } else {
+        this.formData.cityIdList = [this.userInfo.manageCityId]
+        this.formData.closeAllowed = "0"
+      }
+      if (!this.quillContent || (this.quillContent.content || this.quillContent.structuredContent)) {
+        this.quillContent = {
+          content: "",
+          structuredContent: "",
+        };
+      }
+      if (!this.titleImage || this.titleImage && this.titleImage.length > 0) {
+        this.titleImage = []
+      }
+      
     },
     handleCreate() {
       this.$refs.form.validate(valid => {
@@ -319,8 +358,6 @@ export default {
     },
     handleUpdate() {},
     handleDraft() {
-      console.log(this.quillContent.structuredContent)
-      return
       this.$refs.form.validate(valid => {
         if (valid) {
           this.save(0)
