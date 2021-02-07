@@ -24,7 +24,7 @@ module.exports = {
         target: url,
         ws: true,
         pathRewrite: {
-          "^/api": "/api"
+          // "^/api": ""
         }
       },
       // '/admin': {
