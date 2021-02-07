@@ -244,7 +244,7 @@ export default {
     },
     toCreate() {
       this.formData = {
-        cityIdList: [],
+        cityIdList: [this.userInfo.manageCityId],
         closeAllowed: "0",
       };
       this.quillContent = {
@@ -252,9 +252,6 @@ export default {
         structuredContent: "",
       };
       this.titleImage = [];
-      if (this.userType == 1 || this.userType == 2) {
-        this.formData.cityIdList = [this.userInfo.manageCityId];
-      }
       this.publish = true;
       this.publishType = "add";
     },
@@ -322,6 +319,8 @@ export default {
     },
     handleUpdate() {},
     handleDraft() {
+      console.log(this.quillContent.structuredContent)
+      return
       this.$refs.form.validate(valid => {
         if (valid) {
           this.save(0)

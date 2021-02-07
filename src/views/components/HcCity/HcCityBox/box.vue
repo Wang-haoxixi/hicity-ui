@@ -16,7 +16,14 @@
             <div v-for="city in cityMapList" :key="city.key" class="city-select-nav-item" :class="{'checked': selectKey == city.key}" @click="cityArangeSelect(city)">{{city.key}}</div>
           </div>
           <div class="city-select-list">
-            <div v-for="city in cityArange" :key="city.id" class="city-select-list-item"  :class="{'checked': hasSelected(city.id)}" @click="selectCity(city)">{{city.regionName}}{{cityChildren(city.id)}}</div>
+            <!-- <div v-for="city in cityArange" :key="city.id" class="city-select-list-item"  :class="{'checked': hasSelected(city.id)}" @click="selectCity(city)">
+              <div class="item-name">{{city.regionName}}</div>
+              <div class="item-number">{{cityChildren(city.id)}}</div>  
+            </div> -->
+            <city-name v-for="city in cityArange" :key="city.id" :checked="!!hasSelected(city.id)"
+              :name="city.regionName"
+              :number="cityChildren(city.id)"
+              @click.native="selectCity(city)"></city-name>
           </div>
         </div>
       </div>
@@ -33,6 +40,7 @@
 import pinyin from 'pinyin'
 import { deepClone } from '@/util/util'
 import HcCityBox from './box'
+import CityName from './CityName'
 
 function formatCitys (tempCityList) {
   let cityList = Object.assign([], tempCityList)
@@ -74,7 +82,7 @@ function formatCitys (tempCityList) {
 
 export default {
   name: 'HcCityBox',
-  components: { HcCityBox },
+  components: { HcCityBox, CityName },
   data () {
     return {
       selectKey: '',
@@ -113,6 +121,8 @@ export default {
   },
   methods: {
     open (allCityTree = {}, initCityTree = {}, viewOnly = false) {
+      this.selectKey = ''
+      this.cityArange = []
       this.dialogVisible = true
       this.allCityTree = allCityTree
       this.initCityTree = initCityTree
@@ -381,6 +391,7 @@ export default {
         padding: 0 10px;
         color: #6985AE;
         font-size: 14px;
+        cursor: pointer;
         &.checked {
           color: #333333;
           &::after {
@@ -401,16 +412,25 @@ export default {
       grid-template-columns: repeat(auto-fill, 80px);
       grid-template-rows: repeat(auto-fill, 36px);
       grid-gap: 24px;
-      .city-select-list-item {
-        height: 36px;
-        line-height: 36px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        color: #666666;
-        &.checked {
-          color: #1676FF;
-        }
-      }
+      // .city-select-list-item {
+      //   height: 36px;
+      //   line-height: 36px;
+      //   display: flex;
+      //   overflow: hidden;
+      //   text-overflow: ellipsis;
+      //   color: #666666;
+      //   &.checked {
+      //     color: #1676FF;
+      //   }
+      //   .item-name {
+      //     flex: 1 1 10px;
+      //     overflow: hidden;
+      //     white-space: nowrap;
+      //     text-overflow: ellipsis;
+      //   }
+      //   // .item-number {
+      //   // }
+      // }
     }
   }
 }

@@ -43,7 +43,7 @@
           </el-table-column>
           <el-table-column prop="createTime" label="创建时间"></el-table-column>
           <!-- 平台可见 -->
-          <el-table-column label="展示范围" width="80" v-if="isAdmin">
+          <el-table-column label="展示范围" width="80" v-if="userType == 1 || userType == 2">
             <template slot-scope="scope">
               <span @click="check(scope.row.officialNewsId)" class="isClick"
                 >查看</span
@@ -53,7 +53,7 @@
           <el-table-column label="操作">
             <template
               slot-scope="scope"
-              v-if="isAdmin || (!isAdmin && scope.row.source == 2)"
+               v-if="userType <= scope.row.source"
             >
               <!-- <el-button
                 @click="handleDetails(scope.row)"
@@ -114,7 +114,7 @@
             </el-col>
             <el-col :span="12">
               <!-- 发布城市 平台可见 -->
-              <el-form-item label="发布城市" v-if="isAdmin">
+              <el-form-item v-if="addform.source ? userType == addform.source : (userType == 1 || userType == 2)" label="发布城市">
                 <hc-city-select v-model="addform.cityIdList" :city-id="userInfo.manageCityId"></hc-city-select>
               </el-form-item>
             </el-col>
@@ -266,15 +266,6 @@ export default {
     },
     // 新建
     toCreate() {
-      if (!this.isAdmin) {
-        this.addform = {
-          cityIdList: [this.userInfo.manageCityId],
-          closeAllowed: "0", //启停
-        };
-        this.isShow = false;
-        this.publishType = "add";
-        return false;
-      }
       this.addform = {
         cityIdList: [this.userInfo.manageCityId],
         closeAllowed: "0", //启停
@@ -288,10 +279,10 @@ export default {
         current: this.currentPage,
         size: this.pageSize,
       };
-      if (this.isAdmin) {
-        this.addform.source = 1;
-        form.source = 1;
-      }
+      // if (this.isAdmin) {
+      //   this.addform.source = 1;
+      //   form.source = 1;
+      // }
       officialReleaseList(form).then((res) => {
         res.data.data.data.records.forEach((item) => {
           if (item.state === 0) {
@@ -550,7 +541,7 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(["userInfo", "dicList"]),
+    ...mapGetters(["userInfo", "dicList", "userType"]),
     // 3/4平台
     isAdmin() {
       return this.userInfo.userType == 3 || this.userInfo.userType == 4;
