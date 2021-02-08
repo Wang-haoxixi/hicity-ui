@@ -41,16 +41,24 @@ import pinyin from 'pinyin'
 import { deepClone } from '@/util/util'
 import HcCityBox from './box'
 import CityName from './CityName'
+const cqRegexp  = /^重庆/
 
 function formatCitys (tempCityList) {
   let cityList = Object.assign([], tempCityList)
   let dataList = []
   cityList.sort((a, b) => {
-    return pinyin.compare(a.regionName, b.regionName)
+    let a_name = a.regionName.replace(cqRegexp, '崇庆')
+    let b_name = b.regionName.replace(cqRegexp, '崇庆')
+    return pinyin.compare(a_name, b_name)
   })
   let data = {}
   for (let i = 0; i < cityList.length; i++) {
-    let firstLetter = pinyin(cityList[i].regionName, {style: pinyin.STYLE_FIRST_LETTER, segment: true})[0][0][0].toUpperCase()
+    let firstLetter = ''
+    if (cqRegexp.test(cityList[i].regionName)) {
+      firstLetter = 'C'
+    } else {
+      firstLetter = pinyin(cityList[i].regionName, {style: pinyin.STYLE_FIRST_LETTER, segment: true})[0][0][0].toUpperCase()
+    }
     if (data.key) {
       if ( data.key.includes(firstLetter) ) {
         data.cityList.push(cityList[i])
@@ -409,7 +417,7 @@ export default {
     }
     .city-select-list {
       display: grid;
-      grid-template-columns: repeat(auto-fill, 80px);
+      grid-template-columns: repeat(auto-fill, 100px);
       grid-template-rows: repeat(auto-fill, 36px);
       grid-gap: 24px;
       // .city-select-list-item {

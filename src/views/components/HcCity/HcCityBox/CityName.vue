@@ -58,7 +58,6 @@ export default {
     }
   }
   .item-name {
-    flex: 1 1 10px;
     white-space: nowrap;
   }
   // .item-number {
