@@ -13,9 +13,18 @@
         label-width="120px"
       >
         <!-- 所属城市 -->
-        <el-form-item v-if="baseFormData.source ? (userType != 3 && userType == baseFormData.source) : (userType == 1 || userType == 2)" label="所属城市：">
-          <!-- {{baseFormData.cityIdList}} -->
-          <hc-city-select v-model="baseFormData.cityIdList" :city-id="userInfo.manageCityId"></hc-city-select>
+        <el-form-item
+          v-if="
+            baseFormData.source
+              ? userType != 3 && userType == baseFormData.source
+              : userType == 1 || userType == 2
+          "
+          label="所属城市："
+        >
+          <hc-city-select
+            v-model="baseFormData.cityIdList"
+            :city-id="userInfo.manageCityId"
+          ></hc-city-select>
         </el-form-item>
 
         <!-- 活动标题 -->
@@ -378,7 +387,7 @@
       </el-form>
 
       <div class="footer-btn">
-        <!-- 底部按钮 -->
+        <!-- 底部按钮   this.$route.query.id是否有参数传递过来,没有参数说明走新建,否则走编辑   -->
         <el-button v-if="!this.$route.query.id" @click="publish" type="danger"
           >发布活动</el-button
         >
@@ -536,7 +545,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['userType', 'userInfo'])
+    ...mapGetters(["userType", "userInfo"]),
   },
   methods: {
     // 返回
@@ -559,7 +568,6 @@ export default {
     },
     // 活动分类改变触发
     changeClassification(e) {
-      console.log(e);
       this.baseFormData.classification = this.classification[0];
       this.baseFormData.subClassification = this.classification[1];
     },
@@ -581,23 +589,18 @@ export default {
         // 删除活动分类树中children为空的属性
         this.handleRecurve(res.data.data.data);
         this.activityClassifyArr = res.data.data.data;
-        console.log("活动分类", this.activityClassifyArr);
       });
     },
     // 获取活动详情
     getActivityInfo(id) {
       if (!id) {
-        this.baseFormData.cityIdList = [this.userInfo.manageCityId]
+        this.baseFormData.cityIdList = [this.userInfo.manageCityId];
       } else {
         activityInfo(id).then((res) => {
           if (res.data.code !== 0) {
             this.$message.error("获取活动详情失败！");
           }
           let data = res.data.data.data;
-          console.log("活动详情", data);
-          // console.log("活动详情", data.city.split(","));
-          // this.baseFormData = res.data.data.data;
-          // console.log("活动详情", this.baseFormData);
           this.baseFormData.cityIdList = data.cityIdList;
           this.baseFormData.name = data.name;
           this.baseFormData.startTime = data.startTime;
@@ -606,17 +609,17 @@ export default {
           this.baseFormData.poster = data.poster;
           this.baseFormData.cityId = data.cityId;
           this.baseFormData.field = data.field;
-          this.baseFormData.source = data.source
-  
+          this.baseFormData.source = data.source;
+
           this.classification = [data.classification, data.subClassification];
           this.baseFormData.classification = this.classification[0];
           this.baseFormData.subClassification = this.classification[1];
-  
+
           this.baseFormData.label = data.label;
           this.baseFormData.spot = data.spot;
           this.quillContent.content = data.details;
           this.contentShow = true;
-  
+
           data.fileList.forEach((item) => {
             this.fileList.push({
               name: item.original,
@@ -629,12 +632,10 @@ export default {
           });
         });
       }
-
     },
     // 获取活动类型
     getActivityType() {
       activityType("qms_activity_type").then((res) => {
-        console.log("活动类型", res);
         this.activityTypeArr = res.data.data.data.dictItemList;
       });
     },
@@ -644,7 +645,6 @@ export default {
         // 删除城市树中children为空的属性
         this.handleRecurve(res.data.data.data[0].children);
         this.holdAddressArr = res.data.data.data[0].children;
-        console.log("城市树", res);
       });
     },
     // 获取海报数据
@@ -659,7 +659,6 @@ export default {
     // 获取标签页
     getTagsPage() {
       tagsPage().then((res) => {
-        console.log("标签页", res);
         res.data.data.data.records.forEach((item) => {
           this.allTagArr.push({
             label: item.tagId,
@@ -676,13 +675,11 @@ export default {
     },
     // 选择海报图库海报
     selectPoster(item) {
-      console.log(item);
       this.baseFormData.poster = item.posterUrl;
       this.dialogPostersVisible = false;
     },
     // 海报上传成功回调
     handlePosterSuccess(res) {
-      console.log("海报上传成功回调", res);
       if (res.code !== 0) {
         this.$message.error("上传海报失败!");
       }
@@ -723,13 +720,11 @@ export default {
 
     // 返回输入建议
     querySearch(queryString, cb) {
-      console.log("输入的值:", queryString);
       let results = [];
 
       // 未输入
       if (!queryString) {
         results = this.allTagArr;
-        console.log("无值", results);
         cb(results);
         return;
       }
@@ -740,27 +735,20 @@ export default {
           item.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0
         );
       });
-      console.log("有值", results);
       cb(results);
     },
-    handleBlur(){
-    },
+    handleBlur() {},
 
     // 选择活动标签
     handleTagValFn() {
-      console.log("enter", this.actInpVal);
       this.baseFormData.label.push(this.actInpVal);
       this.actInpVal = "";
       this.haveInputVal = false;
     },
     // 删除活动标签
-    handleClose(tag) {
-      console.log(tag);
-    },
+    handleClose(tag) {},
     // 活动附件上传成功的钩子
     handleAccessorySuccess(res, file) {
-      console.log("res", res);
-      console.log("file", file);
       this.fileList.push({
         name: file.name,
         url: file.response.data.data.url,
@@ -769,20 +757,23 @@ export default {
         original: file.name,
         attachFile: file.response.data.data.url,
       });
-      console.log("fileList", this.fileList);
-      console.log("baseFormData.fileList", this.baseFormData.fileList);
     },
     // 活动附件移除
     handleAccessoryRemove(file, fileList) {
-      // console.log(file, fileList)
-      // this.fileList = fileList
-      // this.baseFormData.fileList = this.baseFormData.fileList.filter(item=>{
-      //   return item.original != file.name
-      // })
-      // console.log(111,this.baseFormData.fileList)
+      this.fileList.forEach((item, i) => {
+        if (file.name === item.name) {
+          this.fileList.splice(i, 1);
+        }
+      });
+
+      this.baseFormData.fileList.forEach((item, i) => {
+        if (file.name === item.original) {
+          this.baseFormData.fileList.splice(i, 1);
+        }
+      });
     },
     onChange(res) {},
-    // 编辑保存
+    // 编辑 - 编辑保存
     editSave() {
       this.baseFormData.details = this.quillContent.content;
 
@@ -800,6 +791,8 @@ export default {
       this.baseFormData.submitType = 1;
       this.baseFormData.id = this.$route.query.id;
 
+      console.log(this.baseFormData)
+
       editSaveActivity(this.baseFormData).then((res) => {
         if (res.data.code !== 0) {
           return this.$message.error("编辑活动失败");
@@ -810,13 +803,13 @@ export default {
         this.$router.go(-1);
       });
     },
-    // 发布活动
+    // 新增 - 发布活动
     publish() {
       this.baseFormData.details = this.quillContent.content;
 
       // 遍历票种数组
       this.baseFormData.ticketingManagements.forEach((item) => {
-        // 保存时将支付方式列表清空并重新
+        // 保存时将支付方式列表清空并重新赋值
         item.payMethodList = [];
         if (item.priceType.includes("能贝")) {
           item.payMethodList.push(item.payWeCanPay);
@@ -826,7 +819,6 @@ export default {
         }
       });
       this.baseFormData.submitType = 1;
-      console.log(this.baseFormData);
 
       savePublish(this.baseFormData).then((res) => {
         if (res.data.code !== 0) {
@@ -838,7 +830,7 @@ export default {
         this.$router.go(-1);
       });
     },
-    // 保存草稿
+    // 新增 - 保存草稿
     saveManuscript() {
       this.baseFormData.details = this.quillContent.content;
 
@@ -854,7 +846,6 @@ export default {
         }
       });
       this.baseFormData.submitType = 0;
-      console.log(this.baseFormData);
 
       savePublish(this.baseFormData).then((res) => {
         if (res.data.code !== 0) {
@@ -866,6 +857,8 @@ export default {
         this.$router.go(-1);
       });
     },
+
+    // 编辑 - 保存草稿
     saveManuscriptUpdate() {
       this.baseFormData.details = this.quillContent.content;
 
@@ -880,7 +873,7 @@ export default {
           item.payMethodList.push(item.payOfflinePay);
         }
       });
-      this.baseFormData.submitType = 1;
+      this.baseFormData.submitType = 0;
       this.baseFormData.id = this.$route.query.id;
 
       editSaveActivity(this.baseFormData).then((res) => {
@@ -908,6 +901,8 @@ export default {
     this.getActivityType();
     this.getTagsPage();
     this.getActivityInfo(this.$route.query.id);
+    // console.log(this.fileList)
+    // console.log(this.baseFormData.fileList)
   },
 };
 </script>

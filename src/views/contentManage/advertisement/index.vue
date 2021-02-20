@@ -6,14 +6,15 @@
         type="primary"
         icon="el-icon-plus"
         size="mini"
-      >新建</el-button>
+        >新建</el-button
+      >
 
       <el-table
         :data="tableData"
         border
         stripe
         :header-cell-style="{ background: '#FAFAFA' }"
-        style="width: 100%;margin-top:10px"
+        style="width: 100%; margin-top: 10px"
         ref="multipleTable"
       >
         <el-table-column type="selection" width="55"></el-table-column>
@@ -38,13 +39,10 @@
         <el-table-column prop="cityName" label="城市"></el-table-column>
         <el-table-column label="操作">
           <template slot-scope="scope" v-if="scope.row.authority">
-            <el-button  size="mini" type="text" @click="handleEdit(scope.row)"
+            <el-button size="mini" type="text" @click="handleEdit(scope.row)"
               >编辑</el-button
             >
-            <el-button
-              size="mini"
-              type="text"
-              @click="handleDelete(scope.row)"
+            <el-button size="mini" type="text" @click="handleDelete(scope.row)"
               >删除</el-button
             >
           </template>
@@ -62,9 +60,7 @@
         class="paging"
         layout="total, sizes, prev, pager, next, jumper"
       ></el-pagination>
-
     </hc-table-form>
-
 
     <!-- 广告位新增弹窗 -->
     <el-dialog
@@ -80,10 +76,10 @@
           :label-width="formLabelWidth"
         >
           <el-select
+            :loading="loading"
             v-model="form.cityId"
             placeholder="请选择城市"
             filterable
-            @change="valChange"
           >
             <el-option
               v-for="(item, index) in cityGroup"
@@ -115,17 +111,10 @@
           prop="adslotDescription"
           :label-width="formLabelWidth"
         >
-          <el-input
-            type="textarea"
-            v-model="form.adslotDescription"
-          ></el-input>
+          <el-input type="textarea" v-model="form.adslotDescription"></el-input>
         </el-form-item>
         <!-- 类型 -->
-        <el-form-item
-          label="类型 :"
-          prop="type"
-          :label-width="formLabelWidth"
-        >
+        <el-form-item label="类型 :" prop="type" :label-width="formLabelWidth">
           <el-radio-group v-model="form.type">
             <el-radio :label="1">文字</el-radio>
             <el-radio :label="2">图片</el-radio>
@@ -149,7 +138,6 @@
           <el-select
             v-model="editForm.cityId"
             placeholder="请选择城市"
-            @change="valChange"
             filterable
           >
             <el-option
@@ -165,10 +153,7 @@
           prop="adslotName"
           :label-width="formLabelWidth"
         >
-          <el-input
-            v-model="editForm.adslotName"
-            autocomplete="off"
-          ></el-input>
+          <el-input v-model="editForm.adslotName" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item
           label="广告位编码 :"
@@ -190,11 +175,7 @@
             v-model="editForm.adslotDescription"
           ></el-input>
         </el-form-item>
-        <el-form-item
-          label="类型 :"
-          prop="type"
-          :label-width="formLabelWidth"
-        >
+        <el-form-item label="类型 :" prop="type" :label-width="formLabelWidth">
           <el-radio-group v-model="editForm.type">
             <el-radio :label="1">文字</el-radio>
             <el-radio :label="2">图片</el-radio>
@@ -221,6 +202,7 @@ export default {
   data() {
     return {
       tableData: [],
+      loading: false,
       dialogFormVisible: false, //广告位新增弹窗
       dialogEditFormVisible: false, //广告位编辑弹窗
       //新增表单数据
@@ -269,11 +251,6 @@ export default {
       this.$refs.ruleForm.resetFields();
     },
 
-    // 选中值发生变化时触发
-    valChange(e) {
-      this.form.cityId = e;
-    },
-
     // 分页查询广告位
     getList() {
       adPosition({
@@ -295,9 +272,11 @@ export default {
     },
 
     handleEdit(row) {
+      console.log(row)
       this.dialogEditFormVisible = true;
       this.editForm = { ...row };
-      console.log(this.editForm);
+      // this.cityGroup = {id:row.id}
+      // console.log(this.editForm);
     },
 
     handleDelete(row) {

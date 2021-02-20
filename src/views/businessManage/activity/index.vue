@@ -27,13 +27,14 @@
       </el-col>
     </el-row>
 
-      <!-- :row-key="getRowKeys" -->
-      <!-- :expand-row-keys="expends" -->
+    <!-- default-expand-all是否默认展开所有行 -->
     <el-table
       style="margin-top: 10px"
       :header-cell-style="{ background: '#FAFAFA' }"
       :data="tableData"
+      :default-expand-all="true"
     >
+      <!-- :row-key="getRowKeys" -->
       <!-- 展开列 -->
       <el-table-column type="expand">
         <template slot-scope="props">
@@ -87,15 +88,18 @@
           <el-tag v-if="scope.row.statusFlag == '1'" type="success"
             >进行中</el-tag
           >
-          <el-tag v-if="scope.row.statusFlag == '2'" type="info"
-            >已结束</el-tag
-          >
+          <el-tag v-if="scope.row.statusFlag == '2'" type="info">已结束</el-tag>
           <el-tag v-if="scope.row.statusFlag == '3'" type="warning"
             >被下架</el-tag
           >
         </template>
       </el-table-column>
-      <el-table-column v-if="userType == 1 || userType == 2" prop="exhibits" label="展示范围" width="100">
+      <el-table-column
+        v-if="userType == 1 || userType == 2"
+        prop="exhibits"
+        label="展示范围"
+        width="100"
+      >
         <template slot-scope="scope">
           <el-button type="text" @click="check(scope.row.id)">查看</el-button>
         </template>
@@ -149,7 +153,6 @@ export default {
       currentPage: 1,
       pageSize: 10,
       total: 0,
-      expends: [], // 展开行数组id
       showCityDialogVisible: false, //控制展示城市
       allCityList: [],
       initCityList: [],
@@ -158,7 +161,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['userInfo', 'userType'])
+    ...mapGetters(["userInfo", "userType"]),
   },
   filters: {},
   methods: {
@@ -234,7 +237,11 @@ export default {
       checkCity({
         activityId: id,
       }).then((res) => {
-        this.$refs.hcCityBox.open(this.userInfo.manageCityId, res.data.data.data || [], true)
+        this.$refs.hcCityBox.open(
+          this.userInfo.manageCityId,
+          res.data.data.data || [],
+          true
+        );
       });
       this.showCityDialogVisible = true;
     },
@@ -254,23 +261,10 @@ export default {
     peopleManagement() {},
     // 票务管理
     ticketManagement() {},
-    // 遍历数据获取展开列id
-    getExpends() {
-      let Id = this.tableData.map((item) => item.id);
-      this.expends = Id;
-      console.log("tableData", this.tableData);
-      console.log(this.expends);
-    },
-    // 行数据的 Key
-    // getRowKeys(row) {
-    //   return row.id;
-    // },
   },
   created() {
     this.getActivitiesListFn();
-    // this.getExpends();
   },
-  mounted() {},
 };
 </script>
 

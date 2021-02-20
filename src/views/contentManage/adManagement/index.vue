@@ -66,9 +66,13 @@
       :visible.sync="dialogFormVisible"
       @close="dialogFormVisibleClose"
     >
-      <el-form :model="form" ref="ruleForm">
+      <el-form :model="form" ref="ruleForm" :rules="ruleForm">
         <!-- 城市 -->
-        <el-form-item label="城市 :" :label-width="formLabelWidth">
+        <el-form-item
+          label="城市 :"
+          prop="cityName"
+          :label-width="formLabelWidth"
+        >
           <el-input
             v-model="form.cityName"
             disabled
@@ -78,7 +82,7 @@
         <!-- 广告位 -->
         <el-form-item
           label="广告位 :"
-          prop="adslot"
+          prop="adslotId"
           :label-width="formLabelWidth"
         >
           <el-select
@@ -221,7 +225,11 @@
       </div>
     </el-dialog>
     <!-- 广告编辑 -->
-    <el-dialog title="广告编辑" :visible.sync="dialogEditFormVisible">
+    <el-dialog
+      title="广告编辑"
+      :visible.sync="dialogEditFormVisible"
+      @close="dialogEditFormVisibleClose"
+    >
       <el-form :model="editForm" ref="ruleForm">
         <!-- 城市 -->
         <el-form-item label="城市 :" :label-width="formLabelWidth">
@@ -324,10 +332,7 @@
           prop="adslotName"
           :label-width="formLabelWidth"
         >
-          <el-select
-            v-model="editForm.relationId"
-            placeholder="请选择跳转对象"
-          >
+          <el-select v-model="editForm.relationId" placeholder="请选择跳转对象">
             <el-option
               v-for="(item, index) in jumpObjArr"
               :key="index"
@@ -428,19 +433,22 @@ export default {
       formLabelWidth: "120px",
 
       ruleForm: {
-        cityId: [{ required: true, message: "请选择", trigger: "change" }],
-        adslotId: [
-          { required: true, message: "请输入广告位", trigger: "blur" },
-          { min: 1, message: "请输入", trigger: "blur" },
+        cityName: [{ required: true, message: "请选择广告位" }],
+        adslotId: [{ required: true, message: "请选择", trigger: "change" }],
+        adName: [
+          { required: true, message: "请输入广告名称", trigger: "blur" },
+          { min: 2, message: "长度大于 1 个字符", trigger: "blur" },
         ],
-        name: [
-          { required: true, message: "请输入广告位名称", trigger: "blur" },
-          { min: 1, message: "请输入", trigger: "blur" },
+        beginDate: [
+          { required: true, message: "请选择开始时间", trigger: "change" },
         ],
-        imageUrl: [
-          { required: true, message: "广告图片不能位空", trigger: "blur" },
+        endDate: [
+          { required: true, message: "请选择结束时间", trigger: "change" },
         ],
-        type: [{ required: true, message: "请选择", trigger: "change" }],
+        type: [
+          { required: true, message: "请选择广告类型", trigger: "change" },
+        ],
+        text: [{ required: true, message: "请输入广告文字", trigger: "blur" }],
       },
 
       currentPage: 1,
@@ -449,6 +457,7 @@ export default {
     };
   },
   methods: {
+    // 重置新增表单
     dialogFormVisibleClose() {
       // 重置表单
       this.$refs.ruleForm.resetFields();
@@ -456,6 +465,43 @@ export default {
       this.form.cityId = "";
       this.form.adslotId = "";
       this.imageUrl = "";
+      this.form = {
+        cityName: "", //城市名称
+        cityId: "", //城市id
+        adslotId: "", //广告位id
+        adName: "", //广告名称
+        beginDate: "", //开始时间
+        endDate: "", //结束时间
+        type: "", //广告类型
+        // jumpType: "", //跳转类型
+        relationId: "", //跳转对象
+        text: "", //广告文字
+        imageUrl: "", //广告图片
+        seq: "", //广告排序
+      };
+    },
+    // 重置编辑表单
+    dialogEditFormVisibleClose() {
+      // 重置表单
+      this.$refs.ruleForm.resetFields();
+      this.editForm.cityName = "";
+      this.editForm.cityId = "";
+      this.editForm.adslotId = "";
+      this.imageUrl = "";
+      this.editForm = {
+        cityName: "", //城市名称
+        cityId: "", //城市id
+        adslotId: "", //广告位id
+        adName: "", //广告名称
+        beginDate: "", //开始时间
+        endDate: "", //结束时间
+        type: "", //广告类型
+        // jumpType: "", //跳转类型
+        relationId: "", //跳转对象
+        text: "", //广告文字
+        imageUrl: "", //广告图片
+        seq: "", //广告排序
+      };
     },
     // 新增 选中值发生变化时触发
     valChange(data) {
@@ -471,7 +517,6 @@ export default {
     },
     // 编辑 选中值发生变化时触发
     editTypeValChange(data) {
-      console.log("选中值发生变化时触发", data);
       if (this.adslotGroup) {
         this.adslotGroup.forEach((item) => {
           if (item.adslotId === data) {
@@ -524,7 +569,6 @@ export default {
     // 新增广告
     addAdFn() {
       addAd(this.form).then((res) => {
-        // console.log("新增", res);
         if (res.data.code !== 0) {
           return this.$message.error("新增广告失败！");
         }
@@ -539,9 +583,9 @@ export default {
 
     // 编辑按钮
     handleEdit(row) {
-      console.log("row", row);
+      // console.log("row", row);
       this.editForm = { ...row };
-      console.log("aaaa", this.editForm);
+      // console.log("aaaa", this.editForm);
       this.adslotGroup.forEach((item) => {
         if (item.cityId === row.cityId) {
           this.editForm.cityName = item.cityName;
@@ -585,9 +629,7 @@ export default {
 
     // 广告编辑 提交
     editSubmit() {
-      console.log(this.editForm)
       updateAd(this.editForm).then((res) => {
-        console.log("submit edit", res);
         if (res.data.code !== 0) {
           return this.$message.error("广告编辑失败！");
         }
@@ -638,10 +680,12 @@ export default {
     // 广告新增 提交
     submit() {
       this.$refs.ruleForm.validate((valid) => {
+        console.log(valid, this.form);
+        // 校验未通过
         if (!valid) {
           return this.$message.error("请填写必填信息！");
         }
-        console.log(this.form);
+        // 调用接口
         this.addAdFn();
       });
     },
