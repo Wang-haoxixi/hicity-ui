@@ -242,7 +242,7 @@
         <!-- 广告位 -->
         <el-form-item
           label="广告位 :"
-          prop="adslot"
+          prop="adslotId"
           :label-width="formLabelWidth"
         >
           <el-select

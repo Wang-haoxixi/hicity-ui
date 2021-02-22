@@ -14,14 +14,38 @@
           >
           <div class="inp-more">
             <el-input
+              clearable
               size="mini"
               class="inp"
-              placeholder="请输入"
-              suffix-icon="el-icon-search"
+              placeholder="请输入官方发布名称"
               v-model="input"
+              @clear="clearVal"
             >
+              <el-button
+                slot="append"
+                icon="el-icon-search"
+                @click="search"
+              ></el-button>
             </el-input>
-            <el-button icon="el-icon-more" class="more"></el-button>
+            <el-button
+              icon="el-icon-more"
+              class="more"
+              @click="dialogOpenMoreVisible = true"
+            ></el-button>
+            <el-dialog
+              title="多 选"
+              :visible.sync="dialogOpenMoreVisible"
+              width="600"
+            >
+              <el-checkbox-group v-model="checkList">
+                <el-checkbox label="名称"></el-checkbox>
+                <el-checkbox label="栏目"></el-checkbox>
+                <el-checkbox label="发布者"></el-checkbox>
+                <el-checkbox label="状态"></el-checkbox>
+                <el-checkbox label="创建时间"></el-checkbox>
+                <el-checkbox label="展示范围"></el-checkbox>
+              </el-checkbox-group>
+            </el-dialog>
           </div>
         </div>
         <!-- 表格 -->
@@ -32,18 +56,36 @@
           :header-cell-style="{ background: '#FAFAFA' }"
           style="width: 100%"
         >
-          <el-table-column prop="officialNewsName" label="名称">
+          <el-table-column
+            v-if="checkList.includes('名称')"
+            prop="officialNewsName"
+            label="名称"
+          >
           </el-table-column>
           <el-table-column
+            v-if="checkList.includes('栏目')"
             prop="officialColumnName"
             label="栏目"
           ></el-table-column>
-          <el-table-column prop="createByName" label="发布者"></el-table-column>
-          <el-table-column prop="state" label="状态" width="100">
+          <el-table-column
+            v-if="checkList.includes('发布者')"
+            prop="createByName"
+            label="发布者"
+          ></el-table-column>
+          <el-table-column
+            v-if="checkList.includes('状态')"
+            prop="state"
+            label="状态"
+            width="100"
+          >
           </el-table-column>
-          <el-table-column prop="createTime" label="创建时间"></el-table-column>
+          <el-table-column v-if="checkList.includes('创建时间')" prop="createTime" label="创建时间"></el-table-column>
           <!-- 平台可见 -->
-          <el-table-column label="展示范围" width="80" v-if="userType == 1 || userType == 2">
+          <el-table-column
+            label="展示范围"
+            width="80"
+            v-if="(userType == 1 || userType == 2) && checkList.includes('展示范围')"
+          >
             <template slot-scope="scope">
               <span @click="check(scope.row.officialNewsId)" class="isClick"
                 >查看</span
@@ -51,10 +93,7 @@
             </template>
           </el-table-column>
           <el-table-column label="操作">
-            <template
-              slot-scope="scope"
-               v-if="userType <= scope.row.source"
-            >
+            <template slot-scope="scope" v-if="userType <= scope.row.source">
               <!-- <el-button
                 @click="handleDetails(scope.row)"
                 type="text"
@@ -88,17 +127,23 @@
           layout="total, sizes, prev, pager, next, jumper"
         ></el-pagination>
       </template>
+
       <template slot="form">
-        <el-form ref="addformRef" :model="addform" label-width="80px">
+        <el-form
+          ref="addformRef"
+          :model="addform"
+          :rules="rules"
+          label-width="120px"
+        >
           <!-- 名称 -->
-          <el-form-item label="名称">
+          <el-form-item label="名称" prop="officialNewsName">
             <el-input v-model="addform.officialNewsName"></el-input>
           </el-form-item>
 
           <el-row>
             <el-col :span="12">
               <!-- 栏目 -->
-              <el-form-item label="栏目">
+              <el-form-item label="栏目" prop="officialColumnId">
                 <el-select
                   v-model="addform.officialColumnId"
                   placeholder="请选择"
@@ -114,14 +159,25 @@
             </el-col>
             <el-col :span="12">
               <!-- 发布城市 平台可见 -->
-              <el-form-item v-if="addform.source ? userType == addform.source : (userType == 1 || userType == 2)" label="发布城市">
-                <hc-city-select v-model="addform.cityIdList" :city-id="userInfo.manageCityId"></hc-city-select>
+              <el-form-item
+                v-if="
+                  addform.source
+                    ? userType == addform.source
+                    : userType == 1 || userType == 2
+                "
+                label="发布城市"
+                prop="cityIdList"
+              >
+                <hc-city-select
+                  v-model="addform.cityIdList"
+                  :city-id="userInfo.manageCityId"
+                ></hc-city-select>
               </el-form-item>
             </el-col>
           </el-row>
 
           <!-- 标题图 -->
-          <el-form-item label="标题图">
+          <el-form-item label="标题图" prop="urlList">
             <el-upload
               :action="uploadPicUrl"
               list-type="picture-card"
@@ -135,7 +191,11 @@
           </el-form-item>
 
           <!-- 图片展示比例 -->
-          <el-form-item label="图片展示比例" label-width="100px">
+          <el-form-item
+            label="图片展示比例"
+            label-width="120px"
+            prop="imageSizeType"
+          >
             <el-radio-group v-model="addform.imageSizeType">
               <el-radio
                 v-for="(item, index) in dicList.NEWS_IMAGE_SIZE_TYPE"
@@ -147,7 +207,7 @@
           </el-form-item>
 
           <!-- 详情 -->
-          <el-form-item label="详情">
+          <el-form-item label="详情" prop="content">
             <hc-quill v-model="quillContent"></hc-quill>
           </el-form-item>
 
@@ -209,6 +269,8 @@ export default {
         Authorization: "Bearer " + store.getters.access_token,
       },
       input: "",
+      dialogOpenMoreVisible: false,
+      checkList: ["名称", "栏目", "发布者", "状态", "创建时间", "展示范围"], //已选中的菜单
 
       // 发布列表
       tableData: [],
@@ -235,7 +297,32 @@ export default {
       tagList: [],
       allCity: [],
       publishType: "",
+      rules: {
+        officialNewsName: [
+          { required: true, message: "请输入名称", trigger: "blur" },
+        ],
+        officialColumnId: [
+          { required: true, message: "请选择栏目", trigger: "change" },
+        ],
+        cityIdList: [
+          { required: true, message: "请输入城市", trigger: "blur" },
+        ],
+        urlList: [
+          { required: true, message: "请添加标题图", trigger: "change" },
+        ],
+        imageSizeType: [
+          { required: true, message: "请选择图片展示比例", trigger: "change" },
+        ],
+        content: [{ validator: this.contentValidator, required: true }],
+      },
     };
+  },
+  watch: {
+    quillContent() {
+      // this.$nextTick(() => {
+      this.$refs.addformRef.validateField("content");
+      // });
+    },
   },
   methods: {
     backClisk() {
@@ -252,6 +339,13 @@ export default {
       this.fileList = [];
       this.isShow = true;
     },
+    contentValidator(rule, value, callback) {
+      if (this.quillContent && this.quillContent.content) {
+        callback();
+      } else {
+        callback(new Error("请输入详情"));
+      }
+    },
     init() {
       getAllTagList({ cityId: this.userInfo.manageCityId }).then(({ data }) => {
         this.tagList = data.data.data;
@@ -263,6 +357,14 @@ export default {
           regionName: "全国",
         });
       });
+    },
+    // 搜索
+    search() {
+      this.getOfficialReleaseList();
+    },
+    // 清空搜索
+    clearVal() {
+      this.getOfficialReleaseList();
     },
     // 新建
     toCreate() {
@@ -276,6 +378,7 @@ export default {
     // 获取官方发布列表
     getOfficialReleaseList() {
       let form = {
+        officialColumnName: this.input,
         current: this.currentPage,
         size: this.pageSize,
       };
@@ -304,7 +407,11 @@ export default {
       checkCity({
         officialNewsId: id,
       }).then((res) => {
-        this.$refs.hcCityBox.open(this.userInfo.manageCityId, res.data.data.data || [], true)
+        this.$refs.hcCityBox.open(
+          this.userInfo.manageCityId,
+          res.data.data.data || [],
+          true
+        );
       });
     },
     // 详情
@@ -357,21 +464,33 @@ export default {
     // 删除
     handleDel(row) {
       console.log("删除", row);
-
-      officialDel({
-        officialNewsId: row.officialNewsId,
-        cityId: this.userInfo.manageCityId,
-      }).then((res) => {
-        console.log(res);
-        if (res.data.code !== 0) {
-          return this.$message.error("删除失败！");
-        }
-        this.$message({
-          message: "删除成功！",
-          type: "success",
+      this.$confirm("此操作将永久删除, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          officialDel({
+            officialNewsId: row.officialNewsId,
+            cityId: this.userInfo.manageCityId,
+          }).then((res) => {
+            console.log(res);
+            if (res.data.code !== 0) {
+              return this.$message.error("删除失败！");
+            }
+            this.$message({
+              message: "删除成功！",
+              type: "success",
+            });
+            this.getOfficialReleaseList();
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除",
+          });
         });
-        this.getOfficialReleaseList();
-      });
     },
     // 复制链接
     // handleCopylink(row) {
@@ -436,31 +555,38 @@ export default {
       console.log("addform", addform);
 
       if (this.publishType == "add") {
-        officaialNewsCreate(addform).then((res) => {
-          // console.log("直接发布", res);
-          if (res.data.code !== 0) {
-            return this.$message.error("保存失败");
+        this.$refs.addformRef.validate((valid) => {
+          if (valid) {
+            officaialNewsCreate(addform).then((res) => {
+              // console.log("直接发布", res);
+              if (res.data.code !== 0) {
+                return this.$message.error("保存失败");
+              }
+              this.$message({
+                message: "保存成功！",
+                type: "success",
+              });
+              this.getOfficialReleaseList();
+              this.isShow = true;
+            });
           }
-          this.$message({
-            message: "保存成功！",
-            type: "success",
-          });
-          this.getOfficialReleaseList();
-          this.isShow = true;
         });
       } else {
-        console.log("sss", addform);
-        officaialNewsUpdate(addform).then((res) => {
-          if (res.data.code !== 0) {
-            return this.$message.error("编辑失败");
+        this.$refs.addformRef.validate((valid) => {
+          if (valid) {
+            officaialNewsUpdate(addform).then((res) => {
+              if (res.data.code !== 0) {
+                return this.$message.error("编辑失败");
+              }
+              this.$message({
+                message: "编辑成功！",
+                type: "success",
+              });
+              this.getOfficialReleaseList();
+              this.isShow = true;
+              this.fileList = [];
+            });
           }
-          this.$message({
-            message: "编辑成功！",
-            type: "success",
-          });
-          this.getOfficialReleaseList();
-          this.isShow = true;
-          this.fileList = [];
         });
       }
     },
@@ -475,56 +601,66 @@ export default {
 
       addform.officialNewsContent = this.quillContent.content;
       addform.structuredContent = this.quillContent.structuredContent;
+      addform.state = 1;
       console.log("addform", addform);
       // 新增
       if (this.publishType == "add") {
-        officaialNewsCreate(addform).then((res) => {
-          // console.log("直接发布", res);
-          if (res.data.code !== 0) {
-            return this.$message.error("发布失败");
+        this.$refs.addformRef.validate((valid) => {
+          console.log(valid);
+          if (valid) {
+            officaialNewsCreate(addform).then((res) => {
+              // console.log("直接发布", res);
+              if (res.data.code !== 0) {
+                return this.$message.error("发布失败");
+              }
+              this.$message({
+                message: "发布成功！",
+                type: "success",
+              });
+              // 清空标题图数组
+              this.urlList = [];
+              this.addform = {
+                cityIdList: [],
+                closeAllowed: "0", //启停
+              };
+              this.quillContent = {
+                content: "",
+                structuredContent: "",
+              };
+              this.getOfficialReleaseList();
+              this.isShow = true;
+            });
           }
-          this.$message({
-            message: "发布成功！",
-            type: "success",
-          });
-          // 清空标题图数组
-          this.urlList = [];
-          this.addform = {
-            cityIdList: [],
-            closeAllowed: "0", //启停
-          };
-          this.quillContent = {
-            content: "",
-            structuredContent: "",
-          };
-          this.getOfficialReleaseList();
-          this.isShow = true;
         });
       }
       // 编辑
       else {
         console.log("sss", addform);
-        officaialNewsUpdate(addform).then((res) => {
-          if (res.data.code !== 0) {
-            return this.$message.error("编辑失败");
+        this.$refs.addformRef.validate((valid) => {
+          if (valid) {
+            officaialNewsUpdate(addform).then((res) => {
+              if (res.data.code !== 0) {
+                return this.$message.error("编辑失败");
+              }
+              this.$message({
+                message: "编辑成功！",
+                type: "success",
+              });
+              // 清空标题图数组
+              this.urlList = [];
+              this.addform = {
+                cityIdList: [],
+                closeAllowed: "0", //启停
+              };
+              this.quillContent = {
+                content: "",
+                structuredContent: "",
+              };
+              this.fileList = [];
+              this.isShow = true;
+              this.getOfficialReleaseList();
+            });
           }
-          this.$message({
-            message: "编辑成功！",
-            type: "success",
-          });
-          // 清空标题图数组
-          this.urlList = [];
-          this.addform = {
-            cityIdList: [],
-            closeAllowed: "0", //启停
-          };
-          this.quillContent = {
-            content: "",
-            structuredContent: "",
-          };
-          this.fileList = [];
-          this.isShow = true;
-          this.getOfficialReleaseList();
         });
       }
     },
