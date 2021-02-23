@@ -53,7 +53,7 @@
             <hc-city-select v-model="formData.cityList" :city-id="userInfo.manageCityId"></hc-city-select>
           </el-form-item>
           <el-form-item label="内容：" prop="content">
-            <el-input type="textarea" v-model="formData.content"></el-input>
+            <el-input type="textarea" v-model="formData.content" :autosize="{minRows: 10, maxRows: 20}"></el-input>
           </el-form-item>
           <el-form-item>
             <!-- <el-button @click="preview">预览</el-button> -->
