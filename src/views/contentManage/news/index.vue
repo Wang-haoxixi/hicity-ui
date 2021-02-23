@@ -162,6 +162,7 @@ export default {
       tableLoading: false,
       tableData: [],
       formData: {
+        cityIdList: [],
         lableIdList: []
       },
       tagList: [],
@@ -218,8 +219,6 @@ export default {
       })
     },
     'formData.lableIdList': function (va1, va2) {
-      console.log(va1)
-      console.log(va2)
       this.$nextTick(() => {
         this.$refs.form.validateField('lableIdList')
       })
@@ -271,17 +270,10 @@ export default {
         });
     },
     toCreate() {
-      this.publish = true;
-      this.publishType = "add";
-      if (!this.formData.lableIdList || this.formData.lableIdList && this.formData.lableIdList.length > 0) {
-        this.formData = {
-          cityIdList: [this.userInfo.manageCityId],
-          closeAllowed: "0",
-          lableIdList: []
-        };
-      } else {
-        this.formData.cityIdList = [this.userInfo.manageCityId]
-        this.formData.closeAllowed = "0"
+      this.formData = {
+        cityIdList: [this.userInfo.manageCityId],
+        closeAllowed: "0",
+        lableIdList: []
       }
       if (!this.quillContent || (this.quillContent.content || this.quillContent.structuredContent)) {
         this.quillContent = {
@@ -292,6 +284,10 @@ export default {
       if (!this.titleImage || this.titleImage && this.titleImage.length > 0) {
         this.titleImage = []
       }
+      this.$nextTick(() => {
+        this.publish = true;
+        this.publishType = "add";
+      })
       
     },
     handleCreate() {
@@ -438,6 +434,7 @@ export default {
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;
+  flex-wrap: wrap;
   .tag-list-item {
     margin-bottom: 10px;
     height: 30px;
