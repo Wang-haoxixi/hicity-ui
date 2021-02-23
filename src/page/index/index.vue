@@ -1,15 +1,15 @@
 <template>
   <div :class="{'avue--collapse':isCollapse}"
     class="avue-contail">
-    <div class="avue-header">
-      <!-- 顶部导航栏 -->
-      <top/>
+    <div class="avue-left">
+      <!-- 左侧导航栏 -->
+      <sidebar/>
     </div>
 
     <div class="avue-layout">
-      <div class="avue-left">
-        <!-- 左侧导航栏 -->
-        <sidebar/>
+      <div class="avue-header">
+        <!-- 顶部导航栏 -->
+        <top/>
       </div>
       <div class="avue-main">
         <!-- 顶部标签卡 -->
