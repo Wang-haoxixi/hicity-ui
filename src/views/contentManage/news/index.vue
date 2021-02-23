@@ -58,6 +58,7 @@
             <el-select
               style="width: 100%"
               v-model="formData.lableIdList"
+              @change="$refs.form.validateField('lableIdList')"
               multiple
               filterable
               placeholder="请选择"
@@ -218,11 +219,11 @@ export default {
         this.$refs.form.validateField('content')
       })
     },
-    'formData.lableIdList': function (va1, va2) {
-      this.$nextTick(() => {
-        this.$refs.form.validateField('lableIdList')
-      })
-    }
+    // 'formData.lableIdList': function (va1, va2) {
+    //   // this.$nextTick(() => {
+    //   //   this.$refs.form.validateField('lableIdList')
+    //   // })
+    // }
   },
   created() {
     this.init();
@@ -270,25 +271,24 @@ export default {
         });
     },
     toCreate() {
-      this.formData = {
-        cityIdList: [this.userInfo.manageCityId],
-        closeAllowed: "0",
-        lableIdList: []
-      }
-      if (!this.quillContent || (this.quillContent.content || this.quillContent.structuredContent)) {
-        this.quillContent = {
-          content: "",
-          structuredContent: "",
-        };
-      }
-      if (!this.titleImage || this.titleImage && this.titleImage.length > 0) {
-        this.titleImage = []
-      }
+      this.publish = true;
+      this.publishType = "add";
       this.$nextTick(() => {
-        this.publish = true;
-        this.publishType = "add";
+        this.formData = {
+          cityIdList: [this.userInfo.manageCityId],
+          closeAllowed: "0",
+          lableIdList: []
+        }
+        if (!this.quillContent || (this.quillContent.content || this.quillContent.structuredContent)) {
+          this.quillContent = {
+            content: "",
+            structuredContent: "",
+          };
+        }
+        if (!this.titleImage || this.titleImage && this.titleImage.length > 0) {
+          this.titleImage = []
+        }
       })
-      
     },
     handleCreate() {
       this.$refs.form.validate(valid => {
