@@ -34,8 +34,8 @@
                   :show-file-list="false"
                   :on-success="handleAvatarSuccess"
                   class="avatar-uploader"
-                  action="/admin/sys_file/upload">
-                  <img v-if="ruleForm2.avatar" id="avatar" :src="avatarUrl" class="avatar">
+                  action="/api/admin/sys_file/oss/upload">
+                  <img v-if="ruleForm2.avatar" id="avatar" :src="ruleForm2.avatar" class="avatar">
                   <i v-else class="el-icon-plus avatar-uploader-icon"/>
                 </el-upload>
               </el-form-item>
@@ -161,9 +161,9 @@ export default {
   },
   methods: {
     switchTab(tab) {
-      if (tab.name === 'userManager') {
-        handleImg(this.ruleForm2.avatar, 'avatar')
-      }
+      // if (tab.name === 'userManager') {
+      //   handleImg(this.ruleForm2.avatar, 'avatar')
+      // }
       this.switchStatus = tab.name
     },
     submitForm(formName) {
@@ -194,18 +194,18 @@ export default {
       })
     },
     resetForm(formName) {
-        this.ruleForm2.password = undefined
-        this.ruleForm2.newpassword1 = undefined
-        this.ruleForm2.newpassword2 = undefined
-        this.ruleForm2.username = this.userInfo.username
-        this.ruleForm2.phone = this.userInfo.phone
-        this.ruleForm2.avatar = this.userInfo.avatar
-        handleImg(this.userInfo.avatar, 'avatar')
-        //判断是否选择了租户ID
-        const TENANT_ID = getStore({ name: 'tenantId' })
-        if (TENANT_ID) {
-            this.headers['TENANT-ID'] = TENANT_ID // 租户ID
-        }
+      this.ruleForm2.password = undefined
+      this.ruleForm2.newpassword1 = undefined
+      this.ruleForm2.newpassword2 = undefined
+      this.ruleForm2.username = this.userInfo.username
+      this.ruleForm2.phone = this.userInfo.phone
+      this.ruleForm2.avatar = this.userInfo.avatar
+      // handleImg(this.userInfo.avatar, 'avatar')
+      //判断是否选择了租户ID
+      const TENANT_ID = getStore({ name: 'tenantId' })
+      if (TENANT_ID) {
+          this.headers['TENANT-ID'] = TENANT_ID // 租户ID
+      }
     },
     handleClick(thirdpart) {
       let appid, client_id, redirect_uri, url
@@ -226,8 +226,8 @@ export default {
       openWindow(url, thirdpart, 540, 540)
     },
     handleAvatarSuccess(res, file) {
-      this.avatarUrl = URL.createObjectURL(file.raw)
-      this.ruleForm2.avatar = res.data.bucketName + '-' + res.data.fileName
+      // this.avatarUrl = URL.createObjectURL(file.raw)
+      this.ruleForm2.avatar = res.data.data.url
     }
   }
 }
