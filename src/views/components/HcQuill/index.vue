@@ -347,18 +347,19 @@ export default {
             delete attributes.link
           }
           deltas.insert(op.insert)
-        } else if (!op.insert.image) {
-          deltas.insert(op.insert, op.attributes)
-        } else {
-          let uuid = uuidv4()
-          deltas.insert({
-            'ImageUploading': {
-              uuid,
-              file: op.insert.image,
-              type: 2,
-            }
-          })
         }
+        // else if (!op.insert.image) {
+        //   deltas.insert(op.insert, op.attributes)
+        // } else {
+        //   let uuid = uuidv4()
+        //   deltas.insert({
+        //     'ImageUploading': {
+        //       uuid,
+        //       file: op.insert.image,
+        //       type: 2,
+        //     }
+        //   })
+        // }
       })
       return deltas
     });
