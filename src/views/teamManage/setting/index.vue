@@ -201,7 +201,7 @@
             },
             handleDept() {
                 fetchTree().then(response => {
-                    this.treeDeptData = response.data.data
+                    this.treeDeptData = response.data.data.data
                 })
             },
             handleFilter(param) {
