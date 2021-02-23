@@ -78,7 +78,7 @@
             :default-expand-all="false"
             type="tree"
             :disabled="!notAdmin(scope.row)"
-            placeholder="请选择所属部门"/>
+            placeholder="请选择所属平台"/>
         </template>
       </avue-crud>
     </basic-container>

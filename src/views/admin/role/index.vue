@@ -35,7 +35,7 @@
               :props="cityProps"
               :default-expand-all="false"
               type="tree"
-              placeholder="请选择所属部门"/>
+              placeholder="请选择所属平台"/>
           </template>
 
         <template

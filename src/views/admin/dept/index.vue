@@ -65,7 +65,7 @@
                   placeholder="节点编号"/>
               </el-form-item>
               <el-form-item
-                label="部门名称"
+                label="平台名称"
                 prop="deptName">
                 <el-input
                   v-model="form.deptName"
@@ -149,7 +149,7 @@ export default {
           { required: true, message: '请输入父级节点', trigger: 'blur' }
         ],
         deptName: [
-          { required: true, message: '请输入部门名称', trigger: 'blur' },
+          { required: true, message: '请输入平台名称', trigger: 'blur' },
           { min: 3, max: 32, message: '长度在 3 到 32 个字符', trigger: 'blur'}
         ],
         orderNum: [
