@@ -21,19 +21,35 @@ const base64ToBlob = function(base64Data) {
 
 export function uploadImage (url) {
   return new Promise((resolve, reject) => {
-    if (base64Reg.test(url)) {
-      const blob = base64ToBlob(url);
-      const file = new window.File([blob], 'temp.png', {type: blob.type})
-      ossUpload(file).then(({data}) => {
-        resolve(data)
-      })
-    } else {
-      downloadUrl(url).then(blob => {
+    try {
+      if (base64Reg.test(url)) {
+        const blob = base64ToBlob(url);
         const file = new window.File([blob], 'temp.png', {type: blob.type})
-        ossUpload(file).then((data) => {
+        ossUpload(file).then(({data}) => {
           resolve(data)
+        }, () => {
+          reject(new Error('图片上传失败！'))
+        }).catch(() => {
+          reject(new Error('图片上传失败！'))
         })
-      })
-    } 
+      } else {
+        downloadUrl(url).then(blob => {
+          const file = new window.File([blob], 'temp.png', {type: blob.type})
+          ossUpload(file).then((data) => {
+            resolve(data)
+          }, () => {
+            reject(new Error('图片上传失败！'))
+          }).catch(() => {
+            reject(new Error('图片上传失败！'))
+          })
+        }, () => {
+          reject(new Error('图片获取失败！'))
+        }).catch(() => {
+          reject(new Error('图片获取失败！'))
+        })
+      } 
+    } catch (e) {
+      reject(new Error('图片上传失败！'))
+    }
   })
 }
