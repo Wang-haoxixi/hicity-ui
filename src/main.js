@@ -17,6 +17,7 @@ import 'element-ui/lib/theme-chalk/index.css'
 import './styles/common.scss'
 import basicContainer from './components/basic-container/main'
 import HcTableForm from '@/views/components/HcTableForm/index'
+import HcTableDataBox from '@/views/components/HcTableDataBox/index'
 import Avue from '@smallwei/avue'
 import '@smallwei/avue/lib/index.css'
 // 插件 json 展示
@@ -38,6 +39,7 @@ Vue.use(Avue)
 // 注册全局容器
 Vue.component('basicContainer', basicContainer)
 Vue.component('HcTableForm', HcTableForm)
+Vue.component('HcTableDataBox', HcTableDataBox)
 
 // 加载相关url地址
 Object.keys(urls).forEach(key => {

@@ -202,7 +202,7 @@ export default {
         this.publish = false;
         this.$notify({
           title: "成功",
-          message: "发布成功",
+          message: state ? "发布成功！" : "保存成功！",
           type: "success",
           duration: 2000,
         });

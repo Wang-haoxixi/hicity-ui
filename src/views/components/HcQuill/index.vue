@@ -357,7 +357,7 @@ export default {
           if (attributes && attributes.link) {
             delete attributes.link
           }
-          deltas.insert(op.insert)
+          deltas.insert(op.insert, op.attributes)
         }
         else if (!op.insert.image) {
           deltas.insert(op.insert, op.attributes)
