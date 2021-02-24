@@ -121,10 +121,10 @@ const BlockEmbed = Quill.import('blots/block/embed');
 class ImageUploading extends BlockEmbed {
   static blotName = 'ImageUploading'
   static tagName = 'div'
-  static className = 'quill-image'
+  static className = 'quill-image-box'
   static create() {
     let value = `
-      <div class="quill-image-box">
+      <div class="quill-image-innder">
         <img src="/img/quill/quill-uploading.png" />
       </div>
     `
@@ -155,24 +155,25 @@ Quill.register(ImageUploading);
 
 class image extends BlockEmbed {
   static blotName = 'image'
-  static tagName = 'div'
+  static tagName = 'img'
   static className = 'quill-image'
 
   static create() {
-    let value = `
-      <div class="quill-image-box">
-      </div>
-    `
-    const node = super.create(value);
+    // let value = `
+    //   <div class="quill-image-box">
+    //   </div>
+    // `
+    const node = super.create();
     node.setAttribute('contenteditable', 'false');
     node.setAttribute('width', '100%');
-    node.innerHTML = this.transformValue(value)
+    // node.innerHTML = this.transformValue(value)
     return node;
   }
   constructor(domNode, data) {
-    let img = document.createElement('img')
-    img.src = data
-    domNode.childNodes[0].appendChild(img)
+    // let img = document.createElement('img')
+    // img.src = data
+    // domNode.childNodes[0].appendChild(img)
+    domNode.src = data
     super(domNode)
   }
   static transformValue(value) {
@@ -182,7 +183,7 @@ class image extends BlockEmbed {
     return handleArr.join('')
   }
   static value(domNode) {
-    return domNode.childNodes[0].childNodes[0].src
+    return domNode.src
   }
 }
 Quill.register(image);
@@ -334,8 +335,7 @@ export default {
         this.dialogVisibleVideo = true
       }
     })
-
-    this.quill.root.innerHTML = this.value.content
+    this.quill.setContents(JSON.parse(this.value.structuredContent || '[]'))
     this.quill.on('text-change', (delta, oldDelta, source) => {
       let deltas = new Delta()
       this.quill.getContents().forEach(op => {
@@ -532,9 +532,18 @@ export default {
 .quill-image {
   display: block;
   margin: 20px 0;
+  margin: 0 auto;
+  font-size: 0;
+  width: 400px;
+}
+
+.quill-image-box {
+  display: block;
+  margin: 20px 0;
   text-align: center;
   font-size: 0;
-  .quill-image-box {
+  width: 100%;
+  .quill-image-inner {
     display: inline-block;
     font-size: 0;
     position: relative;
