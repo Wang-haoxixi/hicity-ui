@@ -21,27 +21,29 @@
       </div>
     </el-form>
 
-    <div class="tag-box">
-      <div v-for="tag in tagList" :key="tag.tagId" class="tag-item">
-        <div class="tag-item-info">
-          <div class="tag-item-name">{{tag.name}}</div>
-          <div class="tag-item-sort" v-if="tag.isOpening && tag.sort">No.{{tag.sort}}</div>
-        </div>
-        <div class="tag-item-option">
-          <div class="tag-item-option-left">
-            <el-button v-if="userInfo.userType == 3 || userInfo.userType == 4" type="text" size="mini" @click="cityView(tag.tagId)">查看配置城市</el-button>
-            <el-button v-else-if="tag.editable" type="text" size="mini" @click="handleStart(tag)">{{tag.isOpening ? '停用' : '启用'}}</el-button>
+    <hc-table-data-box :empty="!tagList || tagList.length == 0" :loading="boxLoading">
+      <div class="tag-box">
+        <div v-for="tag in tagList" :key="tag.tagId" class="tag-item">
+          <div class="tag-item-info">
+            <div class="tag-item-name">{{tag.name}}</div>
+            <div class="tag-item-sort" v-if="tag.isOpening && tag.sort">No.{{tag.sort}}</div>
           </div>
-          <div class="tag-item-option-right">
-            <el-button v-if="!isAdmin" type="text" size="mini" @click="handleSort(tag)">排序</el-button>
-            <template v-if="isAdmin || !tag.isPlatform">
-              <el-button type="text" size="mini" @click="handleUpdate(tag)">编辑</el-button>
-              <el-button type="text" size="mini" @click="handleDel(tag.tagId)">删除</el-button>
-            </template>
+          <div class="tag-item-option">
+            <div class="tag-item-option-left">
+              <el-button v-if="userInfo.userType == 3 || userInfo.userType == 4" type="text" size="mini" @click="cityView(tag.tagId)">查看配置城市</el-button>
+              <el-button v-else-if="tag.editable" type="text" size="mini" @click="handleStart(tag)">{{tag.isOpening ? '停用' : '启用'}}</el-button>
+            </div>
+            <div class="tag-item-option-right">
+              <el-button v-if="!isAdmin" type="text" size="mini" @click="handleSort(tag)">排序</el-button>
+              <template v-if="isAdmin || !tag.isPlatform">
+                <el-button type="text" size="mini" @click="handleUpdate(tag)">编辑</el-button>
+                <el-button type="text" size="mini" @click="handleDel(tag.tagId)">删除</el-button>
+              </template>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </hc-table-data-box>
 
     <div class="pagination-box">
       <el-pagination
@@ -107,6 +109,7 @@ export default {
       },
       allCityList: [],
       initCityList: [],
+      boxLoading: false,
     }
   },
   computed: {
@@ -127,7 +130,7 @@ export default {
   },
   methods: {
     getList (page = this.page, form = this.searchForm) {
-      this.tableLoading = true
+      this.boxLoading = true
       getTagList({
         current: page.currentPage,
         size: page.pageSize,
@@ -141,7 +144,7 @@ export default {
           }
         }
       }).finally(() => {
-        this.tableLoading = false
+        this.boxLoading = false
       })
     },
     handleCreate () {

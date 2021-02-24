@@ -48,6 +48,7 @@
           :header-cell-style="{ background: '#FAFAFA' }"
           style="width: 100%; margin-top: 10px"
           ref="multipleTable"
+          v-loading="tableLoading"
         >
           <!-- <el-table-column type="selection" width="55"></el-table-column> -->
           <el-table-column
@@ -107,6 +108,9 @@
               >
             </template>
           </el-table-column>
+          <template slot="empty">
+            <hc-empty-data></hc-empty-data>
+          </template>
         </el-table>
         <el-pagination
           @size-change="handleSizeChange"
@@ -455,7 +459,9 @@ import {
 } from "@/api/content/ad";
 import { adPosition } from "@/api/content/ad-position";
 import store from "@/store";
+import HcEmptyData from "@/views/components/HcEmptyData/index"
 export default {
+  components: { HcEmptyData },
   data() {
     return {
       tableData: [],
@@ -520,6 +526,7 @@ export default {
       currentPage: 1,
       pageSize: 10,
       total: 30,
+      tableLoading: false
     };
   },
   methods: {
@@ -578,6 +585,7 @@ export default {
 
     // 获取广告分页
     getList() {
+      this.tableLoading = true
       ads({
         current: this.currentPage, //当前页
         size: this.pageSize, //条数
@@ -586,6 +594,8 @@ export default {
         let arr = res.data.data.data.records;
         this.tableData = arr;
         this.total = res.data.data.data.total;
+      }).finally(() => {
+        this.tableLoading = false
       });
     },
 

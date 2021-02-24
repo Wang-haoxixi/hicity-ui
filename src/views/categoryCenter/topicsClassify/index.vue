@@ -14,22 +14,25 @@
             @click="toCreate">添加
           </el-button>
         </div>
-        <div class="classify-box">
-          <div v-for="classify in classifyList" :key="classify.id" class="classify-item">
-            <div class="classify-item-name">{{classify.classifyName}}</div>
-            <el-image class="classify-item-cover" :src="classify.imageUrl"></el-image>
-            <div class="classify-item-topic-view" @click="topicView(classify.id)">关联话题</div>
-            <div class="classify-item-option">
-              <template v-if="classify.operationAuthority == 1">
-                <el-button type="text" size="mini" @click="toUpdate(classify)">编辑</el-button>
-                <el-button type="text" size="mini" @click="handleDel(classify.id)">删除</el-button>
-              </template>
-              <template v-if="classify.confAuthority == 1">
-                <el-button type="text" size="mini" @click="enableChange(classify)">{{classify.openOrClose ? '停用' : '启用'}}</el-button>
-              </template>
+
+        <hc-table-data-box :empty="!classifyList || classifyList.length == 0" :loading="boxLoading">
+          <div class="classify-box">
+            <div v-for="classify in classifyList" :key="classify.id" class="classify-item">
+              <div class="classify-item-name">{{classify.classifyName}}</div>
+              <el-image class="classify-item-cover" :src="classify.imageUrl"></el-image>
+              <div class="classify-item-topic-view" @click="topicView(classify.id)">关联话题</div>
+              <div class="classify-item-option">
+                <template v-if="classify.operationAuthority == 1">
+                  <el-button type="text" size="mini" @click="toUpdate(classify)">编辑</el-button>
+                  <el-button type="text" size="mini" @click="handleDel(classify.id)">删除</el-button>
+                </template>
+                <template v-if="classify.confAuthority == 1">
+                  <el-button type="text" size="mini" @click="enableChange(classify)">{{classify.openOrClose ? '停用' : '启用'}}</el-button>
+                </template>
+              </div>
             </div>
           </div>
-        </div>
+        </hc-table-data-box>
         <div class="pagination-box">
           <el-pagination
             style="display: inline-block"
@@ -62,7 +65,6 @@
         </el-form>
         <avue-crud
           :option="tableOption"
-          :table-loading="tableLoading"
           :data="tableData">
           <template slot="menuLeft">
             关联话题
@@ -105,15 +107,18 @@
       :visible.sync="topicViewDialogVisible"
       width="70%"
     >
-      <div class="classify-list">
-        <div v-for="topic in relativeTopicList"
-          :key="topic.id"
-          class="classify-list-item">
-          {{ topic.topicsName }}
+      <template>
+        <div class="classify-list" v-if="relativeTopicList && relativeTopicList.length > 0">
+          <div v-for="topic in relativeTopicList"
+            :key="topic.id"
+            class="classify-list-item">
+            {{ topic.topicsName }}
+          </div>
         </div>
-      </div>
+        <hc-empty-data v-else></hc-empty-data>
+      </template>
       <div slot="footer">
-        <el-button @click="topicViewDialogVisible = false">取 消</el-button>
+        <el-button @click="topicViewDialogVisible = false">返 回</el-button>
       </div>
     </el-dialog>
   </basic-container>
@@ -123,9 +128,10 @@
 import { getClassifyList, addClassify, getTopicList, updateClassify, deleteClassify, deleteRelation, setEnableState } from '@/api/cms/travel'
 import { mapGetters } from 'vuex'
 import HcImageUpload from '@/views/components/HcImageUpload/index'
-import HcTableForm from "@/views/components/HcTableForm/index";
+import HcTableForm from "@/views/components/HcTableForm/index"
+import HcEmptyData from "@/views/components/HcEmptyData/index"
 export default {
-  components: { HcImageUpload, HcTableForm },
+  components: { HcImageUpload, HcTableForm, HcEmptyData },
   data () {
     return {
       tempSearch: {
@@ -178,7 +184,8 @@ export default {
       topicSelectList: [],
       formRule: {
         classifyName: [{required: true, message: '分类名称不能为空'}]
-      }
+      },
+      boxLoading: false
     }
   },
   computed: {
@@ -218,7 +225,7 @@ export default {
       })
     },
     getList (page = this.page, form = this.searchForm) {
-      this.tableLoading = true
+      this.boxLoading = true
       getClassifyList({
         current: page.currentPage,
         size: page.pageSize,
@@ -232,7 +239,7 @@ export default {
           }
         }
       }).finally(() => {
-        this.tableLoading = false
+        this.boxLoading = false
       })
     },
     toCreate () {

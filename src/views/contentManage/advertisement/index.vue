@@ -48,6 +48,7 @@
         :header-cell-style="{ background: '#FAFAFA' }"
         style="width: 100%; margin-top: 10px"
         ref="multipleTable"
+        v-loading="tableLoading"
       >
         <!-- <el-table-column type="selection" width="55"></el-table-column> -->
         <el-table-column
@@ -92,6 +93,9 @@
             >
           </template>
         </el-table-column>
+        <template slot="empty">
+          <hc-empty-data></hc-empty-data>
+        </template>
       </el-table>
 
       <el-pagination
@@ -243,7 +247,9 @@ import {
   editPlace,
   delAdP,
 } from "@/api/content/ad-position";
+import HcEmptyData from "@/views/components/HcEmptyData/index"
 export default {
+  components: { HcEmptyData },
   data() {
     return {
       tableData: [],
@@ -289,6 +295,7 @@ export default {
       pageSize: 10,
       total: 0,
       cityGroup: [], //城市数组
+      tableLoading: false
     };
   },
   methods: {
@@ -300,14 +307,16 @@ export default {
 
     // 分页查询广告位
     getList() {
+      this.tableLoading = true
       adPosition({
         current: this.currentPage, //当前页
         size: this.pageSize, //条数
       }).then((res) => {
-        console.log("广告位分页", res);
         this.total = res.data.data.data.total;
         let records = res.data.data.data.records;
         this.tableData = records;
+      }).finally(() => {
+        this.tableLoading = false
       });
     },
 
@@ -319,11 +328,9 @@ export default {
     },
 
     handleEdit(row) {
-      console.log(row);
       this.dialogEditFormVisible = true;
       this.editForm = { ...row };
       // this.cityGroup = {id:row.id}
-      // console.log(this.editForm);
     },
 
     handleDelete(row) {
@@ -363,7 +370,6 @@ export default {
     submit() {
       this.$refs.ruleForm.validate((valid) => {
         if (valid) {
-          console.log(this.form);
           // 添加广告位
           addAdPosition(this.form).then((res) => {
             if (res.data.code === 0) {
@@ -386,7 +392,6 @@ export default {
     editSubmit() {
       this.$refs.ruleEditForm.validate((valid) => {
         if (valid) {
-          console.log("修改", this.editForm);
           editPlace(this.editForm).then((res) => {
             if (res.data.code === 0) {
               this.dialogEditFormVisible = false;

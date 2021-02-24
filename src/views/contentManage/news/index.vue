@@ -52,7 +52,7 @@
           :rules="formRule"
         >
           <el-form-item label="名称：" prop="title">
-            <el-input v-model="formData.title"></el-input>
+            <el-input v-model="formData.title" maxlength="200"></el-input>
           </el-form-item>
           <el-form-item label="标签：" prop="lableIdList">
             <el-select
@@ -113,17 +113,20 @@
       :visible.sync="tagViewDialogVisible"
       width="70%"
     >
-      <div class="tag-list">
-        <div
-          v-for="tag in newsTagList"
-          :key="tag.lableId"
-          class="tag-list-item"
-        >
-          {{ tag.lable }}
+      <template>
+        <div v-if="newsTagList && newsTagList.length > 0" class="tag-list">
+          <div
+            v-for="tag in newsTagList"
+            :key="tag.lableId"
+            class="tag-list-item"
+          >
+            {{ tag.lable }}
+          </div>
         </div>
-      </div>
+        <hc-empty-data v-else></hc-empty-data>
+      </template>
       <div slot="footer">
-        <el-button @click="tagViewDialogVisible = false">取 消</el-button>
+        <el-button @click="tagViewDialogVisible = false">返 回</el-button>
       </div>
     </el-dialog>
   </basic-container>
@@ -147,11 +150,12 @@ import HcQuill from "@/views/components/HcQuill";
 import HcCityBox from "@/views/components/HcCity/HcCityBox/index";
 import HcCitySelect from "@/views/components/HcCity/HcCitySelect/index";
 import HcImageUpload from "@/views/components/HcImageUpload/index";
-import HcTableForm from "@/views/components/HcTableForm/index";
+import HcTableForm from "@/views/components/HcTableForm/index"
+import HcEmptyData from "@/views/components/HcEmptyData/index"
 
 export default {
   name: "SysUser",
-  components: { HcQuill, HcCityBox, HcCitySelect, HcImageUpload, HcTableForm },
+  components: { HcQuill, HcCityBox, HcCitySelect, HcImageUpload, HcTableForm, HcEmptyData },
   data() {
     return {
       page: {
@@ -182,7 +186,7 @@ export default {
       tagViewDialogVisible: false,
       titleImage: [],
       formRule: {
-        title: [{required: true, message: '请输入名称'}],
+        title: [{required: true, message: '请输入名称', trigger: 'blur'}],
         lableIdList: [{required: true, message: '请选择标签', trigger: 'blur'}],
         titleImage: [{validator: this.imageValidator, required: true, trigger: 'blur'}],
         imageSizeType: [{required: true, message: '请选择图片展示比例'}],
@@ -314,7 +318,7 @@ export default {
           this.publish = false;
           this.$notify({
             title: "成功",
-            message: "发布成功",
+            message: state ? "发布成功！" : "保存成功！",
             type: "success",
             duration: 2000,
           });
@@ -325,7 +329,7 @@ export default {
           this.publish = false;
           this.$notify({
             title: "成功",
-            message: "发布成功",
+            message: state ? "发布成功！" : "保存成功！",
             type: "success",
             duration: 2000,
           });
@@ -378,7 +382,7 @@ export default {
             this.publish = false;
             this.$notify({
               title: "成功",
-              message: "发布成功",
+              message: "删除成功",
               type: "success",
               duration: 2000,
             });

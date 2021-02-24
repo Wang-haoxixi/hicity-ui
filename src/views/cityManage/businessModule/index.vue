@@ -30,21 +30,23 @@
           </div>
           
         </el-form>
-        <div class="city-box">
-          <div v-for="city in cityList" :key="city.cityId" class="city-item">
-            <div class="city-item-info">
-              <div class="city-item-name">{{city.cityName}}</div>
-            </div>
-            <div class="city-item-option">
-              <city-state :state="city.state || ''" :is-opening="city.isOpening"></city-state>
-              <div class="city-item-option-right">
-                <template v-if="isAdmin || !city.isPlatform">
-                  <el-button type="text" size="mini" @click="handleModule(city)">配置</el-button>
-                </template>
+        <hc-table-data-box :empty="!cityList || cityList.length == 0" :loading="boxLoading">
+          <div class="city-box">
+            <div v-for="city in cityList" :key="city.cityId" class="city-item">
+              <div class="city-item-info">
+                <div class="city-item-name">{{city.cityName}}</div>
+              </div>
+              <div class="city-item-option">
+                <city-state :state="city.state || ''" :is-opening="city.isOpening"></city-state>
+                <div class="city-item-option-right">
+                  <template v-if="isAdmin || !city.isPlatform">
+                    <el-button type="text" size="mini" @click="handleModule(city)">配置</el-button>
+                  </template>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </hc-table-data-box>
         <div class="pagination-box">
           <el-pagination
             style="display: inline-block"
@@ -97,6 +99,7 @@ export default {
       cityStatus: 'all',
       setModule: false,
       handleCityId: '',
+      boxLoading: false,
     }
   },
   computed: {
@@ -146,9 +149,7 @@ export default {
   },
   methods: {
     getList (page = this.page, form = this.searchForm) {
-      const loading = this.$loading({
-        target: '.city-box',
-      });
+      this.boxLoading = true
       adminCityOpenList({
         current: page.currentPage,
         size: page.pageSize,
@@ -162,7 +163,7 @@ export default {
           }
         }
       }).finally(() => {
-        loading.close()
+        this.boxLoading = false
       })
     },
     init () {

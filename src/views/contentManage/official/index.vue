@@ -54,6 +54,7 @@
           border
           stripe
           :header-cell-style="{ background: '#FAFAFA' }"
+          v-loading="tableLoading"
           style="width: 100%"
         >
           <el-table-column
@@ -118,6 +119,9 @@
               > -->
             </template>
           </el-table-column>
+          <template slot="empty">
+            <hc-empty-data></hc-empty-data>
+          </template>
         </el-table>
         <el-pagination
           background
@@ -141,7 +145,7 @@
         >
           <!-- 名称 -->
           <el-form-item label="名称" prop="officialNewsName">
-            <el-input v-model="addform.officialNewsName"></el-input>
+            <el-input v-model="addform.officialNewsName" maxlength="200"></el-input>
           </el-form-item>
 
           <el-row>
@@ -263,8 +267,9 @@ import store from "@/store";
 import { getAllTagList } from "@/api/tms/city";
 import { adminCityList } from "@/api/admin/city";
 import HcTableForm from "@/views/components/HcTableForm/index";
+import HcEmptyData from "@/views/components/HcEmptyData/index"
 export default {
-  components: { HcQuill, HcCityBox, HcCitySelect, HcTableForm },
+  components: { HcQuill, HcCityBox, HcCitySelect, HcTableForm, HcEmptyData },
   data() {
     return {
       isShow: true, //是否显示咨询列表
@@ -319,6 +324,7 @@ export default {
         ],
         content: [{ validator: this.contentValidator, required: true }],
       },
+      tableLoading: false
     };
   },
   watch: {
@@ -381,6 +387,7 @@ export default {
     },
     // 获取官方发布列表
     getOfficialReleaseList() {
+      this.tableLoading = true
       let form = {
         officialColumnName: this.input,
         current: this.currentPage,
@@ -403,6 +410,8 @@ export default {
         console.log("官方发布列表", res);
         this.total = res.data.data.data.total;
         this.tableData = res.data.data.data.records;
+      }).finally(() => {
+        this.tableLoading = false
       });
     },
     // 查看

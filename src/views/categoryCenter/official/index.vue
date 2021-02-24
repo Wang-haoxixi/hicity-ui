@@ -18,27 +18,29 @@
       </div>
     </el-form>
 
-    <div class="column-box">
-      <div v-for="column in columnList" :key="column.officialColumnId" class="column-item">
-        <div class="column-item-info">
-          <div class="column-item-name">{{column.officialColumnName}}</div>
-          <!-- <div class="column-item-sort" v-if="column.isOpening && column.sort">No.{{column.sort}}</div> -->
-        </div>
-        <div class="column-item-option">
-          <div class="column-item-option-left">
-            <el-button v-if="confAuthority(column)" type="text" size="mini" @click="cityView(column.officialColumnId)">查看配置城市</el-button>
-            <el-button v-else-if="column.closeAllowed == '0'" type="text" size="mini" @click="handleStart(column)">{{column.havEnable ? '启用' : '停用'}}</el-button>
+    <hc-table-data-box :empty="!columnList || columnList.length == 0" :loading="boxLoading">
+      <div class="column-box">
+        <div v-for="column in columnList" :key="column.officialColumnId" class="column-item">
+          <div class="column-item-info">
+            <div class="column-item-name">{{column.officialColumnName}}</div>
+            <!-- <div class="column-item-sort" v-if="column.isOpening && column.sort">No.{{column.sort}}</div> -->
           </div>
-          <div class="column-item-option-right">
-            <!-- <el-button v-if="!isAdmin" type="text" size="mini" @click="handleSort(column)">排序</el-button> -->
-            <template v-if="operAuthority(column)">
-              <el-button type="text" size="mini" @click="handleUpdate(column)">编辑</el-button>
-              <el-button type="text" size="mini" @click="handleDel(column.officialColumnId)">删除</el-button>
-            </template>
+          <div class="column-item-option">
+            <div class="column-item-option-left">
+              <el-button v-if="confAuthority(column)" type="text" size="mini" @click="cityView(column.officialColumnId)">查看配置城市</el-button>
+              <el-button v-else-if="column.closeAllowed == '0'" type="text" size="mini" @click="handleStart(column)">{{column.havEnable ? '启用' : '停用'}}</el-button>
+            </div>
+            <div class="column-item-option-right">
+              <!-- <el-button v-if="!isAdmin" type="text" size="mini" @click="handleSort(column)">排序</el-button> -->
+              <template v-if="operAuthority(column)">
+                <el-button type="text" size="mini" @click="handleUpdate(column)">编辑</el-button>
+                <el-button type="text" size="mini" @click="handleDel(column.officialColumnId)">删除</el-button>
+              </template>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </hc-table-data-box>
 
     <div class="pagination-box">
       <el-pagination
@@ -101,6 +103,7 @@ export default {
       },
       allCityList: [],
       initCityList: [],
+      boxLoading: false
     }
   },
   computed: {
@@ -124,7 +127,7 @@ export default {
       return this.userType <= column.source
     },
     getList (page = this.page, form = this.searchForm) {
-      this.tableLoading = true
+      this.boxLoading = true
       let formData = {
         current: page.currentPage,
         size: page.pageSize,
@@ -143,7 +146,7 @@ export default {
           }
         }
       }).finally(() => {
-        this.tableLoading = false
+        this.boxLoading = false
       })
     },
     handleCreate () {
