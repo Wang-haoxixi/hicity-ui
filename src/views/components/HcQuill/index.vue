@@ -115,52 +115,17 @@ import Delta from 'quill-delta'
 import 'quill/dist/quill.snow.css'
 import { ossUpload } from '@/api/admin/sys-file'
 import { uploadImage } from '@/util/file'
+import { QuillDeltaToHtmlConverter } from 'quill-delta-to-html';
 
 const BlockEmbed = Quill.import('blots/block/embed');
 class ImageUploading extends BlockEmbed {
   static blotName = 'ImageUploading'
   static tagName = 'div'
-  static create(data) {
-    window.quillVm.updateImage(data.uuid, data.file, data.type)
+  static className = 'quill-image'
+  static create() {
     let value = `
-      <div class="quill-image">
-        <div class="quill-image-box">
-          <img src="/img/quill/quill-uploading.png" />
-        </div>
-      </div>
-    `
-    const node = super.create(data.uuid);
-    node.setAttribute('contenteditable', 'false');
-    node.setAttribute('width', '100%');
-    node.setAttribute('uuid', data.uuid)
-    node.innerHTML = this.transformValue(value)
-    return node;
-  }
-  static transformValue(value) {
-    let handleArr = value.split('\n')
-    handleArr = handleArr.map(e => e.replace(/^[\s]+/, '')
-      .replace(/[\s]+$/, ''))
-    return handleArr.join('')
-  }
-  static value(value) {
-    return {
-      uuid: value.getAttribute('uuid')
-    }
-  }
-}
-Quill.register(ImageUploading);
-
-class image extends BlockEmbed {
-  static blotName = 'image'
-  static tagName = 'div'
-
-  static create(url) {
-    this.url = url
-    let value = `
-      <div class="quill-image">
-        <div class="quill-image-box">
-          <img src="${url}" />
-        </div>
+      <div class="quill-image-box">
+        <img src="/img/quill/quill-uploading.png" />
       </div>
     `
     const node = super.create(value);
@@ -169,17 +134,55 @@ class image extends BlockEmbed {
     node.innerHTML = this.transformValue(value)
     return node;
   }
-
   static transformValue(value) {
     let handleArr = value.split('\n')
     handleArr = handleArr.map(e => e.replace(/^[\s]+/, '')
       .replace(/[\s]+$/, ''))
     return handleArr.join('')
   }
+  constructor(domNode, data) {
+    domNode.setAttribute('uuid', data.uuid)
+    super(domNode)
+    window.quillVm.updateImage(data.uuid, data.file, data.type)
+  }
+  static value(domNode) {
+    return {
+      uuid: domNode.getAttribute('uuid'),
+    }
+  }
+}
+Quill.register(ImageUploading);
 
-  // 返回节点自身的value值 用于撤销操作
-  static value() {
-    return this.url
+class image extends BlockEmbed {
+  static blotName = 'image'
+  static tagName = 'div'
+  static className = 'quill-image'
+
+  static create() {
+    let value = `
+      <div class="quill-image-box">
+      </div>
+    `
+    const node = super.create(value);
+    node.setAttribute('contenteditable', 'false');
+    node.setAttribute('width', '100%');
+    node.innerHTML = this.transformValue(value)
+    return node;
+  }
+  constructor(domNode, data) {
+    let img = document.createElement('img')
+    img.src = data
+    domNode.childNodes[0].appendChild(img)
+    super(domNode)
+  }
+  static transformValue(value) {
+    let handleArr = value.split('\n')
+    handleArr = handleArr.map(e => e.replace(/^[\s]+/, '')
+      .replace(/[\s]+$/, ''))
+    return handleArr.join('')
+  }
+  static value(domNode) {
+    return domNode.childNodes[0].childNodes[0].src
   }
 }
 Quill.register(image);
@@ -221,6 +224,7 @@ class video extends BlockEmbed {
 // Quill.register(video);
 
 export default {
+  name: 'HcQuill',
   props: {
     value: {
       type: Object,
@@ -299,7 +303,6 @@ export default {
 
      // 自定义视频
     this.quill.getModule('toolbar').addHandler('video', (value) => {
-      console.log(value)
       let selection = this.quill.getSelection() || {index: 0, length: 0}
       if (!value && selection.length == 0) {
         let pointerIndex = selection.index
@@ -334,7 +337,15 @@ export default {
 
     this.quill.root.innerHTML = this.value.content
     this.quill.on('text-change', (delta, oldDelta, source) => {
-      this.$emit('input', {content: this.quill.root.innerHTML, structuredContent: JSON.stringify(this.quill.getContents().ops)})
+      let deltas = new Delta()
+      this.quill.getContents().forEach(op => {
+        if (!op.ImageUploading) {
+          deltas.insert(op.insert, op.attributes)
+        }
+      })
+      const converter = new QuillDeltaToHtmlConverter(deltas.ops, {})
+      const html = converter.convert()
+      this.$emit('input', {content: html, structuredContent: JSON.stringify(deltas.ops)})
     });
     
     // 复制粘贴
@@ -347,7 +358,8 @@ export default {
             delete attributes.link
           }
           deltas.insert(op.insert)
-        } else if (!op.insert.image) {
+        }
+        else if (!op.insert.image) {
           deltas.insert(op.insert, op.attributes)
         } else {
           let uuid = uuidv4()
@@ -373,61 +385,70 @@ export default {
       if (type == 1) {
         // 选择的文件上传
         ossUpload(file).then(({data}) => {
-          let url = data.data.data.url
-          let structuredContent = this.quill.getContents()
-          let index = 0
-          let insert
-          structuredContent.forEach(op => {
-            insert = op.insert
-            if (typeof insert == 'string') {
-              index += insert.length
-            } else if (insert.ImageUploading) {
-              if (insert.ImageUploading.uuid == uuid) {
-                let delta = new Delta()
-                .retain(index)
-                .delete(1)
-                .insert({
-                  image: url
-                })
-                this.quill.updateContents(delta)
-                return
-              }
-            } else {
-              index++
-            }
-          })
+          this.replaceImage(uuid, data.data.data.url)
+        }, (error) => {
+          this.$message.error('图片上传失败！')
+          this.removeImage(uuid)
+        }).catch(() => {
+          this.$message.error('图片上传失败！')
+          this.removeImage(uuid)
         })
       } else {
         // 路径图片上传
         uploadImage(file).then(({data}) => {
-          let url = data.data.data.url
-          let structuredContent = this.quill.getContents()
-          let index = 0
-          let insert
-          structuredContent.forEach(op => {
-            insert = op.insert
-            if (typeof insert == 'string') {
-              index += insert.length
-            } else if (insert.ImageUploading) {
-              if (insert.ImageUploading.uuid == uuid) {
-                let delta = new Delta()
-                .retain(index)
-                .delete(1)
-                .insert({
-                  image: url
-                })
-                this.quill.updateContents(delta)
-                return
-              }
-            } else {
-              index++
-            }
-          })
+          this.replaceImage(uuid, data.data.data.url)
+        }, (error) => {
+          this.$message.error(error.message)
+          this.removeImage(uuid)
+        }).catch(() => {
+          this.$message.error('图片上传失败！')
+          this.removeImage(uuid)
         })
       }
     },
+    // 替换上传的图片
+    replaceImage (uuid, url) {
+      let structuredContent = this.quill.getContents()
+      let index = 0
+      let insert
+      structuredContent.forEach(op => {
+        insert = op.insert
+        if (typeof insert == 'string') {
+          index += insert.length
+        } else if (insert.ImageUploading && insert.ImageUploading.uuid == uuid) {
+          let delta = new Delta()
+          .retain(index)
+          .delete(1)
+          .insert({
+            image: url
+          })
+          this.quill.updateContents(delta)
+        } else {
+          index++
+        }
+      })
+    },
+    // 移除正在上传的图片
+    removeImage (uuid) {
+      let structuredContent = this.quill.getContents()
+      let index = 0
+      let insert
+      structuredContent.forEach(op => {
+        insert = op.insert
+        if (typeof insert == 'string') {
+          index += insert.length
+        } else if (insert.ImageUploading && insert.ImageUploading.uuid == uuid) {
+          let delta = new Delta()
+          .retain(index)
+          .delete(1)
+          this.quill.updateContents(delta)
+        } else {
+          index++
+        }
+      })
+    },
+    // 图片上传
     insertImage (file) {
-      // 图片上传
       let uuid = uuidv4()
       let selection = this.quill.getSelection()
       this.quill.insertEmbed(selection.index || 0, 'ImageUploading', {uuid, file, type: 1});

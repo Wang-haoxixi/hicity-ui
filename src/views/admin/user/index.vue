@@ -92,7 +92,7 @@
                 :dic="treeDeptData"
                 :props="defaultProps"
                 type="tree"
-                placeholder="请选择所属部门"/>
+                placeholder="请选择所属平台"/>
             </template>
             <template
               slot="roleForm"

@@ -96,7 +96,7 @@ export const tableOption = (edit = false, admin = false) => {
         dataType:"number",
         rules: [{
           required: true,
-          message: '请选择所属部门',
+          message: '请选择所属平台',
           trigger: 'change'
         }]
       },

@@ -150,6 +150,7 @@ export default {
           regionName: this.allCityTree.regionName
         }]
       })
+      this.cityArangeSelect(this.cityMapList[0])
     },
     cityArangeSelect ({key, cityList}) {
       this.selectKey = key

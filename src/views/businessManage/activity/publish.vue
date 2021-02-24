@@ -438,7 +438,7 @@
 
 <script>
 import store from "@/store";
-import HcQuill from "@/views/components//HcQuill";
+import HcQuill from "@/views/components/HcQuill";
 import HcCitySelect from "@/views/components/HcCity/HcCitySelect/index";
 import { mapGetters } from "vuex";
 import {
