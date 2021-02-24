@@ -236,11 +236,18 @@
 
           <!-- 事件按钮 -->
           <el-form-item>
-            <!-- <el-button @click="preview">预览</el-button> -->
+            <el-button @click="handlePreview">预览</el-button>
             <el-button @click="handleDraft">保存草稿</el-button>
             <el-button @click="handleCreate">直接发布</el-button>
           </el-form-item>
         </el-form>
+        <hc-preview v-if="preview" @close="preview = false">
+          <div class="preview-title">
+            {{addform.officialNewsName || '资讯标题'}}
+          </div>
+          <div class="preview-time">发布时间：{{dateFormat(new Date())}}</div>
+          <div class="preview-content" v-html="quillContent.content || '内容'"></div>
+        </hc-preview>
       </template>
     </hc-table-form>
 
@@ -259,6 +266,7 @@ import {
   officialDel,
   officaialNewsUpdate,
 } from "@/api/officialRelease/officialRelease.js";
+import { dateFormat } from "@/util/date"
 import HcQuill from "@/views/components/HcQuill";
 import HcCityBox from "@/views/components/HcCity/HcCityBox/index";
 import HcCitySelect from "@/views/components/HcCity/HcCitySelect/index";
@@ -268,8 +276,9 @@ import { getAllTagList } from "@/api/tms/city";
 import { adminCityList } from "@/api/admin/city";
 import HcTableForm from "@/views/components/HcTableForm/index";
 import HcEmptyData from "@/views/components/HcEmptyData/index"
+import HcPreview from "@/views/components/HcPreview/index"
 export default {
-  components: { HcQuill, HcCityBox, HcCitySelect, HcTableForm, HcEmptyData },
+  components: { HcQuill, HcCityBox, HcCitySelect, HcTableForm, HcEmptyData, HcPreview },
   data() {
     return {
       isShow: true, //是否显示咨询列表
@@ -324,17 +333,19 @@ export default {
         ],
         content: [{ validator: this.contentValidator, required: true }],
       },
-      tableLoading: false
+      tableLoading: false,
+      preview: false
     };
   },
   watch: {
     quillContent() {
-      // this.$nextTick(() => {
-      this.$refs.addformRef.validateField("content");
-      // });
+      this.$nextTick(() => {
+        this.$refs.addformRef.validateField("content");
+      });
     },
   },
   methods: {
+    dateFormat,
     backClisk() {
       // 清空标题图数组
       this.urlList = [];
@@ -407,7 +418,6 @@ export default {
             item.state = "已失效";
           }
         });
-        console.log("官方发布列表", res);
         this.total = res.data.data.data.total;
         this.tableData = res.data.data.data.records;
       }).finally(() => {
@@ -416,7 +426,6 @@ export default {
     },
     // 查看
     check(id) {
-      console.log("查看", id);
       checkCity({
         officialNewsId: id,
       }).then((res) => {
@@ -449,12 +458,10 @@ export default {
           res.data.data.data.officialColumnId = "";
         }
         this.addform = res.data.data.data;
-        console.log("this.addform", this.addform);
         this.quillContent = {
           content: res.data.data.data.officialNewsContent,
           structuredContent: res.data.data.data.structuredContent,
         };
-        console.log("addform", this.addform);
         this.urlList = [];
         this.fileList = [];
         this.addform.urlList.forEach((item, index) => {
@@ -476,7 +483,6 @@ export default {
     },
     // 删除
     handleDel(row) {
-      console.log("删除", row);
       this.$confirm("此操作将永久删除, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -487,7 +493,6 @@ export default {
             officialNewsId: row.officialNewsId,
             cityId: this.userInfo.manageCityId,
           }).then((res) => {
-            console.log(res);
             if (res.data.code !== 0) {
               return this.$message.error("删除失败！");
             }
@@ -519,14 +524,11 @@ export default {
     },
     // 保存
     save() {
-      console.log("新增数据", this.addform);
       officialColumnCreate({}).then((res) => {
-        console.log("新增保存", res);
       });
     },
     // 图片移除
     handleRemove(res, file) {
-      console.log("ree", res);
       if (!res.response) {
         this.urlList.forEach((item, index) => {
           if (res.url === item.newsUrl) {
@@ -540,11 +542,9 @@ export default {
           }
         });
       }
-      console.log("urlList", this.urlList);
     },
     // 图片上传成功的钩子
     handlePicSuccess(res) {
-      console.log("图片上传成功的钩子", res);
       this.urlList.push({
         type: "image",
         newsUrl: res.data.data.url,
@@ -552,7 +552,9 @@ export default {
       });
     },
     // 预览
-    preview() {},
+    handlePreview() {
+      this.preview = true
+    },
     // 保存草稿
     handleDraft() {
       this.urlList.forEach((item) => {
@@ -560,12 +562,10 @@ export default {
       });
       this.addform.urlList = this.urlList;
       let addform = this.addform;
-      console.log(addform);
 
       addform.officialNewsContent = this.quillContent.content;
       addform.structuredContent = this.quillContent.structuredContent;
       addform.state = 0;
-      console.log("addform", addform);
 
       if (this.publishType == "add") {
         this.$refs.addformRef.validate((valid) => {
@@ -610,16 +610,13 @@ export default {
       });
       this.addform.urlList = this.urlList;
       let addform = this.addform;
-      console.log(addform);
 
       addform.officialNewsContent = this.quillContent.content;
       addform.structuredContent = this.quillContent.structuredContent;
       addform.state = 1;
-      console.log("addform", addform);
       // 新增
       if (this.publishType == "add") {
         this.$refs.addformRef.validate((valid) => {
-          console.log(valid);
           if (valid) {
             officaialNewsCreate(addform).then((res) => {
               // console.log("直接发布", res);
@@ -648,7 +645,6 @@ export default {
       }
       // 编辑
       else {
-        console.log("sss", addform);
         this.$refs.addformRef.validate((valid) => {
           if (valid) {
             officaialNewsUpdate(addform).then((res) => {
@@ -711,9 +707,7 @@ export default {
     this.getOfficialReleaseList();
     this.getCityColumn();
     this.init();
-    console.log("userInfo", this.userInfo);
     // console.log("isAdmin", this.isAdmin);
-    console.log("dicList", this.dicList);
     // console.log("source", this.addform.source);
   },
 };
@@ -765,5 +759,25 @@ export default {
 .paging {
   margin-top: 20px;
   text-align: right;
+}
+
+
+.preview-title {
+  line-height: 26px;
+  color: #333333;
+  font-size: 18px;
+}
+.preview-time {
+  margin-top: 10px;
+  height: 17px;
+  line-height: 17px;
+  color: #999999;
+  font-size: 12px;
+}
+.preview-content {
+  margin-top: 24px;
+  /deep/ img {
+    width: 100% !important;
+  }
 }
 </style>

@@ -97,13 +97,19 @@
             <hc-quill ref="quill" v-model="quillContent"></hc-quill>
           </el-form-item>
           <el-form-item>
-            <!-- <el-button @click="preview">预览</el-button> -->
+            <el-button @click="handlePreview">预览</el-button>
             <el-button @click="handleDraft">保存草稿</el-button>
             <el-button @click="handleCreate">直接发布</el-button>
           </el-form-item>
         </el-form>
+        <hc-preview v-if="preview" @close="preview = false">
+          <div class="preview-title">
+            {{formData.title || '资讯标题'}}
+          </div>
+          <div class="preview-time">发布时间：{{dateFormat(new Date())}}</div>
+          <div class="preview-content" v-html="quillContent.content || '内容'"></div>
+        </hc-preview>
       </template>
-      
     </hc-table-form>
 
     <hc-city-box ref="hcCityBox"></hc-city-box>
@@ -135,6 +141,7 @@
 <script>
 import { tableOption } from "./const";
 import { mapGetters } from "vuex";
+import { dateFormat } from "@/util/date"
 import {
   getNewsList,
   addNews,
@@ -152,10 +159,11 @@ import HcCitySelect from "@/views/components/HcCity/HcCitySelect/index";
 import HcImageUpload from "@/views/components/HcImageUpload/index";
 import HcTableForm from "@/views/components/HcTableForm/index"
 import HcEmptyData from "@/views/components/HcEmptyData/index"
+import HcPreview from "@/views/components/HcPreview/index"
 
 export default {
   name: "SysUser",
-  components: { HcQuill, HcCityBox, HcCitySelect, HcImageUpload, HcTableForm, HcEmptyData },
+  components: { HcQuill, HcCityBox, HcCitySelect, HcImageUpload, HcTableForm, HcEmptyData, HcPreview },
   data() {
     return {
       page: {
@@ -192,7 +200,8 @@ export default {
         imageSizeType: [{required: true, message: '请选择图片展示比例'}],
         cityIdList: [{required: true, message: '请选择城市'}],
         content: [{validator: this.contentValidator, required: true}]
-      }
+      },
+      preview: false
     };
   },
   computed: {
@@ -233,6 +242,7 @@ export default {
     this.init();
   },
   methods: {
+    dateFormat,
     imageValidator (rule, value, callback) {
       if (this.titleImage && this.titleImage.length > 0) {
         callback()
@@ -364,7 +374,8 @@ export default {
         }
       })
     },
-    preview() {
+    handlePreview() {
+      this.preview = true
       // this.$refs.quill.getData()
       // console.log()
     },
@@ -460,6 +471,25 @@ export default {
     height: 60px;
     line-height: 60px;
     font-size: 20px;
+  }
+}
+
+.preview-title {
+  line-height: 26px;
+  color: #333333;
+  font-size: 18px;
+}
+.preview-time {
+  margin-top: 10px;
+  height: 17px;
+  line-height: 17px;
+  color: #999999;
+  font-size: 12px;
+}
+.preview-content {
+  margin-top: 24px;
+  /deep/ img {
+    width: 100% !important;
   }
 }
 </style>

@@ -56,11 +56,24 @@
             <el-input type="textarea" v-model="formData.content" :autosize="{minRows: 5, maxRows: 10}" maxlength="250"></el-input>
           </el-form-item>
           <el-form-item>
-            <!-- <el-button @click="preview">预览</el-button> -->
+            <el-button @click="handlePreview">预览</el-button>
             <el-button @click="handleDraft">保存草稿</el-button>
             <el-button @click="handleCreate">直接发布</el-button>
           </el-form-item>
         </el-form>
+        <hc-preview v-if="preview" @close="preview = false">
+          <div class="preview-user">
+            <img class="preview-avatar" :src="userInfo.avatar"/>
+            <div class="name-time">
+              <div class="user-name">{{userInfo.realName}}</div>
+              <div class="preview-time">{{dateFormat(new Date())}}</div>
+            </div>
+          </div>
+          <div class="preview-title">
+            {{formData.travelName || '资讯标题'}}
+          </div>
+          <div class="preview-content" v-html="formData.content.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>')"></div>
+        </hc-preview>
       </template>
     </hc-table-form>
     
@@ -71,15 +84,17 @@
 <script>
 import { tableOption } from "./const";
 import { mapGetters } from "vuex";
+import { dateFormat } from "@/util/date"
 import { getTravelList, getClassifyList, getTopicList, saveTravel, getTravelDetail, deleteTravel, travelOpenList } from "@/api/cms/travel"
 import HcCityBox from "@/views/components/HcCity/HcCityBox/index";
 import HcCitySelect from "@/views/components/HcCity/HcCitySelect/index";
 import HcImageUpload from "@/views/components/HcImageUpload/index";
 import HcTopicSelect from "@/views/components/HcTopicSelect/index";
 import HcTableForm from "@/views/components/HcTableForm/index";
+import HcPreview from "@/views/components/HcPreview/index"
 export default {
   name: "SysUser",
-  components: { HcCityBox, HcCitySelect, HcImageUpload, HcTopicSelect, HcTableForm },
+  components: { HcCityBox, HcCitySelect, HcImageUpload, HcTopicSelect, HcTableForm, HcPreview },
   data() {
     return {
       page: {
@@ -141,7 +156,8 @@ export default {
         cityList: [{required: true, message: '请选择城市'}],
         images: [{required: true, message: '请添加游记图片'}],
         content: [{required: true, message: '请输入内容'}],
-      }
+      },
+      preview: false
     };
   },
   computed: {
@@ -164,6 +180,7 @@ export default {
   created() {
   },
   methods: {
+    dateFormat,
     getList(page = this.page, params) {
       this.tableLoading = true;
       let form = {
@@ -237,7 +254,8 @@ export default {
         }
       })
     },
-    preview() {
+    handlePreview() {
+      this.preview = true
       // this.$refs.quill.getData()
       // console.log()
     },
@@ -313,6 +331,45 @@ export default {
     line-height: 60px;
     font-size: 20px;
   }
+}
+.preview-user {
+  margin: 0 -16px;
+  padding: 0 16px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  background-color: #F9F9F9;
+  .preview-avatar {
+    margin-right: 5px;
+    height: 30px;
+    width: 30px !important;
+    flex: 0 0 30px !important;
+  }
+  .name-time {
+    flex: 1 1 200px;
+    .user-name {
+      height: 20px;
+      line-height: 20px;
+      color: #333333;
+      font-size: 14px;
+    }
+    .preview-time {
+      margin-top: 2px;
+      height: 17px;
+      line-height: 17px;
+      color: #999999;
+      font-size: 12px;
+    }
+  }
+}
+.preview-title {
+  margin-top: 16px;
+  line-height: 26px;
+  color: #333333;
+  font-size: 18px;
+}
+.preview-content {
+  margin-top: 16px;
 }
 </style>
 
