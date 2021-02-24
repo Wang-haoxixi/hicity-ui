@@ -8,7 +8,7 @@
       :data="tableData"
       @on-load="getList"
       @refresh-change="handleRefreshChange">
-      <template v-if="userType == 1" slot="menu" slot-scope="scope">
+      <template slot="menu" slot-scope="scope">
         <el-button type="text" size="mini" @click="handleQuote(scope.row)">引用至官方</el-button>
         <el-button type="text" size="mini" @click="toDelete(scope.row)">删除</el-button>
       </template>
@@ -18,7 +18,6 @@
 
 <script>
 import { tableOption } from "./const";
-import { mapGetters } from "vuex";
 import {
   getTopicList,
   quoteTopic,
@@ -39,7 +38,6 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['userType']),
     tableOption() {
       return tableOption();
     },
