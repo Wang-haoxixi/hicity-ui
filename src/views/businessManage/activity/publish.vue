@@ -10,10 +10,12 @@
         class="elForm"
         ref="baseFormDataRef"
         :model="baseFormData"
+        :rules="baseFormDataRules"
         label-width="120px"
       >
         <!-- 所属城市 -->
         <el-form-item
+          prop="cityIdList"
           v-if="
             baseFormData.source
               ? userType != 3 && userType == baseFormData.source
@@ -28,7 +30,7 @@
         </el-form-item>
 
         <!-- 活动标题 -->
-        <el-form-item label="活动标题：">
+        <el-form-item prop="name" label="活动标题：">
           <el-input
             v-model="baseFormData.name"
             placeholder="不小于5个字，不超过40个字"
@@ -36,28 +38,38 @@
         </el-form-item>
 
         <!-- 举办时间 -->
-        <el-form-item label="举办时间：">
-          <el-date-picker
-            value-format="yyyy-MM-dd HH:mm:ss"
-            prefix-icon="el-icon-date"
-            style="margin-right: 15px"
-            v-model="baseFormData.startTime"
-            type="datetime"
-            placeholder="选择开始日期"
-          >
-          </el-date-picker>
-          <el-date-picker
-            value-format="yyyy-MM-dd HH:mm:ss"
-            prefix-icon="el-icon-date"
-            v-model="baseFormData.endTime"
-            type="datetime"
-            placeholder="选择结束日期"
-          >
-          </el-date-picker>
+        <el-form-item label="举办时间：" required>
+          <el-col :span="6">
+            <el-form-item prop="startTime">
+              <el-date-picker
+                value-format="yyyy-MM-dd HH:mm:ss"
+                prefix-icon="el-icon-date"
+                style="width: 100%"
+                v-model="baseFormData.startTime"
+                type="datetime"
+                placeholder="选择开始日期"
+              >
+              </el-date-picker>
+            </el-form-item>
+          </el-col>
+          <el-col class="line" style="text-align: center" :span="1">-</el-col>
+          <el-col :span="6">
+            <el-form-item prop="endTime">
+              <el-date-picker
+                value-format="yyyy-MM-dd HH:mm:ss"
+                prefix-icon="el-icon-date"
+                style="width: 100%"
+                v-model="baseFormData.endTime"
+                type="datetime"
+                placeholder="选择结束日期"
+              >
+              </el-date-picker>
+            </el-form-item>
+          </el-col>
         </el-form-item>
 
         <!-- 活动类型 -->
-        <el-form-item label="活动类型：">
+        <el-form-item prop="type" label="活动类型：">
           <el-select v-model="baseFormData.type" placeholder="请选择">
             <el-option
               v-for="item in activityTypeArr"
@@ -69,7 +81,7 @@
         </el-form-item>
 
         <!-- 活动海报 -->
-        <el-form-item label="活动海报：">
+        <el-form-item prop="poster" label="活动海报：">
           <div class="posterInpBox">
             <!-- 点击上传按钮 -->
             <el-upload
@@ -122,7 +134,7 @@
         </el-form-item>
 
         <!-- 活动地址 -->
-        <el-form-item label="活动地址：">
+        <el-form-item prop="cityId" label="活动地址：">
           <div class="addressbox">
             <!-- 举办地 -->
             <el-cascader
@@ -144,7 +156,7 @@
         </el-form-item>
 
         <!-- 活动分类 -->
-        <el-form-item label="活动分类：">
+        <el-form-item prop="classification" label="活动分类：">
           <el-cascader
             @change="changeClassification"
             v-model="classification"
@@ -154,7 +166,7 @@
         </el-form-item>
 
         <!-- 活动标签 -->
-        <el-form-item label="活动标签：">
+        <el-form-item prop="label" label="活动标签：">
           <!-- 暂无标签 -->
           <em style="margin-right: 10px" v-if="baseFormData.label.length === 0"
             >暂无标签</em
@@ -194,7 +206,7 @@
         </el-form-item>
 
         <!-- 活动亮点 -->
-        <el-form-item label="活动亮点：">
+        <el-form-item prop="spot" label="活动亮点：">
           <el-input
             :rows="4"
             placeholder="请填写几句活动核心亮点，便于分享摘要以及百度等搜索引擎搜索（150个字）"
@@ -204,7 +216,7 @@
         </el-form-item>
 
         <!-- 活动详情 -->
-        <el-form-item label="活动详情：">
+        <el-form-item prop="details" label="活动详情：">
           <hc-quill
             v-model="quillContent"
             v-if="!$route.query.id || contentShow"
@@ -212,7 +224,7 @@
         </el-form-item>
 
         <!-- 活动附件 -->
-        <el-form-item label="活动附件：">
+        <el-form-item prop="fileList" label="活动附件：">
           <el-upload
             class="upload-demo"
             :limit="3"
@@ -240,11 +252,11 @@
             :body-style="cardStyle"
           >
             <!-- 设置票种表单 -->
-            <el-form ref="setTicketDataRef" :model="item">
+            <el-form ref="setTicketDataRef" :model="item" :rules="setTicketDataRules">
               <el-row>
                 <el-col :span="8">
                   <!-- 票务种类 -->
-                  <el-form-item label="票务种类：" label-width="100">
+                  <el-form-item label="票务种类：" label-width="100" prop="ticketingType">
                     <el-select
                       v-model="item.ticketingType"
                       placeholder="请选择票务种类"
@@ -256,7 +268,7 @@
                 </el-col>
                 <el-col :span="10">
                   <!-- 票务名称 -->
-                  <el-form-item label="票务名称：" label-width="100">
+                  <el-form-item label="票务名称：" label-width="100" prop="ticketingName">
                     <el-input
                       style="width: 300px"
                       v-model="item.ticketingName"
@@ -266,10 +278,10 @@
                 </el-col>
               </el-row>
 
-              <el-row>
+              <el-row style="margin: 15px 0">
                 <el-col :span="8">
                   <!-- 票种数量 -->
-                  <el-form-item label="票种数量：" label-width="100">
+                  <el-form-item label="票种数量：" label-width="100" prop="number">
                     <el-input-number
                       v-model="item.number"
                       controls-position="right"
@@ -279,7 +291,7 @@
                 </el-col>
                 <el-col :span="8">
                   <!-- 单次购票数量 -->
-                  <el-form-item label="单次购票数量：" label-width="100">
+                  <el-form-item label="单次购票数量：" label-width="100" prop="limitTicket">
                     <el-input-number
                       v-model="item.limitTicket"
                       controls-position="right"
@@ -318,6 +330,8 @@
               </el-row>
               <!-- 票务金额  付费票时显示 -->
               <el-form-item
+                style="margin-bottom:15px"
+                required
                 label="票务金额："
                 v-if="item.ticketingType === '2'"
               >
@@ -370,7 +384,7 @@
               <el-row>
                 <el-col>
                   <!-- 票种备注 -->
-                  <el-form-item label="票种备注：" label-width="200">
+                  <el-form-item label="票种备注：" label-width="200" prop="remarks">
                     <el-input
                       style="width: 650px"
                       placeholder="请输入备注内容"
@@ -437,6 +451,7 @@ import {
   activityInfo,
   editSaveActivity,
 } from "@/api/activity/publish";
+import { validateURL } from '../../../util/validate';
 export default {
   components: { HcQuill, HcCitySelect },
   data() {
@@ -454,6 +469,30 @@ export default {
       },
       // 上传图片路径
       uploadPicUrl: "/api/admin/sys_file/oss/upload",
+
+      baseFormDataRules: {
+        cityIdList:[{ required: true, message: "请输入城市", trigger: "blur" }],
+        name:[{ required: true, message: "请输入活动标题", trigger: "blur" }],
+        startTime:[{ required: true, message: '请选择开始日期', trigger: 'change' }],
+        endTime:[{ required: true, message: '请选择结束日期', trigger: 'change' }],
+        type:[{ required: true, message: "请选择活动类型", trigger: "blur" }],
+        poster:[{ required: true, message: "请选择活动海报", trigger: "change" }],
+        cityId:[{ required: true, message: "请选择活动地址", trigger: "change" }],
+        classification:[{ required: true, message: "请选择活动分类", trigger: "change" }],
+        label:[{ required: true, message: "请选择活动分类",trigger: "change" }],
+        spot:[{ required: true, message: "请输入活动亮点", trigger: "blur" }],
+        details:[{ required: true, message: "请输入活动详情", trigger: "blur" }],
+        fileList:[{ required: true, message: "请选择活动附件",trigger: "change" }]
+      },
+
+      setTicketDataRules:{
+        ticketingType:[{ required: true, message: '请选择票务种类', trigger: 'change' }],
+        ticketingName:[{ required: true, message: "请输入票务名称", trigger: "blur" }],
+        number:[{ required: true, message: "请输入票种数量", trigger: "blur" }],
+        limitTicket:[{ required: true, message: "请输入购票数量", trigger: "blur" }],
+        remarks:[{ required: true, message: "请输入票种备注", trigger: "blur" }]
+      },
+
       // 基本信息数据
       baseFormData: {
         cityIdList: [], //所属城市
@@ -791,7 +830,7 @@ export default {
       this.baseFormData.submitType = 1;
       this.baseFormData.id = this.$route.query.id;
 
-      console.log(this.baseFormData)
+      console.log(this.baseFormData);
 
       editSaveActivity(this.baseFormData).then((res) => {
         if (res.data.code !== 0) {
@@ -819,6 +858,20 @@ export default {
         }
       });
       this.baseFormData.submitType = 1;
+
+      // this.$refs.baseFormDataRef.validate(valid1=>{
+      //   console.log(111,valid1)
+      // })
+      // this.$refs.setTicketDataRef.forEach(item=>{
+      //   item.validate(valid2=>{
+      //     // console.log(222,valid)
+      //     if(!valid2){
+      //       console.log('验证不成功')
+      //       return false
+      //     }
+      //     console.log('验证成功')
+      //   })
+      // })
 
       savePublish(this.baseFormData).then((res) => {
         if (res.data.code !== 0) {

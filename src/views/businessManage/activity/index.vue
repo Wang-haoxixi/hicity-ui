@@ -2,30 +2,51 @@
   <basic-container>
     <div class="title">活动列表</div>
 
-    <el-row>
-      <el-col :span="2">
-        <el-button
-          @click="addCreate"
-          type="primary"
-          size="mini"
-          class="el-icon-plus"
-        >
-          新增</el-button
-        >
-      </el-col>
-      <el-col :span="6">
+    <div class="add-inp-more">
+      <el-button
+        @click="addCreate"
+        type="primary"
+        size="mini"
+        class="el-icon-plus"
+      >
+        新增</el-button
+      >
+      <div class="inp-more">
         <el-input
           clearable
-          prefix-icon="el-icon-search"
           size="mini"
           v-model="name"
           placeholder="请输入"
           @keyup.enter.native="enterCheck"
           @clear="clearName"
           @input="inputVal"
-        ></el-input>
-      </el-col>
-    </el-row>
+        >
+          <el-button
+            slot="append"
+            icon="el-icon-search"
+            @click="enterCheck"
+          ></el-button>
+        </el-input>
+        <el-button
+          icon="el-icon-more"
+          class="more"
+          @click="dialogOpenMoreVisible = true"
+        ></el-button>
+        <el-dialog
+          title="多 选"
+          :visible.sync="dialogOpenMoreVisible"
+          width="600px"
+        >
+          <el-checkbox-group v-model="checkList">
+            <el-checkbox label="活动封面"></el-checkbox>
+            <el-checkbox label="活动信息"></el-checkbox>
+            <el-checkbox label="活动状态"></el-checkbox>
+            <el-checkbox label="展示范围"></el-checkbox>
+            <el-checkbox label="报名人数"></el-checkbox>
+          </el-checkbox-group>
+        </el-dialog>
+      </div>
+    </div>
 
     <!-- default-expand-all是否默认展开所有行 -->
     <el-table
@@ -34,7 +55,6 @@
       :data="tableData"
       :default-expand-all="true"
     >
-      <!-- :row-key="getRowKeys" -->
       <!-- 展开列 -->
       <el-table-column type="expand">
         <template slot-scope="props">
@@ -60,7 +80,7 @@
         </template>
       </el-table-column>
       <!-- 其他列表页 -->
-      <el-table-column label="活动封面" width="200">
+      <el-table-column v-if="checkList.includes('活动封面')" label="活动封面" width="200">
         <template slot-scope="scope">
           <el-image
             style="width: 100px; height: 100px"
@@ -69,7 +89,7 @@
           ></el-image>
         </template>
       </el-table-column>
-      <el-table-column label="活动信息">
+      <el-table-column v-if="checkList.includes('活动信息')" label="活动信息">
         <template slot-scope="scope">
           <div>{{ scope.row.name }}</div>
           <div>
@@ -82,7 +102,7 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="活动状态" width="130">
+      <el-table-column v-if="checkList.includes('活动状态')" label="活动状态" width="130">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.statusFlag == '0'">草稿</el-tag>
           <el-tag v-if="scope.row.statusFlag == '1'" type="success"
@@ -95,7 +115,7 @@
         </template>
       </el-table-column>
       <el-table-column
-        v-if="userType == 1 || userType == 2"
+        v-if="(userType == 1 || userType == 2) && checkList.includes('展示范围')"
         prop="exhibits"
         label="展示范围"
         width="100"
@@ -105,11 +125,12 @@
         </template>
       </el-table-column>
       <el-table-column
+        v-if="checkList.includes('报名人数')"
         prop="joinNumber"
         label="报名人数"
         width="100"
       ></el-table-column>
-      <el-table-column label="操作" width="140">
+      <el-table-column label="操作" width="150">
         <template slot-scope="scope" v-if="userType <= scope.row.source">
           <el-button type="text" @click="handleEdit(scope.row)">编辑</el-button>
           <el-button type="text" @click="handleDelete(scope.row)"
@@ -154,6 +175,8 @@ export default {
       pageSize: 10,
       total: 0,
       showCityDialogVisible: false, //控制展示城市
+      dialogOpenMoreVisible: false,
+      checkList: ["活动封面", "活动信息", "活动状态", "展示范围", "报名人数"],
       allCityList: [],
       initCityList: [],
 
@@ -273,6 +296,22 @@ export default {
   padding-bottom: 5px;
   font-size: 18px;
   font-weight: 400;
+}
+.add-inp-more {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  .inp-more {
+    display: flex;
+    .inp {
+      width: 272px;
+    }
+    .more {
+      padding: 0 12px;
+      margin-left: 8px;
+      height: 28px;
+    }
+  }
 }
 .paging {
   margin-top: 20px;

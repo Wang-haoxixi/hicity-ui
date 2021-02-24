@@ -2,13 +2,45 @@
   <basic-container>
     <hc-table-form title="广告管理">
       <template>
-        <el-button
-          @click="dialogFormVisible = true"
-          type="primary"
-          size="mini"
-          icon="el-icon-plus"
-          >新建</el-button
-        >
+        <div class="add-inp-more">
+          <el-button
+            @click="dialogFormVisible = true"
+            type="primary"
+            size="mini"
+            icon="el-icon-plus"
+            >新建</el-button
+          >
+          <div class="inp-more">
+            <!-- <el-input
+            clearable
+            size="mini"
+            class="inp"
+            v-model="input"
+            placeholder="请输入广告位名称"
+          >
+            <el-button slot="append" icon="el-icon-search"></el-button>
+          </el-input> -->
+            <el-button
+              icon="el-icon-more"
+              class="more"
+              @click="dialogOpenMoreVisible = true"
+            ></el-button>
+            <el-dialog
+              title="多 选"
+              :visible.sync="dialogOpenMoreVisible"
+              width="600px"
+            >
+              <el-checkbox-group v-model="checkList">
+                <el-checkbox label="广告排序"></el-checkbox>
+                <el-checkbox label="广告缩略图"></el-checkbox>
+                <el-checkbox label="广告名称"></el-checkbox>
+                <el-checkbox label="广告位"></el-checkbox>
+                <el-checkbox label="开始时间"></el-checkbox>
+                <el-checkbox label="结束时间"></el-checkbox>
+              </el-checkbox-group>
+            </el-dialog>
+          </div>
+        </div>
         <el-table
           :data="tableData"
           border
@@ -17,24 +49,52 @@
           style="width: 100%; margin-top: 10px"
           ref="multipleTable"
         >
-          <el-table-column type="selection" width="55"></el-table-column>
+          <!-- <el-table-column type="selection" width="55"></el-table-column> -->
           <el-table-column
+            v-if="checkList.includes('广告排序')"
+            align="center"
             prop="seq"
             label="广告排序"
             width="100"
           ></el-table-column>
-          <el-table-column prop="imageUrl" label="广告缩略图" width="180">
+          <el-table-column
+            v-if="checkList.includes('广告缩略图')"
+            align="center"
+            prop="imageUrl"
+            label="广告缩略图"
+            width="180"
+          >
             <template slot-scope="scope">
               <div class="picbox">
                 <img :src="scope.row.imageUrl" class="pic" />
               </div>
             </template>
           </el-table-column>
-          <el-table-column prop="adName" label="广告名称"></el-table-column>
-          <el-table-column prop="adslotName" label="广告位"></el-table-column>
-          <el-table-column prop="beginDate" label="开始时间"></el-table-column>
-          <el-table-column prop="endDate" label="结束时间"></el-table-column>
-          <el-table-column label="操作">
+          <el-table-column
+            v-if="checkList.includes('广告名称')"
+            align="center"
+            prop="adName"
+            label="广告名称"
+          ></el-table-column>
+          <el-table-column
+            v-if="checkList.includes('广告位')"
+            align="center"
+            prop="adslotName"
+            label="广告位"
+          ></el-table-column>
+          <el-table-column
+            v-if="checkList.includes('开始时间')"
+            align="center"
+            prop="beginDate"
+            label="开始时间"
+          ></el-table-column>
+          <el-table-column
+            v-if="checkList.includes('结束时间')"
+            align="center"
+            prop="endDate"
+            label="结束时间"
+          ></el-table-column>
+          <el-table-column align="center" label="操作" width="150">
             <template slot-scope="scope" v-if="scope.row.authority">
               <el-button size="mini" type="text" @click="handleEdit(scope.row)"
                 >编辑</el-button
@@ -66,7 +126,7 @@
       :visible.sync="dialogFormVisible"
       @close="dialogFormVisibleClose"
     >
-      <el-form :model="form" ref="ruleForm" :rules="ruleForm">
+      <el-form :model="form" ref="ruleAddForm" :rules="ruleForm">
         <!-- 城市 -->
         <el-form-item
           label="城市 :"
@@ -193,11 +253,7 @@
         </el-form-item>
 
         <!-- 广告图片 -->
-        <el-form-item
-          label="广告图片 :"
-          prop="imageUrl"
-          :label-width="formLabelWidth"
-        >
+        <el-form-item label="广告图片 :" :label-width="formLabelWidth">
           <el-upload
             class="avatar-uploader"
             :action="baseUrl"
@@ -230,7 +286,7 @@
       :visible.sync="dialogEditFormVisible"
       @close="dialogEditFormVisibleClose"
     >
-      <el-form :model="editForm" ref="ruleForm">
+      <el-form :model="editForm" ref="ruleEditForm" :rules="ruleForm">
         <!-- 城市 -->
         <el-form-item label="城市 :" :label-width="formLabelWidth">
           <el-input
@@ -328,6 +384,7 @@
 
         <!-- 跳转对象 -->
         <el-form-item
+          v-if="editForm.type"
           label="跳转对象 :"
           prop="adslotName"
           :label-width="formLabelWidth"
@@ -409,6 +466,15 @@ export default {
       },
       dialogFormVisible: false, //新增广告弹窗
       dialogEditFormVisible: false, //编辑广告弹窗
+      dialogOpenMoreVisible: false,
+      checkList: [
+        "广告排序",
+        "广告缩略图",
+        "广告名称",
+        "广告位",
+        "开始时间",
+        "结束时间",
+      ],
       // 新增广告表单
       form: {
         cityName: "", //城市名称
@@ -423,7 +489,7 @@ export default {
         relationId: "", //跳转对象
         text: "", //广告文字
         imageUrl: "", //广告图片
-        seq: "", //广告排序
+        seq: "1", //广告排序
       },
       editForm: {}, // 编辑广告表单
       adslotGroup: [], //广告位数据
@@ -459,49 +525,18 @@ export default {
   methods: {
     // 重置新增表单
     dialogFormVisibleClose() {
-      // 重置表单
-      this.$refs.ruleForm.resetFields();
-      this.form.cityName = "";
-      this.form.cityId = "";
-      this.form.adslotId = "";
+      this.$refs.ruleAddForm.resetFields();
       this.imageUrl = "";
-      this.form = {
-        cityName: "", //城市名称
-        cityId: "", //城市id
-        adslotId: "", //广告位id
-        adName: "", //广告名称
-        beginDate: "", //开始时间
-        endDate: "", //结束时间
-        type: "", //广告类型
-        // jumpType: "", //跳转类型
-        relationId: "", //跳转对象
-        text: "", //广告文字
-        imageUrl: "", //广告图片
-        seq: "", //广告排序
-      };
+      this.form.imageUrl = "";
+      this.form.seq = "1";
+      this.form.cityId = ''
     },
     // 重置编辑表单
     dialogEditFormVisibleClose() {
-      // 重置表单
-      this.$refs.ruleForm.resetFields();
-      this.editForm.cityName = "";
-      this.editForm.cityId = "";
-      this.editForm.adslotId = "";
+      this.$refs.ruleEditForm.resetFields();
       this.imageUrl = "";
-      this.editForm = {
-        cityName: "", //城市名称
-        cityId: "", //城市id
-        adslotId: "", //广告位id
-        adName: "", //广告名称
-        beginDate: "", //开始时间
-        endDate: "", //结束时间
-        type: "", //广告类型
-        // jumpType: "", //跳转类型
-        relationId: "", //跳转对象
-        text: "", //广告文字
-        imageUrl: "", //广告图片
-        seq: "", //广告排序
-      };
+      this.editForm.imageUrl = "";
+      this.editForm.seq = "1";
     },
     // 新增 选中值发生变化时触发
     valChange(data) {
@@ -511,17 +546,21 @@ export default {
           if (item.adslotId === data) {
             this.form.cityName = item.cityName;
             this.form.cityId = item.cityId;
+            this.form.type = ''
+            this.form.relationId = ''
           }
         });
       }
     },
-    // 编辑 选中值发生变化时触发
+    // 编辑 - 广告位选中值发生变化时触发
     editTypeValChange(data) {
       if (this.adslotGroup) {
         this.adslotGroup.forEach((item) => {
           if (item.adslotId === data) {
             this.editForm.cityName = item.cityName;
             this.editForm.cityId = item.cityId;
+            this.editForm.type = ''
+            this.editForm.relationId = ''
           }
         });
       }
@@ -554,7 +593,6 @@ export default {
     getDictByTypeFn() {
       getDictByType("ad_type").then((res) => {
         this.adType = res.data.data.data.dictItemList;
-        console.log("获取广告类型数据", this.adType);
       });
     },
 
@@ -583,9 +621,8 @@ export default {
 
     // 编辑按钮
     handleEdit(row) {
-      // console.log("row", row);
+      console.log(row)
       this.editForm = { ...row };
-      // console.log("aaaa", this.editForm);
       this.adslotGroup.forEach((item) => {
         if (item.cityId === row.cityId) {
           this.editForm.cityName = item.cityName;
@@ -595,16 +632,12 @@ export default {
       if (row.type === "activity") {
         this.getActivitiePageFn(row.cityId);
       }
-      // console.log("editForm", this.editForm);
-
       this.dialogEditFormVisible = true;
-
       this.imageUrl = this.editForm.imageUrl;
     },
 
     // 监听广告类型变化
     typeChange(val) {
-      console.log(val);
       if (!this.form.cityId) {
         this.$message.error("请先选择广告位");
         this.form.type = "";
@@ -629,16 +662,22 @@ export default {
 
     // 广告编辑 提交
     editSubmit() {
-      updateAd(this.editForm).then((res) => {
-        if (res.data.code !== 0) {
-          return this.$message.error("广告编辑失败！");
+      this.$refs.ruleEditForm.validate((valid) => {
+        if (valid) {
+          updateAd(this.editForm).then((res) => {
+            if (res.data.code !== 0) {
+              return this.$message.error("广告编辑失败！");
+            }
+            this.$message({
+              message: "广告编辑成功！",
+              type: "success",
+            });
+            this.dialogEditFormVisible = false;
+            this.getList();
+          });
+        } else {
+          return this.$message.error("请填写必填信息！");
         }
-        this.$message({
-          message: "广告编辑成功！",
-          type: "success",
-        });
-        this.dialogEditFormVisible = false;
-        this.getList();
       });
     },
 
@@ -679,7 +718,7 @@ export default {
 
     // 广告新增 提交
     submit() {
-      this.$refs.ruleForm.validate((valid) => {
+      this.$refs.ruleAddForm.validate((valid) => {
         console.log(valid, this.form);
         // 校验未通过
         if (!valid) {
@@ -692,7 +731,6 @@ export default {
 
     // 图片上传成功时的钩子
     handleAvatarSuccess(res) {
-      console.log("上传成功", res);
       this.imageUrl = res.data.data.url;
       this.form.imageUrl = res.data.data.url;
     },
@@ -718,6 +756,22 @@ export default {
   padding-bottom: 5px;
   font-size: 18px;
   font-weight: 400;
+}
+.add-inp-more {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  .inp-more {
+    display: flex;
+    .inp {
+      width: 272px;
+    }
+    .more {
+      padding: 0 12px;
+      margin-left: 8px;
+      height: 28px;
+    }
+  }
 }
 .paging {
   margin-top: 20px;

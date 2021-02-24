@@ -26,8 +26,6 @@ export function adDetails(data) {
 }
 
 // 通过字典类型(唯一)查找字典
-// /dict/getDictByType/{type}
-// 通过字典类型(唯一)查找字典
 export function getDictByType(data) {
   return request({
     url: "/admin/dict/getDictByType/" + data,

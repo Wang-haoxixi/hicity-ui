@@ -35,7 +35,7 @@
             <el-dialog
               title="多 选"
               :visible.sync="dialogOpenMoreVisible"
-              width="600"
+              width="600px"
             >
               <el-checkbox-group v-model="checkList">
                 <el-checkbox label="名称"></el-checkbox>
@@ -57,29 +57,33 @@
           style="width: 100%"
         >
           <el-table-column
+            align='center'
             v-if="checkList.includes('名称')"
             prop="officialNewsName"
             label="名称"
           >
           </el-table-column>
           <el-table-column
+            align='center'
             v-if="checkList.includes('栏目')"
             prop="officialColumnName"
             label="栏目"
           ></el-table-column>
           <el-table-column
+            align='center'
             v-if="checkList.includes('发布者')"
             prop="createByName"
             label="发布者"
           ></el-table-column>
           <el-table-column
+            align='center'
             v-if="checkList.includes('状态')"
             prop="state"
             label="状态"
             width="100"
           >
           </el-table-column>
-          <el-table-column v-if="checkList.includes('创建时间')" prop="createTime" label="创建时间"></el-table-column>
+          <el-table-column align='center' v-if="checkList.includes('创建时间')" prop="createTime" label="创建时间"></el-table-column>
           <!-- 平台可见 -->
           <el-table-column
             label="展示范围"
@@ -92,7 +96,7 @@
               >
             </template>
           </el-table-column>
-          <el-table-column label="操作">
+          <el-table-column align='center' label="操作" width="150">
             <template slot-scope="scope" v-if="userType <= scope.row.source">
               <!-- <el-button
                 @click="handleDetails(scope.row)"

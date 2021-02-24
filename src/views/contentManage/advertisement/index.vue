@@ -1,13 +1,45 @@
 <template>
   <basic-container>
     <hc-table-form title="广告位管理">
-      <el-button
-        @click="dialogFormVisible = true"
-        type="primary"
-        icon="el-icon-plus"
-        size="mini"
-        >新建</el-button
-      >
+      <div class="add-inp-more">
+        <el-button
+          @click="dialogFormVisible = true"
+          type="primary"
+          icon="el-icon-plus"
+          size="mini"
+          >新建</el-button
+        >
+
+        <div class="inp-more">
+          <!-- <el-input
+            clearable
+            size="mini"
+            class="inp"
+            v-model="input"
+            placeholder="请输入广告位名称"
+          >
+            <el-button slot="append" icon="el-icon-search"></el-button>
+          </el-input> -->
+          <el-button
+            icon="el-icon-more"
+            class="more"
+            @click="dialogOpenMoreVisible = true"
+          ></el-button>
+          <el-dialog
+            title="多 选"
+            :visible.sync="dialogOpenMoreVisible"
+            width="600px"
+          >
+            <el-checkbox-group v-model="checkList">
+              <el-checkbox label="广告位id"></el-checkbox>
+              <el-checkbox label="广告位名称"></el-checkbox>
+              <el-checkbox label="广告位描述"></el-checkbox>
+              <el-checkbox label="广告位编码"></el-checkbox>
+              <el-checkbox label="城市"></el-checkbox>
+            </el-checkbox-group>
+          </el-dialog>
+        </div>
+      </div>
 
       <el-table
         :data="tableData"
@@ -17,27 +49,40 @@
         style="width: 100%; margin-top: 10px"
         ref="multipleTable"
       >
-        <el-table-column type="selection" width="55"></el-table-column>
+        <!-- <el-table-column type="selection" width="55"></el-table-column> -->
         <el-table-column
+          v-if="checkList.includes('广告位id')"
+          align="center"
           prop="adslotId"
           label="广告位id"
           width="180"
         ></el-table-column>
         <el-table-column
+          v-if="checkList.includes('广告位名称')"
+          align="center"
           prop="adslotName"
           label="广告位名称"
           width="180"
         ></el-table-column>
         <el-table-column
+          v-if="checkList.includes('广告位描述')"
+          align="center"
           prop="adslotDescription"
           label="广告位描述"
         ></el-table-column>
         <el-table-column
+          v-if="checkList.includes('广告位编码')"
+          align="center"
           prop="adslotNumber"
           label="广告位编码"
         ></el-table-column>
-        <el-table-column prop="cityName" label="城市"></el-table-column>
-        <el-table-column label="操作">
+        <el-table-column
+          v-if="checkList.includes('城市')"
+          align="center"
+          prop="cityName"
+          label="城市"
+        ></el-table-column>
+        <el-table-column align="center" label="操作" width="150">
           <template slot-scope="scope" v-if="scope.row.authority">
             <el-button size="mini" type="text" @click="handleEdit(scope.row)"
               >编辑</el-button
@@ -205,6 +250,8 @@ export default {
       loading: false,
       dialogFormVisible: false, //广告位新增弹窗
       dialogEditFormVisible: false, //广告位编辑弹窗
+      dialogOpenMoreVisible: false, //菜单操作
+      checkList: ["广告位id", "广告位名称", "广告位描述", "广告位编码", "城市"],
       //新增表单数据
       form: {
         cityId: "",
@@ -272,7 +319,7 @@ export default {
     },
 
     handleEdit(row) {
-      console.log(row)
+      console.log(row);
       this.dialogEditFormVisible = true;
       this.editForm = { ...row };
       // this.cityGroup = {id:row.id}
@@ -372,5 +419,21 @@ export default {
 .paging {
   margin-top: 20px;
   text-align: right;
+}
+.add-inp-more {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  .inp-more {
+    display: flex;
+    .inp {
+      width: 272px;
+    }
+    .more {
+      padding: 0 12px;
+      margin-left: 8px;
+      height: 28px;
+    }
+  }
 }
 </style>
