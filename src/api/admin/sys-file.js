@@ -60,7 +60,13 @@ export function downloadUrl(url) {
     xhr.onreadystatechange = function () {
       if (this.readyState == 4) {
         if (this.status == 200) {
-          resolve(this.response)
+          if (this.response) {
+            resolve(this.response)
+          } else {
+            reject(new Error('图片获取失败！'))
+          }
+        } else {
+          reject(new Error('图片获取失败！'))
         }
       }
     }
