@@ -62,6 +62,14 @@
           </el-form-item>
         </el-form>
         <hc-preview v-if="preview" @close="preview = false">
+          <div class="preview-image">
+            <swiper :options="swiperOptions">
+              <swiper-slide v-for="(image, index) in formData.images" :key="index">
+                <img :src="image" />
+              </swiper-slide>
+              <div class="swiper-pagination" slot="pagination"></div>
+            </swiper>
+          </div>
           <div class="preview-user">
             <img class="preview-avatar" :src="userInfo.avatar"/>
             <div class="name-time">
@@ -92,9 +100,11 @@ import HcImageUpload from "@/views/components/HcImageUpload/index";
 import HcTopicSelect from "@/views/components/HcTopicSelect/index";
 import HcTableForm from "@/views/components/HcTableForm/index";
 import HcPreview from "@/views/components/HcPreview/index"
+import { Swiper, SwiperSlide } from 'vue-awesome-swiper'
+import 'swiper/swiper.scss'
 export default {
   name: "SysUser",
-  components: { HcCityBox, HcCitySelect, HcImageUpload, HcTopicSelect, HcTableForm, HcPreview },
+  components: { HcCityBox, HcCitySelect, HcImageUpload, HcTopicSelect, HcTableForm, HcPreview, Swiper, SwiperSlide },
   data() {
     return {
       page: {
@@ -157,7 +167,12 @@ export default {
         images: [{required: true, message: '请添加游记图片'}],
         content: [{required: true, message: '请输入内容'}],
       },
-      preview: false
+      preview: false,
+      swiperOptions: {
+        pagination: {
+          el: '.swiper-pagination'
+        },
+      }
     };
   },
   computed: {
@@ -331,6 +346,42 @@ export default {
     line-height: 60px;
     font-size: 20px;
   }
+}
+
+.preview-image {
+  margin: -16px -16px 0;
+  height: 225px;
+  width: 375px;
+  img {
+    height: 225px;
+    width: 375px;
+  }
+  /deep/ .swiper-container {
+    .swiper-pagination {
+    position: absolute;
+    bottom: 10px;
+    left: 0;
+    right: 0;
+    height: .23rem;
+    font-family: PingFangSC-Regular;
+    font-size: .156rem;
+    color: #fff;
+    letter-spacing: 0;
+    line-height: .12rem;
+  }
+  .swiper-pagination-bullet {
+    background: #fff;
+    opacity: 0.8;
+    height: 0.08rem;
+    border-radius: 0.06rem;
+    width: 0.08rem;
+    transition: all 0.2s; //可设置缓慢变化
+  }
+  .swiper-pagination-bullet-active {
+    width: 30px;
+  }
+  }
+  
 }
 .preview-user {
   margin: 0 -16px;
