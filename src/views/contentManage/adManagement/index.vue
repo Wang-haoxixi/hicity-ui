@@ -765,7 +765,7 @@ export default {
           return this.$message.error("请填写必填信息！");
         }
         // 调用接口
-        // this.addAdFn();
+        this.addAdFn();
       });
     },
 
