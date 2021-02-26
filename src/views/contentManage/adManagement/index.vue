@@ -181,6 +181,7 @@
             v-model="form.beginDate"
             type="datetime"
             placeholder="选择日期时间"
+            :picker-options="pickerOptionsBeginDate"
           >
           </el-date-picker>
         </el-form-item>
@@ -196,6 +197,7 @@
             v-model="form.endDate"
             type="datetime"
             placeholder="选择日期时间"
+            :picker-options="pickerOptionsEndDate"
           >
           </el-date-picker>
         </el-form-item>
@@ -459,7 +461,7 @@ import {
 } from "@/api/content/ad";
 import { adPosition } from "@/api/content/ad-position";
 import store from "@/store";
-import HcEmptyData from "@/views/components/HcEmptyData/index"
+import HcEmptyData from "@/views/components/HcEmptyData/index";
 export default {
   components: { HcEmptyData },
   data() {
@@ -481,6 +483,32 @@ export default {
         "开始时间",
         "结束时间",
       ],
+
+      // 选择今天以及今天之后的日期
+      pickerOptionsBeginDate: {
+        disabledDate: (time) => {
+          // console.log(new Date())
+          // 选择过结束时间
+          if (this.form.endDate) {
+            return time.getTime() > new Date(this.form.endDate).getTime();
+          } else {
+            //还没有选择结束时间的时候，让他只能选择今天之后的时间包括今天
+            return time.getTime() < Date.now() - 8.64e7;
+          }
+        },
+      },
+      // 选择今天以及今天以前的日期
+      pickerOptionsEndDate: {
+        disabledDate: (time) => {
+          if (this.form.beginDate) {
+            return (
+              time.getTime() <
+              new Date(this.form.beginDate).getTime() - 1 * 24 * 60 * 60 * 1000
+            ); //可以选择同一天
+          }
+        },
+      },
+
       // 新增广告表单
       form: {
         cityName: "", //城市名称
@@ -526,7 +554,7 @@ export default {
       currentPage: 1,
       pageSize: 10,
       total: 30,
-      tableLoading: false
+      tableLoading: false,
     };
   },
   methods: {
@@ -536,7 +564,7 @@ export default {
       this.imageUrl = "";
       this.form.imageUrl = "";
       this.form.seq = "1";
-      this.form.cityId = ''
+      this.form.cityId = "";
     },
     // 重置编辑表单
     dialogEditFormVisibleClose() {
@@ -553,8 +581,8 @@ export default {
           if (item.adslotId === data) {
             this.form.cityName = item.cityName;
             this.form.cityId = item.cityId;
-            this.form.type = ''
-            this.form.relationId = ''
+            this.form.type = "";
+            this.form.relationId = "";
           }
         });
       }
@@ -566,8 +594,8 @@ export default {
           if (item.adslotId === data) {
             this.editForm.cityName = item.cityName;
             this.editForm.cityId = item.cityId;
-            this.editForm.type = ''
-            this.editForm.relationId = ''
+            this.editForm.type = "";
+            this.editForm.relationId = "";
           }
         });
       }
@@ -585,18 +613,20 @@ export default {
 
     // 获取广告分页
     getList() {
-      this.tableLoading = true
+      this.tableLoading = true;
       ads({
         current: this.currentPage, //当前页
         size: this.pageSize, //条数
-      }).then((res) => {
-        console.log("广告分页", res);
-        let arr = res.data.data.data.records;
-        this.tableData = arr;
-        this.total = res.data.data.data.total;
-      }).finally(() => {
-        this.tableLoading = false
-      });
+      })
+        .then((res) => {
+          console.log("广告分页", res);
+          let arr = res.data.data.data.records;
+          this.tableData = arr;
+          this.total = res.data.data.data.total;
+        })
+        .finally(() => {
+          this.tableLoading = false;
+        });
     },
 
     // 获取广告类型数据
@@ -631,7 +661,7 @@ export default {
 
     // 编辑按钮
     handleEdit(row) {
-      console.log(row)
+      console.log(row);
       this.editForm = { ...row };
       this.adslotGroup.forEach((item) => {
         if (item.cityId === row.cityId) {
@@ -735,7 +765,7 @@ export default {
           return this.$message.error("请填写必填信息！");
         }
         // 调用接口
-        this.addAdFn();
+        // this.addAdFn();
       });
     },
 

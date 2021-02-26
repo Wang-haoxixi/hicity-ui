@@ -5,7 +5,6 @@
         <div>基本信息</div>
         <el-button @click="backClick">返回</el-button>
       </div>
-
       <el-form
         class="elForm"
         ref="baseFormDataRef"
@@ -28,7 +27,6 @@
             :city-id="userInfo.manageCityId"
           ></hc-city-select>
         </el-form-item>
-
         <!-- 活动标题 -->
         <el-form-item prop="name" label="活动标题：">
           <el-input
@@ -36,7 +34,6 @@
             placeholder="不小于5个字，不超过40个字"
           ></el-input>
         </el-form-item>
-
         <!-- 举办时间 -->
         <el-form-item label="举办时间：" required>
           <el-col :span="6">
@@ -67,7 +64,6 @@
             </el-form-item>
           </el-col>
         </el-form-item>
-
         <!-- 活动类型 -->
         <el-form-item prop="type" label="活动类型：">
           <el-select v-model="baseFormData.type" placeholder="请选择">
@@ -79,7 +75,6 @@
             ></el-option>
           </el-select>
         </el-form-item>
-
         <!-- 活动海报 -->
         <el-form-item prop="poster" label="活动海报：">
           <div class="posterInpBox">
@@ -132,7 +127,6 @@
             />
           </div>
         </el-form-item>
-
         <!-- 活动地址 -->
         <el-form-item prop="cityId" label="活动地址：">
           <div class="addressbox">
@@ -143,18 +137,15 @@
               :options="holdAddressArr"
               :props="defaultCityTreeParams"
             ></el-cascader>
-
             <!-- 活动地址 -->
             <el-input
               style="width: 600px; margin: 0 10px"
               v-model="baseFormData.field"
               placeholder="请输入活动地址"
             ></el-input>
-
             <el-checkbox v-model="onLine">线上举办</el-checkbox>
           </div>
         </el-form-item>
-
         <!-- 活动分类 -->
         <el-form-item prop="classification" label="活动分类：">
           <el-cascader
@@ -164,7 +155,6 @@
             :props="defaultActivityClassifyParams"
           ></el-cascader>
         </el-form-item>
-
         <!-- 活动标签 -->
         <el-form-item prop="label" label="活动标签：">
           <!-- 暂无标签 -->
@@ -204,7 +194,6 @@
             @select="handleTagValFn"
           ></el-autocomplete>
         </el-form-item>
-
         <!-- 活动亮点 -->
         <el-form-item prop="spot" label="活动亮点：">
           <el-input
@@ -214,7 +203,6 @@
             v-model="baseFormData.spot"
           ></el-input>
         </el-form-item>
-
         <!-- 活动详情 -->
         <el-form-item prop="details" label="活动详情：">
           <hc-quill
@@ -222,7 +210,6 @@
             v-if="!$route.query.id || contentShow"
           ></hc-quill>
         </el-form-item>
-
         <!-- 活动附件 -->
         <el-form-item prop="fileList" label="活动附件：">
           <el-upload
@@ -238,13 +225,10 @@
           </el-upload>
         </el-form-item>
       </el-form>
-
       <!-- 设置票种 -->
-      <!-- :model="setTicketData" -->
-      <el-form v-if="!$route.query.id" label-width="120px">
+      <el-form v-if="!$route.query.id || statusFlag == '0'" label-width="120px">
         <el-form-item label="设置票种：">
           <el-button @click="addTic" type="danger" plain>新增</el-button>
-          <!-- 卡片 -->
           <el-card
             v-for="(item, i) in baseFormData.ticketingManagements"
             :key="i"
@@ -252,11 +236,19 @@
             :body-style="cardStyle"
           >
             <!-- 设置票种表单 -->
-            <el-form ref="setTicketDataRef" :model="item" :rules="setTicketDataRules">
+            <el-form
+              ref="setTicketDataRef"
+              :model="item"
+              :rules="setTicketDataRules"
+            >
               <el-row>
                 <el-col :span="8">
                   <!-- 票务种类 -->
-                  <el-form-item label="票务种类：" label-width="100" prop="ticketingType">
+                  <el-form-item
+                    label="票务种类："
+                    label-width="100"
+                    prop="ticketingType"
+                  >
                     <el-select
                       v-model="item.ticketingType"
                       placeholder="请选择票务种类"
@@ -267,8 +259,11 @@
                   </el-form-item>
                 </el-col>
                 <el-col :span="10">
-                  <!-- 票务名称 -->
-                  <el-form-item label="票务名称：" label-width="100" prop="ticketingName">
+                  <el-form-item
+                    label="票务名称："
+                    label-width="100"
+                    prop="ticketingName"
+                  >
                     <el-input
                       style="width: 300px"
                       v-model="item.ticketingName"
@@ -280,27 +275,30 @@
 
               <el-row style="margin: 15px 0">
                 <el-col :span="8">
-                  <!-- 票种数量 -->
-                  <el-form-item label="票种数量：" label-width="100" prop="number">
+                  <el-form-item
+                    label="票种数量："
+                    label-width="100"
+                    prop="number"
+                  >
                     <el-input-number
                       v-model="item.number"
-                      controls-position="right"
                       :min="1"
                     ></el-input-number>
                   </el-form-item>
                 </el-col>
                 <el-col :span="8">
-                  <!-- 单次购票数量 -->
-                  <el-form-item label="单次购票数量：" label-width="100" prop="limitTicket">
+                  <el-form-item
+                    label="单次购票数量："
+                    label-width="100"
+                    prop="limitTicket"
+                  >
                     <el-input-number
                       v-model="item.limitTicket"
-                      controls-position="right"
                       :min="1"
                     ></el-input-number>
                   </el-form-item>
                 </el-col>
                 <el-col :span="7">
-                  <!-- 票种审核 -->
                   <el-form-item
                     v-if="item.ticketingType === '1'"
                     label="票种审核："
@@ -313,7 +311,6 @@
                     >
                     </el-switch>
                   </el-form-item>
-                  <!-- 允许退票 -->
                   <el-form-item
                     v-if="item.ticketingType === '2'"
                     label="允许退票："
@@ -328,14 +325,15 @@
                   </el-form-item>
                 </el-col>
               </el-row>
-              <!-- 票务金额  付费票时显示 -->
+              <!-- 票务金额 付费票时显示 ticketingType:1不显示2显示  -->
               <el-form-item
-                style="margin-bottom:15px"
+                style="margin-bottom: 15px"
                 required
                 label="票务金额："
                 v-if="item.ticketingType === '2'"
               >
                 <el-checkbox-group v-model="item.priceType" class="checkGroup">
+                  <!-- priceType是否包含已选类目且长度为1 -->
                   <el-checkbox
                     label="能贝"
                     name="nb"
@@ -383,8 +381,11 @@
               </el-form-item>
               <el-row>
                 <el-col>
-                  <!-- 票种备注 -->
-                  <el-form-item label="票种备注：" label-width="200" prop="remarks">
+                  <el-form-item
+                    label="票种备注："
+                    label-width="200"
+                    prop="remarks"
+                  >
                     <el-input
                       style="width: 650px"
                       placeholder="请输入备注内容"
@@ -399,22 +400,18 @@
           </el-card>
         </el-form-item>
       </el-form>
-
       <div class="footer-btn">
-        <!-- 底部按钮   this.$route.query.id是否有参数传递过来,没有参数说明走新建,否则走编辑   -->
+        <!-- this.$route.query.id是否有参数传递过来,没有参数说明走新建,否则走编辑   -->
         <el-button v-if="!this.$route.query.id" @click="publish" type="danger"
           >发布活动</el-button
         >
-        <el-button v-else @click="editSave" type="danger">编辑保存</el-button>
-
+        <el-button v-else @click="editSave" type="danger">发布活动</el-button>
         <el-button v-if="!this.$route.query.id" @click="saveManuscript"
           >保存草稿</el-button
         >
         <el-button v-else @click="saveManuscriptUpdate">保存草稿</el-button>
-
         <el-button @click="backClick">取消</el-button>
       </div>
-
       <!-- 海报弹窗 -->
       <el-dialog
         title="海报图库"
@@ -451,7 +448,8 @@ import {
   activityInfo,
   editSaveActivity,
 } from "@/api/activity/publish";
-import { validateURL } from '../../../util/validate';
+import { validateURL } from "../../../util/validate";
+import { Loading } from 'element-ui';
 export default {
   components: { HcQuill, HcCitySelect },
   data() {
@@ -463,34 +461,62 @@ export default {
       },
       // 控制富文本显示隐藏
       contentShow: false,
-      // 请求头
       headersOpt: {
         Authorization: "Bearer " + store.getters.access_token,
       },
       // 上传图片路径
       uploadPicUrl: "/api/admin/sys_file/oss/upload",
-
+      // 活动状态
+      statusFlag:'',
       baseFormDataRules: {
-        cityIdList:[{ required: true, message: "请输入城市", trigger: "blur" }],
-        name:[{ required: true, message: "请输入活动标题", trigger: "blur" }],
-        startTime:[{ required: true, message: '请选择开始日期', trigger: 'change' }],
-        endTime:[{ required: true, message: '请选择结束日期', trigger: 'change' }],
-        type:[{ required: true, message: "请选择活动类型", trigger: "blur" }],
-        poster:[{ required: true, message: "请选择活动海报", trigger: "change" }],
-        cityId:[{ required: true, message: "请选择活动地址", trigger: "change" }],
-        classification:[{ required: true, message: "请选择活动分类", trigger: "change" }],
-        label:[{ required: true, message: "请选择活动分类",trigger: "change" }],
-        spot:[{ required: true, message: "请输入活动亮点", trigger: "blur" }],
-        details:[{ required: true, message: "请输入活动详情", trigger: "blur" }],
-        fileList:[{ required: true, message: "请选择活动附件",trigger: "change" }]
+        cityIdList: [
+          { required: true, message: "请输入城市", trigger: "blur" },
+        ],
+        name: [{ required: true, message: "请输入活动标题", trigger: "blur" }],
+        startTime: [
+          { required: true, message: "请选择开始日期", trigger: "change" },
+        ],
+        endTime: [
+          { required: true, message: "请选择结束日期", trigger: "change" },
+        ],
+        type: [{ required: true, message: "请选择活动类型", trigger: "change" }],
+        poster: [
+          { validator:this.validatorPoster,required: true, trigger: "change" },
+        ],
+        cityId: [
+          { required: true, message: "请选择活动地址", trigger: "change" },
+        ],
+        classification: [
+          { required: true, message: "请选择活动分类", trigger: "change" },
+        ],
+        label: [
+          { validator:this.validatorLabel,required: true, message: "请选择活动标签", trigger: "change" },
+        ],
+        spot: [{ required: true, message: "请输入活动亮点", trigger: "blur" }],
+        details: [
+          { required: true, message: "请输入活动详情", trigger: "blur" },
+        ],
+        fileList: [
+          { validator:this.validatorFileList,required: true, trigger: "change" },
+        ],
       },
 
-      setTicketDataRules:{
-        ticketingType:[{ required: true, message: '请选择票务种类', trigger: 'change' }],
-        ticketingName:[{ required: true, message: "请输入票务名称", trigger: "blur" }],
-        number:[{ required: true, message: "请输入票种数量", trigger: "blur" }],
-        limitTicket:[{ required: true, message: "请输入购票数量", trigger: "blur" }],
-        remarks:[{ required: true, message: "请输入票种备注", trigger: "blur" }]
+      setTicketDataRules: {
+        ticketingType: [
+          { required: true, message: "请选择票务种类", trigger: "change" },
+        ],
+        ticketingName: [
+          { required: true, message: "请输入票务名称", trigger: "blur" },
+        ],
+        number: [
+          { required: true, message: "请输入票种数量", trigger: "blur" },
+        ],
+        limitTicket: [
+          { required: true, message: "请输入购票数量", trigger: "blur" },
+        ],
+        remarks: [
+          { required: true, message: "请输入票种备注", trigger: "blur" },
+        ],
       },
 
       // 基本信息数据
@@ -499,14 +525,12 @@ export default {
         name: "",
         startTime: "",
         endTime: "",
-        type: [],
+        type: '',
         poster: "", //海报
         cityId: [], //举办地
         field: "", //活动地址
-
         classification: "", //活动父类
         subClassification: "", //活动子类
-
         label: [], //标签
         spot: "", //亮点
         details: "", //活动详情
@@ -553,7 +577,7 @@ export default {
         content: "",
         structuredContent: "",
       },
-      // 活动附件
+      // 预览活动附件
       fileList: [],
       // 活动分类数组
       activityClassifyArr: [],
@@ -581,6 +605,7 @@ export default {
       allTagArr: [],
       // 控制删除
       showDelete: false,
+      validRst: [],
     };
   },
   computed: {
@@ -605,6 +630,29 @@ export default {
         })
         .catch(() => {});
     },
+
+    validatorPoster(rule, value, callback){
+      if(value){
+        callback()
+      }else{
+        callback(new Error('请选择活动海报'));
+      }
+    },
+    validatorLabel(rule, value, callback){
+      if(value.length != 0){
+        callback()
+      }else{
+        callback(new Error('请选择活动标签'));
+      }
+    },
+    validatorFileList(rule, value, callback){
+      if(value.length != 0){
+        callback()
+      }else{
+        callback(new Error('请上传活动附件'));
+      }
+    },
+
     // 活动分类改变触发
     changeClassification(e) {
       this.baseFormData.classification = this.classification[0];
@@ -635,11 +683,13 @@ export default {
       if (!id) {
         this.baseFormData.cityIdList = [this.userInfo.manageCityId];
       } else {
+        Loading.service();
         activityInfo(id).then((res) => {
           if (res.data.code !== 0) {
-            this.$message.error("获取活动详情失败！");
+            return this.$message.error("获取活动详情失败！");
           }
           let data = res.data.data.data;
+          this.statusFlag = data.statusFlag
           this.baseFormData.cityIdList = data.cityIdList;
           this.baseFormData.name = data.name;
           this.baseFormData.startTime = data.startTime;
@@ -649,16 +699,13 @@ export default {
           this.baseFormData.cityId = data.cityId;
           this.baseFormData.field = data.field;
           this.baseFormData.source = data.source;
-
           this.classification = [data.classification, data.subClassification];
           this.baseFormData.classification = this.classification[0];
           this.baseFormData.subClassification = this.classification[1];
-
           this.baseFormData.label = data.label;
           this.baseFormData.spot = data.spot;
           this.quillContent.content = data.details;
           this.contentShow = true;
-
           data.fileList.forEach((item) => {
             this.fileList.push({
               name: item.original,
@@ -669,7 +716,45 @@ export default {
               attachFile: item.attachFile,
             });
           });
-        });
+
+          if(this.statusFlag == '0'){
+            console.log('需要设置票种...')
+            data.ticketingManagements.forEach(obj=>{
+              obj.priceType = ["能贝", "人民币"]
+
+              if(obj.ticketingType == '2'){
+                obj.payMethodList.forEach(payItem=>{
+                  if(payItem.type == 'WeCanPay'){
+                    obj.payWeCanPay = {
+                      type: "WeCanPay", 
+                      amount: payItem.amount, 
+                    }
+                  }else if(payItem.type == 'OfflinePay'){
+                    obj.payOfflinePay = {
+                      type: "OfflinePay", 
+                      amount: payItem.amount, 
+                    }
+                  }
+                })
+                obj.payMethodList = []
+              }else{
+                obj.payWeCanPay = {
+                  type: "WeCanPay", 
+                  amount: 0.01, 
+                }
+                obj.payOfflinePay = {
+                  type: "OfflinePay", 
+                  amount: 0.01, 
+                }
+              }
+            })
+            this.baseFormData.ticketingManagements = data.ticketingManagements
+          }
+        }).finally(()=>{
+          this.$nextTick(() => { 
+            Loading.service(this.options).close();
+          });
+        })
       }
     },
     // 获取活动类型
@@ -716,6 +801,7 @@ export default {
     selectPoster(item) {
       this.baseFormData.poster = item.posterUrl;
       this.dialogPostersVisible = false;
+      this.$refs.baseFormDataRef.validateField('poster')
     },
     // 海报上传成功回调
     handlePosterSuccess(res) {
@@ -723,10 +809,12 @@ export default {
         this.$message.error("上传海报失败!");
       }
       this.baseFormData.poster = res.data.data.url;
+      this.$refs.baseFormDataRef.validateField('poster')
     },
     // 移除海报
     deletePoster() {
       this.baseFormData.poster = "";
+      this.$refs.baseFormDataRef.validateField('poster')
     },
 
     // 新增票种
@@ -783,19 +871,20 @@ export default {
       this.baseFormData.label.push(this.actInpVal);
       this.actInpVal = "";
       this.haveInputVal = false;
+      this.$refs.baseFormDataRef.validateField('label')
     },
     // 删除活动标签
-    handleClose(tag) {},
+    handleClose(tag) {
+      this.baseFormData.label.splice(this.baseFormData.label.indexOf(tag),1)
+      this.$refs.baseFormDataRef.validateField('label')
+    },
     // 活动附件上传成功的钩子
     handleAccessorySuccess(res, file) {
-      this.fileList.push({
-        name: file.name,
-        url: file.response.data.data.url,
-      });
       this.baseFormData.fileList.push({
         original: file.name,
         attachFile: file.response.data.data.url,
       });
+      this.$refs.baseFormDataRef.validateField('fileList')
     },
     // 活动附件移除
     handleAccessoryRemove(file, fileList) {
@@ -804,16 +893,17 @@ export default {
           this.fileList.splice(i, 1);
         }
       });
-
       this.baseFormData.fileList.forEach((item, i) => {
         if (file.name === item.original) {
           this.baseFormData.fileList.splice(i, 1);
         }
       });
+      this.$refs.baseFormDataRef.validateField('fileList')
     },
     onChange(res) {},
-    // 编辑 - 编辑保存
+    // 编辑 - 发布活动1
     editSave() {
+      let that = this
       this.baseFormData.details = this.quillContent.content;
 
       // 遍历票种数组
@@ -830,20 +920,52 @@ export default {
       this.baseFormData.submitType = 1;
       this.baseFormData.id = this.$route.query.id;
 
-      console.log(this.baseFormData);
-
-      editSaveActivity(this.baseFormData).then((res) => {
-        if (res.data.code !== 0) {
-          return this.$message.error("编辑活动失败");
+      this.$refs.baseFormDataRef.validate((valid1) => {
+        // 状态不为草稿
+        if(this.statusFlag != '0'){
+          if (valid1) {
+            editSaveActivity(this.baseFormData).then((res) => {
+              if (res.data.code !== 0) {
+                return this.$message.error("编辑活动失败");
+              }
+              this.$message.success("编辑活动成功");
+              this.fileList = [];
+              this.baseFormData.fileList = [];
+              this.$router.go(-1);
+            });
+          }else{
+            this.$message.error("活动信息填写不完整");
+            this.validRst = [];
+          }
+          return
         }
-        this.$message.success("编辑活动成功");
-        this.fileList = [];
-        this.baseFormData.fileList = [];
-        this.$router.go(-1);
+        this.$refs.setTicketDataRef.forEach((item) => {
+          item.validate((valid2) => {
+            that.validRst.push(valid2);
+            return false;
+          });
+        });
+        console.log("validRst", this.validRst);
+        if (!this.validRst.includes(false) && valid1) {
+          editSaveActivity(this.baseFormData).then((res) => {
+            if (res.data.code !== 0) {
+              return this.$message.error("编辑活动失败");
+            }
+            this.$message.success("编辑活动成功");
+            this.fileList = [];
+            this.baseFormData.fileList = [];
+            this.$router.go(-1);
+          });
+        }else{
+          this.$message.error("活动信息填写不完整");
+          this.validRst = [];
+        }
       });
     },
     // 新增 - 发布活动
     publish() {
+      console.log(this.baseFormData)
+      let that = this;
       this.baseFormData.details = this.quillContent.content;
 
       // 遍历票种数组
@@ -859,32 +981,36 @@ export default {
       });
       this.baseFormData.submitType = 1;
 
-      // this.$refs.baseFormDataRef.validate(valid1=>{
-      //   console.log(111,valid1)
-      // })
-      // this.$refs.setTicketDataRef.forEach(item=>{
-      //   item.validate(valid2=>{
-      //     // console.log(222,valid)
-      //     if(!valid2){
-      //       console.log('验证不成功')
-      //       return false
-      //     }
-      //     console.log('验证成功')
-      //   })
-      // })
-
-      savePublish(this.baseFormData).then((res) => {
-        if (res.data.code !== 0) {
-          return this.$message.error("发布活动失败");
+      this.$refs.baseFormDataRef.validate((valid1) => {
+        this.$refs.setTicketDataRef.forEach((item) => {
+          item.validate((valid2) => {
+            that.validRst.push(valid2);
+            return false;
+          });
+        });
+        console.log("validRst", this.validRst);
+        if (!this.validRst.includes(false) && valid1) {
+          // console.log("验证通过...");
+          savePublish(this.baseFormData).then((res) => {
+            if (res.data.code !== 0) {
+              this.validRst = [];
+              return this.$message.error("发布活动失败");
+            }
+            this.$message.success("发布活动成功");
+            this.fileList = [];
+            this.baseFormData.fileList = [];
+            this.$router.go(-1);
+            this.validRst = [];
+          });
+        }else{
+          this.$message.error("活动信息填写不完整");
+          this.validRst = [];
         }
-        this.$message.success("发布活动成功");
-        this.fileList = [];
-        this.baseFormData.fileList = [];
-        this.$router.go(-1);
       });
     },
     // 新增 - 保存草稿
     saveManuscript() {
+      let that = this;
       this.baseFormData.details = this.quillContent.content;
 
       // 遍历票种数组
@@ -899,22 +1025,35 @@ export default {
         }
       });
       this.baseFormData.submitType = 0;
-
-      savePublish(this.baseFormData).then((res) => {
-        if (res.data.code !== 0) {
-          return this.$message.error("保存草稿失败");
+      this.$refs.baseFormDataRef.validate((valid1) => {
+        this.$refs.setTicketDataRef.forEach((item) => {
+          item.validate((valid2) => {
+            that.validRst.push(valid2);
+            return false;
+          });
+        });
+        console.log("validRst", this.validRst);
+        if (!this.validRst.includes(false) && valid1) {
+          savePublish(this.baseFormData).then((res) => {
+            if (res.data.code !== 0) {
+              return this.$message.error("保存草稿失败");
+            }
+            this.$message.success("保存草稿成功");
+            this.fileList = [];
+            this.baseFormData.fileList = [];
+            this.$router.go(-1);
+          });
+        }else{
+          this.$message.error("活动信息填写不完整");
+          this.validRst = [];
         }
-        this.$message.success("保存草稿成功");
-        this.fileList = [];
-        this.baseFormData.fileList = [];
-        this.$router.go(-1);
       });
     },
 
-    // 编辑 - 保存草稿
+    // 编辑 - 保存草稿0
     saveManuscriptUpdate() {
+      let that = this;
       this.baseFormData.details = this.quillContent.content;
-
       // 遍历票种数组
       this.baseFormData.ticketingManagements.forEach((item) => {
         // 保存时将支付方式列表清空并重新
@@ -928,15 +1067,46 @@ export default {
       });
       this.baseFormData.submitType = 0;
       this.baseFormData.id = this.$route.query.id;
-
-      editSaveActivity(this.baseFormData).then((res) => {
-        if (res.data.code !== 0) {
-          return this.$message.error("保存草稿失败");
+      this.$refs.baseFormDataRef.validate((valid1) => {
+        // 状态不为草稿
+        if(this.statusFlag != '0'){
+          if (valid1) {
+            editSaveActivity(this.baseFormData).then((res) => {
+              if (res.data.code !== 0) {
+                return this.$message.error("保存草稿失败");
+              }
+              this.$message.success("保存草稿成功");
+              this.fileList = [];
+              this.baseFormData.fileList = [];
+              this.$router.go(-1);
+            });
+          }else{
+            this.$message.error("活动信息填写不完整");
+            this.validRst = [];
+          }
+          return
         }
-        this.$message.success("保存草稿成功");
-        this.fileList = [];
-        this.baseFormData.fileList = [];
-        this.$router.go(-1);
+        this.$refs.setTicketDataRef.forEach((item) => {
+          item.validate((valid2) => {
+            that.validRst.push(valid2);
+            return false;
+          });
+        });
+        console.log("validRst", this.validRst);
+        if (!this.validRst.includes(false) && valid1) {
+          editSaveActivity(this.baseFormData).then((res) => {
+            if (res.data.code !== 0) {
+              return this.$message.error("保存草稿失败");
+            }
+            this.$message.success("保存草稿成功");
+            this.fileList = [];
+            this.baseFormData.fileList = [];
+            this.$router.go(-1);
+          });
+        }else{
+          this.$message.error("活动信息填写不完整");
+          this.validRst = [];
+        }
       });
     },
     // 移入
@@ -954,8 +1124,6 @@ export default {
     this.getActivityType();
     this.getTagsPage();
     this.getActivityInfo(this.$route.query.id);
-    // console.log(this.fileList)
-    // console.log(this.baseFormData.fileList)
   },
 };
 </script>
@@ -1053,5 +1221,9 @@ export default {
 }
 ::v-deep .popperName {
   background: rgb(48, 48, 49);
+}
+::v-deep .el-input-number__increase {
+  right: 0px !important;
+  border-left: 1px solid #dcdfe6 !important;
 }
 </style>

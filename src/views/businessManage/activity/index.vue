@@ -54,6 +54,7 @@
       :header-cell-style="{ background: '#FAFAFA' }"
       :data="tableData"
       :default-expand-all="true"
+      v-loading="tableLoading"
     >
       <!-- 展开列 -->
       <el-table-column type="expand">
@@ -181,6 +182,7 @@ export default {
       initCityList: [],
 
       name: "", //活动名称
+      tableLoading: false
     };
   },
   computed: {
@@ -190,6 +192,7 @@ export default {
   methods: {
     // 获取活动列表数据
     getActivitiesListFn() {
+      this.tableLoading = true
       activitiesList({
         name: this.name,
         current: this.currentPage,
@@ -204,6 +207,8 @@ export default {
         this.currentPage = res.data.data.data.current;
         this.pageSize = res.data.data.data.size;
         console.log(this.tableData);
+      }).finally(() => {
+        this.tableLoading = false
       });
     },
     // 根据活动名搜索查询
