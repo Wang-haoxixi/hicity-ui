@@ -1,5 +1,5 @@
 <template>
-  <hc-city-box ref="box" @save="save"></hc-city-box>
+  <hc-city-box ref="box" :single="single" @save="save"></hc-city-box>
 </template>
 
 <script>
@@ -53,6 +53,12 @@ function getCityTree (city, idList) {
 
 export default {
   components: { HcCityBox },
+  props: {
+    single: {
+      type: Boolean,
+      default: false
+    }
+  },
   data () {
     return {
 
@@ -70,7 +76,6 @@ export default {
     save (city) {
       this.$refs.box.close()
       this.$emit('save', city)
-      
     }
   }
 }

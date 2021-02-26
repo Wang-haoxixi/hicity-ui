@@ -1,13 +1,12 @@
 <template>
   <div>
     <el-input @focus="toSelect" :value="cityName" readonly></el-input>
-    <hc-city-box ref="hcCityBox" @save="save"></hc-city-box>
+    <hc-city-box ref="hcCityBox" :single="single" @save="save"></hc-city-box>
   </div>
 </template>
 
 <script>
 import HcCityBox from '@/views/components/HcCity/HcCityBox/index'
-import { adminCityList } from '@/api/admin/city'
 import { mapGetters } from 'vuex'
 
 function getCityList (tree) {
@@ -22,6 +21,18 @@ function getCityList (tree) {
     }
   }
   return cityList
+}
+
+function getLastCity (citySelected) {
+  if (citySelected) {
+    if (citySelected.children && citySelected.children.length > 0) {
+      return getLastCity(citySelected.children[0])
+    } else {
+      return citySelected.regionName
+    }
+  } else {
+    return ''
+  }
 }
 
 function getCityShow (citySelected) {
@@ -92,28 +103,36 @@ export default {
   components: { HcCityBox },
   props: {
     value: {
-      type: Array,
+      type: [Array, String, Number],
       required: true
     },
     cityId: {
       type: Number,
       default: 1
+    },
+    single: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
     return {
-      citySelected: [],
+      citySelected: !this.single ? [] : '',
       cityChooseDialogVisible: false,
     }
   },
   computed: {
     ...mapGetters(['userInfo', 'allCityTree']),
     cityName () {
-      let cityName = ''
-      for (let i = 0; i < this.citySelected.length; i++) {
-        cityName += cityName ? ` / ${this.citySelected[i]}` : this.citySelected[i]
+      if (this.single) {
+        return this.citySelected
+      } else {
+        let cityName = ''
+        for (let i = 0; i < this.citySelected.length; i++) {
+          cityName += cityName ? ` / ${this.citySelected[i]}` : this.citySelected[i]
+        }
+        return cityName
       }
-      return cityName
     }
   },
   created () {
@@ -127,15 +146,16 @@ export default {
   methods: {
     initSelect () {
       let usedCity = getUsedCity(this.allCityTree, this.cityId)
-      let cityTree = getCityTree(usedCity, this.value)
-      this.citySelected = getCityShow(cityTree)
+      let cityTree = getCityTree(usedCity, this.single ? (this.value ? [this.value] : []) : this.value)
+      this.citySelected = !this.single ? getCityShow(cityTree) : getLastCity(cityTree)
     },
     toSelect () {
-      this.$refs.hcCityBox.open(this.cityId, this.value || [])
+      this.$refs.hcCityBox.open(this.cityId, this.single ? (this.value ? [this.value] : []) : (this.value || []))
     },
     save (city) {
-      this.citySelected = getCityShow(city)
-      this.$emit('input', getCityList(city))
+      this.citySelected = !this.single ? getCityShow(city) : getLastCity(city)
+      let cityList = getCityList(city)
+      this.$emit('input', !this.single ? cityList : (cityList && (cityList.length > 0 ? cityList[0] : '')))
     },
   }
 }
