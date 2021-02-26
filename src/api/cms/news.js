@@ -1,6 +1,6 @@
 import request from "@/router/axios"
 
-// 获取咨询列表
+// 获取资讯列表
 export function getNewsList(params) {
   return new request({
     url: '/cms/news/news_page',
@@ -8,7 +8,7 @@ export function getNewsList(params) {
   })
 }
 
-// 添加咨询
+// 添加资讯
 export function addNews(data) {
   return new request({
     url: '/cms/news/create',
@@ -17,7 +17,7 @@ export function addNews(data) {
   })
 }
 
-// 获取咨询详情
+// 获取资讯详情
 export function getNewsDetail(params) {
   return new request({
     url: '/cms/open/news_details',
@@ -25,7 +25,7 @@ export function getNewsDetail(params) {
   })
 }
 
-// 更新咨询
+// 更新资讯
 export function updateNews(data) {
   return new request({
     url: '/cms/news/update',
@@ -34,7 +34,7 @@ export function updateNews(data) {
   })
 }
 
-// 咨询开通城市列表
+// 资讯开通城市列表
 export function newsOpenList(params) {
   return new request({
     url: '/cms/news/city_open_list',
@@ -42,7 +42,7 @@ export function newsOpenList(params) {
   })
 }
 
-// 删除咨询
+// 删除资讯
 export function deleteNews(data) {
   return new request({
     url: '/cms/news/delete',
@@ -51,7 +51,7 @@ export function deleteNews(data) {
   })
 }
 
-// 咨询启停
+// 资讯启停
 export function newsEnable (data) {
   return request({
     url: '/cms/news/enable_stop',

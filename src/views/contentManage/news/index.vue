@@ -3,7 +3,7 @@
     <hc-table-form
       :title="title"
       :formVisible="publish"
-      @go-back="publish = false">
+      @go-back="goBack">
       <avue-crud
         ref="crud"
         :option="tableOption"
@@ -224,12 +224,12 @@ export default {
   watch: {
     titleImage () {
       this.$nextTick(() => {
-        this.$refs.form.validateField('titleImage')
+        this.$refs.form && this.$refs.form.validateField('titleImage')
       })
     },
     quillContent () {
       this.$nextTick(() => {
-        this.$refs.form.validateField('content')
+        this.$refs.form && this.$refs.form.validateField('content')
       })
     },
     // 'formData.lableIdList': function (va1, va2) {
@@ -242,6 +242,18 @@ export default {
     this.init();
   },
   methods: {
+    goBack () {
+      this.quillContent = {
+        content: "",
+        structuredContent: ""
+      }
+      this.formData = {
+        cityIdList: [],
+        lableIdList: []
+      }
+      this.titleImage = []
+      this.publish = false
+    },
     dateFormat,
     imageValidator (rule, value, callback) {
       if (this.titleImage && this.titleImage.length > 0) {
@@ -339,7 +351,7 @@ export default {
           this.publish = false;
           this.$notify({
             title: "成功",
-            message: state ? "发布成功！" : "保存成功！",
+            message: state ? "编辑成功！" : "保存成功！",
             type: "success",
             duration: 2000,
           });
@@ -380,7 +392,7 @@ export default {
       // console.log()
     },
     toDelete({ newsId }) {
-      this.$confirm("是否确认删除该条咨询?", "警告", {
+      this.$confirm("是否确认删除该条资讯?", "警告", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
@@ -488,7 +500,7 @@ export default {
 }
 .preview-content {
   margin-top: 24px;
-  /deep/ img {
+  /deep/ .quill-image, .quill-image-box, img {
     width: 100% !important;
   }
 }
