@@ -286,6 +286,7 @@
         <el-button type="primary" @click="submit">确 定</el-button>
       </div>
     </el-dialog>
+
     <!-- 广告编辑 -->
     <el-dialog
       title="广告编辑"
@@ -339,6 +340,7 @@
             v-model="editForm.beginDate"
             type="datetime"
             placeholder="选择日期时间"
+            :picker-options="pickerOptionsEditBeginDate"
           >
           </el-date-picker>
         </el-form-item>
@@ -354,6 +356,7 @@
             v-model="editForm.endDate"
             type="datetime"
             placeholder="选择日期时间"
+            :picker-options="pickerOptionsEditEndDate"
           >
           </el-date-picker>
         </el-form-item>
@@ -484,16 +487,25 @@ export default {
         "结束时间",
       ],
 
-      // 选择今天之后的日期
       pickerOptionsBeginDate: {
         disabledDate(time) {
           return time.getTime() < Date.now() - 8.64e7;
         },
       },
-      // 选择大于开始时间的日期
       pickerOptionsEndDate: {
         disabledDate: (time) => {
           return time.getTime() < new Date(this.form.beginDate).getTime();
+        },
+      },
+
+      pickerOptionsEditBeginDate: {
+        disabledDate(time) {
+          return time.getTime() < Date.now() - 8.64e7;
+        },
+      },
+      pickerOptionsEditEndDate: {
+        disabledDate: (time) => {
+          return time.getTime() < new Date(this.editForm.beginDate).getTime();
         },
       },
 
@@ -540,7 +552,7 @@ export default {
       },
 
       currentPage: 1,
-      pageSize: 10,
+      pageSize: 20,
       total: 30,
       tableLoading: false,
     };

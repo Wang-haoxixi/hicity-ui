@@ -733,7 +733,6 @@ export default {
           });
 
           if(this.statusFlag == '0'){
-            console.log('需要设置票种...')
             data.ticketingManagements.forEach(obj=>{
               obj.priceType = ["能贝", "人民币"]
 
@@ -960,7 +959,6 @@ export default {
             return false;
           });
         });
-        console.log("validRst", this.validRst);
         if (!this.validRst.includes(false) && valid1) {
           editSaveActivity(this.baseFormData).then((res) => {
             if (res.data.code !== 0) {
@@ -979,7 +977,6 @@ export default {
     },
     // 新增 - 发布活动
     publish() {
-      console.log(this.baseFormData)
       let that = this;
       this.baseFormData.details = this.quillContent.content;
 
@@ -1003,7 +1000,6 @@ export default {
             return false;
           });
         });
-        console.log("validRst", this.validRst);
         if (!this.validRst.includes(false) && valid1) {
           // console.log("验证通过...");
           savePublish(this.baseFormData).then((res) => {
@@ -1047,7 +1043,6 @@ export default {
             return false;
           });
         });
-        console.log("validRst", this.validRst);
         if (!this.validRst.includes(false) && valid1) {
           savePublish(this.baseFormData).then((res) => {
             if (res.data.code !== 0) {
@@ -1107,7 +1102,6 @@ export default {
             return false;
           });
         });
-        console.log("validRst", this.validRst);
         if (!this.validRst.includes(false) && valid1) {
           editSaveActivity(this.baseFormData).then((res) => {
             if (res.data.code !== 0) {

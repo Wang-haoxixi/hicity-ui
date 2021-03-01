@@ -1,7 +1,6 @@
 <template>
   <basic-container>
     <div class="title">合伙人申请列表</div>
-    <!-- 合伙人申请列表 -->
     <el-table
       border
       stripe
@@ -78,10 +77,8 @@ export default {
   methods: {
     // 查看 详情
     handleLook(row) {
-      console.log(row.id);
       this.dialogFormVisible = true;
       partnerDetail(row.id).then((res) => {
-        console.log("详情", res);
         this.partner = res.data.data.data;
       });
     },
@@ -93,7 +90,6 @@ export default {
         size: this.pageSize,
       })
         .then((res) => {
-          console.log("合伙人", res);
           let records = res.data.data.data.records;
           this.total = res.data.data.data.total;
           if (records) {
@@ -134,8 +130,5 @@ export default {
 .item {
   line-height: 35px;
   font-size: 16px;
-}
-::v-deep .el-dialog__body {
-  padding: 15px 20px;
 }
 </style>
