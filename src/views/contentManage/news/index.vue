@@ -4,16 +4,7 @@
       :title="title"
       :formVisible="publish"
       @go-back="goBack">
-      <avue-crud
-        ref="crud"
-        :option="tableOption"
-        :page="page"
-        :table-loading="tableLoading"
-        :data="tableData"
-        @on-load="getList"
-        @refresh-change="handleRefreshChange"
-        style="margin-left: 0;"
-      >
+      <hc-crud :option="tableOption" :fetchListFun="fetchListFun" @toUpdate="toUpdate" @toDelete="toDelete">
         <template slot="menuLeft">
           <el-button
             type="primary"
@@ -32,7 +23,7 @@
             >查看</el-button
           >
         </template>
-        <template slot="menu" slot-scope="scope">
+        <!-- <template slot="menu" slot-scope="scope">
           <template v-if="userType <= scope.row.source">
             <el-button type="text" size="mini" @click="toUpdate(scope.row)"
               >编辑</el-button
@@ -41,8 +32,8 @@
               >删除</el-button
             >
           </template>
-        </template>
-      </avue-crud>
+        </template> -->
+      </hc-crud>
       <template slot="form">
         <el-form
           ref="form"
@@ -73,9 +64,6 @@
             </el-select>
           </el-form-item>
           <el-form-item v-if="formData.source ? (userType != 3 && userType == formData.source) : (userType == 1 || userType == 2)" label="发布城市：" prop="cityIdList">
-            <!-- <el-select style="width: 100%" v-model="formData.cityIdList" multiple filterable  placeholder="请选择城市" @change="cityChange">
-              <el-option v-for="city in allCity" :key="city.id" :label="city.regionName" :value="city.id"></el-option>
-            </el-select> -->
             <hc-city-select v-model="formData.cityIdList" :city-id="userInfo.manageCityId"></hc-city-select>
           </el-form-item>
           <el-form-item label="标题图：" prop="titleImage">
@@ -92,8 +80,6 @@
             </el-radio-group>
           </el-form-item>
           <el-form-item label="详情：" prop="content">
-            <!-- <el-input type="textarea" v-model="quillContent.content"></el-input>
-            <el-input type="textarea" v-model="quillContent.structuredContent"></el-input> -->
             <hc-quill ref="quill" v-model="quillContent"></hc-quill>
           </el-form-item>
           <el-form-item>
@@ -149,7 +135,6 @@ import {
   updateNews,
   newsOpenList,
   deleteNews,
-  newsEnable,
 } from "@/api/cms/news";
 import { getAllTagList } from "@/api/tms/city";
 import { adminCityList } from "@/api/admin/city";
@@ -162,18 +147,9 @@ import HcEmptyData from "@/views/components/HcEmptyData/index"
 import HcPreview from "@/views/components/HcPreview/index"
 
 export default {
-  name: "SysUser",
   components: { HcQuill, HcCityBox, HcCitySelect, HcImageUpload, HcTableForm, HcEmptyData, HcPreview },
   data() {
     return {
-      page: {
-        total: 0, // 总页数
-        currentPage: 1, // 当前页数
-        pageSize: 20, // 每页显示多少条,
-        isAsc: false, // 是否倒序
-      },
-      tableLoading: false,
-      tableData: [],
       formData: {
         cityIdList: [],
         lableIdList: []
@@ -232,11 +208,6 @@ export default {
         this.$refs.form && this.$refs.form.validateField('content')
       })
     },
-    // 'formData.lableIdList': function (va1, va2) {
-    //   // this.$nextTick(() => {
-    //   //   this.$refs.form.validateField('lableIdList')
-    //   // })
-    // }
   },
   created() {
     this.init();
@@ -281,20 +252,19 @@ export default {
         });
       });
     },
-    getList(page = this.page, params) {
-      this.tableLoading = true;
-      let form = {
-        current: page.currentPage,
-        size: page.pageSize,
-      };
-      getNewsList(form)
-        .then(({ data }) => {
-          this.tableData = data.data.data.records;
-          this.page.total = data.data.data.total;
-        })
-        .finally(() => {
-          this.tableLoading = false;
+    fetchListFun (params) {
+      return new Promise((resolve, reject) => {
+        getNewsList(params).then((res) => {
+          let records = res.data.data.data.records;
+          let total = this.total = res.data.data.data.total;
+          resolve({
+            records,
+            page: {
+              total
+            }
+          })
         });
+      })
     },
     toCreate() {
       this.publish = true;
@@ -378,7 +348,6 @@ export default {
         this.publishType = "edit";
       });
     },
-    handleUpdate() {},
     handleDraft() {
       this.$refs.form.validate(valid => {
         if (valid) {
@@ -413,22 +382,6 @@ export default {
           });
         })
         .catch(function () {});
-    },
-    handleStart(row) {
-      let havEnable = row.havEnable ? 0 : 1;
-      newsEnable({
-        newsId: row.newsId,
-        havEnable,
-        cityId: this.userInfo.manageCityId,
-      }).then(({ data }) => {
-        if (data.code === 0) {
-          this.$message.success("操作成功");
-          this.getList();
-        }
-      });
-    },
-    handleRefreshChange() {
-      this.getList(this.page);
     },
     cityView(newsId) {
       newsOpenList({ newsId }).then(({ data }) => {

@@ -1,36 +1,9 @@
 <template>
   <basic-container>
-    <div class="title">合伙人申请列表</div>
-    <el-table
-      border
-      stripe
-      :data="tableData"
-      :header-cell-style="{ background: '#FAFAFA' }"
-      style="width: 100%; margin-top: 10px"
-      v-loading="tableLoading"
-    >
-      <el-table-column align="center" prop="id" label="用户账号">
-      </el-table-column>
-      <el-table-column align="center" prop="name" label="姓名">
-      </el-table-column>
-      <el-table-column align="center" prop="mobile" label="联系方式">
-      </el-table-column>
-      <el-table-column align="center" prop="cityName" label="地区">
-      </el-table-column>
-      <el-table-column
-        align="center"
-        prop="cooperationIntention"
-        label="合作意向"
-      >
-      </el-table-column>
-      <el-table-column align="center" label="操作">
-        <template slot-scope="scope">
-          <el-button type="text" size="mini" @click="handleLook(scope.row)"
-            >查看</el-button
-          >
-        </template>
-      </el-table-column>
-    </el-table>
+    <hc-table-form
+      title="合伙人申请列表">
+       <hc-crud :option="tableOption" :fetchListFun="fetchListFun" @handleView="handleView"></hc-crud>
+    </hc-table-form>
 
     <!-- 合伙人详情 -->
     <el-dialog title="合伙人详情" :visible.sync="dialogFormVisible" width="50%">
@@ -45,74 +18,42 @@
         >
       </span>
     </el-dialog>
-
-    <el-pagination
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"
-      :current-page="currentPage"
-      :page-sizes="[10, 20, 30, 40, 50, 100]"
-      :page-size="pageSize"
-      :total="total"
-      background
-      class="paging"
-      layout="total, sizes, prev, pager, next, jumper"
-    ></el-pagination>
   </basic-container>
 </template>
 
 <script>
+import { tableOption } from './const.js'
 import { partnerList, partnerDetail } from "@/api/content/partners";
 export default {
   data() {
     return {
-      tableData: [],
+      tableOption: tableOption,
       dialogFormVisible: false,
-      currentPage: 1,
-      pageSize: 20,
-      total: 0,
       partner: {},
       tableLoading: false,
     };
   },
   methods: {
     // 查看 详情
-    handleLook(row) {
+    handleView(row) {
       this.dialogFormVisible = true;
       partnerDetail(row.id).then((res) => {
         this.partner = res.data.data.data;
       });
     },
     // 获取合伙人列表
-    getPartnerList() {
-      this.tableLoading = true;
-      partnerList({
-        current: this.currentPage,
-        size: this.pageSize,
-      })
-        .then((res) => {
-          let records = res.data.data.data.records;
-          this.total = res.data.data.data.total;
-          if (records) {
-            this.tableData = records;
-          }
+    fetchListFun(params) {
+      return new Promise((resolve, reject) => {
+        partnerList(params).then((res) => {
+          resolve({
+            records: res.data.data.data.records,
+            page: {
+              total: res.data.data.data.total
+            }
+          })
         })
-        .finally(() => {
-          this.tableLoading = false;
-        });
+      })
     },
-
-    handleSizeChange(val) {
-      this.pageSize = val;
-      this.getPartnerList();
-    },
-    handleCurrentChange(val) {
-      this.currentPage = val;
-      this.getPartnerList();
-    },
-  },
-
-  created() {
-    this.getPartnerList();
   },
 };
 </script>
