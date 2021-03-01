@@ -32,7 +32,7 @@
         <el-button v-if="!viewOnly" type="primary" @click="save">确 定</el-button>
       </div>
     </el-dialog>
-    <hc-city-box v-if="handleNext" ref="box" @save="saveSelect"></hc-city-box>
+    <hc-city-box v-if="handleNext" ref="box" :single="single" @save="saveSelect"></hc-city-box>
   </div>
 </template>
 
@@ -91,6 +91,12 @@ function formatCitys (tempCityList) {
 export default {
   name: 'HcCityBox',
   components: { HcCityBox, CityName },
+  props: {
+    single: {
+      type: Boolean,
+      default: false
+    }
+  },
   data () {
     return {
       selectKey: '',
@@ -213,7 +219,7 @@ export default {
             }]
           }
         } else {
-          if (this.citySelected) {
+          if (this.citySelected && !this.single) {
             this.citySelected.children.push({
               id: city.id,
               regionName: city.regionName
@@ -272,7 +278,7 @@ export default {
       this.$emit('save', this.citySelected)
     },
     saveSelect (city) {
-      if (this.citySelected) {
+      if (this.citySelected && !this.single) {
         let children = this.citySelected.children
         if (children && children.length > 0) {
           let hasSelected = false
@@ -305,6 +311,9 @@ export default {
         }
       }
       this.handleNext = false
+      if (this.single) {
+        this.save()
+      }
     },
     toNext (city) {
       this.handleCityId = city.id

@@ -281,7 +281,7 @@ export default {
   components: { HcQuill, HcCityBox, HcCitySelect, HcTableForm, HcEmptyData, HcPreview },
   data() {
     return {
-      isShow: true, //是否显示咨询列表
+      isShow: true, //是否显示资讯列表
       uploadPicUrl: "/api/admin/sys_file/oss/upload",
       headersOpt: {
         Authorization: "Bearer " + store.getters.access_token,
@@ -340,7 +340,7 @@ export default {
   watch: {
     quillContent() {
       this.$nextTick(() => {
-        this.$refs.addformRef.validateField("content");
+        this.$refs.addformRef && this.$refs.addformRef.validateField("content");
       });
     },
   },
@@ -776,7 +776,7 @@ export default {
 }
 .preview-content {
   margin-top: 24px;
-  /deep/ img {
+  /deep/ .quill-image, /deep/ .quill-image-box, /deep/ img {
     width: 100% !important;
   }
 }

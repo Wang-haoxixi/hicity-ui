@@ -234,7 +234,7 @@ export default {
         this.publish = false;
         this.$notify({
           title: "成功",
-          message: state ? "发布成功！" : "保存成功！",
+          message: this.publishType == 'add' ? "发布成功！" : "编辑成功！",
           type: "success",
           duration: 2000,
         });
