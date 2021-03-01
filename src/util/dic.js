@@ -14,3 +14,17 @@ export function getDic (name = '') {
   let dicList = getDicAll()
   return dicList[name]
 }
+
+export function getDicValue (name = '', value = '') {
+  let dicData = getDic(name)
+  if (dicData) {
+    for (let i = 0; i < dicData.length; i++) {
+      if (dicData[i].value == value) {
+        console.log(dicData[i])
+        return dicData[i].label
+      }
+    }
+  } else {
+    return ''
+  }
+}

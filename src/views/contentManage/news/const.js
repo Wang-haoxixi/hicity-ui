@@ -1,5 +1,5 @@
 export const tableOption = (admin = false) => {
-  let column = [
+  let columns = [
     {
       label: '名称',
       prop: 'title',
@@ -37,7 +37,7 @@ export const tableOption = (admin = false) => {
     
   ]
   if (admin) {
-    column.push({
+    columns.push({
       label: '展示范围',
       prop: 'cityList',
       slot: true,
@@ -46,19 +46,19 @@ export const tableOption = (admin = false) => {
   }
 
   let option = {
-    border: true,
-    // index: true,
-    // indexLabel: '序号', 
-    stripe: true,
-    menuAlign: 'center',
-    editBtn: false,
-    delBtn: false,
-    align: 'center',
-    addBtn: false,
-    labelWidth: 160,
-    menuWidth: 150,
-    column
+    menu: [
+      {
+        label: '编辑',
+        fun: 'toUpdate'
+      },
+      {
+        label: '删除',
+        fun: 'toDelete'
+      },
+    ],
+    menuWidth: 120,
+    columns,
+    header: true,
   }
-  
   return option
 }

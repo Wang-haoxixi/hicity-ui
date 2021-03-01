@@ -17,6 +17,7 @@ import 'element-ui/lib/theme-chalk/index.css'
 import './styles/common.scss'
 import basicContainer from './components/basic-container/main'
 import HcTableForm from '@/views/components/HcTableForm/index'
+import HcCrud from '@/views/components/HcCrud/index'
 import HcTableDataBox from '@/views/components/HcTableDataBox/index'
 import Avue from '@smallwei/avue'
 import '@smallwei/avue/lib/index.css'
@@ -40,6 +41,7 @@ Vue.use(Avue)
 Vue.component('basicContainer', basicContainer)
 Vue.component('HcTableForm', HcTableForm)
 Vue.component('HcTableDataBox', HcTableDataBox)
+Vue.component('HcCrud', HcCrud)
 
 // 加载相关url地址
 Object.keys(urls).forEach(key => {
