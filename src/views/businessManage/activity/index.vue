@@ -173,7 +173,7 @@ export default {
     return {
       tableData: [],
       currentPage: 1,
-      pageSize: 10,
+      pageSize: 20,
       total: 0,
       showCityDialogVisible: false, //控制展示城市
       dialogOpenMoreVisible: false,

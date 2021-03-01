@@ -484,28 +484,16 @@ export default {
         "结束时间",
       ],
 
-      // 选择今天以及今天之后的日期
+      // 选择今天之后的日期
       pickerOptionsBeginDate: {
-        disabledDate: (time) => {
-          // console.log(new Date())
-          // 选择过结束时间
-          if (this.form.endDate) {
-            return time.getTime() > new Date(this.form.endDate).getTime();
-          } else {
-            //还没有选择结束时间的时候，让他只能选择今天之后的时间包括今天
-            return time.getTime() < Date.now() - 8.64e7;
-          }
+        disabledDate(time) {
+          return time.getTime() < Date.now() - 8.64e7;
         },
       },
-      // 选择今天以及今天以前的日期
+      // 选择大于开始时间的日期
       pickerOptionsEndDate: {
         disabledDate: (time) => {
-          if (this.form.beginDate) {
-            return (
-              time.getTime() <
-              new Date(this.form.beginDate).getTime() - 1 * 24 * 60 * 60 * 1000
-            ); //可以选择同一天
-          }
+          return time.getTime() < new Date(this.form.beginDate).getTime();
         },
       },
 

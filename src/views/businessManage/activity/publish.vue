@@ -45,6 +45,7 @@
                 v-model="baseFormData.startTime"
                 type="datetime"
                 placeholder="选择开始日期"
+                :picker-options="pickerOptionsBeginDate"
               >
               </el-date-picker>
             </el-form-item>
@@ -59,6 +60,7 @@
                 v-model="baseFormData.endTime"
                 type="datetime"
                 placeholder="选择结束日期"
+                :picker-options="pickerOptionsEndDate"
               >
               </el-date-picker>
             </el-form-item>
@@ -517,6 +519,19 @@ export default {
         remarks: [
           { required: true, message: "请输入票种备注", trigger: "blur" },
         ],
+      },
+
+      // 选择今天之后的日期
+      pickerOptionsBeginDate: {
+        disabledDate(time) {
+          return time.getTime() < Date.now() - 8.64e7;
+        },
+      },
+      // 选择大于开始时间的日期
+      pickerOptionsEndDate: {
+        disabledDate: (time) => {
+          return time.getTime() < new Date(this.baseFormData.startTime).getTime();
+        },
       },
 
       // 基本信息数据
