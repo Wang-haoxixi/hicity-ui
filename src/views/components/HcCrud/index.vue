@@ -16,9 +16,9 @@
     <div v-if="option.header || autoAdd" class="hc-crud-header">
       <div class="menu-left">
         <el-button v-if="autoAdd" type="primary" size="mini" icon="el-icon-plus" @click="toCreate">新建</el-button>
-        <tempalte v-else>
+        <template v-else>
           <slot  name="menuLeft"></slot>
-        </tempalte>
+        </template>
       </div>
       <div v-if="option.header" class="menu-right">
         <slot name="menuRight"></slot>
