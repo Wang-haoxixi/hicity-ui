@@ -1,6 +1,15 @@
 <template>
-  <el-input v-if="option.type == 'text' || option.type == 'textarea'" :value="value" @input="change"></el-input>
-  <el-select v-else-if="option.type == 'select'" :value="value" @change="change">
+  <el-input v-if="option.type == 'text' || option.type == 'textarea' || option.type == 'password'"
+    :type="option.type"
+    :value="value"
+    :maxlength="option.maxlength"
+    :disabled="disabled"
+    :placeholder="option.placeholder || `请输入${option.label}`"
+    @input="change"></el-input>
+  <el-select v-else-if="option.type == 'select'"
+    :value="value"
+    :disabled="disabled"
+    @change="change">
     <el-option v-for="(item, index) in dicList[option.dicName]" :key="index" :value="item.value" :label="item.label">{{item.label}}</el-option>
   </el-select>
 </template>
@@ -19,6 +28,10 @@ export default {
           type: 'text'
         }
       }
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     }
   },
   data () {

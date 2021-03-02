@@ -29,7 +29,7 @@ const getters = {
       return 1
     } else if (state.user.userInfo.userType == 1 || state.user.userInfo.userType == 2) {
       return 2
-    } else if (state.user.userInfo.userType == 5) {
+    } else if (state.user.userInfo.userType == 5 || state.user.userInfo.userType == 6) {
       return 3
     } else {
       return 0

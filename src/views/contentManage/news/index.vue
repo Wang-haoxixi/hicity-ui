@@ -4,7 +4,7 @@
       :title="title"
       :formVisible="publish"
       @go-back="goBack">
-      <hc-crud :option="tableOption" :fetchListFun="fetchListFun" @toUpdate="toUpdate" @toDelete="toDelete">
+      <hc-crud ref="hcCrud" :option="tableOption" :fetchListFun="fetchListFun" @toUpdate="toUpdate" @toDelete="toDelete">
         <template slot="menuLeft">
           <el-button
             type="primary"
@@ -314,7 +314,7 @@ export default {
             type: "success",
             duration: 2000,
           });
-          this.getList();
+          this.$refs.hcCrud.refresh();
         });
       } else {
         updateNews({ ...formData, state: 1 }).then(({ data }) => {
@@ -325,7 +325,7 @@ export default {
             type: "success",
             duration: 2000,
           });
-          this.getList();
+          this.$refs.hcCrud.refresh();
         });
       }
     },
@@ -378,7 +378,7 @@ export default {
               type: "success",
               duration: 2000,
             });
-            this.getList();
+            this.$refs.hcCrud.refresh()
           });
         })
         .catch(function () {});

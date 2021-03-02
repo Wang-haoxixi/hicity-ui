@@ -39,16 +39,9 @@
     <!-- 新建 -->
     <div v-if="option.header || autoAdd" class="hc-crud-header">
       <div class="menu-left">
-        <el-button
-          v-if="autoAdd"
-          type="primary"
-          size="mini"
-          icon="el-icon-plus"
-          @click="toCreate"
-          >新建</el-button
-        >
+        <el-button v-if="autoAdd" type="primary" size="mini" icon="el-icon-plus" @click="toCreate">新建</el-button>
         <template v-else>
-          <slot name="menuLeft"></slot>
+          <slot  name="menuLeft"></slot>
         </template>
       </div>
       <div v-if="option.header" class="menu-right">
@@ -58,6 +51,7 @@
     <!-- 表格 -->
     <slot name="table">
       <hc-crud-table
+        :start-index="(page.currentPage - 1) * page.pageSize"
         :option="option"
         :tableData="tableData"
         :table-loading="tableLoading"
@@ -174,12 +168,10 @@ export default {
         for (let i = 0; i < columns.length; i++) {
           if (columns[i].search) {
             list.push({
-              prop: columns[i].prop,
-              type: columns[i].type || "text",
-              label: columns[i].label,
-              dicName: columns[i].dicName,
-            });
-            this.$set(this.searchFormShow, columns[i].prop, "");
+              type: 'text',
+              ...columns[i]
+            })
+            this.$set(this.searchFormShow, columns[i].prop, '')
           }
         }
         return list;
@@ -272,7 +264,19 @@ export default {
     toCreate() {
       this.$refs.form.open();
     },
-    handleAdd(row) {
+    rowAdd () {
+      this.toCreate()
+    },
+    rowView (row = {}) {
+      this.handleAutoEvent({type: 'view', row})
+    },
+    rowEdit (row = {}) {
+      this.handleAutoEvent({type: 'edit', row})
+    },
+    rowDelete (row) {
+      this.handleAutoEvent({type: 'delete', row})
+    },
+    handleAdd (row) {
       this.addFun(row, () => {
         this.$refs.form.close();
         this.refresh();

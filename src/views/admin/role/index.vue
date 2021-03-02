@@ -1,70 +1,48 @@
 <template>
-  <div class="app-container calendar-list-container">
-    <basic-container>
-      <avue-crud
-        ref="crud"
-        :option="tableOption"
-        :data="list"
-        :page="page"
-        v-model="form"
-        :table-loading="listLoading"
-        :before-open="handleOpenBefore"
-        @on-load="getList"
-        @search-change="handleFilter"
-        @refresh-change="handleRefreshChange"
-        @row-update="update"
-        @row-save="create">
-
+  <basic-container>
+    <hc-table-form title="角色管理">
+      <hc-crud ref="hcCrud" :option="tableOption" :fetchListFun="fetchListFun" :addFun="addFun" :updateFun="updateFun">
         <template slot="menuLeft">
           <el-button
-            v-if="roleManager_btn_add"
-            class="filter-item"
             type="primary"
             size="mini"
             icon="el-icon-plus"
-            @click="handleCreate">添加
-          </el-button>
+            @click="handleCreate"
+            >新建</el-button>
         </template>
-
-        <template
-            slot="cityIdForm"
-            slot-scope="scope">
-            <avue-input
-              v-model="form.cityId"
-              :dic="treeCityData"
-              :props="cityProps"
-              :default-expand-all="false"
-              type="tree"
-              placeholder="请选择所属平台"/>
+        <template v-slot:menu="scope">
+          <template v-if="scope.row.roleId != 1 && scope.row.roleId != 2 && scope.row.roleId != 3 && scope.row.roleId != 4">
+            <el-button
+              type="text"
+              size="mini"
+              icon="el-icon-view"
+              @click="handleView(scope.row,scope.index)">查看
+            </el-button>
+            <el-button
+              v-if="roleManager_btn_edit"
+              type="text"
+              size="mini"
+              icon="el-icon-edit"
+              @click="handleUpdate(scope.row,scope.index)">编辑
+            </el-button>
+            <el-button
+              v-if="roleManager_btn_del"
+              type="text"
+              size="mini"
+              icon="el-icon-delete"
+              @click="handleDelete(scope.row,scope.index)">删除
+            </el-button>
           </template>
-
-        <template
-          slot="menu"
-          slot-scope="scope">
           <el-button
-            v-if="roleManager_btn_edit"
-            type="text"
-            size="mini"
-            icon="el-icon-edit"
-            @click="handleUpdate(scope.row,scope.index)">编辑
-          </el-button>
-          <el-button
-            v-if="roleManager_btn_del"
-            type="text"
-            size="mini"
-            icon="el-icon-delete"
-            @click="handleDelete(scope.row,scope.index)">删除
-          </el-button>
-          <el-button
-            v-if="roleManager_btn_perm"
+            v-if="roleManager_btn_perm && scope.row.roleId != 1 && scope.row.roleId != 3"
             type="text"
             size="mini"
             icon="el-icon-plus"
             @click="handlePermission(scope.row,scope.index)">权限
           </el-button>
         </template>
-      </avue-crud>
-    </basic-container>
+      </hc-crud>
+    </hc-table-form>
     <el-dialog
       :visible.sync="dialogPermissionVisible"
       :close-on-click-modal="false"
@@ -87,16 +65,16 @@
         class="dialog-footer">
         <el-button
           type="primary"
-                   size="small"
+                  size="small"
           @click="updatePermession(roleId)">更 新
         </el-button>
         <el-button
-	        type="default"
-                   size="small"
+          type="default"
+                  size="small"
           @click="cancal()">取消</el-button>
       </div>
     </el-dialog>
-  </div>
+  </basic-container>
 </template>
 
 <script>
@@ -155,56 +133,70 @@ export default {
     }
   },
   methods: {
-    getList(page, params) {
-      this.listLoading = true
-      fetchList(Object.assign({
-        current: page.currentPage,
-        size: page.pageSize,
-        cityId: this.userInfo.manageCityId
-      }, params, this.searchForm)).then(response => {
-        this.list = response.data.data.data.records
-        this.page.total = response.data.data.data.total
-        this.listLoading = false
-      }).catch(() => {
-        this.listLoading = false
+    fetchListFun (params) {
+      return new Promise((resolve, reject) => {
+        fetchList({...params, cityId: this.userInfo.manageCityId}).then(response => {
+          resolve({
+            records: response.data.data.data.records,
+            page: {
+              total: response.data.data.data.total
+            }
+          })
+        })
       })
-    },
-    handleRefreshChange() {
-      this.getList(this.page)
-    },
-    handleFilter(form) {
-      this.searchForm = form
-      this.getList(this.page, form)
     },
     handleCreate() {
-      this.$refs.crud.rowAdd()
-    },
-    handleOpenBefore(show) {
-      getCityTree().then(response => {
-        this.treeCityData = response.data.data.data
-      })
-      show()
+      this.$refs.hcCrud.rowAdd()
     },
     handleUpdate(row, index) {
-      this.$refs.crud.rowEdit(row, index)
+      this.$refs.hcCrud.rowEdit(row, index)
     },
-      cancal () {
-        this.dialogPermissionVisible = false;
-      },
+    handleView(row) {
+      this.$refs.hcCrud.rowView(row)
+    },
+    addFun(row, next) {
+      addObj({
+        ...row,
+        cityId: this.userInfo.manageCityId
+      }).then(() => {
+        this.$refs.hcCrud.refresh()
+        next()
+        this.$notify({
+          title: '成功',
+          message: '创建成功',
+          type: 'success',
+          duration: 2000
+        })
+      })
+    },
+    updateFun(row, next) {
+      putObj(row).then(() => {
+        this.$refs.hcCrud.refresh()
+        next()
+        this.$notify({
+          title: '成功',
+          message: '修改成功',
+          type: 'success',
+          duration: 2000
+        })
+      })
+    },
+    cancal () {
+      this.dialogPermissionVisible = false;
+    },
     handlePermission(row) {
-      fetchRoleTree(row.roleId)
-        .then(response => {
-          this.checkedKeys = response.data.data
-          return fetchMenuTree()
-        })
-        .then(response => {
-          this.treeData = response.data.data
-          // 解析出所有的太监节点
-          this.checkedKeys = this.resolveAllEunuchNodeId(this.treeData, this.checkedKeys, [])
-          this.dialogPermissionVisible = true
-          this.roleId = row.roleId
-          this.roleCode = row.roleCode
-        })
+      fetchRoleTree(row.roleId).then(response => {
+        this.checkedKeys = response.data.data
+        return fetchMenuTree()
+      })
+      .then(response => {
+        this.treeData = response.data.data
+        // 解析出所有的太监节点
+        this.checkedKeys = this.resolveAllEunuchNodeId(this.treeData, this.checkedKeys, [])
+        this.dialogPermissionVisible = true
+        this.roleId = row.roleId
+        this.roleCode = row.roleCode
+      })
     },
     /**
        * 解析出所有的太监节点id
@@ -229,11 +221,7 @@ export default {
       if (!value) return true
       return data.label.indexOf(value) !== -1
     },
-    getNodeData(data, done) {
-      done()
-    },
     handleDelete(row, index) {
-      var _this = this
       this.$confirm('是否确认删除名称为"' + row.roleName + '"' + '"的数据项?', '警告', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -241,42 +229,18 @@ export default {
       }).then(function() {
         return delObj(row.roleId)
       }).then(() => {
-        this.getList(this.page)
+        this.$refs.hcCrud.refresh()
         this.$notify.success('删除成功')
       })
     },
-    create(row, done, loading) {
-      // if (this.form.dsType === 1) {
-      //   this.form.dsScope = this.$refs.scopeTree.getCheckedKeys().join(',')
-      // }
-      addObj(this.form).then(() => {
-        this.getList(this.page)
-        done()
-        this.$notify.success('创建成功')
-      }).catch(() => {
-        loading()
-      })
-    },
-    update(row, index, done , loading) {
-      // if (this.form.dsType === 1) {
-      //   this.form.dsScope = this.$refs.scopeTree.getCheckedKeys().join(',')
-      // }
-      putObj(this.form).then(() => {
-        this.getList(this.page)
-        done()
-        this.$notify.success('修改成功')
-      }).catch(() => {
-        loading()
-      })
-    },
     updatePermession (roleId) {
-        this.menuIds = ''
-        this.menuIds = this.$refs.menuTree.getCheckedKeys().join(',').concat(',').concat(this.$refs.menuTree.getHalfCheckedKeys().join(','))
-        permissionUpd(roleId, this.menuIds).then(() => {
-            this.dialogPermissionVisible = false
-            this.$store.dispatch('GetMenu', false)
-            this.$notify.success('修改成功')
-        })
+      this.menuIds = ''
+      this.menuIds = this.$refs.menuTree.getCheckedKeys().join(',').concat(',').concat(this.$refs.menuTree.getHalfCheckedKeys().join(','))
+      permissionUpd(roleId, this.menuIds).then(() => {
+        this.dialogPermissionVisible = false
+        this.$store.dispatch('GetMenu', false)
+        this.$notify.success('修改成功')
+      })
     }
   }
 }

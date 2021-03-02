@@ -1,6 +1,6 @@
 import { rule } from "@/util/validateRules";
 export const tableOption = (admin = false) => {
-  let column = [
+  let columns = [
     {
       label: '角色名称',
       prop: 'roleName',
@@ -23,51 +23,29 @@ export const tableOption = (admin = false) => {
       ]
     },
     {
-      width: 150,
       label: '角色描述',
       prop: 'roleDesc',
-      overHidden: true,
       type: 'textarea',
       span: 24,
-      row: true,
-      minRows: 2,
       rules: [
         { max: 128, message: '长度在 128 个字符内', trigger: 'blur' }
       ]
+    },
+    {
+      label: '创建时间',
+      prop: 'createTime',
+      width: 160,
+      formHidden: true,
+      span: 24
     }
   ]
-  if (admin) {
-    column.push({
-      label: '所属城市',
-      prop: 'cityId',
-      formslot: true,
-      span: 24,
-      formatter: function (row) {
-        return row.cityName
-      }
-    })
-  }
-  column.push({
-    label: '创建时间',
-    prop: 'createTime',
-    type: 'datetime',
-    format: 'yyyy-MM-dd HH:mm',
-    valueFormat: 'yyyy-MM-dd HH:mm:ss',
-    editDisplay: false,
-    addDisplay: false,
-    span: 24
-  })
   return {
-    border: true,
     index: true,
     indexLabel: '序号',
-    stripe: true,
-    menuAlign: 'center',
-    editBtn: false,
-    delBtn: false,
-    align: 'center',
-    addBtn: false,
-    viewBtn: true,
-    column
+    labelWidth: '150px',
+    header: true,
+    menu: true,
+    menuWidth: 240,
+    columns
   }
 }

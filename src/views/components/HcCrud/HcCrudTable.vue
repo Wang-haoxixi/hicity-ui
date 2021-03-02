@@ -1,8 +1,13 @@
 <template>
-  <el-table :data="tableData" style="width: 100%" header-row-class-name="hc-crud-table-header" :header-cell-style="{backgroundColor: '#FAFAFA', color: '#333333'}" v-loading="tableLoading">
+  <el-table :data="tableData" stripe border style="width: 100%" header-row-class-name="hc-crud-table-header" :header-cell-style="{backgroundColor: '#FAFAFA', color: '#333333'}" v-loading="tableLoading">
     <el-table-column v-if="option.expand" type="expand" width="50px">
       <template v-slot="scope">
         <slot name="expand" :row="scope.row"></slot>
+      </template>
+    </el-table-column>
+    <el-table-column v-if="option.index" width="50px" :label="option.indexLabel || '序号'">
+      <template v-slot="scope">
+        <div>{{scope.$index + 1 + startIndex}}</div>
       </template>
     </el-table-column>
     <el-table-column v-for="(item, index) in columns" :key="index" :prop="item.prop" :label="item.label"  :width="item.width || ''">
@@ -49,6 +54,10 @@ export default {
       type: Object,
       required: true
     },
+    startIndex: {
+      type: Number,
+      default: 0,
+    }
   },
   data () {
     return {
