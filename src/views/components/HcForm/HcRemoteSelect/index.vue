@@ -11,7 +11,8 @@
       v-for="option in options"
       :key="option.value"
       :label="option.label"
-      :value="option.value">
+      :value="option.value"
+      :disabled="disabledItems.includes(option.value)">
     </el-option>
   </el-select>
 </template>
@@ -35,6 +36,10 @@ export default {
       type: Function,
       required: true
     },
+    disabledItems: {
+      type: Array,
+      default: () => []
+    }
   },
   data () {
     return {
@@ -51,7 +56,12 @@ export default {
       this.selectData = val
     },
     value (val) {
-      this.selectData = val
+      if (this.options && this.options.length > 0) {
+        this.selectData = val
+        this.$nextTick(() => {
+          this.options = []
+        })
+      }
     }
   },
   methods: {

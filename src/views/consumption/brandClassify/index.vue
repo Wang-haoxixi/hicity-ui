@@ -70,7 +70,7 @@
                 </el-button>
               </template>
               <template v-slot:brandName="scope">
-                <hc-remote-select v-model="scope.row.brandId" :remote-fun="getAllBrand" :show-word="scope.row.brandName"></hc-remote-select>
+                <hc-remote-select v-model="scope.row.brandId" :remote-fun="getAllBrand" :show-word="scope.row.brandName" :disabled-items="brandSelected"></hc-remote-select>
               </template>
               <template v-slot:sort="scope">
                 <el-input-number v-model="scope.row.sortNumber" :min="1"></el-input-number>
@@ -180,9 +180,6 @@ export default {
   },
   computed: {
     ...mapGetters(['userInfo']),
-    isAdmin () {
-      return this.userInfo.userType == 3 || this.userInfo.userType == 4
-    },
     title () {
       if (!this.publish) {
         return '商品分类'
@@ -193,6 +190,17 @@ export default {
           return '商品分类-编辑'
         }
       }
+    },
+    brandSelected () {
+      if (this.formData.relations && this.formData.relations.length > 0) {
+        let relations = this.formData.relations
+        let list = []
+        for (let i = 0; i < relations.length; i++) {
+          list.push(relations[i].brandId)
+        }
+        return list
+      }
+      return []
     }
   },
   created () {

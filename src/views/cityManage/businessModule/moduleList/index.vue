@@ -56,7 +56,9 @@
           </div>
           <div class="mod-info-item">
             <div class="mod-info-item-label">跳转编码：</div>
-            <div class="mod-info-item-content">{{modDetail.path}}</div>
+            <div class="mod-info-item-content mod-path">
+              <hc-single-view v-if="dialogVisible" :text="modDetail.path"></hc-single-view>
+            </div>
           </div>
           <div class="mod-info-item">
             <div class="mod-info-item-label">当前状态：</div>
@@ -75,7 +77,9 @@
 <script>
 import { adminCityModule } from '@/api/admin/city'
 import { mapGetters } from 'vuex'
+import HcSingleView from '@/views/components/HcSingleView/index'
 export default {
+  components: { HcSingleView },
   props: {
     cityId: {
       type: Number,
@@ -121,7 +125,6 @@ export default {
       })
     },
     moduleView (data) {
-      console.log(data)
       this.modDetail = data
       this.dialogVisible = true
     }
@@ -194,6 +197,7 @@ export default {
   justify-self: start;
   align-items: center;
   height: 150px;
+  overflow: hidden;
   .mod-icon {
     display: flex;
     justify-content: center;
@@ -213,13 +217,14 @@ export default {
     margin-left: 24px;
     .mod-info-item {
       position: relative;
-      display: flex;
-      justify-content: flex-start;
-      align-items: center;
+      display: grid;
+      grid-template-columns: 70px auto;
       height: 50px;
       line-height: 50px;
       font-size: 14px;
+      width: 100%;
       color: #666666;
+      overflow: hidden;
       &::after {
         content: '';
         position: absolute;
@@ -238,6 +243,12 @@ export default {
         line-height: 50px;
         flex: 70px 1 1;
         margin-left: 8px;
+      }
+      .mod-path {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        overflow: hidden;
       }
     }
   }

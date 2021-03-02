@@ -23,7 +23,7 @@
             >新建</el-button>
         </template>
          <template slot="menuRight">
-          <el-checkbox v-model="isOwn" @change="refresh" style="margin-right: 20px;">尽看我的</el-checkbox>
+          <el-checkbox v-model="isOwn" @change="refresh" style="margin-right: 20px;">仅看我的</el-checkbox>
         </template>
         <template slot="menu" slot-scope="scope">
           <template>

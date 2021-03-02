@@ -35,15 +35,15 @@
       :close-on-click-modal="false"
       append-to-body
       title="配置角色">
-      <el-form ref="form" class="dialog-main-tree" :model="formData" label-width="180px">
+      <el-form ref="form" class="dialog-main-tree" :model="formData" label-width="180px" :rules="formRule">
         <el-form-item label="城市名称：">
           <el-input disabled :value="formData.cityName"></el-input>
         </el-form-item>
-        <el-form-item label="开通最高管理员账号：">
-          <el-input v-model="formData.username"></el-input>
+        <el-form-item label="开通最高管理员账号：" prop="username">
+          <el-input v-model="formData.username" maxlength="20"></el-input>
         </el-form-item>
-        <el-form-item label="输入密码：">
-          <el-input v-model="formData.password" type="password"></el-input>
+        <el-form-item label="输入密码：" prop="password">
+          <el-input v-model="formData.password" type="password" maxlength="20"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer"
@@ -83,7 +83,11 @@ export default {
       dialogRoleVisible: false,
       formData: {},
       searchForm: {},
-      form: {}
+      form: {},
+      formRule: {
+        username: {required: true, message: '请输入账号', trigger: 'blur'},
+        password: {required: true, message: '请输入密码', trigger: 'blur'}
+      }
     }
   },
   computed: {
