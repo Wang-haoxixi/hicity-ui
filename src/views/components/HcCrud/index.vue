@@ -26,6 +26,7 @@
     </div>
     <slot name="table">
       <hc-crud-table
+        :start-index="(page.currentPage - 1) * page.pageSize"
         :option="option"
         :tableData="tableData"
         :table-loading="tableLoading"
@@ -126,10 +127,8 @@ export default {
         for (let i = 0; i < columns.length; i++) {
           if (columns[i].search) {
             list.push({
-              prop: columns[i].prop,
-              type: columns[i].type || 'text',
-              label: columns[i].label,
-              dicName: columns[i].dicName
+              type: 'text',
+              ...columns[i]
             })
             this.$set(this.searchFormShow, columns[i].prop, '')
           }
@@ -221,6 +220,18 @@ export default {
     },
     toCreate () {
       this.$refs.form.open()
+    },
+    rowAdd () {
+      this.toCreate()
+    },
+    rowView (row = {}) {
+      this.handleAutoEvent({type: 'view', row})
+    },
+    rowEdit (row = {}) {
+      this.handleAutoEvent({type: 'edit', row})
+    },
+    rowDelete (row) {
+      this.handleAutoEvent({type: 'delete', row})
     },
     handleAdd (row) {
       this.addFun(row, () => {
