@@ -63,7 +63,7 @@
       <hc-crud-form ref="form" :option="option" @handle-edit="handleUpdate" @handle-add="handleAdd">
         <template v-for="(item, index) in formSlotList" :slot="`${item.prop}Form`" slot-scope="scope">
           <div :key="`form__${index}`">
-            <slot :name="item.prop" :form-data="scope.formData"></slot>
+            <slot :name="`${item.prop}Form`" :form-data="scope.formData"></slot>
           </div>
         </template>
       </hc-crud-form>
