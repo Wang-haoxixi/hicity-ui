@@ -12,6 +12,7 @@
         @refresh-change="handleRefreshChange"
         @search-change="handleFilter"
         @current-change="currentChange"
+        @size-change="sizeChange"
       >
         <template slot="menu" slot-scope="scope">
           <el-button
@@ -187,7 +188,6 @@ export default {
       this.getList();
     },
     currentChange (current) {
-      console.log(current)
       this.page.currentPage = current
       this.getList()
     },

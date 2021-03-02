@@ -10,7 +10,9 @@
         :data="tableData"
         @on-load="getList"
         @refresh-change="handleRefreshChange"
-        @search-change="handleFilter" >
+        @search-change="handleFilter"
+        @current-change="currentChange"
+        @size-change="sizeChange">
         <template
           slot="menu"
           slot-scope="scope">
@@ -167,8 +169,23 @@ export default {
       })
     },
     handleRefreshChange() {
-      this.getList(this.page)
+      this.page = {
+        total: 0, // 总页数
+        currentPage: 1, // 当前页数
+        pageSize: 20, // 每页显示多少条,
+        isAsc: false, // 是否倒序
+      }
+      this.getList();
     },
+    currentChange (current) {
+      this.page.currentPage = current
+      this.getList()
+    },
+    sizeChange (size) {
+      this.page.pageSize = size
+      this.page.currentPage = 1
+      this.getList()
+    }
   }
 }
 </script>
