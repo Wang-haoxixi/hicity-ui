@@ -5,7 +5,7 @@
         <slot name="expand" :row="scope.row"></slot>
       </template>
     </el-table-column>
-    <el-table-column v-for="(item, index) in (option.columns || [])" :key="index" :prop="item.prop" :label="item.label"  :width="item.width || ''">
+    <el-table-column v-for="(item, index) in columns" :key="index" :prop="item.prop" :label="item.label"  :width="item.width || ''">
       <template v-if="item.slot || item.type == 'select' || item.formatter" v-slot="scope">
         <slot v-if="item.slot" :name="item.prop" :row="scope.row">
         </slot>
@@ -16,7 +16,12 @@
     <el-table-column v-if="option.menu" label="操作" :width="option.menuWidth || ''">
       <template v-slot="scope">
         <slot name="menu" :row="scope.row">
-          <el-button v-for="(item, index) in menuList" :key="index" type="text" size="mini" @click="handleEvent(item.fun, scope.row)">{{item.label}}</el-button>
+          <template v-for="(item, index) in menuList">
+            <template v-if="item.auto">
+              <el-button v-if="item.auto" :key="index" type="text" size="mini" @click="handleAutoEvent(item.type, scope.row)">{{handleName(item.type)}}</el-button>
+            </template>
+            <el-button v-else :key="index" type="text" size="mini" @click="handleEvent(item.fun, scope.row)">{{item.label}}</el-button>
+          </template>
         </slot>
       </template>
     </el-table-column>
@@ -50,10 +55,38 @@ export default {
     }
   },
   computed: {
+    columns () {
+      let columnList = this.option.columns
+      if (columnList && columnList.length > 0) {
+        let columns = []
+        for (let i = 0; i < columnList.length; i++) {
+          if (!columnList[i].hidden) {
+            columns.push(columnList[i])
+          }
+        }
+        return columns
+      }
+      return []
+    },
     menuList () {
       let menu = this.option.menu
       if (menu && menu instanceof Array && menu.length > 0) {
-        return menu
+        let menuList = []
+        for (let i = 0; i < menu.length; i++) {
+          let menuItem = menu[i]
+          if (menuItem == 'view' || menuItem == 'edit' || menuItem == 'delete') {
+            menuList.push({
+              auto: true,
+              type: menuItem,
+            })
+          } else if (menuItem instanceof Object && menuItem.fun && menuItem.label) {
+            menuList.push({
+              label: menuItem.label,
+              fun: menuItem.fun
+            })
+          }
+        }
+        return menuList
       }
       return []
     }
@@ -67,8 +100,14 @@ export default {
         return ''
       }
     },
+    handleName (type) {
+      return type == 'view' ? '查看' : type == 'edit' ? '编辑' : type == 'delete' ? '删除' : ''
+    },
     handleEvent (fun, row) {
       this.$emit('handle-event', {fun, row})
+    },
+    handleAutoEvent (type, row) {
+      this.$emit('handle-auto-event', {type, row})
     }
   }
 }

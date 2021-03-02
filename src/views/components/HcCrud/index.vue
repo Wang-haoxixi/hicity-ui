@@ -13,16 +13,24 @@
         </el-form-item>
       </el-form>
     </slot>
-    <div v-if="option.header" class="hc-crud-header">
-      <slot name="menuLeft"></slot>
-      <slot name="menuRight"></slot>
+    <div v-if="option.header || autoAdd" class="hc-crud-header">
+      <div class="menu-left">
+        <el-button v-if="autoAdd" type="primary" size="mini" icon="el-icon-plus" @click="toCreate">新建</el-button>
+        <tempalte v-else>
+          <slot  name="menuLeft"></slot>
+        </tempalte>
+      </div>
+      <div v-if="option.header" class="menu-right">
+        <slot name="menuRight"></slot>
+      </div>
     </div>
     <slot name="table">
       <hc-crud-table
         :option="option"
         :tableData="tableData"
         :table-loading="tableLoading"
-        @handle-event="handleEvent">
+        @handle-event="handleEvent"
+        @handle-auto-event="handleAutoEvent">
         <template v-for="(item, index) in slotList" :slot="item.prop" slot-scope="scope">
           <div :key="index">
             <slot :name="item.prop" :row="scope.row"></slot>
@@ -51,15 +59,25 @@
         </el-pagination>
       </div>
     </slot>
+    <slot name="form">
+      <hc-crud-form ref="form" :option="option" @handle-edit="handleUpdate" @handle-add="handleAdd">
+        <template v-for="(item, index) in formSlotList" :slot="`${item.prop}Form`" slot-scope="scope">
+          <div :key="`form__${index}`">
+            <slot :name="item.prop" :form-data="scope.formData"></slot>
+          </div>
+        </template>
+      </hc-crud-form>
+    </slot>
   </div>
 </template>
 
 <script>
 import HcFormItem from './HcFormItem'
 import HcCrudTable from './HcCrudTable'
+import HcCrudForm from './HcCrudForm'
 export default {
   name: 'HcCrud',
-  components: { HcFormItem, HcCrudTable },
+  components: { HcFormItem, HcCrudTable, HcCrudForm },
   props: {
     option: {
       type: Object,
@@ -68,6 +86,18 @@ export default {
     fetchListFun: {
       type: Function,
       required: true
+    },
+    addFun: {
+      type: Function,
+      default: () => null
+    },
+    updateFun: {
+      type: Function,
+      default: () => null
+    },
+    deleteFun: {
+      type: Function,
+       default: () => null
     },
     searchQuery: {
       type: Array,
@@ -107,6 +137,16 @@ export default {
         return list
       }
     },
+    formSlotList () {
+      let columns = this.option.columns || []
+      let slotList = []
+      for (let i = 0; i < columns.length; i++) {
+        if (columns[i].formSlot) {
+          slotList.push(columns[i])
+        }
+      }
+      return slotList
+    },
     slotList () {
       let columns = this.option.columns || []
       let slotList = []
@@ -116,18 +156,25 @@ export default {
         }
       }
       return slotList
+    },
+    autoAdd () {
+      if (this.option.menu && this.option.menu instanceof Array) {
+        return this.option.menu.includes('add')
+      }
     }
   },
   mounted() {
     this.getList()
   },
   methods: {
-    refresh (initPage = false) {
-      if (initPage) {
-        this.page = {
-          currentPage: 1,
-          pageSize: 10,
-        }
+    refresh (page = {}, searchForm = {}) {
+      this.searchForm = {
+        ...searchForm,
+        ...this.searchForm
+      }
+      this.page = {
+        ...page,
+        ...this.page
       }
       this.getList()
     },
@@ -162,6 +209,30 @@ export default {
     },
     handleEvent ({fun, row}) {
       this.$emit(fun, row)
+    },
+    handleAutoEvent ({type, row}) {
+      if (type == 'view' || type == 'edit') {
+        // 查看 或 编辑
+        this.$refs.form.open(row, type)
+      } else if (type == 'delete') {
+        // 删除
+        this.deleteFun && this.deleteFun(row, this.refresh)
+      }
+    },
+    toCreate () {
+      this.$refs.form.open()
+    },
+    handleAdd (row) {
+      this.addFun(row, () => {
+        this.$refs.form.close()
+        this.refresh()
+      })
+    },
+    handleUpdate (row) {
+      this.updateFun(row, () => {
+        this.$refs.form.close()
+        this.refresh()
+      })
     },
     toSearch () {
       this.searchForm = this.searchFormShow
