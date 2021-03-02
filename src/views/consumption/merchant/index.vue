@@ -57,7 +57,7 @@
             <el-input v-model="formData.merchantUserPhone" maxlength="200"></el-input>
           </el-form-item>
           <el-form-item label="所在城市：" prop="cityId">
-            <hc-city-select v-model="cityIdList" :city-id="userInfo.manageCityId" single></hc-city-select>
+            <hc-city-select v-model="formData.cityId" :city-id="userInfo.manageCityId" single></hc-city-select>
             <!-- <el-input v-model="formData.cityId" maxlength="200"></el-input> -->
           </el-form-item>
           <el-form-item label="定位地址：" prop="locationAddr">
@@ -119,7 +119,8 @@ export default {
       formData: {
         merchantName: '',
         merchantLogo: '',
-        merchantSynopsis: ''
+        merchantSynopsis: '',
+        cityId: '',
       },
       locationAddr: {},
       publish: false,
@@ -134,7 +135,6 @@ export default {
       },
       brandList: [],
       brandLoading: false,
-      cityIdList: '',
     };
   },
   computed: {
@@ -212,6 +212,7 @@ export default {
         merchantName: '',
         merchantLogo: '',
         merchantSynopsis: '',
+        cityId: '',
       }
       this.locationAddr = {}
       this.barndList = []
@@ -224,8 +225,6 @@ export default {
       })
     },
     save () {
-      console.log(this.formData)
-      console.log(this.locationAddr)
       let formData = { 
         ...this.formData,
         lng: this.locationAddr.longitude,
