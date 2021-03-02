@@ -31,6 +31,9 @@
         <template v-slot:menu="scope">
           <slot name="menu" :row="scope.row"></slot>
         </template>
+        <template v-slot:expand="scope">
+          <slot name="expand" :row="scope.row"></slot>
+        </template>
       </hc-crud-table>
     </slot>
     <slot name="pagination">
@@ -119,6 +122,15 @@ export default {
     this.getList()
   },
   methods: {
+    refresh (initPage = false) {
+      if (initPage) {
+        this.page = {
+          currentPage: 1,
+          pageSize: 10,
+        }
+      }
+      this.getList()
+    },
     getList () {
       // 统一参数
       let params = {

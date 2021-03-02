@@ -1,5 +1,10 @@
 <template>
-  <el-table :data="tableData" border style="width: 100%" header-row-class-name="hc-crud-table-header" :header-cell-style="{backgroundColor: '#FAFAFA', color: '#333333'}" v-loading="tableLoading">
+  <el-table :data="tableData" style="width: 100%" header-row-class-name="hc-crud-table-header" :header-cell-style="{backgroundColor: '#FAFAFA', color: '#333333'}" v-loading="tableLoading">
+    <el-table-column v-if="option.expand" type="expand" width="50px">
+      <template v-slot="scope">
+        <slot name="expand" :row="scope.row"></slot>
+      </template>
+    </el-table-column>
     <el-table-column v-for="(item, index) in (option.columns || [])" :key="index" :prop="item.prop" :label="item.label"  :width="item.width || ''">
       <template v-if="item.slot || item.type == 'select' || item.formatter" v-slot="scope">
         <slot v-if="item.slot" :name="item.prop" :row="scope.row">
