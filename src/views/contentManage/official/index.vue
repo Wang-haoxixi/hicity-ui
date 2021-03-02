@@ -2,139 +2,33 @@
   <basic-container>
     <!-- 官方发布 -->
     <hc-table-form :title="title" :formVisible="!isShow" @go-back="backClisk">
-      <template>
-        <div class="add-inp-more">
-          <!-- 新建按钮 -->
+      <hc-crud
+        :option="tableOption"
+        :fetchListFun="fetchListFun"
+        :addFun="addFun"
+        @toUpdate="toUpdate"
+        @toDelete="toDelete"
+        ref="hcCrud"
+      >
+        <div slot="menuLeft">
           <el-button
-            size="mini"
             @click="toCreate"
+            class="el-icon-plus"
             type="primary"
-            icon="el-icon-plus"
-            >新建</el-button
+            size="mini"
           >
-          <div class="inp-more">
-            <el-input
-              clearable
-              size="mini"
-              class="inp"
-              placeholder="请输入官方发布名称"
-              v-model="input"
-              @clear="clearVal"
-            >
-              <el-button
-                slot="append"
-                icon="el-icon-search"
-                @click="search"
-              ></el-button>
-            </el-input>
-            <el-button
-              icon="el-icon-more"
-              class="more"
-              @click="dialogOpenMoreVisible = true"
-            ></el-button>
-            <el-dialog
-              title="多 选"
-              :visible.sync="dialogOpenMoreVisible"
-              width="600px"
-            >
-              <el-checkbox-group v-model="checkList">
-                <el-checkbox label="名称"></el-checkbox>
-                <el-checkbox label="栏目"></el-checkbox>
-                <el-checkbox label="发布者"></el-checkbox>
-                <el-checkbox label="状态"></el-checkbox>
-                <el-checkbox label="创建时间"></el-checkbox>
-                <el-checkbox label="展示范围"></el-checkbox>
-              </el-checkbox-group>
-            </el-dialog>
-          </div>
+            新建</el-button
+          >
         </div>
-        <!-- 表格 -->
-        <el-table
-          :data="tableData"
-          border
-          stripe
-          :header-cell-style="{ background: '#FAFAFA' }"
-          v-loading="tableLoading"
-          style="width: 100%"
-        >
-          <el-table-column
-            align='center'
-            v-if="checkList.includes('名称')"
-            prop="officialNewsName"
-            label="名称"
+        <template slot="cityList" slot-scope="scope">
+          <el-button
+            type="text"
+            size="mini"
+            @click="check(scope.row.officialNewsId)"
+            >查看</el-button
           >
-          </el-table-column>
-          <el-table-column
-            align='center'
-            v-if="checkList.includes('栏目')"
-            prop="officialColumnName"
-            label="栏目"
-          ></el-table-column>
-          <el-table-column
-            align='center'
-            v-if="checkList.includes('发布者')"
-            prop="createByName"
-            label="发布者"
-          ></el-table-column>
-          <el-table-column
-            align='center'
-            v-if="checkList.includes('状态')"
-            prop="state"
-            label="状态"
-            width="100"
-          >
-          </el-table-column>
-          <el-table-column align='center' v-if="checkList.includes('创建时间')" prop="createTime" label="创建时间"></el-table-column>
-          <!-- 平台可见 -->
-          <el-table-column
-            label="展示范围"
-            width="80"
-            v-if="(userType == 1 || userType == 2) && checkList.includes('展示范围')"
-          >
-            <template slot-scope="scope">
-              <span @click="check(scope.row.officialNewsId)" class="isClick"
-                >查看</span
-              >
-            </template>
-          </el-table-column>
-          <el-table-column align='center' label="操作" width="150">
-            <template slot-scope="scope" v-if="userType <= scope.row.source">
-              <!-- <el-button
-                @click="handleDetails(scope.row)"
-                type="text"
-                size="small"
-                >详情</el-button
-              > -->
-              <el-button @click="handleEdit(scope.row)" type="text" size="small"
-                >编辑</el-button
-              >
-              <el-button @click="handleDel(scope.row)" type="text" size="small"
-                >删除</el-button
-              >
-              <!-- <el-button
-                @click="handleCopylink(scope.row)"
-                type="text"
-                size="small"
-                >复制链接</el-button
-              > -->
-            </template>
-          </el-table-column>
-          <template slot="empty">
-            <hc-empty-data></hc-empty-data>
-          </template>
-        </el-table>
-        <el-pagination
-          background
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          :current-page="currentPage"
-          :page-sizes="[10, 20, 30, 40, 50, 100]"
-          :page-size="pageSize"
-          :total="total"
-          class="paging"
-          layout="total, sizes, prev, pager, next, jumper"
-        ></el-pagination>
-      </template>
+        </template>
+      </hc-crud>
 
       <template slot="form">
         <el-form
@@ -145,7 +39,10 @@
         >
           <!-- 名称 -->
           <el-form-item label="名称" prop="officialNewsName">
-            <el-input v-model="addform.officialNewsName" maxlength="200"></el-input>
+            <el-input
+              v-model="addform.officialNewsName"
+              maxlength="200"
+            ></el-input>
           </el-form-item>
 
           <el-row>
@@ -219,21 +116,6 @@
             <hc-quill v-model="quillContent"></hc-quill>
           </el-form-item>
 
-          <!-- 是否允许城市停用 -->
-          <!-- <el-form-item
-          label="是否允许城市停用"
-          label-width="140px"
-          v-if="isAdmin"
-        >
-          <el-switch
-            v-model="addform.closeAllowed"
-            active-value="0"
-            active-text="允许"
-            inactive-text="不允许"
-            inactive-value="1"
-          ></el-switch>
-        </el-form-item> -->
-
           <!-- 事件按钮 -->
           <el-form-item>
             <el-button @click="handlePreview">预览</el-button>
@@ -243,10 +125,13 @@
         </el-form>
         <hc-preview v-if="preview" @close="preview = false">
           <div class="preview-title">
-            {{addform.officialNewsName || '资讯标题'}}
+            {{ addform.officialNewsName || "资讯标题" }}
           </div>
-          <div class="preview-time">发布时间：{{dateFormat(new Date())}}</div>
-          <div class="preview-content" v-html="quillContent.content || '内容'"></div>
+          <div class="preview-time">发布时间：{{ dateFormat(new Date()) }}</div>
+          <div
+            class="preview-content"
+            v-html="quillContent.content || '内容'"
+          ></div>
         </hc-preview>
       </template>
     </hc-table-form>
@@ -266,7 +151,7 @@ import {
   officialDel,
   officaialNewsUpdate,
 } from "@/api/officialRelease/officialRelease.js";
-import { dateFormat } from "@/util/date"
+import { dateFormat } from "@/util/date";
 import HcQuill from "@/views/components/HcQuill";
 import HcCityBox from "@/views/components/HcCity/HcCityBox/index";
 import HcCitySelect from "@/views/components/HcCity/HcCitySelect/index";
@@ -275,10 +160,21 @@ import store from "@/store";
 import { getAllTagList } from "@/api/tms/city";
 import { adminCityList } from "@/api/admin/city";
 import HcTableForm from "@/views/components/HcTableForm/index";
-import HcEmptyData from "@/views/components/HcEmptyData/index"
-import HcPreview from "@/views/components/HcPreview/index"
+import HcEmptyData from "@/views/components/HcEmptyData/index";
+import HcPreview from "@/views/components/HcPreview/index";
+
+// -------------
+import { tableOption } from "./const.js";
+
 export default {
-  components: { HcQuill, HcCityBox, HcCitySelect, HcTableForm, HcEmptyData, HcPreview },
+  components: {
+    HcQuill,
+    HcCityBox,
+    HcCitySelect,
+    HcTableForm,
+    HcEmptyData,
+    HcPreview,
+  },
   data() {
     return {
       isShow: true, //是否显示资讯列表
@@ -288,7 +184,6 @@ export default {
       },
       input: "",
       dialogOpenMoreVisible: false,
-      checkList: ["名称", "栏目", "发布者", "状态", "创建时间", "展示范围"], //已选中的菜单
 
       // 发布列表
       tableData: [],
@@ -334,7 +229,7 @@ export default {
         content: [{ validator: this.contentValidator, required: true }],
       },
       tableLoading: false,
-      preview: false
+      preview: false,
     };
   },
   watch: {
@@ -345,6 +240,93 @@ export default {
     },
   },
   methods: {
+    fetchListFun(params) {
+      return new Promise((resolve, reject) => {
+        officialReleaseList(params).then((res) => {
+          resolve({
+            records: res.data.data.data.records,
+            page: {
+              total: res.data.data.data.total,
+            },
+          });
+        });
+      });
+    },
+    toDelete({ officialNewsId }) {
+      this.$confirm("此操作将永久删除, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          officialDel({
+            officialNewsId: officialNewsId,
+            cityId: this.userInfo.manageCityId,
+          }).then((res) => {
+            if (res.data.code !== 0) {
+              return this.$message.error("删除失败！");
+            }
+            this.$message({
+              message: "删除成功！",
+              type: "success",
+            });
+            this.getOfficialReleaseList();
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除",
+          });
+        });
+    },
+    addFun(data, next) {
+      console.log("新增", data);
+      setTimeout(() => {
+        next();
+      }, 1000);
+    },
+    // 编辑
+    toUpdate({ officialNewsId }) {
+      officialDetail({
+        officialNewsId: officialNewsId,
+      }).then((res) => {
+        let officialColumnId = res.data.data.data.officialColumnId;
+        let officialMatch = false;
+        for (let i = 0; i < this.columnData.length; i++) {
+          if (this.columnData[i].officialColumnId == officialColumnId) {
+            officialMatch = true;
+            break;
+          }
+        }
+        if (!officialMatch) {
+          res.data.data.data.officialColumnId = "";
+        }
+        this.addform = res.data.data.data;
+        this.quillContent = {
+          content: res.data.data.data.officialNewsContent,
+          structuredContent: res.data.data.data.structuredContent,
+        };
+        this.urlList = [];
+        this.fileList = [];
+        this.addform.urlList.forEach((item, index) => {
+          this.fileList.push({
+            name: index,
+            url: item,
+          });
+          this.urlList.push({
+            type: "image",
+            newsUrl: item,
+            imageSizeType: this.addform.imageSizeType,
+          });
+        });
+        this.addform.urlList = this.urlList;
+        this.isShow = false;
+      });
+
+      this.publishType = "edit";
+    },
+    // -----------
     dateFormat,
     backClisk() {
       // 清空标题图数组
@@ -398,7 +380,7 @@ export default {
     },
     // 获取官方发布列表
     getOfficialReleaseList() {
-      this.tableLoading = true
+      this.tableLoading = true;
       let form = {
         officialColumnName: this.input,
         current: this.currentPage,
@@ -408,21 +390,23 @@ export default {
       //   this.addform.source = 1;
       //   form.source = 1;
       // }
-      officialReleaseList(form).then((res) => {
-        res.data.data.data.records.forEach((item) => {
-          if (item.state === 0) {
-            item.state = "草稿状态";
-          } else if (item.state === 1) {
-            item.state = "已生效";
-          } else {
-            item.state = "已失效";
-          }
+      officialReleaseList(form)
+        .then((res) => {
+          res.data.data.data.records.forEach((item) => {
+            if (item.state === 0) {
+              item.state = "草稿状态";
+            } else if (item.state === 1) {
+              item.state = "已生效";
+            } else {
+              item.state = "已失效";
+            }
+          });
+          this.total = res.data.data.data.total;
+          this.tableData = res.data.data.data.records;
+        })
+        .finally(() => {
+          this.tableLoading = false;
         });
-        this.total = res.data.data.data.total;
-        this.tableData = res.data.data.data.records;
-      }).finally(() => {
-        this.tableLoading = false
-      });
     },
     // 查看
     check(id) {
@@ -436,84 +420,6 @@ export default {
         );
       });
     },
-    // 详情
-    // handleDetails(row) {
-    //   console.log("详情", row);
-    // },
-    // 编辑
-    handleEdit(row) {
-      // console.log("编辑", row);
-      officialDetail({
-        officialNewsId: row.officialNewsId,
-      }).then((res) => {
-        let officialColumnId = res.data.data.data.officialColumnId;
-        let officialMatch = false;
-        for (let i = 0; i < this.columnData.length; i++) {
-          if (this.columnData[i].officialColumnId == officialColumnId) {
-            officialMatch = true;
-            break;
-          }
-        }
-        if (!officialMatch) {
-          res.data.data.data.officialColumnId = "";
-        }
-        this.addform = res.data.data.data;
-        this.quillContent = {
-          content: res.data.data.data.officialNewsContent,
-          structuredContent: res.data.data.data.structuredContent,
-        };
-        this.urlList = [];
-        this.fileList = [];
-        this.addform.urlList.forEach((item, index) => {
-          this.fileList.push({
-            name: index,
-            url: item,
-          });
-          this.urlList.push({
-            type: "image",
-            newsUrl: item,
-            imageSizeType: this.addform.imageSizeType,
-          });
-        });
-        this.addform.urlList = this.urlList;
-        this.isShow = false;
-      });
-
-      this.publishType = "edit";
-    },
-    // 删除
-    handleDel(row) {
-      this.$confirm("此操作将永久删除, 是否继续?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-      })
-        .then(() => {
-          officialDel({
-            officialNewsId: row.officialNewsId,
-            cityId: this.userInfo.manageCityId,
-          }).then((res) => {
-            if (res.data.code !== 0) {
-              return this.$message.error("删除失败！");
-            }
-            this.$message({
-              message: "删除成功！",
-              type: "success",
-            });
-            this.getOfficialReleaseList();
-          });
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "已取消删除",
-          });
-        });
-    },
-    // 复制链接
-    // handleCopylink(row) {
-    //   console.log("复制链接", row);
-    // },
     handleSizeChange(val) {
       this.pageSize = val;
       this.getOfficialReleaseList();
@@ -524,8 +430,7 @@ export default {
     },
     // 保存
     save() {
-      officialColumnCreate({}).then((res) => {
-      });
+      officialColumnCreate({}).then((res) => {});
     },
     // 图片移除
     handleRemove(res, file) {
@@ -553,7 +458,7 @@ export default {
     },
     // 预览
     handlePreview() {
-      this.preview = true
+      this.preview = true;
     },
     // 保存草稿
     handleDraft() {
@@ -637,7 +542,8 @@ export default {
                 content: "",
                 structuredContent: "",
               };
-              this.getOfficialReleaseList();
+              // this.getOfficialReleaseList();
+              this.$refs.hcCrud.refresh();
               this.isShow = true;
             });
           }
@@ -667,7 +573,8 @@ export default {
               };
               this.fileList = [];
               this.isShow = true;
-              this.getOfficialReleaseList();
+              // this.getOfficialReleaseList();
+              this.$refs.hcCrud.refresh();
             });
           }
         });
@@ -687,6 +594,9 @@ export default {
   },
   computed: {
     ...mapGetters(["userInfo", "dicList", "userType"]),
+    tableOption() {
+      return tableOption(this.userType == 1 || this.userType == 2);
+    },
     // 3/4平台
     isAdmin() {
       return this.userInfo.userType == 3 || this.userInfo.userType == 4;
@@ -761,7 +671,6 @@ export default {
   text-align: right;
 }
 
-
 .preview-title {
   line-height: 26px;
   color: #333333;
@@ -776,7 +685,9 @@ export default {
 }
 .preview-content {
   margin-top: 24px;
-  /deep/ .quill-image, /deep/ .quill-image-box, /deep/ img {
+  /deep/ .quill-image,
+  /deep/ .quill-image-box,
+  /deep/ img {
     width: 100% !important;
   }
 }

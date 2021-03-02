@@ -1,8 +1,21 @@
 <template>
   <basic-container>
-    <hc-table-form
-      title="合伙人申请列表">
-       <hc-crud :option="tableOption" :fetchListFun="fetchListFun" @handleView="handleView"></hc-crud>
+    <hc-table-form title="合伙人申请列表">
+      <hc-crud
+        :option="tableOption"
+        :fetchListFun="fetchListFun"
+        :addFun="addFun"
+        :updateFun="updateFun"
+        :deleteFun="deleteFun"
+        @handleView="handleView"
+      >
+        <!-- <div slot="nameForm" slot-scope="scope">
+          <el-input v-model="scope.formData.id"></el-input>
+        </div> -->
+        <!-- <div slot="name" slot-scope="scope">
+           <div>{{scope}}</div>
+         </div> -->
+      </hc-crud>
     </hc-table-form>
 
     <!-- 合伙人详情 -->
@@ -22,7 +35,7 @@
 </template>
 
 <script>
-import { tableOption } from './const.js'
+import { tableOption } from "./const.js";
 import { partnerList, partnerDetail } from "@/api/content/partners";
 export default {
   data() {
@@ -48,11 +61,29 @@ export default {
           resolve({
             records: res.data.data.data.records,
             page: {
-              total: res.data.data.data.total
-            }
-          })
-        })
-      })
+              total: res.data.data.data.total,
+            },
+          });
+        });
+      });
+    },
+    deleteFun(data, next) {
+      console.log("删除", data);
+      setTimeout(() => {
+        next();
+      }, 1000);
+    },
+    addFun(data, next) {
+      console.log("新增", data);
+      setTimeout(() => {
+        next();
+      }, 1000);
+    },
+    updateFun(data, next) {
+      console.log("编辑", data);
+      setTimeout(() => {
+        next();
+      }, 1000);
     },
   },
 };

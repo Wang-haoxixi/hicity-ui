@@ -1,37 +1,74 @@
 <template>
   <div class="hc-crud-container">
+    <!-- 搜索 -->
     <slot name="search">
-      <el-form v-if="searchList && searchList.length > 0" class="search-box" label-width="auto" style="width: 100%">
-        <el-form-item v-for="(item, index) in searchList" :key="index"
+      <el-form
+        v-if="searchList && searchList.length > 0"
+        class="search-box"
+        label-width="auto"
+        style="width: 100%"
+      >
+        <el-form-item
+          v-for="(item, index) in searchList"
+          :key="index"
           class="search-item"
-          :label="item.label">
-          <hc-form-item v-model="searchFormShow[item.prop]" :option="item"></hc-form-item>
+          :label="item.label"
+        >
+          <hc-form-item
+            v-model="searchFormShow[item.prop]"
+            :option="item"
+          ></hc-form-item>
         </el-form-item>
         <el-form-item>
-          <el-button  class="search-item" type="primary" icon="el-icon-search" @click="toSearch">搜 索</el-button>
-          <el-button  class="search-item" icon="el-icon-refresh" @click="resetSearch">重 置</el-button>
+          <el-button
+            class="search-item"
+            type="primary"
+            icon="el-icon-search"
+            @click="toSearch"
+            >搜 索</el-button
+          >
+          <el-button
+            class="search-item"
+            icon="el-icon-refresh"
+            @click="resetSearch"
+            >重 置</el-button
+          >
         </el-form-item>
       </el-form>
     </slot>
+    <!-- 新建 -->
     <div v-if="option.header || autoAdd" class="hc-crud-header">
       <div class="menu-left">
-        <el-button v-if="autoAdd" type="primary" size="mini" icon="el-icon-plus" @click="toCreate">新建</el-button>
-        <tempalte v-else>
-          <slot  name="menuLeft"></slot>
-        </tempalte>
+        <el-button
+          v-if="autoAdd"
+          type="primary"
+          size="mini"
+          icon="el-icon-plus"
+          @click="toCreate"
+          >新建</el-button
+        >
+        <template v-else>
+          <slot name="menuLeft"></slot>
+        </template>
       </div>
       <div v-if="option.header" class="menu-right">
         <slot name="menuRight"></slot>
       </div>
     </div>
+    <!-- 表格 -->
     <slot name="table">
       <hc-crud-table
         :option="option"
         :tableData="tableData"
         :table-loading="tableLoading"
         @handle-event="handleEvent"
-        @handle-auto-event="handleAutoEvent">
-        <template v-for="(item, index) in slotList" :slot="item.prop" slot-scope="scope">
+        @handle-auto-event="handleAutoEvent"
+      >
+        <template
+          v-for="(item, index) in slotList"
+          :slot="item.prop"
+          slot-scope="scope"
+        >
           <div :key="index">
             <slot :name="item.prop" :row="scope.row"></slot>
           </div>
@@ -44,6 +81,7 @@
         </template>
       </hc-crud-table>
     </slot>
+    <!-- 分页 -->
     <slot name="pagination">
       <div class="pagination-box">
         <el-pagination
@@ -51,17 +89,27 @@
           @size-change="sizeChange"
           @current-change="currentChange"
           :current-page="page.currentPage"
-          :page-sizes="[10, 20, 30,, 40, 50, 100]"
+          :page-sizes="[10, 20, 30, 40, 50, 100]"
           background
           :page-size="page.pageSize"
           layout="total, sizes, prev, pager, next, jumper"
-          :total="page.total">
+          :total="page.total"
+        >
         </el-pagination>
       </div>
     </slot>
     <slot name="form">
-      <hc-crud-form ref="form" :option="option" @handle-edit="handleUpdate" @handle-add="handleAdd">
-        <template v-for="(item, index) in formSlotList" :slot="`${item.prop}Form`" slot-scope="scope">
+      <hc-crud-form
+        ref="form"
+        :option="option"
+        @handle-edit="handleUpdate"
+        @handle-add="handleAdd"
+      >
+        <template
+          v-for="(item, index) in formSlotList"
+          :slot="`${item.prop}Form`"
+          slot-scope="scope"
+        >
           <div :key="`form__${index}`">
             <slot :name="`${item.prop}Form`" :form-data="scope.formData"></slot>
           </div>
@@ -72,39 +120,39 @@
 </template>
 
 <script>
-import HcFormItem from './HcFormItem'
-import HcCrudTable from './HcCrudTable'
-import HcCrudForm from './HcCrudForm'
+import HcFormItem from "./HcFormItem";
+import HcCrudTable from "./HcCrudTable";
+import HcCrudForm from "./HcCrudForm";
 export default {
-  name: 'HcCrud',
+  name: "HcCrud",
   components: { HcFormItem, HcCrudTable, HcCrudForm },
   props: {
     option: {
       type: Object,
-      required: true
+      required: true,
     },
     fetchListFun: {
       type: Function,
-      required: true
+      required: true,
     },
     addFun: {
       type: Function,
-      default: () => null
+      default: () => null,
     },
     updateFun: {
       type: Function,
-      default: () => null
+      default: () => null,
     },
     deleteFun: {
       type: Function,
-       default: () => null
+      default: () => null,
     },
     searchQuery: {
       type: Array,
-      default: () => []
-    }
+      default: () => [],
+    },
   },
-  data () {
+  data() {
     return {
       tableData: [],
       tableLoading: false,
@@ -114,139 +162,141 @@ export default {
         currentPage: 1,
         pageSize: 10,
       },
-    }
+    };
   },
   computed: {
-    searchList () {
+    searchList() {
       if (this.searchQuery && this.searchQuery.length > 0) {
-        return this.searchQuery
+        return this.searchQuery;
       } else {
-        let list = []
-        let columns = this.option.columns || []
+        let list = [];
+        let columns = this.option.columns || [];
         for (let i = 0; i < columns.length; i++) {
           if (columns[i].search) {
             list.push({
               prop: columns[i].prop,
-              type: columns[i].type || 'text',
+              type: columns[i].type || "text",
               label: columns[i].label,
-              dicName: columns[i].dicName
-            })
-            this.$set(this.searchFormShow, columns[i].prop, '')
+              dicName: columns[i].dicName,
+            });
+            this.$set(this.searchFormShow, columns[i].prop, "");
           }
         }
-        return list
+        return list;
       }
     },
-    formSlotList () {
-      let columns = this.option.columns || []
-      let slotList = []
+    formSlotList() {
+      let columns = this.option.columns || [];
+      let slotList = [];
       for (let i = 0; i < columns.length; i++) {
         if (columns[i].formSlot) {
-          slotList.push(columns[i])
+          slotList.push(columns[i]);
         }
       }
-      return slotList
+      return slotList;
     },
-    slotList () {
-      let columns = this.option.columns || []
-      let slotList = []
+    slotList() {
+      let columns = this.option.columns || [];
+      let slotList = [];
       for (let i = 0; i < columns.length; i++) {
         if (columns[i].slot) {
-          slotList.push(columns[i])
+          slotList.push(columns[i]);
         }
       }
-      return slotList
+      return slotList;
     },
-    autoAdd () {
+    autoAdd() {
       if (this.option.menu && this.option.menu instanceof Array) {
-        return this.option.menu.includes('add')
+        return this.option.menu.includes("add");
       }
-    }
+    },
   },
   mounted() {
-    this.getList()
+    this.getList();
   },
   methods: {
-    refresh (page = {}, searchForm = {}) {
+    refresh(page = {}, searchForm = {}) {
       this.searchForm = {
         ...searchForm,
-        ...this.searchForm
-      }
+        ...this.searchForm,
+      };
       this.page = {
         ...page,
-        ...this.page
-      }
-      this.getList()
+        ...this.page,
+      };
+      this.getList();
     },
-    getList () {
+    getList() {
       // 统一参数
       let params = {
         current: this.page.currentPage,
         size: this.page.pageSize,
-        ...this.searchForm
-      }
-      this.tableLoading = true
-      this.fetchListFun(params).then(({records, page}) => {
-        this.tableData = records
-        this.page = {
-          ...page,
-          ...this.page
-        }
-      }).finally(() => {
-        this.tableLoading = false
-      })
+        ...this.searchForm,
+      };
+      this.tableLoading = true;
+      this.fetchListFun(params)
+        .then(({ records, page }) => {
+          this.tableData = records;
+          this.page = {
+            ...page,
+            ...this.page,
+          };
+        })
+        .finally(() => {
+          this.tableLoading = false;
+        });
     },
     // 每页数量改变
-    sizeChange (size) {
-      this.page.pageSize = size
-      this.page.currentPage = 1
-      this.getList()
+    sizeChange(size) {
+      this.page.pageSize = size;
+      this.page.currentPage = 1;
+      this.getList();
     },
     // 页数改变
-    currentChange (current) {
-      this.page.currentPage = current
-      this.getList()
+    currentChange(current) {
+      this.page.currentPage = current;
+      this.getList();
     },
-    handleEvent ({fun, row}) {
-      this.$emit(fun, row)
+    handleEvent({ fun, row }) {
+      this.$emit(fun, row);
     },
-    handleAutoEvent ({type, row}) {
-      if (type == 'view' || type == 'edit') {
+    handleAutoEvent({ type, row }) {
+      if (type == "view" || type == "edit") {
         // 查看 或 编辑
-        this.$refs.form.open(row, type)
-      } else if (type == 'delete') {
+        this.$refs.form.open(row, type);
+      } else if (type == "delete") {
         // 删除
-        this.deleteFun && this.deleteFun(row, this.refresh)
+        this.deleteFun && this.deleteFun(row, this.refresh);
       }
     },
-    toCreate () {
-      this.$refs.form.open()
+    toCreate() {
+      this.$refs.form.open();
     },
-    handleAdd (row) {
+    handleAdd(row) {
       this.addFun(row, () => {
-        this.$refs.form.close()
-        this.refresh()
-      })
+        this.$refs.form.close();
+        this.refresh();
+      });
     },
-    handleUpdate (row) {
+    handleUpdate(row) {
       this.updateFun(row, () => {
-        this.$refs.form.close()
-        this.refresh()
-      })
+        this.$refs.form.close();
+        this.refresh();
+      });
     },
-    toSearch () {
-      this.searchForm = this.searchFormShow
+    toSearch() {
+      this.searchForm = this.searchFormShow;
       this.page = {
         currentPage: 1,
         pageSize: 10,
-      }
-      this.getList()
+      };
+      this.getList();
     },
-    resetSearch () {
-      this.searchFormShow = {}
-    }
-  }
-}
+    resetSearch() {
+      this.searchFormShow = {};
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
