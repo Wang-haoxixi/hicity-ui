@@ -1,15 +1,18 @@
 export const tableOption = (admin = false) => {
   let columns = [
     {
+      prop: "searchName",
+      label: "名称",
+      search: true,
+      hidden: true
+    },
+    {
       prop: "officialNewsName",
       label: "名称"
     },
     {
       prop: "officialColumnName",
       label: "栏目"
-      // slot: true,
-      // formSlot: true,
-      // search: true
     },
     {
       prop: "createByName",

@@ -142,6 +142,8 @@ export default {
               total: response.data.data.data.total
             }
           })
+        }, (error) => {
+          reject(error)
         })
       })
     },

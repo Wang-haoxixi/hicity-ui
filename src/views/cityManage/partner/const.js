@@ -1,17 +1,9 @@
 export const tableOption = (edit = false, admin = false) => {
   let option = {
-    border: true,
-    // index: true,
-    // indexLabel: '序号', 
-    stripe: true,
-    menuAlign: 'center',
-    editBtn: false,
-    delBtn: false,
-    align: 'center',
-    addBtn: false,
     labelWidth: 160,
     menuWidth: 220,
-    column: [
+    menu: true,
+    columns: [
       {
         label: '城市',
         prop: 'cityName',

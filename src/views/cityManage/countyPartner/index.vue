@@ -1,50 +1,31 @@
 <template>
-  <div class="user">
-    <basic-container>
-      <avue-crud
-        v-model="form"
-        ref="crud"
-        :option="tableOption"
-        :page="page"
-        :table-loading="tableLoading"
-        :data="tableData"
-        @on-load="getList"
-        @refresh-change="handleRefreshChange"
-        @search-change="handleFilter"
-        @current-change="currentChange"
-        @size-change="sizeChange"
-      >
-        <template slot="menu" slot-scope="scope">
+  <basic-container>
+    <hc-table-form title="区县合伙人">
+      <hc-crud ref="hcCrud" :option="tableOption" :fetchListFun="fetchListFun">
+        <template
+          slot="menu"
+          slot-scope="scope">
           <el-button
             v-if="!scope.row.isOpening"
             type="text"
             size="mini"
-            @click="toOpen(scope.row)"
-            >开通城市
+            @click="toOpen(scope.row)">开通城市
           </el-button>
           <el-button
             v-else
             type="text"
             size="mini"
-            @click="handleLock(scope.row)"
-            >{{ scope.row.state == 0 ? "锁定" : "解锁" }}
+            @click="handleLock(scope.row)">{{scope.row.state == 0 ? '锁定' : '解锁'}}
           </el-button>
         </template>
-      </avue-crud>
-    </basic-container>
-
+      </hc-crud>
+    </hc-table-form>
     <el-dialog
       :visible.sync="dialogRoleVisible"
       :close-on-click-modal="false"
       append-to-body
-      title="配置角色"
-    >
-      <el-form
-        ref="form"
-        class="dialog-main-tree"
-        :model="formData"
-        label-width="180px"
-        :rules="formRule">
+      title="配置角色">
+      <el-form ref="form" class="dialog-main-tree" :model="formData" label-width="180px" :rules="formRule">
         <el-form-item label="城市名称：">
           <el-input disabled :value="formData.cityName"></el-input>
         </el-form-item>
@@ -55,36 +36,36 @@
           <el-input v-model="formData.password" type="password" maxlength="20"></el-input>
         </el-form-item>
       </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" size="small" @click="handleOpen()"
-          >开 通
+      <div slot="footer"
+        class="dialog-footer">
+        <el-button
+          type="primary"
+          size="small"
+          @click="handleOpen()">开 通
         </el-button>
-        <el-button type="default" size="small" @click="cancal()"
-          >取 消</el-button
-        >
+        <el-button
+          type="default"
+          size="small"
+          @click="cancal()">取 消</el-button>
       </div>
     </el-dialog>
-  </div>
+  </basic-container>
 </template>
 
 <script>
-import { tableOption } from "./const";
-import { mapGetters } from "vuex";
-import {
-  adminCityOpen,
-  adminOpeningCountyList,
-  adminCityLock,
-} from "@/api/admin/city";
+import { tableOption } from './const'
+import { mapGetters } from 'vuex'
+import { adminCityOpen, adminOpeningCountyList, adminCityLock } from '@/api/admin/city'
 
 export default {
-  name: "SysUser",
+  name: 'SysUser',
   data() {
     return {
       page: {
         total: 0, // 总页数
         currentPage: 1, // 当前页数
         pageSize: 20, // 每页显示多少条,
-        isAsc: false, // 是否倒序
+        isAsc: false// 是否倒序
       },
       tableLoading: false,
       tableData: [],
@@ -96,123 +77,98 @@ export default {
         username: {required: true, message: '请输入账号', trigger: 'blur'},
         password: {required: true, message: '请输入密码', trigger: 'blur'}
       }
-    };
+    }
   },
   computed: {
-    ...mapGetters(["permissions", "userInfo"]),
+    ...mapGetters(['permissions', 'userInfo']),
     tableOption() {
-      return tableOption(
-        this.edit,
-        this.userInfo.userType == 3 || this.userInfo.userType == 4
-      );
-    },
+      return tableOption(this.edit, this.userInfo.userType == 3 || this.userInfo.userType == 4)
+    }
   },
-  watch: {},
-  created() {},
+  watch: {
+  },
+  created() {
+  },
   methods: {
-    getList(page = this.page) {
-      this.tableLoading = true;
-      adminOpeningCountyList({
-        current: page.currentPage,
-        size: page.pageSize,
-        ...this.searchForm
-      })
-        .then(({ data }) => {
-          this.tableData = data.data.data.records;
-          this.page.total = data.data.data.total;
+    fetchListFun (params) {
+      return new Promise((resolve, reject) => {
+        adminOpeningCountyList(params).then(({data}) => {
+          resolve({
+            records: data.data.data.records,
+            page: {
+              total: data.data.data.total
+            }
+          })
+        }, (error) => {
+          reject(error)
         })
-        .finally(() => {
-          this.tableLoading = false;
-        });
-    },
-    handleFilter(param) {
-      this.searchForm = param
-      this.getList(this.page, param)
+      })
     },
     toOpen(row) {
       this.formData = {
         cityId: row.cityId,
         cityName: row.cityName,
-      };
-      this.dialogRoleVisible = true;
-    },
-    handleOpen() {
-      this.$refs.form.validate((valid) => {
-        if (valid) {
-          adminCityOpen(this.formData).then(({ data }) => {
-            this.getList();
-            this.$notify({
-              title: "成功",
-              message: "开通成功",
-              type: "success",
-              duration: 2000,
-            });
-            this.dialogRoleVisible = false;
-          });
-        }
-      });
-    },
-    cancal() {
-      this.dialogRoleVisible = false;
-    },
-    handleLock(row) {
-      let lockWord = row.state == 0 ? "锁定" : "解锁";
-      this.$confirm(`是否确认${lockWord}该城市?`, "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-      })
-        .then(() => {
-          adminCityLock({
-            cityId: row.cityId,
-            lock: row.state == 0 ? true : false,
-          }).then(({ data }) => {
-            this.getList();
-            this.$notify({
-              title: "成功",
-              message: `${lockWord}成功`,
-              type: "success",
-              duration: 2000,
-            });
-          });
-        })
-        .catch(function () {});
-    },
-    handleRefreshChange() {
-      this.page = {
-        total: 0, // 总页数
-        currentPage: 1, // 当前页数
-        pageSize: 20, // 每页显示多少条,
-        isAsc: false, // 是否倒序
       }
-      this.getList();
+      this.dialogRoleVisible = true
     },
-    currentChange (current) {
-      this.page.currentPage = current
-      this.getList()
+    handleOpen () {
+      this.$refs.form.validate(valid => {
+        if (valid) {
+          adminCityOpen(this.formData).then(({data}) => {
+            this.$refs.hcCrud.refresh()
+            this.$notify({
+              title: '成功',
+              message: '开通成功',
+              type: 'success',
+              duration: 2000
+            })
+            this.dialogRoleVisible = false
+          })
+        }
+      })
     },
-    sizeChange (size) {
-      this.page.pageSize = size
-      this.page.currentPage = 1
-      this.getList()
-    }
-  },
-};
-</script>
-<style lang="scss">
-.user {
-  height: 100%;
-
-  &__tree {
-    padding-top: 3px;
-    padding-right: 20px;
-  }
-
-  &__main {
-    .el-card__body {
-      padding-top: 0;
-    }
+    cancal () {
+      this.dialogRoleVisible = false
+    },
+    handleLock (row) {
+      let lockWord = row.state == 0 ? '锁定' : '解锁'
+      this.$confirm(`是否确认${lockWord}该城市?`, '警告', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        adminCityLock({
+          cityId: row.cityId,
+          lock: row.state == 0 ? true : false
+        }).then(({data}) => {
+          this.$refs.hcCrud.refresh()
+          this.$notify({
+            title: '成功',
+            message: `${lockWord}成功`,
+            type: 'success',
+            duration: 2000
+          })
+        })
+      }).catch(function() {
+      })
+    },
   }
 }
+</script>
+<style lang="scss">
+  .user {
+    height: 100%;
+
+    &__tree {
+      padding-top: 3px;
+      padding-right: 20px;
+    }
+
+    &__main {
+      .el-card__body {
+        padding-top: 0;
+      }
+    }
+  }
 </style>
 

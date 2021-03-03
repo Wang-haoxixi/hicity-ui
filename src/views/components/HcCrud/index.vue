@@ -3,22 +3,24 @@
     <!-- 搜索 -->
     <slot name="search">
       <el-form
-        v-if="searchList && searchList.length > 0"
+        v-if="optionC.search || searchList && searchList.length > 0"
         class="search-box"
         label-width="auto"
         style="width: 100%"
       >
-        <el-form-item
-          v-for="(item, index) in searchList"
-          :key="index"
-          class="search-item"
-          :label="item.label"
-        >
-          <hc-form-item
-            v-model="searchFormShow[item.prop]"
-            :option="item"
-          ></hc-form-item>
-        </el-form-item>
+        <slot name="searchItems" :search-form="searchFormShow">
+          <el-form-item
+            v-for="(item, index) in searchList"
+            :key="index"
+            class="search-item"
+            :label="item.label + ':'"
+          >
+            <hc-form-item
+              v-model="searchFormShow[item.prop]"
+              :option="item"
+            ></hc-form-item>
+          </el-form-item>
+        </slot>
         <el-form-item>
           <el-button
             class="search-item"
@@ -37,22 +39,22 @@
       </el-form>
     </slot>
     <!-- 新建 -->
-    <div v-if="option.header || autoAdd" class="hc-crud-header">
+    <div v-if="optionC.header || autoAdd" class="hc-crud-header">
       <div class="menu-left">
         <el-button v-if="autoAdd" type="primary" size="mini" icon="el-icon-plus" @click="toCreate">新建</el-button>
         <template v-else>
           <slot  name="menuLeft"></slot>
         </template>
       </div>
-      <div v-if="option.header" class="menu-right">
+      <div v-if="optionC.header" class="menu-right">
         <slot name="menuRight"></slot>
       </div>
     </div>
     <!-- 表格 -->
-    <slot name="table">
+    <slot name="table" :table-data="tableData">
       <hc-crud-table
         :start-index="(page.currentPage - 1) * page.pageSize"
-        :option="option"
+        :option="optionC"
         :tableData="tableData"
         :table-loading="tableLoading"
         @handle-event="handleEvent"
@@ -95,7 +97,7 @@
     <slot name="form">
       <hc-crud-form
         ref="form"
-        :option="option"
+        :option="optionC"
         @handle-edit="handleUpdate"
         @handle-add="handleAdd"
       >
@@ -123,11 +125,11 @@ export default {
   props: {
     option: {
       type: Object,
-      required: true,
+      default: () => {}
     },
     fetchListFun: {
       type: Function,
-      required: true,
+      default: () => null,
     },
     addFun: {
       type: Function,
@@ -159,12 +161,17 @@ export default {
     };
   },
   computed: {
+    optionC () {
+      return {
+        ...this.option
+      }
+    },
     searchList() {
       if (this.searchQuery && this.searchQuery.length > 0) {
         return this.searchQuery;
       } else {
         let list = [];
-        let columns = this.option.columns || [];
+        let columns = this.optionC.columns || [];
         for (let i = 0; i < columns.length; i++) {
           if (columns[i].search) {
             list.push({
@@ -178,7 +185,7 @@ export default {
       }
     },
     formSlotList() {
-      let columns = this.option.columns || [];
+      let columns = this.optionC.columns || [];
       let slotList = [];
       for (let i = 0; i < columns.length; i++) {
         if (columns[i].formSlot) {
@@ -188,7 +195,7 @@ export default {
       return slotList;
     },
     slotList() {
-      let columns = this.option.columns || [];
+      let columns = this.optionC.columns || [];
       let slotList = [];
       for (let i = 0; i < columns.length; i++) {
         if (columns[i].slot) {
@@ -198,8 +205,8 @@ export default {
       return slotList;
     },
     autoAdd() {
-      if (this.option.menu && this.option.menu instanceof Array) {
-        return this.option.menu.includes("add");
+      if (this.optionC.menu && this.optionC.menu instanceof Array) {
+        return this.optionC.menu.includes("add");
       }
     },
   },
@@ -209,34 +216,40 @@ export default {
   methods: {
     refresh(page = {}, searchForm = {}) {
       this.searchForm = {
+        ...(this.searchForm || {}),
         ...searchForm,
-        ...this.searchForm,
       };
       this.page = {
+        ...(this.page || {}),
         ...page,
-        ...this.page,
       };
-      this.getList();
+      return this.getList();
     },
     getList() {
-      // 统一参数
-      let params = {
-        current: this.page.currentPage,
-        size: this.page.pageSize,
-        ...this.searchForm,
-      };
-      this.tableLoading = true;
-      this.fetchListFun(params)
-        .then(({ records, page }) => {
-          this.tableData = records;
-          this.page = {
-            ...page,
-            ...this.page,
+      return new Promise((resolve, reject) => {
+        if (this.fetchListFun) {
+          // 统一参数
+          let params = {
+            current: this.page.currentPage,
+            size: this.page.pageSize,
+            ...this.searchForm,
           };
-        })
-        .finally(() => {
-          this.tableLoading = false;
-        });
+          this.tableLoading = true;
+          this.fetchListFun(params)
+            .then(({ records, page }) => {
+              this.tableData = records;
+              this.page = {
+                ...this.page,
+                ...page,
+              };
+            })
+            .finally(() => {
+              resolve()
+              this.tableLoading = false;
+            });
+        }
+        resolve()
+      })
     },
     // 每页数量改变
     sizeChange(size) {
@@ -290,10 +303,7 @@ export default {
     },
     toSearch() {
       this.searchForm = this.searchFormShow;
-      this.page = {
-        currentPage: 1,
-        pageSize: 10,
-      };
+      this.page.currentPage = 1
       this.getList();
     },
     resetSearch() {

@@ -263,6 +263,8 @@ export default {
               total
             }
           })
+        }, (error) => {
+          reject(error)
         });
       })
     },
