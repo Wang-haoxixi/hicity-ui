@@ -61,7 +61,7 @@
             <!-- <el-input v-model="formData.cityId" maxlength="200"></el-input> -->
           </el-form-item>
           <el-form-item label="定位地址：" prop="locationAddr">
-            <hc-map-select v-model="locationAddr"></hc-map-select>
+            <hc-map-select v-model="locationAddr" @city-change="cityChange"></hc-map-select>
           </el-form-item>
           <el-form-item label="详细地址：" prop="address">
             <el-input v-model="formData.address" maxlength="200"></el-input>
@@ -129,16 +129,25 @@ export default {
       newsTagList: [],
       titleImage: [],
       formRule: {
-        merchantName: [{required: true, message: '请输入商户名称', trigger: 'blur'}],
-        merchantSynopsis: [{required: true, message: '请输入商户介绍', trigger: 'blur'}],
-        merchantLogo: [{required: true, message: '请添加商户Logo', trigger: 'blur'}],
+        merchantName: [{required: true, message: '请输入商户名称', trigger: 'change'}],
+        merchantSynopsis: [{required: true, message: '请输入商户介绍', trigger: 'change'}],
+        merchantLogo: [{required: true, message: '请添加商户Logo', trigger: 'change'}],
+        merchantUserName: [{required: true, message: '请输入联系人', trigger: 'change'}],
+        merchantUserPhone: [{required: true, message: '请输入联系电话', trigger: 'change'}],
+        cityId: [{required: true, message: '请选择所在城市', trigger: 'change'}],
+        locationAddr: [{required: true, message: '请选择定位地址', trigger: 'blur'}],
+        address: [{required: true, message: '请输入详细地址', trigger: 'change'}],
+        brandId: [{required: true, message: '请选择关联品牌', trigger: 'change'}],
+        
+        merchantStatus: [{required: true, message: '请选择店铺状态', trigger: 'change'}],
+        discount: [{required: true, message: '请输入会员折扣', trigger: 'change'}],
       },
       brandList: [],
       brandLoading: false,
     };
   },
   computed: {
-    ...mapGetters(["permissions", "userInfo", "dicList", "userType"]),
+    ...mapGetters(["permissions", "userInfo", "dicList", "userType", "allCityTree"]),
     tableOption() {
       return tableOption(this.userType == 1 || this.userType == 2);
     },
@@ -161,7 +170,6 @@ export default {
     },
     brandSelect (data) {
       this.formData.brandId = data
-      console.log(data)
     },
     refresh () {
       this.page = {
@@ -205,6 +213,27 @@ export default {
           this.tableLoading = false;
         });
     },
+    cityChange ({city, district}) {
+      let allCity = this.allCityTree[0].children
+      if (city) {
+        for (let i = 0; i < allCity.length; i++) {
+          if (allCity[i].regionName == city) {
+            if (district) {
+              let allDistrict = allCity[i].children
+              for (let j = 0; j < allDistrict.length; j++) {
+                if (allDistrict[j].regionName == district) {
+                  this.formData.cityId = allDistrict[j].id
+                  return
+                }
+              }
+            } else {
+              this.formData.cityId = allCity[i].id
+            }
+            return
+          }
+        }
+      }
+    },
     toCreate() {
       this.publish = true;
       this.publishType = "add";
@@ -231,7 +260,6 @@ export default {
         lat: this.locationAddr.latitude,
         locationAddr: this.locationAddr.name
       }
-      console.log(formData)
       if (this.publishType == "add") {
         addMerchant(formData).then(({ data }) => {
           this.publish = false;
