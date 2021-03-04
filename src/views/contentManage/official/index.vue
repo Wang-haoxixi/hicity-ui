@@ -5,7 +5,6 @@
       <hc-crud
         :option="tableOption"
         :fetchListFun="fetchListFun"
-        :addFun="addFun"
         @toUpdate="toUpdate"
         @toDelete="toDelete"
         ref="hcCrud"
@@ -182,19 +181,11 @@ export default {
       headersOpt: {
         Authorization: "Bearer " + store.getters.access_token,
       },
-      input: "",
-      dialogOpenMoreVisible: false,
-
-      // 发布列表
-      tableData: [],
       // 官方发布 - 新增
       addform: {
         cityIdList: [],
         closeAllowed: "0", //启停
       },
-      currentPage: 1,
-      pageSize: 20,
-      total: 0,
       // 预览的图片数组
       fileList: [],
       urlList: [], //标题图数组
@@ -228,7 +219,6 @@ export default {
         ],
         content: [{ validator: this.contentValidator, required: true }],
       },
-      tableLoading: false,
       preview: false,
     };
   },
@@ -272,7 +262,8 @@ export default {
               message: "删除成功！",
               type: "success",
             });
-            this.getOfficialReleaseList();
+            this.isShow = true
+            this.$refs.hcCrud.refresh();
           });
         })
         .catch(() => {
@@ -281,12 +272,6 @@ export default {
             message: "已取消删除",
           });
         });
-    },
-    addFun(data, next) {
-      console.log("新增", data);
-      setTimeout(() => {
-        next();
-      }, 1000);
     },
     // 编辑
     toUpdate({ officialNewsId }) {
@@ -363,14 +348,6 @@ export default {
         });
       });
     },
-    // 搜索
-    search() {
-      this.getOfficialReleaseList();
-    },
-    // 清空搜索
-    clearVal() {
-      this.getOfficialReleaseList();
-    },
     // 新建
     toCreate() {
       this.addform = {
@@ -379,36 +356,6 @@ export default {
       };
       this.isShow = false;
       this.publishType = "add";
-    },
-    // 获取官方发布列表
-    getOfficialReleaseList() {
-      this.tableLoading = true;
-      let form = {
-        officialColumnName: this.input,
-        current: this.currentPage,
-        size: this.pageSize,
-      };
-      // if (this.isAdmin) {
-      //   this.addform.source = 1;
-      //   form.source = 1;
-      // }
-      officialReleaseList(form)
-        .then((res) => {
-          res.data.data.data.records.forEach((item) => {
-            if (item.state === 0) {
-              item.state = "草稿状态";
-            } else if (item.state === 1) {
-              item.state = "已生效";
-            } else {
-              item.state = "已失效";
-            }
-          });
-          this.total = res.data.data.data.total;
-          this.tableData = res.data.data.data.records;
-        })
-        .finally(() => {
-          this.tableLoading = false;
-        });
     },
     // 查看
     check(id) {
@@ -421,18 +368,6 @@ export default {
           true
         );
       });
-    },
-    handleSizeChange(val) {
-      this.pageSize = val;
-      this.getOfficialReleaseList();
-    },
-    handleCurrentChange(val) {
-      this.currentPage = val;
-      this.getOfficialReleaseList();
-    },
-    // 保存
-    save() {
-      officialColumnCreate({}).then((res) => {});
     },
     // 图片移除
     handleRemove(res, file) {
@@ -486,8 +421,8 @@ export default {
                 message: "保存成功！",
                 type: "success",
               });
-              this.getOfficialReleaseList();
-              this.isShow = true;
+              this.isShow = true
+              this.$refs.hcCrud.refresh();
             });
           }
         });
@@ -502,8 +437,8 @@ export default {
                 message: "编辑成功！",
                 type: "success",
               });
-              this.getOfficialReleaseList();
-              this.isShow = true;
+              this.isShow = true
+              this.$refs.hcCrud.refresh();
               this.fileList = [];
             });
           }
@@ -616,7 +551,7 @@ export default {
     },
   },
   created() {
-    this.getOfficialReleaseList();
+    // this.getOfficialReleaseList();
     this.getCityColumn();
     this.init();
     // console.log("isAdmin", this.isAdmin);
