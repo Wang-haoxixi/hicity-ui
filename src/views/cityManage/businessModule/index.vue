@@ -95,34 +95,19 @@ export default {
     cityStatus (val) {
       switch (val) {
         case 'all':
-          this.boxLoading = true
-          this.$refs.hcCrud.refresh({currentPage: 1}, {state: undefined, isOpening: undefined}).then(() => {
-            this.boxLoading = false
-          })
+          this.$refs.hcCrud.refresh({currentPage: 1}, {state: undefined, isOpening: undefined})
           break
         case '1':
-          this.boxLoading = true
-          this.$refs.hcCrud.refresh({currentPage: 1}, {state: '0', isOpening: true}).then(() => {
-            this.boxLoading = false
-          })
+          this.$refs.hcCrud.refresh({currentPage: 1}, {state: '0', isOpening: true})
           break
         case '2':
-          this.boxLoading = true
-          this.$refs.hcCrud.refresh({currentPage: 1}, {state: '9', isOpening: true}).then(() => {
-            this.boxLoading = false
-          })
+          this.$refs.hcCrud.refresh({currentPage: 1}, {state: '9', isOpening: true})
           break
         case '3':
-          this.boxLoading = true
-          this.$refs.hcCrud.refresh({currentPage: 1}, {state: undefined, isOpening: false}).then(() => {
-            this.boxLoading = false
-          })
+          this.$refs.hcCrud.refresh({currentPage: 1}, {state: undefined, isOpening: false})
           break
         default:
-          this.boxLoading = true
-          this.$refs.hcCrud.refresh({currentPage: 1}, {state: undefined, isOpening: undefined}).then(() => {
-            this.boxLoading = false
-          })
+          this.$refs.hcCrud.refresh({currentPage: 1}, {state: undefined, isOpening: undefined})
       }
     }
   },
@@ -131,6 +116,7 @@ export default {
   },
   methods: {
     fetchListFun (params) {
+      this.boxLoading = true
       return new Promise((resolve, reject) => {
         adminCityOpenList(params).then(({data}) => {
           if (data.code === 0) {
@@ -143,6 +129,8 @@ export default {
           }
         }, (error) => {
           reject(error)
+        }).finally(() => {
+          this.boxLoading = false
         })
       })
     },
@@ -156,10 +144,7 @@ export default {
       this.setModule = true
     },
     toSearch () {
-      this.boxLoading = true
-      this.$refs.hcCrud.refresh({currentPage: 1}, this.tempSearch).then(() => {
-        this.boxLoading = false
-      })
+      this.$refs.hcCrud.refresh({currentPage: 1}, this.tempSearch)
     },
   }
 }

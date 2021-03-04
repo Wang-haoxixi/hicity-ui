@@ -1,63 +1,35 @@
 <template>
   <basic-container>
-    <el-form inline :model="tempSearch" class="demo-form-inline">
-      <el-form-item label="标签名称：">
-        <el-input v-model="tempSearch.name" placeholder="请输入标签名称"></el-input>
-      </el-form-item>
-      <el-form-item label="标签编码：">
-        <el-input v-model="tempSearch.tagCode" placeholder="请输入标签编码"></el-input>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="toSearch()">查询</el-button>
-      </el-form-item>
-      <div>
-        <el-button
-          class="filter-item"
-          type="primary"
-          size="mini"
-          icon="el-icon-plus"
-          @click="handleCreate">添加
-        </el-button>
-      </div>
-    </el-form>
-
-    <hc-table-data-box :empty="!tagList || tagList.length == 0" :loading="boxLoading">
-      <div class="tag-box">
-        <div v-for="tag in tagList" :key="tag.tagId" class="tag-item">
-          <div class="tag-item-info">
-            <div class="tag-item-name">{{tag.name}}</div>
-            <div class="tag-item-sort" v-if="tag.isOpening && tag.sort">No.{{tag.sort}}</div>
-          </div>
-          <div class="tag-item-option">
-            <div class="tag-item-option-left">
-              <el-button v-if="userInfo.userType == 3 || userInfo.userType == 4" type="text" size="mini" @click="cityView(tag.tagId)">查看配置城市</el-button>
-              <el-button v-else-if="tag.editable" type="text" size="mini" @click="handleStart(tag)">{{tag.isOpening ? '停用' : '启用'}}</el-button>
+    <hc-table-form title="标签配置">
+      <hc-crud :option="tableOption" :fetchListFun="fetchListFun">
+        <template v-slot:table="scope">
+          <hc-table-data-box :empty="!scope.tableData || scope.tableData.length == 0" :loading="boxLoading">
+            <div class="tag-box">
+              <div v-for="tag in scope.tableData" :key="tag.tagId" class="tag-item">
+                <div class="tag-item-info">
+                  <div class="tag-item-name">{{tag.name}}</div>
+                  <div class="tag-item-sort" v-if="!isAdmin && tag.isOpening && tag.sort">No.{{tag.sort}}</div>
+                </div>
+                <div class="tag-item-option">
+                  <div class="tag-item-option-left">
+                    <el-button v-if="userInfo.userType == 3 || userInfo.userType == 4" type="text" size="mini" @click="cityView(tag.tagId)">查看配置城市</el-button>
+                    <el-button v-else-if="tag.editable" type="text" size="mini" @click="handleStart(tag)">{{tag.isOpening ? '停用' : '启用'}}</el-button>
+                  </div>
+                  <div class="tag-item-option-right">
+                    <el-button v-if="!isAdmin" type="text" size="mini" @click="handleSort(tag)">排序</el-button>
+                    <template v-if="isAdmin || !tag.isPlatform">
+                      <el-button type="text" size="mini" @click="handleUpdate(tag)">编辑</el-button>
+                      <el-button type="text" size="mini" @click="handleDel(tag.tagId)">删除</el-button>
+                    </template>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="tag-item-option-right">
-              <el-button v-if="!isAdmin" type="text" size="mini" @click="handleSort(tag)">排序</el-button>
-              <template v-if="isAdmin || !tag.isPlatform">
-                <el-button type="text" size="mini" @click="handleUpdate(tag)">编辑</el-button>
-                <el-button type="text" size="mini" @click="handleDel(tag.tagId)">删除</el-button>
-              </template>
-            </div>
-          </div>
-        </div>
-      </div>
-    </hc-table-data-box>
+          </hc-table-data-box>
+        </template>
+      </hc-crud>
+    </hc-table-form>
 
-    <div class="pagination-box">
-      <el-pagination
-        style="display: inline-block"
-        @size-change="sizeChange"
-        @current-change="currentChange"
-        :current-page="page.currentPage"
-        :page-sizes="[10, 20, 30,, 40, 50, 100]"
-        background
-        :page-size="page.pageSize"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="page.total">
-      </el-pagination>
-    </div>
 
     <hc-city-box ref="hcCityBox"></hc-city-box>
 
@@ -90,23 +62,16 @@
 import { getTagList, setTagSort, tagEnable, addTag, updateTag, deleteTag, tagOpenList } from '@/api/tms/city'
 import { mapGetters } from 'vuex'
 import HcCityBox from '@/views/components/HcCity/HcCityBox/index'
+import { tableOption } from './const.js'
 export default {
   components: { HcCityBox },
   data () {
     return {
-      tempSearch: {
-        name: ''
-      },
-      searchForm: {},
+      tableOption,
       formData: {},
       formType: 'add',
       formDialogVisible: false,
       tagList: [],
-      page: {
-        currentPage: 1,
-        pageSize: 20,
-        total: 0,
-      },
       allCityList: [],
       initCityList: [],
       boxLoading: false,
@@ -125,26 +90,22 @@ export default {
       }
     }
   },
-  created () {
-    this.getList()
-  },
   methods: {
-    getList (page = this.page, form = this.searchForm) {
+    fetchListFun (params) {
       this.boxLoading = true
-      getTagList({
-        current: page.currentPage,
-        size: page.pageSize,
-        ...form,
-      }).then(({data}) => {
-        if (data.code === 0) {
-          this.tagList = data.data.data.records
-          this.page = {
-            ...page,
-            total: data.data.data.total
-          }
-        }
-      }).finally(() => {
-        this.boxLoading = false
+      return new Promise((resolve, reject) => {
+        getTagList(params).then(({data}) => {
+          resolve({
+            records: data.data.data.records,
+            page: {
+              total: data.data.data.total
+            }
+          })
+        }, (error) => {
+          reject(error)
+        }).finally(() => {
+          this.boxLoading = false
+        })
       })
     },
     handleCreate () {
@@ -164,7 +125,7 @@ export default {
           duration: 2000
         })
         this.page.currentPage = 1
-        this.getList()
+        this.$refs.hcCrud.refresh()
       }).catch(() => {
         loading()
       })
@@ -183,7 +144,7 @@ export default {
           type: 'success',
           duration: 2000
         })
-        this.getList()
+        this.$refs.hcCrud.refresh()
       }).catch(() => {
         loading()
       })
@@ -197,7 +158,7 @@ export default {
       deleteTag({tagId}).then(({data}) => {
         if (data.code === 0) {
           this.$message.success('删除成功')
-          this.getList()
+          this.$refs.hcCrud.refresh()
         }
       })
     },
@@ -209,7 +170,7 @@ export default {
       }).then(({data}) => {
         if (data.code === 0) {
           this.$message.success('操作成功')
-          this.getList()
+          this.$refs.hcCrud.refresh()
         }
       })
     }, 
@@ -230,26 +191,12 @@ export default {
           }).then(({data}) => {
             if (data.code === 0) {
               this.$message.success('操作成功')
-              this.getList()
+              this.$refs.hcCrud.refresh()
             }
           })
         }
       })
     },
-    toSearch () {
-      this.searchForm = this.tempSearch
-      this.page.currentPage = 1
-      this.getList()
-    },
-    currentChange (current) {
-      this.page.currentPage = current
-      this.getList()
-    },
-    sizeChange (size) {
-      this.page.pageSize = size
-      this.page.currentPage = 1
-      this.getList()
-    }
   }
 }
 </script>
@@ -302,10 +249,5 @@ export default {
       }
     }
   }
-}
-.pagination-box {
-  padding: 10px 20px;
-  margin: 15px 0 10px;
-  text-align: right;
 }
 </style>
