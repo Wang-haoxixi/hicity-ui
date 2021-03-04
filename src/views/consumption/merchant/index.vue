@@ -4,16 +4,7 @@
       :title="title"
       :formVisible="publish"
       @go-back="goBack">
-      <avue-crud
-        ref="crud"
-        :option="tableOption"
-        :page="page"
-        :table-loading="tableLoading"
-        :data="tableData"
-        @on-load="getList"
-        @refresh-change="handleRefreshChange"
-        style="margin-left: 0;"
-      >
+      <hc-crud ref="hcCrud" :option="tableOption" :fetchListFun="fetchListFun">
         <template slot="menuLeft">
           <el-button
             type="primary"
@@ -32,7 +23,8 @@
             >
           </template>
         </template>
-      </avue-crud>
+      </hc-crud>
+  
       <template slot="form">
         <el-form
           ref="form"
@@ -107,15 +99,6 @@ export default {
   components: { HcImageUpload, HcTableForm, HcEmptyData, HcMapSelect, HcRemoteSelect, HcCitySelect },
   data() {
     return {
-      page: {
-        total: 0, // 总页数
-        currentPage: 1, // 当前页数
-        pageSize: 20, // 每页显示多少条,
-        isAsc: false, // 是否倒序
-      },
-      isOwn: false,
-      tableLoading: false,
-      tableData: [],
       formData: {
         merchantName: '',
         merchantLogo: '',
@@ -135,7 +118,7 @@ export default {
         merchantUserName: [{required: true, message: '请输入联系人', trigger: 'change'}],
         merchantUserPhone: [{required: true, message: '请输入联系电话', trigger: 'change'}],
         cityId: [{required: true, message: '请选择所在城市', trigger: 'change'}],
-        locationAddr: [{required: true, message: '请选择定位地址', trigger: 'blur'}],
+        // locationAddr: [{required: true, message: '请选择定位地址', trigger: 'blur'}],
         address: [{required: true, message: '请输入详细地址', trigger: 'change'}],
         brandId: [{required: true, message: '请选择关联品牌', trigger: 'change'}],
         
@@ -171,15 +154,6 @@ export default {
     brandSelect (data) {
       this.formData.brandId = data
     },
-    refresh () {
-      this.page = {
-        total: 0, // 总页数
-        currentPage: 1, // 当前页数
-        pageSize: 20, // 每页显示多少条,
-        isAsc: false, // 是否倒序
-      }
-      this.getList()
-    },
     getAllBrand (brandName) {
       return new Promise((resolve, reject) => {
         getAllBrand({brandName}).then(({data}) => {
@@ -197,21 +171,20 @@ export default {
         })
       })
     },
-    getList(page = this.page, params) {
-      this.tableLoading = true;
-      let form = {
-        current: page.currentPage,
-        size: page.pageSize,
-        isOwn: this.isOwn
-      };
-      getMerchantList(form)
+    fetchListFun (params) {
+      return new Promise((resolve, reject) => {
+        getMerchantList(params)
         .then(({ data }) => {
-          this.tableData = data.data.data.records;
-          this.page.total = data.data.data.total;
+          resolve({
+            records: data.data.data.records,
+            page: {
+              total: data.data.data.total
+            }
+          })
+        }, error => {
+          reject(error)
         })
-        .finally(() => {
-          this.tableLoading = false;
-        });
+      })
     },
     cityChange ({city, district}) {
       let allCity = this.allCityTree[0].children
@@ -269,7 +242,7 @@ export default {
             type: "success",
             duration: 2000,
           });
-          this.getList();
+          this.$refs.hcCrud.refresh()
         });
       } else {
         updateMerchant({ ...formData, merchantId: this.formData.merchantId }).then(({ data }) => {
@@ -280,7 +253,7 @@ export default {
             type: "success",
             duration: 2000,
           });
-          this.getList();
+          this.$refs.hcCrud.refresh()
         });
       }
     },
@@ -292,15 +265,6 @@ export default {
           latitude: data.data.data.lat,
           name: data.data.data.locationAddr
         }
-        // getAllBrand({brandName: data.data.data.brandName}).then(({data}) => {
-        //   this.brandList = data.data.data
-        //   if (!data.data.data || data.data.data.length == 0) {
-        //     this.formData.brandId = ''
-        //     this.formData.brandName = ''
-        //   }
-        // }).finally(() => {
-        //   this.brandLoading = false;
-        // })
         this.publish = true;
         this.publishType = "edit";
       });
@@ -322,13 +286,10 @@ export default {
               type: "success",
               duration: 2000,
             });
-            this.getList();
+            this.$refs.hcCrud.refresh()
           });
         })
         .catch(function () {});
-    },
-    handleRefreshChange() {
-      this.getList(this.page);
     },
   },
 };

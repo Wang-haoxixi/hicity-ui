@@ -1,5 +1,5 @@
 export const tableOption = (admin = false) => {
-  let column = [
+  let columns = [
     {
       label: '店铺ID',
       prop: 'merchantId',
@@ -46,18 +46,10 @@ export const tableOption = (admin = false) => {
   ]
 
   let option = {
-    border: true,
-    // index: true,
-    // indexLabel: '序号', 
-    stripe: true,
-    menuAlign: 'center',
-    editBtn: false,
-    delBtn: false,
-    align: 'center',
-    addBtn: false,
-    labelWidth: 160,
     menuWidth: 150,
-    column
+    menu: true,
+    header: true,
+    columns
   }
   
   return option
