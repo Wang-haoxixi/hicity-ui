@@ -319,7 +319,7 @@ export default {
           this.$refs.hcCrud.refresh();
         });
       } else {
-        updateNews({ ...formData, state: 1 }).then(({ data }) => {
+        updateNews({ ...formData, state }).then(({ data }) => {
           this.publish = false;
           this.$notify({
             title: "成功",
