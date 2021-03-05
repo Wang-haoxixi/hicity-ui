@@ -3,6 +3,7 @@ export const tableOption = (admin = false) => {
     {
       label: '店铺ID',
       prop: 'merchantId',
+      width: "70",
     },
     {
       label: '商户门店',
@@ -11,18 +12,22 @@ export const tableOption = (admin = false) => {
     {
       label: '品牌',
       prop: 'brandName',
+      width: "100",
     },
     {
       label: '创建城市',
       prop: 'cityName',
+      width: "100",
     },
     {
       label: '联系人',
       prop: 'merchantUserName',
+      width: "120",
     },
     {
       label: '联系电话',
       prop: 'merchantUserPhone',
+      width: "120",
     },
     {
       label: '详细地址',
@@ -31,6 +36,7 @@ export const tableOption = (admin = false) => {
     {
       label: '店铺状态',
       prop: 'merchantStatus',
+      width: "100",
       formatter: function (data) {
         if (data.merchantStatus == 1) {
           return '正常'
@@ -42,11 +48,18 @@ export const tableOption = (admin = false) => {
           return ''
         }
       }
+    },
+    {
+      label: '店铺二维码',
+      width: "100",
+      prop: 'qrcode',
+      slot: true,
+      formHidden: true
     }
   ]
 
   let option = {
-    menuWidth: 150,
+    menuWidth: 130,
     menu: true,
     header: true,
     columns

@@ -13,8 +13,23 @@
             @click="toCreate"
             >新建</el-button>
         </template>
+        <template v-slot:qrcode>
+          <el-popover
+            placement="left"
+            trigger="click">
+            <template v-slot:reference>
+              <el-button type="text" size="mini">查看</el-button>
+            </template>
+            <template v-slot>
+              <el-image class="qr-image" src="/img/image-qrcode.png"></el-image>
+            </template>
+          </el-popover>
+        </template>
         <template slot="menu" slot-scope="scope">
           <template>
+            <el-button type="text" size="mini" @click="toView(scope.row)"
+              >详情</el-button
+            >
             <el-button type="text" size="mini" @click="toUpdate(scope.row)"
               >编辑</el-button
             >
@@ -27,6 +42,7 @@
   
       <template slot="form">
         <el-form
+          :disabled="publishType == 'view'"
           ref="form"
           class="dialog-main-tree"
           :model="formData"
@@ -34,29 +50,28 @@
           :rules="formRule"
         >
           <el-form-item label="店铺名称：" prop="merchantName">
-            <el-input v-model="formData.merchantName" maxlength="200"></el-input>
+            <el-input v-model="formData.merchantName" maxlength="50"></el-input>
           </el-form-item>
           <el-form-item label="店铺Logo：" prop="merchantLogo">
-            <hc-image-upload :limit="1" v-model="formData.merchantLogo"></hc-image-upload>
+            <hc-image-upload :limit="1" v-model="formData.merchantLogo" @change="logoChange"></hc-image-upload>
           </el-form-item>
           <el-form-item label="店铺介绍：" prop="merchantSynopsis">
-            <el-input type="textarea" v-model="formData.merchantSynopsis" :autosize="{minRows: 5, maxRows: 10}" maxlength="250"></el-input>
+            <el-input type="textarea" v-model="formData.merchantSynopsis" :autosize="{minRows: 5, maxRows: 10}" maxlength="1000"></el-input>
           </el-form-item>
           <el-form-item label="联系人：" prop="merchantUserName">
-            <el-input v-model="formData.merchantUserName" maxlength="200"></el-input>
+            <el-input v-model="formData.merchantUserName" maxlength="50"></el-input>
           </el-form-item>
           <el-form-item label="联系电话：" prop="merchantUserPhone">
-            <el-input v-model="formData.merchantUserPhone" maxlength="200"></el-input>
+            <el-input v-model="formData.merchantUserPhone" maxlength="20"></el-input>
           </el-form-item>
           <el-form-item label="所在城市：" prop="cityId">
             <hc-city-select v-model="formData.cityId" :city-id="userInfo.manageCityId" single></hc-city-select>
-            <!-- <el-input v-model="formData.cityId" maxlength="200"></el-input> -->
           </el-form-item>
           <el-form-item label="定位地址：" prop="locationAddr">
-            <hc-map-select v-model="locationAddr" @city-change="cityChange"></hc-map-select>
+            <hc-map-select v-model="locationAddr" @city-change="cityChange" @change="locationAddrChange"></hc-map-select>
           </el-form-item>
           <el-form-item label="详细地址：" prop="address">
-            <el-input v-model="formData.address" maxlength="200"></el-input>
+            <el-input v-model="formData.address" maxlength="100"></el-input>
           </el-form-item>
           <el-form-item label="关联品牌：" prop="brandId">
             <hc-remote-select v-model="formData.brandId" :remote-fun="getAllBrand" :show-word="formData.brandName"></hc-remote-select>
@@ -67,10 +82,18 @@
             </el-radio-group>
           </el-form-item>
           <el-form-item label="会员折扣：" prop="discount">
-            <el-input v-model="formData.discount" maxlength="200"></el-input>
+            <el-input v-model="formData.discount" maxlength="10"></el-input>
+          </el-form-item>
+          <el-form-item label="抽成类型：" prop="percentageType">
+            <el-select v-model="formData.percentageType" placeholder="请选择抽成类型" @change="percentageTypeChange">
+              <el-option v-for="item in dicList['PERCENTAGE_TYPE']" :key="item.value" :value="item.value" :label="item.label">{{item.label}}</el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item v-if="formData.percentageType == 2 || formData.percentageType == 3" :label="percentageLabel + '：'" prop="percentageMoney">
+            <el-input v-model="formData.percentageMoney" maxlength="100" :placeholder="'请输入' + percentageLabel"></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button @click="handleCreate">保存</el-button>
+            <el-button v-if="publishType != 'view'" @click="handleCreate">保存</el-button>
           </el-form-item>
         </el-form>
       </template>
@@ -104,6 +127,7 @@ export default {
         merchantLogo: '',
         merchantSynopsis: '',
         cityId: '',
+        percentageMoney: ''
       },
       locationAddr: {},
       publish: false,
@@ -111,22 +135,22 @@ export default {
       cityChooseDialogVisible: false,
       newsTagList: [],
       titleImage: [],
-      formRule: {
+      brandList: [],
+      brandLoading: false,
+      formRuleInit: {
         merchantName: [{required: true, message: '请输入商户名称', trigger: 'change'}],
         merchantSynopsis: [{required: true, message: '请输入商户介绍', trigger: 'change'}],
         merchantLogo: [{required: true, message: '请添加商户Logo', trigger: 'change'}],
         merchantUserName: [{required: true, message: '请输入联系人', trigger: 'change'}],
         merchantUserPhone: [{required: true, message: '请输入联系电话', trigger: 'change'}],
         cityId: [{required: true, message: '请选择所在城市', trigger: 'change'}],
-        // locationAddr: [{required: true, message: '请选择定位地址', trigger: 'blur'}],
         address: [{required: true, message: '请输入详细地址', trigger: 'change'}],
         brandId: [{required: true, message: '请选择关联品牌', trigger: 'change'}],
-        
         merchantStatus: [{required: true, message: '请选择店铺状态', trigger: 'change'}],
         discount: [{required: true, message: '请输入会员折扣', trigger: 'change'}],
-      },
-      brandList: [],
-      brandLoading: false,
+        locationAddr: [{validator: this.locationAddrValidator, required: true, message: '请选择定位地址', trigger: 'change'}],
+        percentageType: [{required: true, message: '请选择抽成类型', trigger: 'change'}],
+      }
     };
   },
   computed: {
@@ -134,19 +158,54 @@ export default {
     tableOption() {
       return tableOption(this.userType == 1 || this.userType == 2);
     },
+    formRule () {
+      let formRule = this.formRuleInit
+      formRule.percentageMoney = [{required: true, message: `请输入${this.percentageLabel}`, trigger: 'change'}]
+      return formRule
+    },
+    percentageLabel () {
+      if (this.formData.percentageType == 2) {
+        return '抽成百分比'
+      } else if (this.formData.percentageType == 3) {
+        return '抽成金额'
+      } else {
+        return ''
+      }
+    },
     title () {
       if (!this.publish) {
         return '商户管理'
       } else {
         if (this.publishType == 'add') {
           return '商户信息-新增'
-        } else {
+        } else if (this.publishType == 'eidit') {
           return '商户信息-编辑'
+        } else {
+          return '商户信息'
         }
       }
     }
   },
   methods: {
+    percentageTypeChange (value) {
+      this.formData.percentageMoney = ''
+      this.$nextTick(() => {
+        this.$refs.form.clearValidate('percentageMoney')
+      })
+    },
+    logoChange () {
+      this.$refs.form.validateField('merchantLogo')
+    },
+    locationAddrChange () {
+      this.$refs.form.validateField('locationAddr')
+    },
+    locationAddrValidator (rule, value, callback) {
+      if (this.locationAddr.name && this.locationAddr.longitude && this.locationAddr.latitude) {
+        callback()
+      } else {
+        callback(new Error('请选择定位地址'))
+      }
+    },
     goBack () {
       this.brandList = []
       this.publish = false
@@ -215,6 +274,7 @@ export default {
         merchantLogo: '',
         merchantSynopsis: '',
         cityId: '',
+        percentageMoney: ''
       }
       this.locationAddr = {}
       this.barndList = []
@@ -256,6 +316,21 @@ export default {
           this.$refs.hcCrud.refresh()
         });
       }
+    },
+    showQRCode () {
+
+    },
+    toView ({ merchantId }) {
+      getMerchantDetail({ merchantId }).then(({ data }) => {
+        this.formData = data.data.data;
+        this.locationAddr = {
+          longitude: data.data.data.lng,
+          latitude: data.data.data.lat,
+          name: data.data.data.locationAddr
+        }
+        this.publish = true;
+        this.publishType = "view";
+      });
     },
     toUpdate({ merchantId }) {
       getMerchantDetail({ merchantId }).then(({ data }) => {

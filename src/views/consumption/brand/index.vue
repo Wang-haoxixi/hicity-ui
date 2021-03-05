@@ -27,6 +27,9 @@
         </template>
         <template slot="menu" slot-scope="scope">
           <template>
+            <el-button type="text" size="mini" @click="toView(scope.row)"
+              >详情</el-button
+            >
             <el-button type="text" size="mini" @click="toUpdate(scope.row)"
               >编辑</el-button
             >
@@ -43,6 +46,7 @@
           :model="formData"
           label-width="180px"
           :rules="formRule"
+          :disabled="publishType == 'view'"
         >
           <el-form-item label="品牌名称：" prop="brandName">
             <el-input v-model="formData.brandName" maxlength="200"></el-input>
@@ -54,7 +58,7 @@
             <el-input type="textarea" v-model="formData.brandSynopsis" :autosize="{minRows: 5, maxRows: 10}" maxlength="250"></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button @click="handleCreate">保存</el-button>
+            <el-button v-if="publishType != 'view'" @click="handleCreate">保存</el-button>
           </el-form-item>
         </el-form>
       </template>
@@ -117,8 +121,12 @@ export default {
       } else {
         if (this.publishType == 'add') {
           return '品牌信息-新增'
-        } else {
+        } else if (this.publishType == 'eidit') {
           return '品牌信息-编辑'
+        } else if (this.publishType == 'view') {
+          return '品牌信息-详情'
+        } else {
+          return '品牌信息'
         }
       }
     }
@@ -204,6 +212,13 @@ export default {
         this.formData = data.data.data;
         this.publish = true;
         this.publishType = "edit";
+      });
+    },
+    toView({ brandId }) {
+      getBrandDetail({ brandId }).then(({ data }) => {
+        this.formData = data.data.data;
+        this.publish = true;
+        this.publishType = "view";
       });
     },
     toDelete({ brandId }) {

@@ -186,8 +186,12 @@ export default {
       } else {
         if (this.publishType == 'add') {
           return '商品分类-新增'
-        } else {
+        } else if (this.publishType == 'edit') {
           return '商品分类-编辑'
+        } else if (this.publishType == 'view') {
+          return '商品分类-详情'
+        } else {
+          return '商品分类'
         }
       }
     },
