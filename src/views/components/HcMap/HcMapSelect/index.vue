@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-input @click.native="toSelect()" :value="address.name" readonly></el-input>
+    <el-input @focus="toSelect()" :value="address.name" readonly></el-input>
     <hc-map-box ref="hcMapBox" @select="addressSelect"></hc-map-box>
   </div>
 </template>
@@ -63,6 +63,7 @@ export default {
     },
     addressSelect ({address, city}) {
       this.$emit('city-change', city)
+      this.$emit('change', address)
       this.$emit('input', address)
     },
     dialogBeforeClose () {
