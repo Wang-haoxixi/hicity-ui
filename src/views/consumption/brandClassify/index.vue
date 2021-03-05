@@ -5,44 +5,33 @@
       :formVisible="publish"
       @go-back="publish = false">
       <template>
-        <div>
+        <hc-crud ref="hcCrud" :fetchListFun="fetchListFun" :option="{header: true}">
           <el-button
+            slot="menuLeft"
             class="filter-item"
             type="primary"
             size="mini"
             icon="el-icon-plus"
-            @click="toCreate">添加
+            @click="toCreate">新建
           </el-button>
-        </div>
-
-        <hc-table-data-box :empty="!classifyList || classifyList.length == 0" :loading="boxLoading">
-          <div class="classify-box">
-            <div v-for="classify in classifyList" :key="classify.id" class="classify-item">
-              <div class="classify-item-name">{{classify.brandClassificationName}}</div>
-              <el-image class="classify-item-cover" :src="classify.brandClassificationBg"></el-image>
-              <div class="classify-item-topic-view" @click="brandView(classify.brandClassificationId)">关联品牌</div>
-              <div class="classify-item-option">
-                <template>
-                  <el-button type="text" size="mini" @click="toUpdate(classify)">编辑</el-button>
-                  <el-button type="text" size="mini" @click="handleDel(classify.brandClassificationId)">删除</el-button>
-                </template>
+          <template v-slot:table="scope">
+            <hc-table-data-box :empty="!scope.tableData || scope.tableData.length == 0" :loading="boxLoading">
+              <div class="classify-box">
+                <div v-for="classify in scope.tableData" :key="classify.id" class="classify-item">
+                  <div class="classify-item-name">{{classify.brandClassificationName}}</div>
+                  <el-image class="classify-item-cover" :src="classify.brandClassificationBg"></el-image>
+                  <div class="classify-item-topic-view" @click="brandView(classify.brandClassificationId)">关联品牌</div>
+                  <div class="classify-item-option">
+                    <template>
+                      <el-button type="text" size="mini" @click="toUpdate(classify)">编辑</el-button>
+                      <el-button type="text" size="mini" @click="handleDel(classify.brandClassificationId)">删除</el-button>
+                    </template>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        </hc-table-data-box>
-        <div class="pagination-box">
-          <el-pagination
-            style="display: inline-block"
-            @size-change="sizeChange"
-            @current-change="currentChange"
-            :current-page="page.currentPage"
-            :page-sizes="[10, 20, 30,, 40, 50, 100]"
-            background
-            :page-size="page.pageSize"
-            layout="total, sizes, prev, pager, next, jumper"
-            :total="page.total">
-          </el-pagination>
-        </div>
+            </hc-table-data-box>
+          </template>
+        </hc-crud>
       </template>
       <template slot="form">
         <el-form ref="form"
@@ -124,10 +113,6 @@ export default {
   components: { HcImageUpload, HcTableForm, HcEmptyData, ModuleBgList, HcRemoteSelect },
   data () {
     return {
-      tempSearch: {
-        name: ''
-      },
-      searchForm: {},
       formData: {
         brandClassificationName: '',
         brandClassificationBg: '',
@@ -135,11 +120,6 @@ export default {
       },
       formType: 'add',
       classifyList: [],
-      page: {
-        currentPage: 1,
-        pageSize: 20,
-        total: 0,
-      },
       brandViewDialogVisible: false,
       relativeBrandList: [],
       publish: false,
@@ -207,9 +187,6 @@ export default {
       return []
     }
   },
-  created () {
-    this.getList()
-  },
   methods: {
     getAllBrand (brandName) {
       return new Promise((resolve, reject) => {
@@ -228,22 +205,21 @@ export default {
         })
       })
     },
-    getList (page = this.page, form = this.searchForm) {
-      this.boxLoading = true
-      getBrandClassifyList({
-        current: page.currentPage,
-        size: page.pageSize,
-        ...form,
-      }).then(({data}) => {
-        if (data.code === 0) {
-          this.classifyList = data.data.data.records
-          this.page = {
-            ...page,
-            total: data.data.data.total
-          }
-        }
-      }).finally(() => {
-        this.boxLoading = false
+    fetchListFun (params) {
+      return new Promise((resolve, reject) => {
+        this.boxLoading = true
+        getBrandClassifyList(params).then(({data}) => {
+          resolve({
+            records: data.data.data.records,
+            page: {
+              total: data.data.data.total
+            }
+          })
+        }, error => {
+          reject(error)
+        }).finally(() => {
+          this.boxLoading = false
+        })
       })
     },
     toCreate () {
@@ -298,7 +274,7 @@ export default {
                 duration: 2000
               })
               this.publish = false
-              this.getList()
+              this.$refs.hcCrud.refresh()
             }).catch(() => {
             })
           } else if (this.publishType == 'add') {
@@ -310,7 +286,7 @@ export default {
                 duration: 2000
               })
               this.publish = false
-              this.getList()
+              this.$refs.hcCrud.refresh({currentPage: 1})
             }).catch(() => {
               loading()
             })
@@ -346,25 +322,11 @@ export default {
         deleteBrandClassify({brandClassificationIds: [brandClassificationId]}).then(({data}) => {
           if (data.code === 0) {
             this.$message.success('删除成功')
-            this.getList()
+            this.$refs.hcCrud.refresh()
           }
         })
       })
       .catch(function () {});
-    },
-    toSearch () {
-      this.searchForm = this.tempSearch
-      this.page.currentPage = 1
-      this.getList()
-    },
-    currentChange (current) {
-      this.page.currentPage = current
-      this.getList()
-    },
-    sizeChange (size) {
-      this.page.pageSize = size
-      this.page.currentPage = 1
-      this.getList()
     },
     toAddBrand () {
       this.formData.relations.push([{

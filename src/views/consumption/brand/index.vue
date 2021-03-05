@@ -4,16 +4,7 @@
       :title="title"
       :formVisible="publish"
       @go-back="goBack">
-      <avue-crud
-        ref="crud"
-        :option="tableOption"
-        :page="page"
-        :table-loading="tableLoading"
-        :data="tableData"
-        @on-load="getList"
-        @refresh-change="handleRefreshChange"
-        style="margin-left: 0;"
-      >
+      <hc-crud ref="hcCrud" :option="tableOption" :fetchListFun="fetchListFun">
         <template slot="menuLeft">
           <el-button
             type="primary"
@@ -38,7 +29,7 @@
             >
           </template>
         </template>
-      </avue-crud>
+      </hc-crud>
       <template slot="form">
         <el-form
           ref="form"
@@ -84,14 +75,7 @@ export default {
   components: { HcImageUpload, HcTableForm, HcEmptyData },
   data() {
     return {
-      page: {
-        total: 0, // 总页数
-        currentPage: 1, // 当前页数
-        pageSize: 20, // 每页显示多少条,
-        isAsc: false, // 是否倒序
-      },
       isOwn: false,
-      tableLoading: false,
       tableData: [],
       formData: {
         brandName: '',
@@ -136,29 +120,21 @@ export default {
       this.publish = false
     },
     refresh () {
-      this.page = {
-        total: 0, // 总页数
-        currentPage: 1, // 当前页数
-        pageSize: 20, // 每页显示多少条,
-        isAsc: false, // 是否倒序
-      }
-      this.getList()
+      this.$refs.hcCrud.refresh({currentPage: 1})
     },
-    getList(page = this.page, params) {
-      this.tableLoading = true;
-      let form = {
-        current: page.currentPage,
-        size: page.pageSize,
-        isOwn: this.isOwn
-      };
-      getBrandList(form)
-        .then(({ data }) => {
-          this.tableData = data.data.data.records;
-          this.page.total = data.data.data.total;
+    fetchListFun (params) {
+      return new Promise((resolve, reject) => {
+        getBrandList(params).then(({ data }) => {
+          resolve({
+            records: data.data.data.records,
+            page: {
+              total: data.data.data.total
+            }
+          })
+        }, error => {
+          reject(error)
         })
-        .finally(() => {
-          this.tableLoading = false;
-        });
+      })
     },
     toCreate() {
       this.publish = true;
@@ -192,7 +168,7 @@ export default {
             type: "success",
             duration: 2000,
           });
-          this.getList();
+          this.$refs.hcCrud.refresh({currentPage: 1})
         });
       } else {
         updateBrand({ ...formData, brandId: this.formData.brandId }).then(({ data }) => {
@@ -203,7 +179,7 @@ export default {
             type: "success",
             duration: 2000,
           });
-          this.getList();
+          this.$refs.hcCrud.refresh()
         });
       }
     },
@@ -238,13 +214,10 @@ export default {
               type: "success",
               duration: 2000,
             });
-            this.getList();
+            this.$refs.hcCrud.refresh()
           });
         })
         .catch(function () {});
-    },
-    handleRefreshChange() {
-      this.getList(this.page);
     },
   },
 };

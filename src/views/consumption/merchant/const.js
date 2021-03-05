@@ -15,7 +15,7 @@ export const tableOption = (admin = false) => {
       width: "100",
     },
     {
-      label: '创建城市',
+      label: '城市/地区',
       prop: 'cityName',
       width: "100",
     },

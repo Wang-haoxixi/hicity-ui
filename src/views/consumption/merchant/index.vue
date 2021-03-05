@@ -64,15 +64,21 @@
           <el-form-item label="联系电话：" prop="merchantUserPhone">
             <el-input v-model="formData.merchantUserPhone" maxlength="20"></el-input>
           </el-form-item>
-          <el-form-item label="所在城市：" prop="cityId">
-            <hc-city-select v-model="formData.cityId" :city-id="userInfo.manageCityId" single></hc-city-select>
-          </el-form-item>
           <el-form-item label="定位地址：" prop="locationAddr">
             <hc-map-select v-model="locationAddr" @city-change="cityChange" @change="locationAddrChange"></hc-map-select>
           </el-form-item>
-          <el-form-item label="详细地址：" prop="address">
-            <el-input v-model="formData.address" maxlength="100"></el-input>
-          </el-form-item>
+          <el-row>
+            <el-col :span="12">
+              <el-form-item label="城市/地区：" prop="cityId">
+                <hc-city-select v-model="formData.cityId" :city-id="userInfo.manageCityId" single></hc-city-select>
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="详细地址：" prop="address">
+                <el-input v-model="formData.address" maxlength="100"></el-input>
+              </el-form-item>
+            </el-col>
+          </el-row>
           <el-form-item label="关联品牌：" prop="brandId">
             <hc-remote-select v-model="formData.brandId" :remote-fun="getAllBrand" :show-word="formData.brandName"></hc-remote-select>
           </el-form-item>

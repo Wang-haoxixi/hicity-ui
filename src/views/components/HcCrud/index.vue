@@ -328,9 +328,9 @@ export default {
   justify-content: flex-start;
   align-items: flex-start;
   flex-wrap: wrap;
-  margin: -10px 0 0 -20px;
+  margin: -10px 0 0 -10px;
   .search-item {
-    margin: 10px 0 0 20px;
+    margin: 10px 0 0 10px;
   }
 }
 
