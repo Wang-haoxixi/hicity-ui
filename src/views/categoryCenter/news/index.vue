@@ -156,9 +156,6 @@ export default {
         ...form,
         cityId: this.userInfo.manageCityId
       }
-      if (this.isAdmin) {
-        formData.source = 1
-      }
       getColumnList(formData).then(({data}) => {
         if (data.code === 0) {
           this.columnList = data.data.data.records
