@@ -1,5 +1,5 @@
 export const tableOption = (admin = false) => {
-  let column = [
+  let columns = [
     {
       label: '发布者',
       prop: 'realName',
@@ -7,6 +7,7 @@ export const tableOption = (admin = false) => {
     {
       label: '游记标题',
       prop: 'travelName',
+      search: true,
     },
     {
       label: '创建时间',
@@ -14,7 +15,7 @@ export const tableOption = (admin = false) => {
     },
   ]
   if (admin) {
-    column.push({
+    columns.push({
       label: '展示范围',
       prop: 'cityList',
       slot: true,
@@ -23,18 +24,10 @@ export const tableOption = (admin = false) => {
   }
 
   let option = {
-    border: true,
-    // index: true,
-    // indexLabel: '序号', 
-    stripe: true,
-    menuAlign: 'center',
-    editBtn: false,
-    delBtn: false,
-    align: 'center',
-    addBtn: false,
-    labelWidth: 160,
-    menuWidth: 150,
-    column
+    menuWidth: 120,
+    menu: true,
+    header: true,
+    columns
   }
   
   return option
