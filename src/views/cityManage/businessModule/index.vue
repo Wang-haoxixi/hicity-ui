@@ -6,28 +6,37 @@
       @go-back="setModule = false">
       <hc-crud ref="hcCrud" :option="{search: true}" :fetchListFun="fetchListFun">
         <template v-slot:search>
-          <el-form inline :model="tempSearch">
-            <div class="search-box">
-              <div class="serach-box-left">
-                <el-form-item label="城市搜索：">
-                  <el-input v-model="tempSearch.cityName" placeholder="请输入城市名称" clearable=""></el-input>
-                </el-form-item>
-                <el-form-item>
-                  <el-button type="primary" @click="toSearch()" size="small" icon="el-icon-search">搜 索</el-button>
-                </el-form-item>
-              </div>
-              <div class="serach-box-right">
-                <el-form-item>
-                  <el-radio-group v-model="cityStatus" style="margin-bottom: 30px;">
-                    <el-radio-button plain label="all">全部</el-radio-button>
-                    <el-radio-button plain label="1">已开通</el-radio-button>
-                    <el-radio-button plain label="2">已锁定</el-radio-button>
-                    <el-radio-button plain label="3">未开通</el-radio-button>
-                  </el-radio-group>
-                </el-form-item>
-              </div>
+          <el-form class="search-box" inline :model="tempSearch">
+            <div class="serach-box-left">
+              <el-form-item label="城市搜索：">
+                <el-input v-model="tempSearch.cityName" placeholder="请输入城市名称" clearable=""></el-input>
+              </el-form-item>
+              <el-form-item>
+              <el-button
+                class="search-item"
+                type="primary"
+                icon="el-icon-search"
+                @click="toSearch"
+                >搜 索</el-button
+              >
+              <el-button
+                class="search-item"
+                icon="el-icon-refresh"
+                @click="resetSearch"
+                >重 置</el-button
+              >
+            </el-form-item>
             </div>
-            
+            <div class="serach-box-right">
+              <el-form-item>
+                <el-radio-group v-model="cityStatus" style="margin-bottom: 30px;">
+                  <el-radio-button plain label="all">全部</el-radio-button>
+                  <el-radio-button plain label="1">已开通</el-radio-button>
+                  <el-radio-button plain label="2">已锁定</el-radio-button>
+                  <el-radio-button plain label="3">未开通</el-radio-button>
+                </el-radio-group>
+              </el-form-item>
+            </div>
           </el-form>
         </template>
         <template v-slot:table="scope">
@@ -70,9 +79,7 @@ export default {
   components: { CityState, ModuleList, HcTableForm },
   data () {
     return {
-      tempSearch: {
-        name: ''
-      },
+      tempSearch: {},
       formData: {},
       formType: 'add',
       formDialogVisible: false,
@@ -146,6 +153,11 @@ export default {
     toSearch () {
       this.$refs.hcCrud.refresh({currentPage: 1}, this.tempSearch)
     },
+    resetSearch () {
+      this.tempSearch = {
+        cityName: undefined,
+      }
+    }
   }
 }
 </script>
