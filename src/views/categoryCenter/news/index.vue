@@ -92,7 +92,7 @@
 </template>
 
 <script>
-import { getColumnList, addColumn, updateColumn, deleteColumn, columnEnable, columnOpenList } from '@/api/cms/newsColumn'
+import { getColumnList, addColumn, getColumnDetail, updateColumn, deleteColumn, columnEnable, columnOpenList } from '@/api/cms/newsColumn'
 import { getAllTagList } from '@/api/tms/city'
 import { mapGetters } from 'vuex'
 import HcCityBox from '@/views/components/HcCity/HcCityBox/index'
@@ -190,10 +190,16 @@ export default {
         loading()
       })
     },
-    handleUpdate (row) {
-      this.formData = row
-      this.formType = 'edit'
-      this.formDialogVisible = true
+    handleUpdate ({newsColumnId}) {
+      getColumnDetail(newsColumnId).then(({data}) => {
+        let formData = data.data.data
+        this.formData = {
+          ...formData,
+          cityIdList: [this.userInfo.manageCityId],
+        }
+        this.formType = 'edit'
+        this.formDialogVisible = true
+      })
     },
     update() {
       updateColumn(this.formData).then(({data}) => {
