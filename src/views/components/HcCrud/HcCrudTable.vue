@@ -20,13 +20,13 @@
     </el-table-column>
     <el-table-column v-if="option.menu" label="操作" :width="option.menuWidth || ''">
       <template v-slot="scope">
-        <slot name="menu" :row="scope.row">
-          <template v-for="(item, index) in menuList">
-            <template v-if="item.auto">
-              <el-button v-if="item.auto" :key="index" type="text" size="mini" @click="handleAutoEvent(item.type, scope.row)">{{handleName(item.type)}}</el-button>
-            </template>
-            <el-button v-else :key="index" type="text" size="mini" @click="handleEvent(item.fun, scope.row)">{{item.label}}</el-button>
+        <template v-for="(item, index) in menuList">
+          <template v-if="item.auto">
+            <el-button v-if="item.auto" :key="index" type="text" size="mini" @click="handleAutoEvent(item.type, scope.row)">{{handleName(item.type)}}</el-button>
           </template>
+          <el-button v-else :key="index" type="text" size="mini" @click="handleEvent(item.fun, scope.row)">{{item.label}}</el-button>
+        </template>
+        <slot name="menu" :row="scope.row">
         </slot>
       </template>
     </el-table-column>

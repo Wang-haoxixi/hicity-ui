@@ -66,7 +66,8 @@
           slot-scope="scope"
         >
           <div :key="index">
-            <slot :name="item.prop" :row="scope.row"></slot>
+            <slot v-if="item.dicName || item.dicData" :name="item.prop" :row="scope.row" :dic="getDic(item)" :label="getLabel(item, scope.row)"></slot>
+            <slot v-else :name="item.prop" :row="scope.row"></slot>
           </div>
         </template>
         <template v-slot:menu="scope">
@@ -119,6 +120,7 @@
 import HcFormItem from "./HcFormItem";
 import HcCrudTable from "./HcCrudTable";
 import HcCrudForm from "./HcCrudForm";
+import { getDic } from '@/util/dic.js'
 export default {
   name: "HcCrud",
   components: { HcFormItem, HcCrudTable, HcCrudForm },
@@ -163,6 +165,7 @@ export default {
   computed: {
     optionC () {
       return {
+        refresh: true,
         ...this.option
       }
     },
@@ -214,6 +217,25 @@ export default {
     this.getList();
   },
   methods: {
+    getDic ({dicData, dicName}) {
+      if (dicData) {
+        return dicData
+      } else if (dicName) {
+        return getDic(dicName) || []
+      }
+      return []
+    },
+    getLabel (column, data) {
+      let dicData = this.getDic(column)
+      if (dicData && dicData.length > 0) {
+        for (let i = 0; i < dicData.length; i++) {
+          if (data[column.prop] == dicData[i].value) {
+            return dicData[i].label
+          }
+        }
+      }
+      return ''
+    },
     refresh(page = {}, searchForm = {}) {
       this.searchForm = {
         ...(this.searchForm || {}),

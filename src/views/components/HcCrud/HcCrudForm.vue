@@ -23,6 +23,13 @@
 
 <script>
 import HcFormItem from './HcFormItem'
+function hasValue (value) {
+  if (value === null || value === undefined) {
+    return false
+  }
+  return true
+}
+
 export default {
   components: { HcFormItem },
   props: {
@@ -74,17 +81,24 @@ export default {
       this.formData = {}
     },
     open (data = {}, type = 'add') {
-      
       this.columns = this.option.columns || []
       let initForm = {}
+      let editForm = {}
       let columns = this.columns
       for (let i = 0; i < columns.length; i++) {
-        if (!columns[i].formHidden && !columns[i][`${this.type}Hidden`]) {
+        if (!columns[i].formHidden && !columns[i][`${this.type}Hidden`] && hasValue(columns[i].value)) {
           initForm[columns[i].prop] = columns[i].value
         }
       }
+      if (type == 'edit') {
+        for (let i = 0; i < columns.length; i++) {
+          if (!columns[i].formHidden && !columns[i][`${this.type}Hidden`] && hasValue(columns[i].editValue)) {
+            editForm[columns[i].prop] = columns[i].editValue
+          }
+        }
+      }
       this.type = type
-      this.formData = {...initForm, ...data}
+      this.formData = {...initForm, ...data, ...editForm}
       this.dialogVisible = true
       this.$nextTick(() => {
         this.$refs.form.clearValidate()
