@@ -53,6 +53,13 @@ export const tableOption = (edit = false) => {
       ]
     },
     {
+      label: '联系电话',
+      prop: 'phone',
+      span: 24,
+      width: 120,
+      maxlength: 20,
+    },
+    {
       label: '密码',
       prop: 'password',
       type: 'password',
