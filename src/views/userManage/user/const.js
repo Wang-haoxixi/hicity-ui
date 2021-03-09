@@ -14,22 +14,14 @@ var validateUsername = (rule, value, callback) => {
   })
 }
 export const tableOption = {
-  border: true,
-  // index: true,
-  // indexLabel: '序号', 
-  stripe: true,
-  menuAlign: 'center',
-  editBtn: false,
-  delBtn: false,
-  align: 'center',
-  addBtn: false,
-  labelWidth: 160,
-  menuWidth: 160,
-  column: [{
+  menu: ['edit', 'delete'],
+  labelWidth: "160px",
+  menuWidth: 100,
+  columns: [{
     label: '序号',
     prop: 'userId',
     span: 24,
-    display: false,
+    formHidden: true,
     width: 100,
   }, {
     label: '真实姓名',
@@ -46,7 +38,6 @@ export const tableOption = {
     label: '用户名',
     prop: 'username',
     editDisabled: true,
-    slot: true,
     search: true,
     span: 24,
     rules: [{
@@ -65,8 +56,8 @@ export const tableOption = {
     label: '密码',
     prop: 'password',
     type: 'password',
-    value: '',
-    hide: true,
+    editValue: '',
+    hidden: true,
     span: 24,
     rules: [{
       min: 6,
@@ -80,7 +71,7 @@ export const tableOption = {
     prop: 'phone',
     value: '',
     span: 24,
-    hide: true,
+    hidden: true,
     rules: [{
       min: 11,
       max: 11,
@@ -117,6 +108,7 @@ export const tableOption = {
     format: 'yyyy-MM-dd HH:mm',
     valueFormat: 'yyyy-MM-dd HH:mm:ss',
     display: false,
+    formHidden: true,
     span: 24
   }]
 }

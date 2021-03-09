@@ -1,26 +1,21 @@
 <template>
   <basic-container>
-    <el-form inline :model="tempSearch" class="demo-form-inline">
-      <el-form-item label="栏目名称：">
-        <el-input v-model="tempSearch.newsColumnName" placeholder="请输入栏目名称"></el-input>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="toSearch()">查询</el-button>
-      </el-form-item>
-      <div>
-        <el-button
-          class="filter-item"
-          type="primary"
-          size="mini"
-          icon="el-icon-plus"
-          @click="handleCreate">添加
-        </el-button>
-      </div>
-    </el-form>
-
-    <hc-table-data-box :empty="!columnList || columnList.length == 0" :loading="boxLoading">
-      <div class="column-box">
-        <div v-for="column in columnList" :key="column.newsColumnId" class="column-item">
+    <hc-table-form title="城市新闻栏目">
+      <hc-crud ref="hcCrud" :option="tableOption" :fetchListFun="fetchListFun" :addFun="addFun" :updateFun="updateFun">
+        <template v-slot:lableIdListForm="scope">
+          <el-select style="width: 100%" v-model="scope.formData.lableIdList" multiple filterable placeholder="请选择">
+              <el-option
+                v-for="tag in tagList"
+                :key="tag.tagId"
+                :label="tag.name"
+                :value="tag.tagId">
+              </el-option>
+            </el-select>
+        </template>
+        <template v-slot:table="scope">
+           <hc-table-data-box :empty="!scope.tableData || scope.tableData.length == 0" :loading="boxLoading">
+            <div class="column-box">
+        <div v-for="column in scope.tableData" :key="column.newsColumnId" class="column-item">
           <div class="column-item-info">
             <div class="column-item-name">{{column.newsColumnName}}</div>
             <!-- <div class="column-item-sort" v-if="column.isOpening && column.sort">No.{{column.sort}}</div> -->
@@ -40,54 +35,14 @@
           </div>
         </div>
       </div>
-    </hc-table-data-box>
+          </hc-table-data-box>
+        </template>
+      </hc-crud>
 
-    <div class="pagination-box">
-      <el-pagination
-        style="display: inline-block"
-        @size-change="sizeChange"
-        @current-change="currentChange"
-        :current-page="page.currentPage"
-        :page-sizes="[10, 20, 30,, 40, 50, 100]"
-        background
-        :page-size="page.pageSize"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="page.total">
-      </el-pagination>
-    </div>
+    </hc-table-form>
 
     <hc-city-box ref="hcCityBox"></hc-city-box>
     
-    <el-dialog
-      :title="formTitle"
-      :visible.sync="formDialogVisible"
-      width="70%">
-      <el-form :model="formData" labelWidth="150px">
-        <el-form-item label="栏目名称：">
-          <el-input v-model="formData.newsColumnName"></el-input>
-        </el-form-item>
-        <el-form-item label="关联标签：">
-          <el-select style="width: 100%" v-model="formData.lableIdList" multiple filterable placeholder="请选择">
-            <el-option
-              v-for="tag in tagList"
-              :key="tag.tagId"
-              :label="tag.name"
-              :value="tag.tagId">
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item v-if="userType == 1 || userType == 2" label="是否允许城市停用：">
-          <el-switch v-model="formData.closeAllowed" active-value="0" active-text="允许" inactive-text="不允许" inactive-value="1"></el-switch>
-        </el-form-item>
-        
-      </el-form>
-      <div slot="footer">
-        <el-button v-show="formType == 'add'" type="primary" @click="create">保 存</el-button>
-        <el-button v-show="formType == 'edit'" type="primary" @click="update">修 改</el-button>
-
-        <el-button @click="formDialogVisible = false">取 消</el-button>
-      </div>
-    </el-dialog>
   </basic-container>
 </template>
 
@@ -100,23 +55,38 @@ export default {
   components: { HcCityBox },
   data () {
     return {
-      tempSearch: {
-        newsColumnName: ''
-      },
-      searchForm: {},
-      formData: {},
-      formType: 'add',
-      formDialogVisible: false,
-      columnList: [],
       tagList: [],
-      page: {
-        currentPage: 1,
-        pageSize: 20,
-        total: 0,
-      },
-      allCityList: [],
-      initCityList: [],
-      boxLoading: false
+      boxLoading: false,
+      tableOption: {
+        menu: ['add'],
+        labelWidth: '150px',
+        columns: [
+          {
+            label: '栏目名称',
+            prop: 'newsColumnName',
+            maxlength: 50,
+            search: true,
+            rules: [{required: true,message: '请输入栏目名称', trigger: 'blur'}]
+          },
+          {
+            label: '关联标签',
+            prop: 'lableIdList',
+            formSlot: true,
+            rules: [{required: true,message: '请选择关联标签', trigger: 'blur'}]
+          },
+          {
+            label: '是否允许城市停用',
+            prop: 'closeAllowed',
+            type: 'switch',
+            inactiveText: '不允许',
+            inactiveValue: '1',
+            activeText: '允许',
+            activeValue: '0',
+            value: '1',
+            rules: [{required: true,message: '请选择是否允许城市停用', trigger: 'blur'}]
+          }
+        ]
+      }
     }
   },
   computed: {
@@ -124,17 +94,9 @@ export default {
     isAdmin () {
       return this.userInfo.userType == 3 || this.userInfo.userType == 4
     },
-    formTitle () {
-      if (this.formType == 'add') {
-        return '新 增'
-      } else if (this.formType == 'edit') {
-        return '编 辑'
-      }
-    },
   },
   created () {
     this.initTagList()
-    this.getList()
   },
   methods: {
     confAuthority (column) {
@@ -147,72 +109,58 @@ export default {
       getAllTagList({cityId: this.userInfo.manageCityId}).then(({data}) => {
         this.tagList = data.data.data
       })
-    },
-    getList (page = this.page, form = this.searchForm) {
-      this.boxLoading = true
-      let formData = {
-        current: page.currentPage,
-        size: page.pageSize,
-        ...form,
-        cityId: this.userInfo.manageCityId
-      }
-      getColumnList(formData).then(({data}) => {
-        if (data.code === 0) {
-          this.columnList = data.data.data.records
-          this.page = {
-            ...page,
-            total: data.data.data.total
-          }
-        }
-      }).finally(() => {
-        this.boxLoading = false
+    },fetchListFun (params) {
+      return new Promise((resolve, reject) => {
+        this.boxLoading = true
+        getColumnList({
+          ...params,
+          cityId: this.userInfo.manageCityId
+        }).then(({data}) => {
+          this.boxLoading = false
+          resolve({
+            records: data.data.data.records,
+            page: {
+              total: data.data.data.total
+            }
+          })
+        })
       })
     },
-    handleCreate () {
-      this.formData = {
+    addFun(formData, next) {
+      addColumn({
         cityIdList: [this.userInfo.manageCityId],
-      }
-      this.formType = 'add'
-      this.formDialogVisible = true
-    },
-    create() {
-      addColumn(this.formData).then(({data}) => {
-        this.formDialogVisible = false
+        ...formData
+      }).then(({data}) => {
         this.$notify({
           title: '成功',
           message: '创建成功',
           type: 'success',
           duration: 2000
         })
-        this.page.currentPage = 1
-        this.getList()
-      }).catch(() => {
-        loading()
+        next()
       })
     },
     handleUpdate ({newsColumnId}) {
       getColumnDetail(newsColumnId).then(({data}) => {
-        let formData = data.data.data
-        this.formData = {
-          ...formData,
-          cityIdList: [this.userInfo.manageCityId],
+        let formData = {
+          newsColumnId: data.data.data.newsColumnId,
+          newsColumnName: data.data.data.newsColumnName,
+          lableIdList: data.data.data.lableIdList,
+          closeAllowed: data.data.data.closeAllowed,
+          cityIdList: data.data.data.cityIdList,
         }
-        this.formType = 'edit'
-        this.formDialogVisible = true
+        this.$refs.hcCrud.rowEdit(formData)
       })
     },
-    update() {
-      updateColumn(this.formData).then(({data}) => {
-        this.formDialogVisible = false
+    updateFun(formData, next) {
+      updateColumn(formData).then(({data}) => {
         this.$notify({
           title: '成功',
           message: '修改成功',
           type: 'success',
           duration: 2000
         })
-        this.getList()
-      }).catch(() => {
-        loading()
+        next()
       })
     },
     cityView (columnId) {
@@ -221,11 +169,17 @@ export default {
       })
     },
     handleDel (newsColumnId) {
-      deleteColumn({cityId: this.userInfo.manageCityId, newsColumnId}).then(({data}) => {
-        if (data.code === 0) {
-          this.$message.success('删除成功')
-          this.getList()
-        }
+      this.$confirm("是否删除该栏目?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      }).then(() => {
+        deleteColumn({cityId: this.userInfo.manageCityId, newsColumnId}).then(({data}) => {
+          if (data.code === 0) {
+            this.$message.success('删除成功')
+            this.$refs.hcCrud.refresh()
+          }
+        })
       })
     },
     handleStart (row) {
@@ -241,20 +195,6 @@ export default {
         }
       })
     }, 
-    toSearch () {
-      this.searchForm = this.tempSearch
-      this.page.currentPage = 1
-      this.getList()
-    },
-    currentChange (current) {
-      this.page.currentPage = current
-      this.getList()
-    },
-    sizeChange (size) {
-      this.page.pageSize = size
-      this.page.currentPage = 1
-      this.getList()
-    }
   }
 }
 </script>

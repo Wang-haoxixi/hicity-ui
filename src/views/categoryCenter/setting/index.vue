@@ -1,7 +1,7 @@
 <template>
   <basic-container>
     <hc-table-form title="标签配置">
-      <hc-crud :option="tableOption" :fetchListFun="fetchListFun">
+      <hc-crud ref="hcCrud" :option="tableOption" :fetchListFun="fetchListFun" :addFun="addFun" :updateFun="updateFun">
         <template v-slot:table="scope">
           <hc-table-data-box :empty="!scope.tableData || scope.tableData.length == 0" :loading="boxLoading">
             <div class="tag-box">
@@ -33,28 +33,6 @@
 
     <hc-city-box ref="hcCityBox"></hc-city-box>
 
-    <el-dialog
-      :title="formTitle"
-      :visible.sync="formDialogVisible"
-      width="70%">
-      <el-form :model="formData" labelWidth="150px">
-        <el-form-item label="标签名称：">
-          <el-input v-model="formData.name"></el-input>
-        </el-form-item>
-        <el-form-item label="标签编码：">
-          <el-input v-model="formData.tagCode"></el-input>
-        </el-form-item>
-        <el-form-item v-if="isAdmin" label="是否允许城市停用：">
-          <el-switch v-model="formData.editable" active-text="允许" inactive-text="不允许"></el-switch>
-        </el-form-item>
-      </el-form>
-      <div slot="footer">
-        <el-button v-show="formType == 'add'" type="primary" @click="create">保 存</el-button>
-        <el-button v-show="formType == 'edit'" type="primary" @click="update">修 改</el-button>
-
-        <el-button @click="formDialogVisible = false">取 消</el-button>
-      </div>
-    </el-dialog>
   </basic-container>
 </template>
 
@@ -68,12 +46,7 @@ export default {
   data () {
     return {
       tableOption,
-      formData: {},
-      formType: 'add',
-      formDialogVisible: false,
       tagList: [],
-      allCityList: [],
-      initCityList: [],
       boxLoading: false,
     }
   },
@@ -82,13 +55,6 @@ export default {
     isAdmin () {
       return this.userInfo.userType == 3 || this.userInfo.userType == 4
     },
-    formTitle () {
-      if (this.formType == 'add') {
-        return '新 增'
-      } else if (this.formType == 'edit') {
-        return '编 辑'
-      }
-    }
   },
   methods: {
     fetchListFun (params) {
@@ -108,45 +74,29 @@ export default {
         })
       })
     },
-    handleCreate () {
-      this.formData = {
-        editable: false
-      }
-      this.formType = 'add'
-      this.formDialogVisible = true
-    },
-    create() {
-      addTag(this.formData).then(({data}) => {
-        this.formDialogVisible = false
+    addFun(formData, next) {
+      addTag(formData).then(({data}) => {
         this.$notify({
           title: '成功',
           message: '创建成功',
           type: 'success',
           duration: 2000
         })
-        this.page.currentPage = 1
-        this.$refs.hcCrud.refresh()
-      }).catch(() => {
-        loading()
+        next()
       })
     },
     handleUpdate (row) {
-      this.formData = row
-      this.formType = 'edit'
-      this.formDialogVisible = true
+      this.$refs.hcCrud.rowEdit(row)
     },
-    update() {
-      updateTag(this.formData).then(({data}) => {
-        this.formDialogVisible = false
+    updateFun(formData, next) {
+      updateTag(formData).then(({data}) => {
         this.$notify({
           title: '成功',
           message: '修改成功',
           type: 'success',
           duration: 2000
         })
-        this.$refs.hcCrud.refresh()
-      }).catch(() => {
-        loading()
+        next()
       })
     },
     cityView (tagId) {
@@ -155,11 +105,17 @@ export default {
       })
     },
     handleDel (tagId) {
-      deleteTag({tagId}).then(({data}) => {
-        if (data.code === 0) {
-          this.$message.success('删除成功')
-          this.$refs.hcCrud.refresh()
-        }
+      this.$confirm("是否删除该标签?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      }).then(() => {
+        deleteTag({tagId}).then(({data}) => {
+          if (data.code === 0) {
+            this.$message.success('删除成功')
+            this.$refs.hcCrud.refresh()
+          }
+        })
       })
     },
     handleStart (row) {

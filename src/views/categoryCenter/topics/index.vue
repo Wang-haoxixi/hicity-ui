@@ -1,6 +1,6 @@
 <template>
-  <div class="user">
-    <basic-container>
+  <basic-container>
+    <hc-table-form title="话题库管理">
       <el-tabs v-model="activeName">
         <el-tab-pane label="官方话题" name="official">
           <official-topic v-if="activeName == 'official'"></official-topic>
@@ -9,8 +9,8 @@
           <user-topic v-if="activeName == 'user'"></user-topic>
         </el-tab-pane>
       </el-tabs>
-    </basic-container>
-  </div>
+    </hc-table-form>
+  </basic-container>
 </template>
 
 <script>

@@ -1,5 +1,5 @@
 export const tableOption = (admin = false) => {
-  let column = [
+  let columns = [
     {
       label: '话题名称',
       prop: 'topicsName',
@@ -7,18 +7,11 @@ export const tableOption = (admin = false) => {
     },
   ]
   let option = {
-    border: true,
+    menu: true,
     index: true,
-    indexLabel: '序号', 
-    stripe: true,
-    menuAlign: 'center',
-    editBtn: false,
-    delBtn: false,
-    align: 'center',
-    addBtn: false,
-    labelWidth: 160,
+    labelWidth: '160px',
     menuWidth: 150,
-    column
+    columns
   }
   
   return option
