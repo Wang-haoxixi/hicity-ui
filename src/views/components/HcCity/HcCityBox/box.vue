@@ -3,6 +3,7 @@
     <el-dialog
       title="展示城市"
       :visible.sync="dialogVisible"
+      append-to-body
       width="70%">
       <div class="hc-city-box">
         <div class="city-result">

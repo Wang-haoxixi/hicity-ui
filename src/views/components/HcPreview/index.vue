@@ -1,16 +1,22 @@
 <template>
   <div class="hc-preview-container">
     <div class="container-shadow"></div>
-    <div class="content-box">
+    <div class="content-box" :style="scaleStyle">
       <div class="content-box-overflow">
         <div class="content-inner">
           <div class="content">
             <slot></slot>
           </div>
         </div>
-        <div class="btn-close">
-          <i class="el-icon-circle-close" @click="handleClose"></i>
-        </div>
+      </div>
+      <div class="option-btn btn-close">
+        <i class="el-icon-circle-close" @click="handleClose"></i>
+      </div>
+      <div class="option-btn btn-enlarge">
+        <i class="el-icon-zoom-in" @click="handleEnlarge"></i>
+      </div>
+      <div class="option-btn btn-narrow">
+        <i class="el-icon-zoom-out" @click="handleNarrow"></i>
       </div>
     </div>
   </div>
@@ -20,11 +26,29 @@
 export default {
   data () {
     return {
+      scale: 1,
+    }
+  },
+  computed: {
+    scaleStyle () {
+      return {
+        transform: `scale(${this.scale})`
+      }
     }
   },
   methods: {
     handleClose () {
       this.$emit('close')
+    },
+    handleEnlarge () {
+      if (this.scale < 1.5) {
+        this.scale += .1
+      }
+    },
+    handleNarrow () {
+      if (this.scale > .5) {
+        this.scale -= .1
+      }
     }
   }
 }
@@ -68,11 +92,10 @@ export default {
         }
       }
     }
-    .btn-close {
+    .option-btn {
       position: absolute;
-      bottom: -50px;
-      left: 0;
-      right: 0;
+      right: -50px;
+      top: 50%;
       height: 40px;
       line-height: 40px;
       text-align: center;
@@ -81,6 +104,15 @@ export default {
       i {
         cursor: pointer;
       }
+    }
+    .btn-enlarge {
+      margin-top: -70px;
+    }
+    .btn-narrow {
+      margin-top: -20px;
+    }
+    .btn-close {
+      margin-top: 30px;
     }
   }
 }

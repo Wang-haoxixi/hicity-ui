@@ -1,87 +1,13 @@
 <template>
-  <div class="user">
     <basic-container>
-      <avue-crud
-        ref="crud"
-        :option="option"
-        v-model="form"
-        :page="page"
-        :table-loading="listLoading"
-        :before-open="handleOpenBefore"
-        :data="list"
-        @on-load="getList"
-        @search-change="handleFilter"
-        :search="{searchBtn: false}"
-        @refresh-change="handleRefreshChange"
-        @row-update="update"
-        @row-save="create">
-        <template
-            slot="username"
-            slot-scope="scope">
-            <span>{{ scope.row.username }}</span>
-        </template>
-        <template
-            slot="role"
-            slot-scope="scope">
-            <span
-            v-for="(role,index) in scope.row.roleList"
-            :key="index">
-            <el-tag>{{ role.roleName }} </el-tag>&nbsp;&nbsp;
-            </span>
-        </template>
-        <template
-            slot="deptId"
-            slot-scope="scope">
-            {{ scope.row.deptName }}
-        </template>
-        <template
-            slot="lockFlag"
-            slot-scope="scope">
-            <el-tag>{{ scope.label }}</el-tag>
-        </template>
-        <template
-            slot="menu"
-            slot-scope="scope">
-            <el-button
-            v-if="sys_user_edit && scope.row.userType != 4"
-            type="text"
-            size="mini"
-            icon="el-icon-edit"
-            @click="handleUpdate(scope.row,scope.index)">编辑
-            </el-button>
-            <el-button
-            v-if="sys_user_del && scope.row.userType != 4"
-            type="text"
-            size="mini"
-            icon="el-icon-delete"
-            @click="deletes(scope.row,scope.index)">删除
-            </el-button>
-        </template>
-        <template
-            slot="deptIdForm"
-            slot-scope="scope">
-            <avue-input
-            v-model="form.deptId"
-            :node-click="getNodeData"
-            :dic="treeDeptData"
-            :props="defaultProps"
-            type="tree"
-            placeholder="请选择所属平台"/>
-        </template>
-        <template
-            slot="roleForm"
-            slot-scope="scope">
-            <avue-select
-            v-model="role"
-            :dic="rolesOptions"
-            :props="roleProps"
-            multiple
-            placeholder="请选择角色"/>
-        </template>
-        </avue-crud>
+        <hc-table-form title="用户管理">
+            <hc-crud ref="hcCrud" :option="option" :fetchListFun="fetchListFun" :updateFun="updateFun" :deleteFun="deleteFun">
+                <template v-slot:lockFlag="scope">
+                    <el-tag>{{ scope.label }}</el-tag>
+                </template>
+            </hc-crud>  
+        </hc-table-form>
     </basic-container>
-  </div>
-
 </template>
 
 <script>
@@ -93,19 +19,8 @@
 
     export default {
         name: 'SysUser',
-        data() {
+        data() {    
             return {
-                searchForm: {},
-                treeOption: {
-                    nodeKey: 'id',
-                    addBtn: false,
-                    menu: false,
-                    props: {
-                        label: 'name',
-                        value: 'id'
-                    }
-                },
-                treeData: [],
                 option: tableOption,
                 treeDeptData: [],
                 checkedKeys: [],
@@ -144,97 +59,34 @@
             this.sys_user_del = this.permissions['sys_user_del']
         },
         methods: {
-            nodeClick(data) {
-                this.page.page = 1
-                this.getList(this.page, {deptId: data.id})
+            fetchListFun (params) {
+               return new Promise((resolve, reject) => {
+                   fetchList(params).then(response => {
+                       resolve({
+                           records: response.data.data.records,
+                           page: {
+                               total: response.data.data.total
+                           }
+                       })
+                    }, error => reject(error))
+               }) 
             },
-            getList(page, params) {
-                this.listLoading = true
-                fetchList(Object.assign({
-                    current: page.currentPage,
-                    size: page.pageSize
-                }, params, this.searchForm)).then(response => {
-                    this.list = response.data.data.records
-                    this.page.total = response.data.data.total
-                    this.listLoading = false
-                })
-            },
-            getNodeData() {
-                deptRoleList().then(response => {
-                    this.rolesOptions = response.data.data
-                })
-            },
-            handleDept() {
-                fetchTree().then(response => {
-                    this.treeDeptData = response.data.data
-                })
-            },
-            handleFilter(param) {
-                this.searchForm = param
-                this.getList(this.page, param)
-            },
-            handleRefreshChange() {
-                this.getList(this.page)
-            },
-            handleCreate() {
-                this.$refs.crud.rowAdd()
-            },
-            handleOpenBefore(show, type) {
-                window.boxType = type
-                this.handleDept()
-                if (['edit', 'views'].includes(type)) {
-                    this.role = []
-                    for (var i = 0; i < this.form.roleList.length; i++) {
-                        this.role[i] = this.form.roleList[i].roleId
-                    }
-                    deptRoleList().then(response => {
-                        this.rolesOptions = response.data.data
-                    })
-                } else if (type === 'add') {
-                    this.role = []
+            updateFun(formData, next) {
+                if (formData.phone && formData.phone.indexOf('*') > 0) {
+                    formData.phone = undefined
                 }
-                show()
-            },
-            handleUpdate(row, index) {
-                console.log(row)
-                this.$refs.crud.rowEdit(row, index)
-                this.form.password = undefined
-            },
-            create(row, done, loading) {
-                if (this.form.phone.indexOf('*') > 0) {
-                    this.form.phone = undefined
-                }
-                addObj(this.form).then(() => {
-                    this.getList(this.page)
-                    done()
-                    this.$notify({
-                        title: '成功',
-                        message: '创建成功',
-                        type: 'success',
-                        duration: 2000
-                    })
-                }).catch(() => {
-                    loading()
-                })
-            },
-            update(row, index, done, loading) {
-                if (this.form.phone && this.form.phone.indexOf('*') > 0) {
-                    this.form.phone = undefined
-                }
-                putObj(this.form).then(() => {
-                    this.getList(this.page)
-                    done()
+                putObj(formData).then(() => {
+                    this.$refs.hcCrud.refresh()
                     this.$notify({
                         title: '成功',
                         message: '修改成功',
                         type: 'success',
                         duration: 2000
                     })
-                }).catch(() => {
-                    loading()
+                    next()
                 })
             },
-            deletes(row, index) {
+            deleteFun(row, index) {
                 this.$confirm(
                     '此操作将永久删除该用户(用户名:' + row.username + '), 是否继续?',
                     '提示',
@@ -244,24 +96,22 @@
                         type: 'warning'
                     }
                 ).then(() => {
-                    delObj(row.userId)
-                        .then(() => {
-                            this.list.splice(index, 1)
-                            this.$notify({
-                                title: '成功',
-                                message: '删除成功',
-                                type: 'success',
-                                duration: 2000
-                            })
+                    delObj(row.userId).then(() => {
+                        this.$refs.hcCrud.refresh()
+                        this.$notify({
+                            title: '成功',
+                            message: '删除成功',
+                            type: 'success',
+                            duration: 2000
                         })
-                        .cache(() => {
-                            this.$notify({
-                                title: '失败',
-                                message: '删除失败',
-                                type: 'error',
-                                duration: 2000
-                            })
+                    }).cache(() => {
+                        this.$notify({
+                            title: '失败',
+                            message: '删除失败',
+                            type: 'error',
+                            duration: 2000
                         })
+                    })
                 })
             }
         }

@@ -4,18 +4,28 @@
       title="城市模块配置"
       :formVisible="setModule"
       @go-back="setModule = false">
-      <template>
-        <el-form inline :model="tempSearch">
-          <div class="search-box">
+      <hc-crud ref="hcCrud" :option="{search: true}" :fetchListFun="fetchListFun">
+        <template v-slot:search>
+          <el-form class="search-box" inline :model="tempSearch">
             <div class="serach-box-left">
               <el-form-item label="城市搜索：">
-                <el-select v-model="tempSearch.cityId" placeholder="请选择城市" clearable="">
-                  <el-option v-for="city in allCity" :key="city.id" :label="city.regionName" :value="city.id"></el-option>
-                </el-select>
+                <el-input v-model="tempSearch.cityName" placeholder="请输入城市名称" clearable=""></el-input>
               </el-form-item>
               <el-form-item>
-                <el-button type="primary" @click="toSearch()">查询</el-button>
-              </el-form-item>
+              <el-button
+                class="search-item"
+                type="primary"
+                icon="el-icon-search"
+                @click="toSearch"
+                >搜 索</el-button
+              >
+              <el-button
+                class="search-item"
+                icon="el-icon-refresh"
+                @click="resetSearch"
+                >重 置</el-button
+              >
+            </el-form-item>
             </div>
             <div class="serach-box-right">
               <el-form-item>
@@ -27,41 +37,29 @@
                 </el-radio-group>
               </el-form-item>
             </div>
-          </div>
-          
-        </el-form>
-        <hc-table-data-box :empty="!cityList || cityList.length == 0" :loading="boxLoading">
-          <div class="city-box">
-            <div v-for="city in cityList" :key="city.cityId" class="city-item">
-              <div class="city-item-info">
-                <div class="city-item-name">{{city.cityName}}</div>
-              </div>
-              <div class="city-item-option">
-                <city-state :state="city.state || ''" :is-opening="city.isOpening"></city-state>
-                <div class="city-item-option-right">
-                  <template v-if="isAdmin || !city.isPlatform">
-                    <el-button type="text" size="mini" @click="handleModule(city)">配置</el-button>
-                  </template>
+          </el-form>
+        </template>
+        <template v-slot:table="scope">
+          <hc-table-data-box :empty="!scope.tableData || scope.tableData.length == 0" :loading="boxLoading">
+            <div class="city-box">
+              <div v-for="city in scope.tableData" :key="city.cityId" class="city-item">
+                <div class="city-item-info">
+                  <div class="city-item-name">{{city.cityName}}</div>
+                </div>
+                <div class="city-item-option">
+                  <city-state :state="city.state || ''" :is-opening="city.isOpening"></city-state>
+                  <div class="city-item-option-right">
+                    <template v-if="isAdmin || !city.isPlatform">
+                      <el-button type="text" size="mini" @click="handleModule(city)">配置</el-button>
+                    </template>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </hc-table-data-box>
-        <div class="pagination-box">
-          <el-pagination
-            style="display: inline-block"
-            @size-change="sizeChange"
-            @current-change="currentChange"
-            :current-page="page.currentPage"
-            :page-sizes="[10, 20, 30,, 40, 50, 100]"
-            background
-            :page-size="page.pageSize"
-            layout="total, sizes, prev, pager, next, jumper"
-            :total="page.total">
-          </el-pagination>
-        </div>
-      </template>
-
+          </hc-table-data-box>
+        </template>
+      </hc-crud>
+    
       <template slot="form">
         <module-list module-list :city-id="handleCityId"></module-list>
 
@@ -81,19 +79,11 @@ export default {
   components: { CityState, ModuleList, HcTableForm },
   data () {
     return {
-      tempSearch: {
-        name: ''
-      },
-      searchForm: {},
+      tempSearch: {},
       formData: {},
       formType: 'add',
       formDialogVisible: false,
       cityList: [],
-      page: {
-        currentPage: 1,
-        pageSize: 20,
-        total: 0,
-      },
       allCity: [],
       cityViewDialogVisible: false,
       cityStatus: 'all',
@@ -112,58 +102,43 @@ export default {
     cityStatus (val) {
       switch (val) {
         case 'all':
-          delete this.searchForm.isOpening
-          delete this.searchForm.state
-          this.getList()
+          this.$refs.hcCrud.refresh({currentPage: 1}, {state: undefined, isOpening: undefined})
           break
         case '1':
-          this.searchForm.isOpening = true
-          this.searchForm.state = '0'
-          this.getList()
+          this.$refs.hcCrud.refresh({currentPage: 1}, {state: '0', isOpening: true})
           break
         case '2':
-          this.searchForm.isOpening = true
-          this.searchForm.state = '9'
-          this.getList()
+          this.$refs.hcCrud.refresh({currentPage: 1}, {state: '9', isOpening: true})
           break
         case '3':
-          this.searchForm.isOpening = false
-          delete this.searchForm.state
-          this.getList()
+          this.$refs.hcCrud.refresh({currentPage: 1}, {state: undefined, isOpening: false})
           break
         default:
-          delete this.searchForm.isOpening
-          delete this.searchForm.state
-          this.getList()
+          this.$refs.hcCrud.refresh({currentPage: 1}, {state: undefined, isOpening: undefined})
       }
     }
   },
   created () {
     this.init()
   },
-  mounted () {
-    this.getList()
-  },
-  destroyed () {
-    console.log('destroyed')
-  },
   methods: {
-    getList (page = this.page, form = this.searchForm) {
+    fetchListFun (params) {
       this.boxLoading = true
-      adminCityOpenList({
-        current: page.currentPage,
-        size: page.pageSize,
-        ...form,
-      }).then(({data}) => {
-        if (data.code === 0) {
-          this.cityList = data.data.data.records
-          this.page = {
-            ...page,
-            total: data.data.data.total
+      return new Promise((resolve, reject) => {
+        adminCityOpenList(params).then(({data}) => {
+          if (data.code === 0) {
+            resolve({
+              records: data.data.data.records,
+              page: {
+                total: data.data.data.total
+              }
+            })
           }
-        }
-      }).finally(() => {
-        this.boxLoading = false
+        }, (error) => {
+          reject(error)
+        }).finally(() => {
+          this.boxLoading = false
+        })
       })
     },
     init () {
@@ -176,21 +151,12 @@ export default {
       this.setModule = true
     },
     toSearch () {
-      this.searchForm = {
-        ...this.searchForm,
-        ...this.tempSearch
+      this.$refs.hcCrud.refresh({currentPage: 1}, this.tempSearch)
+    },
+    resetSearch () {
+      this.tempSearch = {
+        cityName: undefined,
       }
-      this.page.currentPage = 1
-      this.getList()
-    },
-    currentChange (current) {
-      this.page.currentPage = current
-      this.getList()
-    },
-    sizeChange (size) {
-      this.page.pageSize = size
-      this.page.currentPage = 1
-      this.getList()
     }
   }
 }
@@ -248,10 +214,5 @@ export default {
       }
     }
   }
-}
-.pagination-box {
-  padding: 10px 20px;
-  margin: 15px 0 10px;
-  text-align: right;
 }
 </style>

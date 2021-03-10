@@ -36,14 +36,18 @@
       :visible.sync="topicChooseDialogVisible"
       width="70%"
     >
-      <div class="classify-list">
-        <div v-for="topic in relativeTopicList"
-          :key="topic.id"
-          class="classify-list-item"
-          @click="handleSelect(topic)">
-          {{ topic.topicsName }}
+      <template>
+        <div v-if="relativeTopicList && relativeTopicList.length > 0" class="classify-list">
+          <div v-for="topic in relativeTopicList"
+            :key="topic.id"
+            class="classify-list-item"
+            @click="handleSelect(topic)">
+            {{ topic.topicsName }}
+          </div>
         </div>
-      </div>
+        <hc-empty-data v-else></hc-empty-data>
+      </template>
+
       <div slot="footer">
         <el-button @click="topicChooseDialogVisible = false">取 消</el-button>
       </div>
@@ -54,7 +58,9 @@
 
 <script>
 import { getClassifyList, getTopicList } from '@/api/cms/travel'
+import HcEmptyData from "@/views/components/HcEmptyData/index"
 export default {
+  components: { HcEmptyData },
   props: {
     topicName: {
       type: String,

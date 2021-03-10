@@ -15,6 +15,13 @@ export function addColumn(data) {
   })
 }
 
+export function getColumnDetail(newsColumnId) {
+  return new request({
+    url: '/cms/news_column/details',
+    params: {newsColumnId}
+  })
+}
+
 export function deleteColumn(data) {
   return new request({
     url: '/cms/news_column/delete',

@@ -1,8 +1,9 @@
 export const tableOption = (admin = false) => {
-  let column = [
+  let columns = [
     {
       label: '圈子ID',
-      prop: 'circleId'
+      prop: 'circleId',
+      width: 100
     },
     {
       label: '圈子名称',
@@ -10,39 +11,41 @@ export const tableOption = (admin = false) => {
     },
     {
       label: '创建者',
-      prop: 'telephone'
+      prop: 'telephone',
+      width: 120
     },
     {
       label: '群主姓名',
-      prop: 'createByName'
+      prop: 'createByName',
+      width: 120
     },
     {
       label: '圈子状态',
-      prop: 'state'
+      prop: 'state',
+      width: 120
     },
     {
       label: '成员',
       prop: 'userCount',
+      width: 80
     },
     {
       label: '注册城市',
-      prop: 'createByCity'
+      prop: 'createByCity',
+      width: 120
     },
     
   ]
   let option = {
-    border: true,
-    // index: true,
-    // indexLabel: '序号', 
-    stripe: true,
-    menuAlign: 'center',
-    editBtn: false,
-    delBtn: false,
-    align: 'center',
-    addBtn: false,
     labelWidth: 160,
-    menuWidth: 150,
-    column
+    menuWidth: 80,
+    menu: [
+      {
+        label: '详情',
+        fun: 'groupView'
+      }
+    ],
+    columns
   }
   
   return option

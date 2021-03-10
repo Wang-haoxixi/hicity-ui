@@ -97,14 +97,22 @@ export default {
         } else {
           this.$message.error(res.msg);
         }
-        this.$emit("input", []);
+        if (this.multiple) {
+          this.$emit("input", [])
+          this.$emit("change", [])
+        } else {
+          this.$emit("input", '')
+          this.$emit("change", '')
+        }
       } else {
         const url = res.data.data.url;
         if (this.multiple) {
           this.$emit("input", [...this.value, url])
+          this.$emit("change", [...this.value, url])
         } else {
           this.fileList = [{url}]
           this.$emit("input", url)
+          this.$emit("change", url)
         }
         this.$message.success("上传成功");
       }
@@ -119,6 +127,7 @@ export default {
       }
       tempData.splice(tempData.indexOf(url), 1)
       this.$emit("input", tempData)
+      this.$emit("change", tempData)
     },
     handleExceed(files, fileList) {
       this.$message.warning(

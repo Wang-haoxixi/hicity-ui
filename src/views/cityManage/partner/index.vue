@@ -1,18 +1,7 @@
 <template>
-  <div class="user">
-    <basic-container>
-      <avue-crud
-        ref="crud"
-        v-model="form"
-        :option="tableOption"
-        :page="page"
-        :table-loading="tableLoading"
-        :data="tableData"
-        @on-load="getList"
-        @refresh-change="handleRefreshChange"
-        @search-change="handleFilter"
-        @current-change="currentChange"
-        @size-change="sizeChange">
+  <basic-container>
+    <hc-table-form title="城市合伙人">
+      <hc-crud ref="hcCrud" :option="tableOption" :fetchListFun="fetchListFun">
         <template
           slot="menu"
           slot-scope="scope">
@@ -29,9 +18,8 @@
             @click="handleLock(scope.row)">{{scope.row.state == 0 ? '锁定' : '解锁'}}
           </el-button>
         </template>
-      </avue-crud>
-    </basic-container>
-
+      </hc-crud>
+    </hc-table-form>
     <el-dialog
       :visible.sync="dialogRoleVisible"
       :close-on-click-modal="false"
@@ -56,13 +44,12 @@
           @click="handleOpen()">开 通
         </el-button>
         <el-button
-	        type="default"
+          type="default"
           size="small"
           @click="cancal()">取 消</el-button>
       </div>
     </el-dialog>
-  </div>
-
+  </basic-container>
 </template>
 
 <script>
@@ -103,22 +90,19 @@ export default {
   created() {
   },
   methods: {
-    getList(page = this.page) {
-      this.tableLoading = true
-      adminCityOpenList({
-        current: page.currentPage,
-        size: page.pageSize,
-        ...this.searchForm
-      }).then(({data}) => {
-        this.tableData = data.data.data.records
-        this.page.total = data.data.data.total
-      }).finally(() => {
-        this.tableLoading = false
+    fetchListFun (params) {
+      return new Promise((resolve, reject) => {
+        adminCityOpenList(params).then(({data}) => {
+          resolve({
+            records: data.data.data.records,
+            page: {
+              total: data.data.data.total
+            }
+          })
+        }, (error) => {
+          reject(error)
+        })
       })
-    },
-    handleFilter(param) {
-      this.searchForm = param
-      this.getList(this.page, param)
     },
     toOpen(row) {
       this.formData = {
@@ -131,7 +115,7 @@ export default {
       this.$refs.form.validate(valid => {
         if (valid) {
           adminCityOpen(this.formData).then(({data}) => {
-            this.getList()
+            this.$refs.hcCrud.refresh()
             this.$notify({
               title: '成功',
               message: '开通成功',
@@ -157,7 +141,7 @@ export default {
           cityId: row.cityId,
           lock: row.state == 0 ? true : false
         }).then(({data}) => {
-          this.getList()
+          this.$refs.hcCrud.refresh()
           this.$notify({
             title: '成功',
             message: `${lockWord}成功`,
@@ -168,24 +152,6 @@ export default {
       }).catch(function() {
       })
     },
-    handleRefreshChange() {
-      this.page = {
-        total: 0, // 总页数
-        currentPage: 1, // 当前页数
-        pageSize: 20, // 每页显示多少条,
-        isAsc: false, // 是否倒序
-      }
-      this.getList();
-    },
-    currentChange (current) {
-      this.page.currentPage = current
-      this.getList()
-    },
-    sizeChange (size) {
-      this.page.pageSize = size
-      this.page.currentPage = 1
-      this.getList()
-    }
   }
 }
 </script>

@@ -64,6 +64,8 @@ export default {
               total: res.data.data.data.total,
             },
           });
+        }, (error) => {
+          reject(error)
         });
       });
     },

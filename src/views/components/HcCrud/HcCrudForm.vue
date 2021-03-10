@@ -12,10 +12,10 @@
       </el-form-item>
     </el-form>
     <div slot="footer">
-      <el-button v-if="type == 'view'" @click="dialogVisible = false">返 回</el-button>
+      <el-button v-if="type == 'view'" @click="cancel">返 回</el-button>
       <template v-else>
         <el-button type="primary" @click="save">保 存</el-button>
-        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button @click="cancel">取 消</el-button>
       </template>
     </div>
   </el-dialog>
@@ -23,6 +23,13 @@
 
 <script>
 import HcFormItem from './HcFormItem'
+function hasValue (value) {
+  if (value === null || value === undefined) {
+    return false
+  }
+  return true
+}
+
 export default {
   components: { HcFormItem },
   props: {
@@ -75,9 +82,27 @@ export default {
     },
     open (data = {}, type = 'add') {
       this.columns = this.option.columns || []
+      let initForm = {}
+      let editForm = {}
+      let columns = this.columns
+      for (let i = 0; i < columns.length; i++) {
+        if (!columns[i].formHidden && !columns[i][`${this.type}Hidden`] && hasValue(columns[i].value)) {
+          initForm[columns[i].prop] = columns[i].value
+        }
+      }
+      if (type == 'edit') {
+        for (let i = 0; i < columns.length; i++) {
+          if (!columns[i].formHidden && !columns[i][`${this.type}Hidden`] && hasValue(columns[i].editValue)) {
+            editForm[columns[i].prop] = columns[i].editValue
+          }
+        }
+      }
       this.type = type
-      this.formData = {...data}
+      this.formData = {...initForm, ...data, ...editForm}
       this.dialogVisible = true
+      this.$nextTick(() => {
+        this.$refs.form.clearValidate()
+      })
     },
     save () {
       this.$refs.form.validate(valid => {
@@ -87,9 +112,18 @@ export default {
       })
     },
     dialogBeforeClose (next) {
+      // this.$refs.form.resetFields()
+      this.$refs.form.clearValidate()
       next()
     },
+    cancel () {
+      // this.$refs.form.resetFields()
+      this.$refs.form.clearValidate()
+      this.dialogVisible = false
+    },
     close () {
+      // this.$refs.form.resetFields()
+      this.$refs.form.clearValidate()
       this.dialogVisible = false
     }
   }

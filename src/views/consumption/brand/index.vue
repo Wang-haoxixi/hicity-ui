@@ -4,16 +4,7 @@
       :title="title"
       :formVisible="publish"
       @go-back="goBack">
-      <avue-crud
-        ref="crud"
-        :option="tableOption"
-        :page="page"
-        :table-loading="tableLoading"
-        :data="tableData"
-        @on-load="getList"
-        @refresh-change="handleRefreshChange"
-        style="margin-left: 0;"
-      >
+      <hc-crud ref="hcCrud" :option="tableOption" :fetchListFun="fetchListFun">
         <template slot="menuLeft">
           <el-button
             type="primary"
@@ -27,6 +18,9 @@
         </template>
         <template slot="menu" slot-scope="scope">
           <template>
+            <el-button type="text" size="mini" @click="toView(scope.row)"
+              >详情</el-button
+            >
             <el-button type="text" size="mini" @click="toUpdate(scope.row)"
               >编辑</el-button
             >
@@ -35,7 +29,7 @@
             >
           </template>
         </template>
-      </avue-crud>
+      </hc-crud>
       <template slot="form">
         <el-form
           ref="form"
@@ -43,6 +37,7 @@
           :model="formData"
           label-width="180px"
           :rules="formRule"
+          :disabled="publishType == 'view'"
         >
           <el-form-item label="品牌名称：" prop="brandName">
             <el-input v-model="formData.brandName" maxlength="200"></el-input>
@@ -54,7 +49,7 @@
             <el-input type="textarea" v-model="formData.brandSynopsis" :autosize="{minRows: 5, maxRows: 10}" maxlength="250"></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button @click="handleCreate">保存</el-button>
+            <el-button v-if="publishType != 'view'" @click="handleCreate">保存</el-button>
           </el-form-item>
         </el-form>
       </template>
@@ -80,14 +75,7 @@ export default {
   components: { HcImageUpload, HcTableForm, HcEmptyData },
   data() {
     return {
-      page: {
-        total: 0, // 总页数
-        currentPage: 1, // 当前页数
-        pageSize: 20, // 每页显示多少条,
-        isAsc: false, // 是否倒序
-      },
       isOwn: false,
-      tableLoading: false,
       tableData: [],
       formData: {
         brandName: '',
@@ -117,8 +105,12 @@ export default {
       } else {
         if (this.publishType == 'add') {
           return '品牌信息-新增'
-        } else {
+        } else if (this.publishType == 'eidit') {
           return '品牌信息-编辑'
+        } else if (this.publishType == 'view') {
+          return '品牌信息-详情'
+        } else {
+          return '品牌信息'
         }
       }
     }
@@ -128,29 +120,21 @@ export default {
       this.publish = false
     },
     refresh () {
-      this.page = {
-        total: 0, // 总页数
-        currentPage: 1, // 当前页数
-        pageSize: 20, // 每页显示多少条,
-        isAsc: false, // 是否倒序
-      }
-      this.getList()
+      this.$refs.hcCrud.refresh({currentPage: 1})
     },
-    getList(page = this.page, params) {
-      this.tableLoading = true;
-      let form = {
-        current: page.currentPage,
-        size: page.pageSize,
-        isOwn: this.isOwn
-      };
-      getBrandList(form)
-        .then(({ data }) => {
-          this.tableData = data.data.data.records;
-          this.page.total = data.data.data.total;
+    fetchListFun (params) {
+      return new Promise((resolve, reject) => {
+        getBrandList(params).then(({ data }) => {
+          resolve({
+            records: data.data.data.records,
+            page: {
+              total: data.data.data.total
+            }
+          })
+        }, error => {
+          reject(error)
         })
-        .finally(() => {
-          this.tableLoading = false;
-        });
+      })
     },
     toCreate() {
       this.publish = true;
@@ -184,7 +168,7 @@ export default {
             type: "success",
             duration: 2000,
           });
-          this.getList();
+          this.$refs.hcCrud.refresh({currentPage: 1})
         });
       } else {
         updateBrand({ ...formData, brandId: this.formData.brandId }).then(({ data }) => {
@@ -195,7 +179,7 @@ export default {
             type: "success",
             duration: 2000,
           });
-          this.getList();
+          this.$refs.hcCrud.refresh()
         });
       }
     },
@@ -204,6 +188,13 @@ export default {
         this.formData = data.data.data;
         this.publish = true;
         this.publishType = "edit";
+      });
+    },
+    toView({ brandId }) {
+      getBrandDetail({ brandId }).then(({ data }) => {
+        this.formData = data.data.data;
+        this.publish = true;
+        this.publishType = "view";
       });
     },
     toDelete({ brandId }) {
@@ -223,13 +214,10 @@ export default {
               type: "success",
               duration: 2000,
             });
-            this.getList();
+            this.$refs.hcCrud.refresh()
           });
         })
         .catch(function () {});
-    },
-    handleRefreshChange() {
-      this.getList(this.page);
     },
   },
 };

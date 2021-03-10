@@ -1,8 +1,9 @@
 export const tableOption = (admin = false) => {
-  let column = [
+  let columns = [
     {
       label: '店铺ID',
       prop: 'merchantId',
+      width: "70",
     },
     {
       label: '商户门店',
@@ -11,18 +12,22 @@ export const tableOption = (admin = false) => {
     {
       label: '品牌',
       prop: 'brandName',
+      width: "100",
     },
     {
-      label: '创建城市',
+      label: '城市/地区',
       prop: 'cityName',
+      width: "100",
     },
     {
       label: '联系人',
       prop: 'merchantUserName',
+      width: "120",
     },
     {
       label: '联系电话',
       prop: 'merchantUserPhone',
+      width: "120",
     },
     {
       label: '详细地址',
@@ -31,6 +36,7 @@ export const tableOption = (admin = false) => {
     {
       label: '店铺状态',
       prop: 'merchantStatus',
+      width: "100",
       formatter: function (data) {
         if (data.merchantStatus == 1) {
           return '正常'
@@ -42,22 +48,21 @@ export const tableOption = (admin = false) => {
           return ''
         }
       }
+    },
+    {
+      label: '店铺二维码',
+      width: "100",
+      prop: 'qrcode',
+      slot: true,
+      formHidden: true
     }
   ]
 
   let option = {
-    border: true,
-    // index: true,
-    // indexLabel: '序号', 
-    stripe: true,
-    menuAlign: 'center',
-    editBtn: false,
-    delBtn: false,
-    align: 'center',
-    addBtn: false,
-    labelWidth: 160,
-    menuWidth: 150,
-    column
+    menuWidth: 130,
+    menu: true,
+    header: true,
+    columns
   }
   
   return option

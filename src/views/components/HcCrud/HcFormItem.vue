@@ -10,8 +10,31 @@
     :value="value"
     :disabled="disabled"
     @change="change">
-    <el-option v-for="(item, index) in dicList[option.dicName]" :key="index" :value="item.value" :label="item.label">{{item.label}}</el-option>
+    <el-option v-for="(item, index) in dicData" :key="index" :value="item.value" :label="item.label">{{item.label}}</el-option>
   </el-select>
+  <el-radio-group v-else-if="option.type == 'radio'"
+    :value="value"
+    :disabled="disabled"
+    @input="change">
+    <el-radio v-for="(item, index) in dicData" :key="index"
+      :border="option.border"
+      :label="item.value">{{item.label}}</el-radio>
+  </el-radio-group>
+  <el-date-picker v-else-if="option.type == 'datetime'"
+    :value="value"
+    @input="change"
+    :format="option.format"
+    type="datetime"
+    placeholder="选择日期时间">
+  </el-date-picker>
+  <el-switch v-else-if="option.type == 'switch'"
+    :value="value"
+    @change="change"
+    :active-value="option.activeValue"
+    :active-text="option.activeText || '是'"
+    :inactive-value="option.inactiveValue"
+    :inactive-text="option.inactiveText || '否'"></el-switch>
+
 </template>
 
 <script>
@@ -40,7 +63,16 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['dicList'])
+    ...mapGetters(['dicList']),
+    dicData () {
+      if (this.option.dicData) {
+        return this.option.dicData
+      } else if (this.option.dicName) {
+        return this.dicList[this.option.dicName]
+      } else {
+        return ''
+      }
+    },
   },
   methods: {
     change (value) {

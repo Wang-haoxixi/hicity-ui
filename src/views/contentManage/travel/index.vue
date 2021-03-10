@@ -4,16 +4,8 @@
       :title="title"
       :formVisible="publish"
       @go-back="publish = false">
-      <avue-crud
-        ref="crud"
-        :option="tableOption"
-        :page="page"
-        :table-loading="tableLoading"
-        :data="tableData"
-        @on-load="getList"
-        @refresh-change="handleRefreshChange"
-        style="margin-left: 0;"
-      >
+
+      <hc-crud ref="hcCrud" :fetchListFun="fetchListFun" :option="tableOption">
         <template slot="menuLeft">
           <el-button
             class="filter-item"
@@ -32,7 +24,7 @@
             <el-button type="text" size="mini" @click="toDelete(scope.row)">删除</el-button>
           </template>
         </template>
-      </avue-crud>
+      </hc-crud>
       <template slot="form">
         <el-form
           ref="form"
@@ -107,58 +99,11 @@ export default {
   components: { HcCityBox, HcCitySelect, HcImageUpload, HcTopicSelect, HcTableForm, HcPreview, Swiper, SwiperSlide },
   data() {
     return {
-      page: {
-        total: 0, // 总页数
-        currentPage: 1, // 当前页数
-        pageSize: 20, // 每页显示多少条,
-        isAsc: false, // 是否倒序
-      },
-      tableLoading: false,
-      tableData: [],
       formData: {},
       publish: false,
       publishType: "",
       allCityList: [],
       initCityList: [],
-      topicProps: {
-        lazy: true,
-        lazyLoad (node, resolve) {
-          const { level } = node;
-          if (level == 0) {
-            getClassifyList({
-              current: 1,
-              size: 1000000
-            }).then(({data}) => {
-              let classifyList = data.data.data.records
-              let nodes = []
-              for (let i = 0; i < classifyList.length; i++) {
-                nodes.push({
-                  value: classifyList[i].id,
-                  label: classifyList[i].classifyName,
-                  leaf: false
-                })
-              }
-              resolve(nodes)
-            })
-          } else {
-            getTopicList({
-              queryType: 1,
-              classifyId: node.value
-            }).then(({data}) => {
-              let topicList = data.data.data.records
-              let nodes = []
-              for (let i = 0; i < topicList.length; i++) {
-                nodes.push({
-                  value: topicList[i].id,
-                  label: topicList[i].topicsName,
-                  leaf: true
-                })
-              }
-              resolve(nodes)
-            })
-          }
-        }
-      },
       topicName: '',
       formRule: {
         travelName: [{required: true, message: '请输入名称'}],
@@ -196,21 +141,22 @@ export default {
   },
   methods: {
     dateFormat,
-    getList(page = this.page, params) {
-      this.tableLoading = true;
-      let form = {
-        current: page.currentPage,
-        size: page.pageSize,
-        queryType: 0
-      };
-      getTravelList(form)
-        .then(({ data }) => {
-          this.tableData = data.data.data.records;
-          this.page.total = data.data.data.total;
+    fetchListFun (params) {
+      return new Promise((resolve, reject) => {
+        getTravelList({
+          ...params,
+          queryType: 0
+        }).then(({ data }) => {
+          resolve({
+            records: data.data.data.records,
+            page: {
+              total: data.data.data.total
+            }
+          })
+        }, error => {
+          reject(error)
         })
-        .finally(() => {
-          this.tableLoading = false;
-        });
+      })
     },
     toCreate() {
       this.formData = {
@@ -238,7 +184,7 @@ export default {
           type: "success",
           duration: 2000,
         });
-        this.getList();
+        this.$refs.hcCrud.refresh()
       });
     },
     toUpdate({ id }) {
@@ -289,13 +235,10 @@ export default {
               type: "success",
               duration: 2000,
             });
-            this.getList();
+            this.$refs.hcCrud.refresh()
           });
         })
         .catch(function () {});
-    },
-    handleRefreshChange() {
-      this.getList(this.page);
     },
     cityView(id) {
       travelOpenList({ id }).then(({ data }) => {

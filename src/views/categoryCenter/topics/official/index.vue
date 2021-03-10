@@ -1,42 +1,16 @@
 <template>
-  <div class="user">
-    <avue-crud
-      ref="crud"
-      :option="tableOption"
-      :page="page"
-      :table-loading="tableLoading"
-      :data="tableData"
-      @on-load="getList"
-      @refresh-change="handleRefreshChange"
-      @row-update="handleUpdate"
-      @row-save="handleCreate"
-    >
-      <template slot="menuLeft">
-        <el-button
-          class="filter-item"
-          type="primary"
-          size="mini"
-          icon="el-icon-plus"
-          @click="toCreate"
-          >添加
-        </el-button>
+  <hc-crud ref="hcCrud" :option="tableOption" :fetchListFun="fetchListFun" :addFun="addFun" :updateFun="updateFun" :deleteFun="deleteFun">
+    <template v-slot:classifyIdForm="scope">
+      <el-select v-model="scope.formData.classifyId" clearable>
+        <el-option v-for="item in classifyList" :key="item.id" :label="item.classifyName" :value="item.id"></el-option>
+      </el-select>
+    </template>
+    <template slot="menu" slot-scope="scope">
+      <template v-if="scope.row.confAuthority == 1">
+        <el-button type="text" size="mini" @click="enableChange(scope.row)">{{scope.row.openOrClose ? '停用' : '启用'}}</el-button>
       </template>
-      <template slot="classifyIdForm" slot-scope="scope">
-        <el-select v-model="scope.row.classifyId" clearable>
-          <el-option v-for="item in classifyList" :key="item.id" :label="item.classifyName" :value="item.id"></el-option>
-        </el-select>
-      </template>
-      <template slot="menu" slot-scope="scope">
-        <template v-if="scope.row.operationAuthority == 1">
-          <el-button type="text" size="mini" @click="toUpdate(scope.row)">编辑</el-button>
-          <el-button type="text" size="mini" @click="toDelete(scope.row)">删除</el-button>
-        </template>
-        <template v-if="scope.row.confAuthority == 1">
-          <el-button type="text" size="mini" @click="enableChange(scope.row)">{{scope.row.openOrClose ? '停用' : '启用'}}</el-button>
-        </template>
-      </template>
-    </avue-crud>
-  </div>
+    </template>
+  </hc-crud>
 </template>
 
 <script>
@@ -54,17 +28,7 @@ import {
 export default {
   data() {
     return {
-      page: {
-        total: 0, // 总页数
-        currentPage: 1, // 当前页数
-        pageSize: 20, // 每页显示多少条,
-        isAsc: false, // 是否倒序
-      },
-      tableLoading: false,
-      tableData: [],
-      formData: {},
       tagList: [],
-      allCity: [],
       classifyList: [],
     };
   },
@@ -82,29 +46,24 @@ export default {
       this.classifyList = data.data.data.records
     })
   },
-  watch: {},
   methods: {
-    getList(page = this.page, params) {
-      this.tableLoading = true;
-      let form = {
-        current: page.currentPage,
-        size: page.pageSize,
-        queryType: 0,
-        isQuote: 1,
-      };
-      getTopicList(form)
-      .then(({ data }) => {
-        this.tableData = data.data.data.records;
-        this.page.total = data.data.data.total;
+    fetchListFun (params) {
+      return new Promise((resolve, reject) => {
+        getTopicList({
+          ...params,
+          queryType: 0,
+          isQuote: 1,
+        }).then(({ data }) => {
+          resolve({
+            records: data.data.data.records,
+            page: {
+              total: data.data.data.total
+            }
+          })
+        }, error => reject(error))
       })
-      .finally(() => {
-        this.tableLoading = false;
-      });
     },
-    toCreate() {
-      this.$refs.crud.rowAdd()
-    },
-    handleCreate(row, done, loading) {
+    addFun(row, done) {
       let form = {
         topicsName: row.topicsName,
       }
@@ -112,8 +71,6 @@ export default {
         form.classifyId = row.classifyId
       }
       addTopic(form).then(({data}) => {
-        this.page.current = 1
-        this.getList(this.page)
         done()
         this.$notify({
           title: '成功',
@@ -121,14 +78,9 @@ export default {
           type: 'success',
           duration: 2000
         })
-      }).catch(() => {
-        loading()
       })
     },
-    toUpdate(row) {
-      this.$refs.crud.rowEdit(row, row.index)
-    },
-    handleUpdate(row, done, loading) {
+    updateFun(row, done) {
       let form = {
         id: row.id,
         topicsName: row.topicsName,
@@ -137,7 +89,6 @@ export default {
         form.classifyId = row.classifyId
       }
       updateTopic(form).then(({data}) => {
-        this.getList(this.page)
         done()
         this.$notify({
           title: '成功',
@@ -145,16 +96,9 @@ export default {
           type: 'success',
           duration: 2000
         })
-      }).catch(() => {
-        loading()
       })
     },
-    handleDraft() {},
-    preview() {
-      this.$refs.quill.getData()
-      // console.log()
-    },
-    toDelete({ id }) {
+    deleteFun({ id }) {
       this.$confirm("是否确认删除该条话题?", "警告", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -169,7 +113,7 @@ export default {
               type: "success",
               duration: 2000,
             });
-            this.getList();
+            this.$refs.hcCrud.refresh()
           });
         })
         .catch(function () {});
@@ -186,11 +130,8 @@ export default {
           type: "success",
           duration: 2000,
         });
-        this.getList();
+        this.$refs.hcCrud.refresh()
       })
-    },
-    handleRefreshChange() {
-      this.getList(this.page);
     },
   },
 };
@@ -208,33 +149,6 @@ export default {
     .el-card__body {
       padding-top: 0;
     }
-  }
-}
-.tag-list {
-  display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
-  .tag-list-item {
-    margin-bottom: 10px;
-    height: 30px;
-    line-height: 30px;
-    padding: 0 15px;
-    border: 1px solid #e9e9e9;
-    border-radius: 4px;
-    margin-right: 20px;
-  }
-}
-
-.form-title {
-  height: 60px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-bottom: 20px;
-  .form-title-name {
-    height: 60px;
-    line-height: 60px;
-    font-size: 20px;
   }
 }
 </style>

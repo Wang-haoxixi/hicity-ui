@@ -2,6 +2,12 @@ export const tableOption = (admin = false) => {
   let columns = [
     {
       label: '名称',
+      prop: 'searchName',
+      hidden: true,
+      search: true
+    },
+    {
+      label: '名称',
       prop: 'title',
     },
     {
