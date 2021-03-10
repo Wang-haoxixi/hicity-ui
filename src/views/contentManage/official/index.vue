@@ -270,7 +270,8 @@ export default {
               message: "删除成功！",
               type: "success",
             });
-            this.getOfficialReleaseList();
+            // this.getOfficialReleaseList();
+            this.$refs.hcCrud.refresh();
           });
         })
         .catch(() => {
@@ -286,7 +287,7 @@ export default {
         next();
       }, 1000);
     },
-    // 编辑
+    // 咨询详情
     toUpdate({ officialNewsId }) {
       officialDetail({
         officialNewsId: officialNewsId,
@@ -484,7 +485,8 @@ export default {
                 message: "保存成功！",
                 type: "success",
               });
-              this.getOfficialReleaseList();
+              // this.getOfficialReleaseList();
+              this.$refs.hcCrud.refresh();
               this.isShow = true;
             });
           }
@@ -497,10 +499,11 @@ export default {
                 return this.$message.error("编辑失败");
               }
               this.$message({
-                message: "编辑成功！",
+                message: "保存成功！",
                 type: "success",
               });
-              this.getOfficialReleaseList();
+              // this.getOfficialReleaseList();
+              this.$refs.hcCrud.refresh();
               this.isShow = true;
               this.fileList = [];
             });
@@ -555,10 +558,10 @@ export default {
           if (valid) {
             officaialNewsUpdate(addform).then((res) => {
               if (res.data.code !== 0) {
-                return this.$message.error("编辑失败");
+                return this.$message.error("发布失败");
               }
               this.$message({
-                message: "编辑成功！",
+                message: "发布成功！",
                 type: "success",
               });
               // 清空标题图数组

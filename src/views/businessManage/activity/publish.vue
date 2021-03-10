@@ -402,6 +402,62 @@
           </el-card>
         </el-form-item>
       </el-form>
+
+      <div class="form-collect">报名表单收集：</div>
+      <div class="tips" @click="toFormCollect" v-if="!showFormCollect">
+        <i class="el-icon-plus"></i>
+        如果您需要收集参与者的必要信息，请添加；若没有则跳过
+      </div>
+      <div class="form-card" v-else>
+        <!-- 默认选项 -->
+        <div class="default-options">
+          <div>
+            <div class="item" v-for="(item, index) in defaultList" :key="index">
+              <el-checkbox v-model="item.must" :disabled="item.isDisabled"
+                >必填</el-checkbox
+              >
+              {{ item.label }}
+            </div>
+          </div>
+          <div class="general-box">
+            <div>常规项</div>
+            <div class="choose-box">
+              <el-button
+                @click="handleSwitch(item)"
+                type="danger"
+                plain
+                v-for="(item, index) in defaultOptions.slice(2)"
+                :key="index"
+                >{{ item.label }}</el-button
+              >
+            </div>
+          </div>
+        </div>
+        <div class="more-options">更多选项</div>
+        <div class="option-box">
+          <el-button @click="handleAdd(item)" v-for="(item,index) in customForm" :key="index" type="danger" plain :title="'添加'+ item.typename">{{item.typename}}</el-button>
+        </div>
+
+        <div class="custom-box">
+          {{customList}}
+          <div v-for="(item,index) in customList" :key="index">
+            <div class="item" >
+              <el-checkbox v-model="item.must">必填</el-checkbox>
+              <el-input :placeholder="item.typename" v-model="item.label"></el-input>
+              <i class="el-icon-remove" title="删除" @click="handleDelete(index)"></i>
+            </div>
+            <div class="option-list" v-if="item.optionsList == [] || item.optionsList">
+              <div>选项列表</div>
+              <div style="display: flex;align-items: center;">
+                <el-tag class="tagitem" closable v-for="(tag,i) in item.optionsList" :key="i" @close="handleCloseOption(tag)">{{tag.label}}</el-tag>
+                <el-input ref="saveTagInput" @keyup.enter.native="handleSaveTag(item,index)" v-if="item.isInput" v-model="item.inputValue" style="width:150px" size="mini"></el-input>
+                <el-button v-else icon="el-icon-plus" size="mini" @click="showInput(item,index)"></el-button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="footer-btn">
         <!-- this.$route.query.id是否有参数传递过来,没有参数说明走新建,否则走编辑   -->
         <el-button v-if="!this.$route.query.id" @click="publish" type="danger"
@@ -451,11 +507,133 @@ import {
   editSaveActivity,
 } from "@/api/activity/publish";
 import { validateURL } from "../../../util/validate";
-import { Loading } from 'element-ui';
+import { Loading } from "element-ui";
 export default {
   components: { HcQuill, HcCitySelect },
   data() {
     return {
+      isInput:false,
+      tagLabel:'',//tag值
+      showFormCollect:false,
+      defaultList: [],
+      // 系统预置项
+      systemopt:[
+        {
+          label: "姓名",
+          must: true,
+          type: "input",
+          placeholder: "请输入姓名",
+          fixedItem: true,
+          code: "user_name",
+          isDisabled: true,
+        },
+        {
+          label: "手机号",
+          must: true,
+          type: "input",
+          placeholder: "请输入手机号",
+          fixedItem: true,
+          code: "phone_number",
+          isDisabled: true,
+        },
+      ],
+      defaultOptions: [
+        {
+          label: "姓名",
+          must: true,
+          type: "input",
+          placeholder: "请输入姓名",
+          fixedItem: true,
+          code: "user_name",
+          isDisabled: true,
+        },
+        {
+          label: "手机号",
+          must: true,
+          type: "input",
+          placeholder: "请输入手机号",
+          fixedItem: true,
+          code: "phone_number",
+          isDisabled: true,
+        },
+        {
+          label: "邮箱",
+          must: false,
+          type: "input",
+          placeholder: "请输入邮箱",
+          fixedItem: true,
+          code: "email",
+        },
+        {
+          label: "单位",
+          must: false,
+          type: "input",
+          placeholder: "请输入单位",
+          fixedItem: true,
+          code: "company",
+        },
+        {
+          label: "职务",
+          must: false,
+          type: "input",
+          placeholder: "请输入职务",
+          fixedItem: true,
+          code: "position",
+        },
+        {
+          label: "备注",
+          must: false,
+          type: "textarea",
+          placeholder: "请输入备注",
+          fixedItem: true,
+        },
+      ],
+      customList:[],
+      customForm:[
+        {
+          "typename": '单行文本',
+          "label": "",
+          "value": "",
+          "type": "input",
+          "must": false,
+          "fixedItem": false,
+          "placeholder": "",
+        },
+        {
+          "typename": '单选按钮框',
+          "label": "",
+          "value": "",
+          "type": "radio",
+          "must": false,
+          "fixedItem": false,
+          "placeholder": "",
+          "optionsList": [],
+          "isInput":false,
+          "inputValue": ""
+        },
+        {
+          "typename": '多选按钮框',
+          "label": "",
+          "value": "",
+          "type": "checkbox",
+          "must": false,
+          "fixedItem": false,
+          "placeholder": "",
+          "optionsList": [],
+          "isInput":false
+        },
+        {
+          "typename": '多行文本',
+          "label": "",
+          "value": "",
+          "type": "textarea",
+          "must": false,
+          "fixedItem": false,
+          "placeholder": "",
+        }
+      ],
+      checkedList: false,
+
       cardStyle: {
         border: "1px solid #eff0f1",
         "border-radius": "10px",
@@ -469,7 +647,7 @@ export default {
       // 上传图片路径
       uploadPicUrl: "/api/admin/sys_file/oss/upload",
       // 活动状态
-      statusFlag:'',
+      statusFlag: "",
       baseFormDataRules: {
         cityIdList: [
           { required: true, message: "请输入城市", trigger: "blur" },
@@ -481,9 +659,15 @@ export default {
         endTime: [
           { required: true, message: "请选择结束日期", trigger: "change" },
         ],
-        type: [{ required: true, message: "请选择活动类型", trigger: "change" }],
+        type: [
+          { required: true, message: "请选择活动类型", trigger: "change" },
+        ],
         poster: [
-          { validator:this.validatorPoster,required: true, trigger: "change" },
+          {
+            validator: this.validatorPoster,
+            required: true,
+            trigger: "change",
+          },
         ],
         cityId: [
           { required: true, message: "请选择活动地址", trigger: "change" },
@@ -492,14 +676,23 @@ export default {
           { required: true, message: "请选择活动分类", trigger: "change" },
         ],
         label: [
-          { validator:this.validatorLabel,required: true, message: "请选择活动标签", trigger: "change" },
+          {
+            validator: this.validatorLabel,
+            required: true,
+            message: "请选择活动标签",
+            trigger: "change",
+          },
         ],
         spot: [{ required: true, message: "请输入活动亮点", trigger: "blur" }],
         details: [
           { required: true, message: "请输入活动详情", trigger: "blur" },
         ],
         fileList: [
-          { validator:this.validatorFileList,required: true, trigger: "change" },
+          {
+            validator: this.validatorFileList,
+            required: true,
+            trigger: "change",
+          },
         ],
       },
 
@@ -530,7 +723,9 @@ export default {
       // 选择大于开始时间的日期
       pickerOptionsEndDate: {
         disabledDate: (time) => {
-          return time.getTime() < new Date(this.baseFormData.startTime).getTime();
+          return (
+            time.getTime() < new Date(this.baseFormData.startTime).getTime()
+          );
         },
       },
 
@@ -540,7 +735,7 @@ export default {
         name: "",
         startTime: "",
         endTime: "",
-        type: '',
+        type: "",
         poster: "", //海报
         cityId: [], //举办地
         field: "", //活动地址
@@ -646,25 +841,25 @@ export default {
         .catch(() => {});
     },
 
-    validatorPoster(rule, value, callback){
-      if(value){
-        callback()
-      }else{
-        callback(new Error('请选择活动海报'));
+    validatorPoster(rule, value, callback) {
+      if (value) {
+        callback();
+      } else {
+        callback(new Error("请选择活动海报"));
       }
     },
-    validatorLabel(rule, value, callback){
-      if(value.length != 0){
-        callback()
-      }else{
-        callback(new Error('请选择活动标签'));
+    validatorLabel(rule, value, callback) {
+      if (value.length != 0) {
+        callback();
+      } else {
+        callback(new Error("请选择活动标签"));
       }
     },
-    validatorFileList(rule, value, callback){
-      if(value.length != 0){
-        callback()
-      }else{
-        callback(new Error('请上传活动附件'));
+    validatorFileList(rule, value, callback) {
+      if (value.length != 0) {
+        callback();
+      } else {
+        callback(new Error("请上传活动附件"));
       }
     },
 
@@ -699,76 +894,80 @@ export default {
         this.baseFormData.cityIdList = [this.userInfo.manageCityId];
       } else {
         Loading.service();
-        activityInfo(id).then((res) => {
-          if (res.data.code !== 0) {
-            return this.$message.error("获取活动详情失败！");
-          }
-          let data = res.data.data.data;
-          this.statusFlag = data.statusFlag
-          this.baseFormData.cityIdList = data.cityIdList;
-          this.baseFormData.name = data.name;
-          this.baseFormData.startTime = data.startTime;
-          this.baseFormData.endTime = data.endTime;
-          this.baseFormData.type = data.type;
-          this.baseFormData.poster = data.poster;
-          this.baseFormData.cityId = data.cityId;
-          this.baseFormData.field = data.field;
-          this.baseFormData.source = data.source;
-          this.classification = [data.classification, data.subClassification];
-          this.baseFormData.classification = this.classification[0];
-          this.baseFormData.subClassification = this.classification[1];
-          this.baseFormData.label = data.label;
-          this.baseFormData.spot = data.spot;
-          this.quillContent.content = data.details;
-          this.contentShow = true;
-          data.fileList.forEach((item) => {
-            this.fileList.push({
-              name: item.original,
-              url: item.attachFile,
+        activityInfo(id)
+          .then((res) => {
+            if (res.data.code !== 0) {
+              return this.$message.error("获取活动详情失败！");
+            }
+            let data = res.data.data.data;
+            console.log(data)
+            this.statusFlag = data.statusFlag;
+            this.baseFormData.cityIdList = data.cityIdList;
+            this.baseFormData.name = data.name;
+            this.baseFormData.startTime = data.startTime;
+            this.baseFormData.endTime = data.endTime;
+            this.baseFormData.type = data.type;
+            this.baseFormData.poster = data.poster;
+            this.baseFormData.cityId = data.cityId;
+            this.baseFormData.field = data.field;
+            this.baseFormData.source = data.source;
+            this.classification = [data.classification, data.subClassification];
+            this.baseFormData.classification = this.classification[0];
+            this.baseFormData.subClassification = this.classification[1];
+            this.baseFormData.label = data.label;
+            this.baseFormData.spot = data.spot;
+            this.quillContent.content = data.details;
+            this.contentShow = true;
+            data.fileList.forEach((item) => {
+              this.fileList.push({
+                name: item.original,
+                url: item.attachFile,
+              });
+              this.baseFormData.fileList.push({
+                original: item.original,
+                attachFile: item.attachFile,
+              });
             });
-            this.baseFormData.fileList.push({
-              original: item.original,
-              attachFile: item.attachFile,
+
+            if (this.statusFlag == "0") {
+              data.ticketingManagements.forEach((obj) => {
+                obj.priceType = ["能贝", "人民币"];
+
+                if (obj.ticketingType == "2") {
+                  obj.payMethodList.forEach((payItem) => {
+                    if (payItem.type == "WeCanPay") {
+                      obj.payWeCanPay = {
+                        type: "WeCanPay",
+                        amount: payItem.amount,
+                      };
+                    } else if (payItem.type == "OfflinePay") {
+                      obj.payOfflinePay = {
+                        type: "OfflinePay",
+                        amount: payItem.amount,
+                      };
+                    }
+                  });
+                  obj.payMethodList = [];
+                } else {
+                  obj.payWeCanPay = {
+                    type: "WeCanPay",
+                    amount: 0.01,
+                  };
+                  obj.payOfflinePay = {
+                    type: "OfflinePay",
+                    amount: 0.01,
+                  };
+                }
+              });
+              this.baseFormData.ticketingManagements =
+                data.ticketingManagements;
+            }
+          })
+          .finally(() => {
+            this.$nextTick(() => {
+              Loading.service(this.options).close();
             });
           });
-
-          if(this.statusFlag == '0'){
-            data.ticketingManagements.forEach(obj=>{
-              obj.priceType = ["能贝", "人民币"]
-
-              if(obj.ticketingType == '2'){
-                obj.payMethodList.forEach(payItem=>{
-                  if(payItem.type == 'WeCanPay'){
-                    obj.payWeCanPay = {
-                      type: "WeCanPay", 
-                      amount: payItem.amount, 
-                    }
-                  }else if(payItem.type == 'OfflinePay'){
-                    obj.payOfflinePay = {
-                      type: "OfflinePay", 
-                      amount: payItem.amount, 
-                    }
-                  }
-                })
-                obj.payMethodList = []
-              }else{
-                obj.payWeCanPay = {
-                  type: "WeCanPay", 
-                  amount: 0.01, 
-                }
-                obj.payOfflinePay = {
-                  type: "OfflinePay", 
-                  amount: 0.01, 
-                }
-              }
-            })
-            this.baseFormData.ticketingManagements = data.ticketingManagements
-          }
-        }).finally(()=>{
-          this.$nextTick(() => { 
-            Loading.service(this.options).close();
-          });
-        })
       }
     },
     // 获取活动类型
@@ -815,7 +1014,7 @@ export default {
     selectPoster(item) {
       this.baseFormData.poster = item.posterUrl;
       this.dialogPostersVisible = false;
-      this.$refs.baseFormDataRef.validateField('poster')
+      this.$refs.baseFormDataRef.validateField("poster");
     },
     // 海报上传成功回调
     handlePosterSuccess(res) {
@@ -823,12 +1022,12 @@ export default {
         this.$message.error("上传海报失败!");
       }
       this.baseFormData.poster = res.data.data.url;
-      this.$refs.baseFormDataRef.validateField('poster')
+      this.$refs.baseFormDataRef.validateField("poster");
     },
     // 移除海报
     deletePoster() {
       this.baseFormData.poster = "";
-      this.$refs.baseFormDataRef.validateField('poster')
+      this.$refs.baseFormDataRef.validateField("poster");
     },
 
     // 新增票种
@@ -885,12 +1084,12 @@ export default {
       this.baseFormData.label.push(this.actInpVal);
       this.actInpVal = "";
       this.haveInputVal = false;
-      this.$refs.baseFormDataRef.validateField('label')
+      this.$refs.baseFormDataRef.validateField("label");
     },
     // 删除活动标签
     handleClose(tag) {
-      this.baseFormData.label.splice(this.baseFormData.label.indexOf(tag),1)
-      this.$refs.baseFormDataRef.validateField('label')
+      this.baseFormData.label.splice(this.baseFormData.label.indexOf(tag), 1);
+      this.$refs.baseFormDataRef.validateField("label");
     },
     // 活动附件上传成功的钩子
     handleAccessorySuccess(res, file) {
@@ -898,7 +1097,7 @@ export default {
         original: file.name,
         attachFile: file.response.data.data.url,
       });
-      this.$refs.baseFormDataRef.validateField('fileList')
+      this.$refs.baseFormDataRef.validateField("fileList");
     },
     // 活动附件移除
     handleAccessoryRemove(file, fileList) {
@@ -912,12 +1111,69 @@ export default {
           this.baseFormData.fileList.splice(i, 1);
         }
       });
-      this.$refs.baseFormDataRef.validateField('fileList')
+      this.$refs.baseFormDataRef.validateField("fileList");
     },
     onChange(res) {},
+    toFormCollect(){
+      this.showFormCollect = true
+      this.defaultList = this.systemopt
+    },
+    handleSwitch(item) {
+      const index = this.defaultList.findIndex(
+        (m) => item.label === m.label && item.type === m.type
+      );
+      console.log(index);
+      if (index == -1) {
+        this.defaultList.push(item);
+      } else {
+        this.defaultList.splice(index, 1);
+      }
+    },
+    handleAdd(item){
+      if (this.customList.length>=10) {
+        this.$message.warning("自定义项最多可以添加10条");
+        return;
+      }
+      this.customList.push(JSON.parse(JSON.stringify(item)));
+    },
+    handleDelete(index){
+      this.customList.splice(index, 1);
+    },
+    handleCloseOption(tag){
+      console.log(tag)
+    },
+    showInput(item,index){
+      this.customList.forEach((m,i)=>{
+        if(i==index){
+          m.isInput = true
+        }
+      })
+      // console.log(this.customList)
+      console.log(this.$refs)
+      this.$nextTick(()=>{
+        this.$refs.saveTagInput[index].focus();
+      })
+    },
+    handleSaveTag(item,index){
+      // console.log(item)
+      let tagLabel = this.tagLabel
+      let num = item.optionsList.length-1
+      console.log(num)
+      let opt = {
+        label: item.inputValue,
+        select: false,
+        value: num + 1
+      }
+      item.optionsList.push(opt)
+      if(this.tagLabel){
+      }
+      this.tagLabel = ''
+      // this.$refs.saveTagInput[index].blur();
+      item.isInput = false
+    },
     // 编辑 - 发布活动1
     editSave() {
-      let that = this
+      let that = this;
       this.baseFormData.details = this.quillContent.content;
 
       // 遍历票种数组
@@ -936,7 +1192,7 @@ export default {
 
       this.$refs.baseFormDataRef.validate((valid1) => {
         // 状态不为草稿
-        if(this.statusFlag != '0'){
+        if (this.statusFlag != "0") {
           if (valid1) {
             editSaveActivity(this.baseFormData).then((res) => {
               if (res.data.code !== 0) {
@@ -947,11 +1203,11 @@ export default {
               this.baseFormData.fileList = [];
               this.$router.go(-1);
             });
-          }else{
+          } else {
             this.$message.error("活动信息填写不完整");
             this.validRst = [];
           }
-          return
+          return;
         }
         this.$refs.setTicketDataRef.forEach((item) => {
           item.validate((valid2) => {
@@ -969,7 +1225,7 @@ export default {
             this.baseFormData.fileList = [];
             this.$router.go(-1);
           });
-        }else{
+        } else {
           this.$message.error("活动信息填写不完整");
           this.validRst = [];
         }
@@ -992,32 +1248,33 @@ export default {
         }
       });
       this.baseFormData.submitType = 1;
-
-      this.$refs.baseFormDataRef.validate((valid1) => {
-        this.$refs.setTicketDataRef.forEach((item) => {
-          item.validate((valid2) => {
-            that.validRst.push(valid2);
-            return false;
-          });
-        });
-        if (!this.validRst.includes(false) && valid1) {
-          // console.log("验证通过...");
-          savePublish(this.baseFormData).then((res) => {
-            if (res.data.code !== 0) {
-              this.validRst = [];
-              return this.$message.error("发布活动失败");
-            }
-            this.$message.success("发布活动成功");
-            this.fileList = [];
-            this.baseFormData.fileList = [];
-            this.$router.go(-1);
-            this.validRst = [];
-          });
-        }else{
-          this.$message.error("活动信息填写不完整");
-          this.validRst = [];
-        }
-      });
+      this.baseFormData.conferenceFormList = [...this.defaultList,...this.customList]
+      console.log(this.baseFormData)
+      // this.$refs.baseFormDataRef.validate((valid1) => {
+      //   this.$refs.setTicketDataRef.forEach((item) => {
+      //     item.validate((valid2) => {
+      //       that.validRst.push(valid2);
+      //       return false;
+      //     });
+      //   });
+      //   if (!this.validRst.includes(false) && valid1) {
+      //     // console.log("验证通过...");
+      //     savePublish(this.baseFormData).then((res) => {
+      //       if (res.data.code !== 0) {
+      //         this.validRst = [];
+      //         return this.$message.error("发布活动失败");
+      //       }
+      //       this.$message.success("发布活动成功");
+      //       this.fileList = [];
+      //       this.baseFormData.fileList = [];
+      //       this.$router.go(-1);
+      //       this.validRst = [];
+      //     });
+      //   } else {
+      //     this.$message.error("活动信息填写不完整");
+      //     this.validRst = [];
+      //   }
+      // });
     },
     // 新增 - 保存草稿
     saveManuscript() {
@@ -1053,7 +1310,7 @@ export default {
             this.baseFormData.fileList = [];
             this.$router.go(-1);
           });
-        }else{
+        } else {
           this.$message.error("活动信息填写不完整");
           this.validRst = [];
         }
@@ -1079,7 +1336,7 @@ export default {
       this.baseFormData.id = this.$route.query.id;
       this.$refs.baseFormDataRef.validate((valid1) => {
         // 状态不为草稿
-        if(this.statusFlag != '0'){
+        if (this.statusFlag != "0") {
           if (valid1) {
             editSaveActivity(this.baseFormData).then((res) => {
               if (res.data.code !== 0) {
@@ -1090,11 +1347,11 @@ export default {
               this.baseFormData.fileList = [];
               this.$router.go(-1);
             });
-          }else{
+          } else {
             this.$message.error("活动信息填写不完整");
             this.validRst = [];
           }
-          return
+          return;
         }
         this.$refs.setTicketDataRef.forEach((item) => {
           item.validate((valid2) => {
@@ -1112,7 +1369,7 @@ export default {
             this.baseFormData.fileList = [];
             this.$router.go(-1);
           });
-        }else{
+        } else {
           this.$message.error("活动信息填写不完整");
           this.validRst = [];
         }
@@ -1224,6 +1481,82 @@ export default {
 }
 .box-card {
   width: 1100px;
+}
+.form-collect {
+  width: 120px;
+  text-align: right;
+}
+.tips {
+  margin: 30px 0 30px 120px;
+  border-radius: 10px;
+  border: 1px solid #eff0f1;
+  padding: 20px;
+  cursor: pointer;
+  text-align: center;
+  font-size: 14px;
+  color: #919397;
+  > i {
+    color: #3cd489;
+  }
+  &:hover {
+    box-shadow: 0px 0px 10px -7px red;
+  }
+}
+.form-card {
+  margin: 30px 0 30px 120px;
+  border-radius: 10px;
+  border: 1px solid #eff0f1;
+  padding: 20px;
+  .default-options {
+    display: flex;
+    justify-content: space-between;
+    ::v-deep .el-checkbox__input.is-checked + .el-checkbox__label {
+      color: #000;
+    }
+    .general-box {
+      width: 200px;
+      padding: 15px;
+      border: 1px dashed #eff0f1;
+      border-radius: 10px;
+      > div:first-child {
+        margin-bottom: 15px;
+      }
+      .choose-box {
+        display: grid;
+        gap: 15px 15px;
+        grid-template-columns: 1fr 1fr;
+        .el-button {
+          margin: 0;
+        }
+      }
+    }
+  }
+  .more-options {
+    margin-bottom: 15px;
+  }
+  .option-box{
+    margin-bottom: 20px;
+  }
+  .custom-box{
+    .item{
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+      >i{
+        margin-left: 10px;
+        color: #409EFF;
+        font-size: 18px;
+        cursor: pointer;
+      }
+    }
+    .option-list{
+      margin-left: 60px;
+      margin-bottom: 15px;
+      .tagitem{
+        margin-right: 10px;
+      }
+    }
+  }
 }
 .footer-btn {
   margin-left: 120px;
