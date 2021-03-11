@@ -450,7 +450,7 @@
               <div>选项列表</div>
               <div style="display: flex;align-items: center;">
                 <el-tag class="tagitem" closable v-for="(tag,i) in item.optionsList" :key="i" @close="handleCloseOption(tag)">{{tag.label}}</el-tag>
-                <el-input ref="saveTagInput" @keyup.enter.native="handleSaveTag(item,index)" v-if="item.isInput" v-model="item.inputValue" style="width:150px" size="mini"></el-input>
+                <el-input ref="saveTagInput" @keyup.enter.native="handleSaveTag(item,index)" @blur="handleSaveTag(item,index)" v-if="item.isInput" v-model="item.inputValue" style="width:150px" size="mini"></el-input>
                 <el-button v-else icon="el-icon-plus" size="mini" @click="showInput(item,index)"></el-button>
               </div>
             </div>
@@ -620,7 +620,8 @@ export default {
           "fixedItem": false,
           "placeholder": "",
           "optionsList": [],
-          "isInput":false
+          "isInput":false,
+          "inputValue": ""
         },
         {
           "typename": '多行文本',
@@ -1155,10 +1156,11 @@ export default {
       })
     },
     handleSaveTag(item,index){
-      // console.log(item)
-      let tagLabel = this.tagLabel
-      let num = item.optionsList.length-1
-      console.log(num)
+      if(item.inputValue==''){
+        item.isInput = false
+        return
+      }
+      let num = item.optionsList.length - 1
       let opt = {
         label: item.inputValue,
         select: false,
@@ -1167,8 +1169,7 @@ export default {
       item.optionsList.push(opt)
       if(this.tagLabel){
       }
-      this.tagLabel = ''
-      // this.$refs.saveTagInput[index].blur();
+      item.inputValue = ''
       item.isInput = false
     },
     // 编辑 - 发布活动1
@@ -1249,32 +1250,32 @@ export default {
       });
       this.baseFormData.submitType = 1;
       this.baseFormData.conferenceFormList = [...this.defaultList,...this.customList]
-      console.log(this.baseFormData)
-      // this.$refs.baseFormDataRef.validate((valid1) => {
-      //   this.$refs.setTicketDataRef.forEach((item) => {
-      //     item.validate((valid2) => {
-      //       that.validRst.push(valid2);
-      //       return false;
-      //     });
-      //   });
-      //   if (!this.validRst.includes(false) && valid1) {
-      //     // console.log("验证通过...");
-      //     savePublish(this.baseFormData).then((res) => {
-      //       if (res.data.code !== 0) {
-      //         this.validRst = [];
-      //         return this.$message.error("发布活动失败");
-      //       }
-      //       this.$message.success("发布活动成功");
-      //       this.fileList = [];
-      //       this.baseFormData.fileList = [];
-      //       this.$router.go(-1);
-      //       this.validRst = [];
-      //     });
-      //   } else {
-      //     this.$message.error("活动信息填写不完整");
-      //     this.validRst = [];
-      //   }
-      // });
+      // console.log(this.baseFormData)
+      this.$refs.baseFormDataRef.validate((valid1) => {
+        this.$refs.setTicketDataRef.forEach((item) => {
+          item.validate((valid2) => {
+            that.validRst.push(valid2);
+            return false;
+          });
+        });
+        if (!this.validRst.includes(false) && valid1) {
+          // console.log("验证通过...");
+          savePublish(this.baseFormData).then((res) => {
+            if (res.data.code !== 0) {
+              this.validRst = [];
+              return this.$message.error("发布活动失败");
+            }
+            this.$message.success("发布活动成功");
+            this.fileList = [];
+            this.baseFormData.fileList = [];
+            this.$router.go(-1);
+            this.validRst = [];
+          });
+        } else {
+          this.$message.error("活动信息填写不完整");
+          this.validRst = [];
+        }
+      });
     },
     // 新增 - 保存草稿
     saveManuscript() {
