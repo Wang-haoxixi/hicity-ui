@@ -130,22 +130,29 @@
           </div>
         </el-form-item>
         <!-- 活动地址 -->
-        <el-form-item prop="cityId" label="活动地址：">
+        <!-- <el-form-item prop="cityId" label="活动地址："> -->
+        <el-form-item label="活动地址：">
           <div class="addressbox">
-            <!-- 举办地 -->
-            <el-cascader
-              placeholder="请选择举办地"
-              v-model="baseFormData.cityId"
-              :options="holdAddressArr"
-              :props="defaultCityTreeParams"
-            ></el-cascader>
-            <!-- 活动地址 -->
-            <el-input
-              style="width: 600px; margin: 0 10px"
-              v-model="baseFormData.field"
-              placeholder="请输入活动地址"
-            ></el-input>
-            <el-checkbox v-model="onLine">线上举办</el-checkbox>
+            <div v-if="!baseFormData.onLine" class="addressItem">
+              <el-form-item prop="cityId">
+                <!-- 举办地 -->
+                <el-cascader
+                  placeholder="请选择举办地"
+                  v-model="baseFormData.cityId"
+                  :options="holdAddressArr"
+                  :props="defaultCityTreeParams"
+                ></el-cascader>
+              </el-form-item>
+              <el-form-item prop="field">
+                <!-- 活动地址 -->
+                <el-input
+                  style="width: 600px; margin: 0 10px"
+                  v-model="baseFormData.field"
+                  placeholder="请输入活动地址"
+                ></el-input>
+              </el-form-item>
+            </div>
+            <el-checkbox v-model="baseFormData.onLine">线上举办</el-checkbox>
           </div>
         </el-form-item>
         <!-- 活动分类 -->
@@ -336,7 +343,7 @@
               >
                 <el-checkbox-group v-model="item.priceType" class="checkGroup">
                   <!-- priceType是否包含已选类目且长度为1 -->
-                  <el-checkbox
+                  <!-- <el-checkbox
                     label="能贝"
                     name="nb"
                     class="elcheck"
@@ -357,7 +364,7 @@
                           : false
                       "
                     ></el-input>
-                  </el-checkbox>
+                  </el-checkbox> -->
                   <el-checkbox
                     label="人民币"
                     name="rmb"
@@ -677,7 +684,10 @@ export default {
           },
         ],
         cityId: [
-          { required: true, message: "请选择活动地址", trigger: "change" },
+          { required: true, message: "请选择举办地", trigger: "change" },
+        ],
+        field:[
+          {required: true,message: '请输入活动地址',trigger: 'blur'}
         ],
         classification: [
           { required: true, message: "请选择活动分类", trigger: "change" },
@@ -748,6 +758,7 @@ export default {
         poster: "", //海报
         cityId: [], //举办地
         field: "", //活动地址
+        onLine:false,//是否线上
         classification: "", //活动父类
         subClassification: "", //活动子类
         label: [], //标签
@@ -788,8 +799,6 @@ export default {
       haveInputVal: false,
       // 活动标签输入框的值
       actInpVal: "",
-      // 线上举办
-      onLine: "",
       // 是否编辑标签
       // isEdit: true,
       quillContent: {
@@ -919,6 +928,7 @@ export default {
             this.baseFormData.poster = data.poster;
             this.baseFormData.cityId = data.cityId;
             this.baseFormData.field = data.field;
+            this.baseFormData.onLine = data.onLine;
             this.baseFormData.source = data.source;
             this.classification = [data.classification, data.subClassification];
             this.baseFormData.classification = this.classification[0];
@@ -1174,11 +1184,7 @@ export default {
           m.isInput = true
         }
       })
-      console.log(this.customList)
-      console.log(this.$refs)
-      // this.$nextTick(()=>{
-      //   this.$refs.saveTagInput[index].focus();
-      // })
+      this.$nextTick(_ => this.$refs.saveTagInput[0].focus());
     },
     // 添加标签
     handleSaveTag(item,index){
@@ -1326,6 +1332,7 @@ export default {
         }
       });
       this.baseFormData.submitType = 0;
+      this.baseFormData.conferenceFormList = [...this.defaultList,...this.customList]
       this.$refs.baseFormDataRef.validate((valid1) => {
         this.$refs.setTicketDataRef.forEach((item) => {
           item.validate((valid2) => {
@@ -1367,7 +1374,7 @@ export default {
       });
       this.baseFormData.submitType = 0;
       this.baseFormData.id = this.$route.query.id;
-
+      this.baseFormData.conferenceFormList = [...this.defaultList,...this.customList]
       // console.log(this.baseFormData)
       this.$refs.baseFormDataRef.validate((valid1) => {
         // 状态不为草稿
@@ -1483,6 +1490,14 @@ export default {
 }
 .addressbox {
   display: flex;
+  .addressItem{
+    display: flex;
+    .el-form-item:last-child{
+      ::v-deep .el-form-item__error{
+        padding-left: 10px;
+      }
+    }
+  }
 }
 .posterInpBox {
   display: flex;

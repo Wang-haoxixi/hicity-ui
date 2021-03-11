@@ -99,7 +99,7 @@
           </div>
           <div>
             <i class="el-icon-location-outline" style="margin-right: 5px"></i
-            >{{ scope.row.field }}
+            >{{scope.row.city}} {{ scope.row.field }}
           </div>
         </template>
       </el-table-column>
@@ -286,8 +286,14 @@ export default {
       this.$router.push("/publish");
     },
     // 人员管理
-    peopleManagement() {
-      this.$router.push("/personnel");
+    peopleManagement(data) {
+      this.$router.push({
+        path: "/personnel",
+        query: {
+          id: data.row.id,
+        },
+      });
+      // this.$router.push("/personnel");
     },
     // 票务管理
     ticketManagement() {},
