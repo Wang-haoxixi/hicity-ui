@@ -47,5 +47,16 @@ export default [
         component: () => import("@/views/businessManage/activity/publish.vue")
       }
     ]
+  },
+  {
+    path: "/personnel",
+    component: Layout,
+    redirect: "/businessManage/activity/personnel",
+    children: [
+      {
+        path: "/businessManage/activity/personnel",
+        component: () => import("@/views/businessManage/activity/personnel/personnel.vue")
+      }
+    ]
   }
 ];

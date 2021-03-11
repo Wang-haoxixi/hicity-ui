@@ -286,7 +286,9 @@ export default {
       this.$router.push("/publish");
     },
     // 人员管理
-    peopleManagement() {},
+    peopleManagement() {
+      this.$router.push("/personnel");
+    },
     // 票务管理
     ticketManagement() {},
   },

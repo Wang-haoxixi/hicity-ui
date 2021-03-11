@@ -412,8 +412,14 @@
         <!-- 默认选项 -->
         <div class="default-options">
           <div>
-            <div class="item" v-for="(item, index) in defaultList" :key="index">
+            <div class="item" v-for="(item, index) in systemopt" :key="index">
               <el-checkbox v-model="item.must" :disabled="item.isDisabled"
+                >必填</el-checkbox
+              >
+              {{ item.label }}
+            </div>
+            <div class="item" v-for="(item, i) in defaultList" :key="'item2'+i">
+              <el-checkbox v-model="item.must"
                 >必填</el-checkbox
               >
               {{ item.label }}
@@ -439,7 +445,6 @@
         </div>
 
         <div class="custom-box">
-          {{customList}}
           <div v-for="(item,index) in customList" :key="index">
             <div class="item" >
               <el-checkbox v-model="item.must">必填</el-checkbox>
@@ -449,7 +454,7 @@
             <div class="option-list" v-if="item.optionsList == [] || item.optionsList">
               <div>选项列表</div>
               <div style="display: flex;align-items: center;">
-                <el-tag class="tagitem" closable v-for="(tag,i) in item.optionsList" :key="i" @close="handleCloseOption(tag)">{{tag.label}}</el-tag>
+                <el-tag class="tagitem" closable v-for="(tag,i) in item.optionsList" :key="i" @close="handleCloseOption(item,tag,i)">{{tag.label}}</el-tag>
                 <el-input ref="saveTagInput" @keyup.enter.native="handleSaveTag(item,index)" @blur="handleSaveTag(item,index)" v-if="item.isInput" v-model="item.inputValue" style="width:150px" size="mini"></el-input>
                 <el-button v-else icon="el-icon-plus" size="mini" @click="showInput(item,index)"></el-button>
               </div>
@@ -586,6 +591,7 @@ export default {
           type: "textarea",
           placeholder: "请输入备注",
           fixedItem: true,
+          code: "remark",
         },
       ],
       customList:[],
@@ -732,6 +738,8 @@ export default {
 
       // 基本信息数据
       baseFormData: {
+        conferenceFormList:[],
+
         cityIdList: [], //所属城市
         name: "",
         startTime: "",
@@ -901,7 +909,7 @@ export default {
               return this.$message.error("获取活动详情失败！");
             }
             let data = res.data.data.data;
-            console.log(data)
+            console.log('baseFormData',data)
             this.statusFlag = data.statusFlag;
             this.baseFormData.cityIdList = data.cityIdList;
             this.baseFormData.name = data.name;
@@ -919,6 +927,24 @@ export default {
             this.baseFormData.spot = data.spot;
             this.quillContent.content = data.details;
             this.contentShow = true;
+
+            this.baseFormData.conferenceFormList = data.conferenceFormList
+
+            this.defaultList = data.conferenceFormList.filter(item=>{
+              return item.code||item.label=='备注'
+            }).slice(2)
+            this.customList = data.conferenceFormList.filter(item=>{
+              return !item.code && item.label!=='备注'
+            })
+            this.customList.forEach(item=>{
+              if(item.type == 'checkbox' || item.type == 'radio'){
+                // item.isInput = false
+                this.$set(item,'isInput',false)
+                this.$set(item,'inputValue','')
+              }
+            })
+            console.log(this.customList)
+            this.showFormCollect = true
             data.fileList.forEach((item) => {
               this.fileList.push({
                 name: item.original,
@@ -1117,17 +1143,15 @@ export default {
     onChange(res) {},
     toFormCollect(){
       this.showFormCollect = true
-      this.defaultList = this.systemopt
+      // this.defaultList = this.systemopt
     },
     handleSwitch(item) {
-      const index = this.defaultList.findIndex(
-        (m) => item.label === m.label && item.type === m.type
-      );
-      console.log(index);
-      if (index == -1) {
-        this.defaultList.push(item);
-      } else {
-        this.defaultList.splice(index, 1);
+      let i = this.defaultList.findIndex(m=> item.label == m.label && item.type == m.type)
+      console.log(i)
+      if(i == -1){
+        this.defaultList.push(item)
+      }else{
+        this.defaultList.splice(i,1)
       }
     },
     handleAdd(item){
@@ -1140,8 +1164,9 @@ export default {
     handleDelete(index){
       this.customList.splice(index, 1);
     },
-    handleCloseOption(tag){
-      console.log(tag)
+    // 删除标签
+    handleCloseOption(item,tag,i){
+      item.optionsList.splice(i,1)
     },
     showInput(item,index){
       this.customList.forEach((m,i)=>{
@@ -1149,18 +1174,19 @@ export default {
           m.isInput = true
         }
       })
-      // console.log(this.customList)
+      console.log(this.customList)
       console.log(this.$refs)
-      this.$nextTick(()=>{
-        this.$refs.saveTagInput[index].focus();
-      })
+      // this.$nextTick(()=>{
+      //   this.$refs.saveTagInput[index].focus();
+      // })
     },
+    // 添加标签
     handleSaveTag(item,index){
       if(item.inputValue==''){
         item.isInput = false
         return
       }
-      let num = item.optionsList.length - 1
+      let num = item.optionsList.length
       let opt = {
         label: item.inputValue,
         select: false,
@@ -1191,6 +1217,8 @@ export default {
       this.baseFormData.submitType = 1;
       this.baseFormData.id = this.$route.query.id;
 
+      this.baseFormData.conferenceFormList = [...this.defaultList,...this.customList]
+
       this.$refs.baseFormDataRef.validate((valid1) => {
         // 状态不为草稿
         if (this.statusFlag != "0") {
@@ -1202,11 +1230,13 @@ export default {
               this.$message.success("编辑活动成功");
               this.fileList = [];
               this.baseFormData.fileList = [];
+              this.defaultList = []
               this.$router.go(-1);
             });
           } else {
             this.$message.error("活动信息填写不完整");
             this.validRst = [];
+            this.defaultList = []
           }
           return;
         }
@@ -1250,7 +1280,7 @@ export default {
       });
       this.baseFormData.submitType = 1;
       this.baseFormData.conferenceFormList = [...this.defaultList,...this.customList]
-      // console.log(this.baseFormData)
+      console.log(this.baseFormData)
       this.$refs.baseFormDataRef.validate((valid1) => {
         this.$refs.setTicketDataRef.forEach((item) => {
           item.validate((valid2) => {
@@ -1270,10 +1300,12 @@ export default {
             this.baseFormData.fileList = [];
             this.$router.go(-1);
             this.validRst = [];
+            this.defaultList = []
           });
         } else {
           this.$message.error("活动信息填写不完整");
           this.validRst = [];
+          this.defaultList = []
         }
       });
     },
@@ -1335,6 +1367,8 @@ export default {
       });
       this.baseFormData.submitType = 0;
       this.baseFormData.id = this.$route.query.id;
+
+      // console.log(this.baseFormData)
       this.$refs.baseFormDataRef.validate((valid1) => {
         // 状态不为草稿
         if (this.statusFlag != "0") {
