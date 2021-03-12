@@ -335,7 +335,11 @@ export default {
         this.dialogVisibleVideo = true
       }
     })
-    this.quill.setContents(JSON.parse(this.value.structuredContent || '[]'))
+    if (this.value.structuredContent) {
+      this.quill.setContents(JSON.parse(this.value.structuredContent || '[]'))
+    } else if (this.value.content) {
+      this.quill.root.innerHTML = this.value.content
+    }
     this.quill.on('text-change', (delta, oldDelta, source) => {
       let deltas = new Delta()
       this.quill.getContents().forEach(op => {
