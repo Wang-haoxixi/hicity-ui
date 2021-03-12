@@ -87,37 +87,26 @@
               size="mini"
               type="primary"
               class="tagInfo"
+              @click="changeName(item, index)"
               v-for="(item, index) in applyInfoForm"
               :key="index"
               >{{ item.formItems[0].value }}</el-button
             >
-            <el-form
-              :model="applyInfoForm"
-              v-for="(item, index) in applyInfoForm"
-              :key="'item2' + index"
-            >
-              <el-form-item label="姓名：" required>
+            <el-form>
+              <el-form-item
+                required
+                v-for="(formItem, indexF) in applyInfo.formItems || []"
+                :key="indexF"
+                :label="formItem.label"
+              >
                 <el-input
-                  v-model="item.formItems[0].value"
-                  disabled
-                  autocomplete="off"
-                ></el-input>
-              </el-form-item>
-              <el-form-item label="手机号：" required>
-                <el-input
-                  v-model="item.formItems[1].value"
+                  :value="formItem.value"
                   disabled
                   autocomplete="off"
                 ></el-input>
               </el-form-item>
             </el-form>
           </div>
-          <span slot="footer" class="dialog-footer">
-            <el-button @click="dialogApplyInfoVisible = false">取 消</el-button>
-            <el-button type="primary" @click="handleSaveApplyInfo"
-              >保 存</el-button
-            >
-          </span>
         </el-dialog>
 
         <el-dialog
@@ -189,6 +178,7 @@ export default {
         current: 1,
         size: 20,
       },
+      applyInfo: {}, //单条报名信息
       dialogAnnotationVisible: false,
       dialogApplyInfoVisible: false,
       dialogSignInVisible: false,
@@ -242,22 +232,22 @@ export default {
     handleCheck(enroleId) {
       this.dialogApplyInfoVisible = true;
       formInquire({ enroleId: enroleId }).then((res) => {
-        console.log(res);
+        // console.log(res);
         this.applyInfoForm = res.data.data.data;
+        if (this.applyInfoForm && this.applyInfoForm.length > 0) {
+          this.applyInfo = this.applyInfoForm[0];
+        }
       });
     },
-    handleSaveApplyInfo() {
-      this.dialogApplyInfoVisible = false;
-    },
     handleSaveSignIn() {
-      console.log(this.checkedSignInCode);
+      // console.log(this.checkedSignInCode);
       let codeArr = this.checkedSignInCode.map((item) => {
         return item.orderNo;
       });
       checkCode({
         orderNos: codeArr,
       }).then((res) => {
-        console.log(res);
+        // console.log(res);
         this.getPeopleManagementList();
       });
       this.dialogSignInVisible = false;
@@ -269,12 +259,12 @@ export default {
       this.enroleId = row.enroleId;
       signInCode({ enroleId: this.enroleId }).then((res) => {
         this.signInCodeData = res.data.data.data;
-        console.log(this.signInCodeData);
+        // console.log(this.signInCodeData);
       });
     },
     getPeopleManagementList() {
       peopleManagement(this.query).then((res) => {
-        console.log("res", res);
+        // console.log("res", res);
         if (res.data.code != 0) {
           return this.$message.error("获取列表失败");
         }
@@ -290,17 +280,21 @@ export default {
       this.query.current = val;
       this.getPeopleManagementList();
     },
+    changeName(item, index) {
+      // console.log(item, index);
+      this.applyInfo = item;
+    },
     handleCheckAllChange(val) {
-      console.log(val);
+      // console.log(val);
       let writeOffStatusCode = this.signInCodeData.filter((item) => {
         return item.writeOffStatus == "0";
       });
-      console.log(writeOffStatusCode);
+      // console.log(writeOffStatusCode);
       this.checkedSignInCode = val ? writeOffStatusCode : [];
       this.isIndeterminate = false;
     },
     handleCheckedCitiesChange(value) {
-      console.log(value);
+      // console.log(value);
       let checkedCount = value.length;
       this.checkAll = checkedCount === this.checkedSignInCode.length;
       this.isIndeterminate =
