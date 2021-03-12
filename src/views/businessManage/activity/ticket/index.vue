@@ -1,10 +1,13 @@
 <template>
   <basic-container>
-    
+    <div class="title">
+      <div>票务管理</div>
+      <el-button @click="goBack">返回</el-button>
+    </div>
     <div class="hc-crud-header">
       <div class="menu-left">
-        <el-button type="primary" icon="el-icon-plus" @click="toAddTicket()">新增</el-button>
-        <el-button>票款统计</el-button>
+        <el-button type="primary" icon="el-icon-plus" size="mini" @click="toAddTicket()">新增</el-button>
+        <!-- <el-button>票款统计</el-button> -->
       </div>
     </div>
     <el-table :data="tableData" stripe border style="width: 100%" header-row-class-name="hc-crud-table-header" :header-cell-style="{backgroundColor: '#FAFAFA', color: '#333333'}" v-loading="tableLoading">
@@ -106,12 +109,23 @@ export default {
     handleFinish () {
       this.getTicketList()
       this.$refs.form.close()
-    }
+    },
+    goBack() {
+      this.$router.back();
+    },
   }
 }
 </script>
 
 <style lang="scss" scoped>
+.title {
+  padding-bottom: 20px;
+  font-size: 18px;
+  font-weight: 400;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 .hc-crud-header {
   display: flex;
   justify-content: space-between;
