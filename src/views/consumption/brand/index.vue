@@ -18,15 +18,9 @@
         </template>
         <template slot="menu" slot-scope="scope">
           <template>
-            <el-button type="text" size="mini" @click="toView(scope.row)"
-              >详情</el-button
-            >
-            <el-button type="text" size="mini" @click="toUpdate(scope.row)"
-              >编辑</el-button
-            >
-            <el-button type="text" size="mini" @click="toDelete(scope.row)"
-              >删除</el-button
-            >
+            <el-button type="text" size="mini" @click="toView(scope.row)">详情</el-button>
+            <el-button v-if="scope.row.hasJurisdiction" type="text" size="mini" @click="toUpdate(scope.row)">编辑</el-button>
+            <el-button v-if="scope.row.hasJurisdiction" type="text" size="mini" @click="toDelete(scope.row)">删除</el-button>
           </template>
         </template>
       </hc-crud>
