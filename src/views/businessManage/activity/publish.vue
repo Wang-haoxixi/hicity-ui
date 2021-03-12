@@ -342,7 +342,8 @@
                   label="票务金额："
                   v-if="item.ticketingType === '2'"
                 >
-                  <el-checkbox-group v-model="item.priceType" class="checkGroup">
+                  
+                  <!-- <el-checkbox-group v-model="item.priceType" class="checkGroup"> -->
                     <!-- priceType是否包含已选类目且长度为1 -->
                     <!-- <el-checkbox
                       label="能贝"
@@ -366,7 +367,7 @@
                         "
                       ></el-input>
                     </el-checkbox> -->
-                    <el-checkbox
+                    <!-- <el-checkbox
                       label="人民币"
                       name="rmb"
                       :disabled="
@@ -387,7 +388,11 @@
                         "
                       ></el-input>
                     </el-checkbox>
-                  </el-checkbox-group>
+                  </el-checkbox-group> -->
+
+                  <el-input style="width: 200px;" v-model="item.payOfflinePay.amount" @blur="priceChange(item.payOfflinePay)">
+                    <div slot="append">元</div>
+                  </el-input>
                 </el-form-item>
                 <el-row>
                   <el-col>
@@ -482,7 +487,7 @@
         <el-button v-if="!this.$route.query.id" @click="saveManuscript"
           >保存草稿</el-button
         >
-        <el-button v-else @click="saveManuscriptUpdate">保存草稿</el-button>
+        <el-button v-else-if="statusFlag != '1'" @click="saveManuscriptUpdate">保存草稿</el-button>
         <el-button @click="backClick">取消</el-button>
       </div>
       <!-- 海报弹窗 -->
@@ -843,6 +848,20 @@ export default {
     ...mapGetters(["userType", "userInfo"]),
   },
   methods: {
+    priceChange (item) {
+      let val = item.amount
+      try {
+        let price = parseFloat(val)
+        if (price == 0 || isNaN(price)) {
+          price = 0.01
+        } else {
+          price = price.toFixed(2)
+        }
+        item.amount = price
+      } catch (e) {
+        item.amount = 0.01
+      }
+    },
     // 返回
     backClick() {
       this.$confirm(
