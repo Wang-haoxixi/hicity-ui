@@ -244,168 +244,171 @@
             class="box-card"
             :body-style="cardStyle"
           >
-            <!-- 设置票种表单 -->
-            <el-form
-              ref="setTicketDataRef"
-              :model="item"
-              :rules="setTicketDataRules"
-            >
-              <el-row>
-                <el-col :span="8">
-                  <!-- 票务种类 -->
-                  <el-form-item
-                    label="票务种类："
-                    label-width="100"
-                    prop="ticketingType"
-                  >
-                    <el-select
-                      v-model="item.ticketingType"
-                      placeholder="请选择票务种类"
-                    >
-                      <el-option label="免费票" value="1"></el-option>
-                      <el-option label="付费票" value="2"></el-option>
-                    </el-select>
-                  </el-form-item>
-                </el-col>
-                <el-col :span="10">
-                  <el-form-item
-                    label="票务名称："
-                    label-width="100"
-                    prop="ticketingName"
-                  >
-                    <el-input
-                      style="width: 300px"
-                      v-model="item.ticketingName"
-                      placeholder="如早餐票、普通票、VIP票"
-                    ></el-input>
-                  </el-form-item>
-                </el-col>
-              </el-row>
-
-              <el-row style="margin: 15px 0">
-                <el-col :span="8">
-                  <el-form-item
-                    label="票种数量："
-                    label-width="100"
-                    prop="number"
-                  >
-                    <el-input-number
-                      v-model="item.number"
-                      :min="1"
-                    ></el-input-number>
-                  </el-form-item>
-                </el-col>
-                <el-col :span="8">
-                  <el-form-item
-                    label="单次购票数量："
-                    label-width="100"
-                    prop="limitTicket"
-                  >
-                    <el-input-number
-                      v-model="item.limitTicket"
-                      :min="1"
-                    ></el-input-number>
-                  </el-form-item>
-                </el-col>
-                <el-col :span="7">
-                  <el-form-item
-                    v-if="item.ticketingType === '1'"
-                    label="票种审核："
-                    label-width="100"
-                  >
-                    <el-switch
-                      v-model="item.needAudit"
-                      active-color="#13ce66"
-                      inactive-color="#cccccc"
-                    >
-                    </el-switch>
-                  </el-form-item>
-                  <el-form-item
-                    v-if="item.ticketingType === '2'"
-                    label="允许退票："
-                    label-width="100"
-                  >
-                    <el-switch
-                      v-model="item.allowedRefund"
-                      active-color="#13ce66"
-                      inactive-color="#cccccc"
-                    >
-                    </el-switch>
-                  </el-form-item>
-                </el-col>
-              </el-row>
-              <!-- 票务金额 付费票时显示 ticketingType:1不显示2显示  -->
-              <el-form-item
-                style="margin-bottom: 15px"
-                required
-                label="票务金额："
-                v-if="item.ticketingType === '2'"
+            <div style="position: relative;">
+              <!-- 设置票种表单 -->
+              <el-form
+                ref="setTicketDataRef"
+                :model="item"
+                :rules="setTicketDataRules"
               >
-                <el-checkbox-group v-model="item.priceType" class="checkGroup">
-                  <!-- priceType是否包含已选类目且长度为1 -->
-                  <!-- <el-checkbox
-                    label="能贝"
-                    name="nb"
-                    class="elcheck"
-                    :disabled="
-                      item.priceType.includes('能贝') &&
-                      item.priceType.length == 1
-                        ? true
-                        : false
-                    "
-                  >
-                    能贝：
-                    <el-input
-                      v-model="item.payWeCanPay.amount"
+                <el-row>
+                  <el-col :span="8">
+                    <!-- 票务种类 -->
+                    <el-form-item
+                      label="票务种类："
+                      label-width="100"
+                      prop="ticketingType"
+                    >
+                      <el-select
+                        v-model="item.ticketingType"
+                        placeholder="请选择票务种类"
+                      >
+                        <el-option label="免费票" value="1"></el-option>
+                        <el-option label="付费票" value="2"></el-option>
+                      </el-select>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="10">
+                    <el-form-item
+                      label="票务名称："
+                      label-width="100"
+                      prop="ticketingName"
+                    >
+                      <el-input
+                        style="width: 300px"
+                        v-model="item.ticketingName"
+                        placeholder="如早餐票、普通票、VIP票"
+                      ></el-input>
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+
+                <el-row style="margin: 15px 0">
+                  <el-col :span="8">
+                    <el-form-item
+                      label="票种数量："
+                      label-width="100"
+                      prop="number"
+                    >
+                      <el-input-number
+                        v-model="item.number"
+                        :min="1"
+                      ></el-input-number>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="8">
+                    <el-form-item
+                      label="单次购票数量："
+                      label-width="100"
+                      prop="limitTicket"
+                    >
+                      <el-input-number
+                        v-model="item.limitTicket"
+                        :min="1"
+                      ></el-input-number>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="7">
+                    <el-form-item
+                      v-if="item.ticketingType === '1'"
+                      label="票种审核："
+                      label-width="100"
+                    >
+                      <el-switch
+                        v-model="item.needAudit"
+                        active-color="#13ce66"
+                        inactive-color="#cccccc"
+                      >
+                      </el-switch>
+                    </el-form-item>
+                    <el-form-item
+                      v-if="item.ticketingType === '2'"
+                      label="允许退票："
+                      label-width="100"
+                    >
+                      <el-switch
+                        v-model="item.allowedRefund"
+                        active-color="#13ce66"
+                        inactive-color="#cccccc"
+                      >
+                      </el-switch>
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+                <!-- 票务金额 付费票时显示 ticketingType:1不显示2显示  -->
+                <el-form-item
+                  style="margin-bottom: 15px"
+                  required
+                  label="票务金额："
+                  v-if="item.ticketingType === '2'"
+                >
+                  <el-checkbox-group v-model="item.priceType" class="checkGroup">
+                    <!-- priceType是否包含已选类目且长度为1 -->
+                    <!-- <el-checkbox
+                      label="能贝"
+                      name="nb"
+                      class="elcheck"
                       :disabled="
                         item.priceType.includes('能贝') &&
                         item.priceType.length == 1
                           ? true
                           : false
                       "
-                    ></el-input>
-                  </el-checkbox> -->
-                  <el-checkbox
-                    label="人民币"
-                    name="rmb"
-                    :disabled="
-                      item.priceType.includes('人民币') &&
-                      item.priceType.length == 1
-                        ? true
-                        : false
-                    "
-                  >
-                    人民币：
-                    <el-input
-                      v-model="item.payOfflinePay.amount"
+                    >
+                      能贝：
+                      <el-input
+                        v-model="item.payWeCanPay.amount"
+                        :disabled="
+                          item.priceType.includes('能贝') &&
+                          item.priceType.length == 1
+                            ? true
+                            : false
+                        "
+                      ></el-input>
+                    </el-checkbox> -->
+                    <el-checkbox
+                      label="人民币"
+                      name="rmb"
                       :disabled="
                         item.priceType.includes('人民币') &&
                         item.priceType.length == 1
                           ? true
                           : false
                       "
-                    ></el-input>
-                  </el-checkbox>
-                </el-checkbox-group>
-              </el-form-item>
-              <el-row>
-                <el-col>
-                  <el-form-item
-                    label="票种备注："
-                    label-width="200"
-                    prop="remarks"
-                  >
-                    <el-input
-                      style="width: 650px"
-                      placeholder="请输入备注内容"
-                      type="textarea"
-                      v-model="item.remarks"
-                      :rows="4"
-                    ></el-input>
-                  </el-form-item>
-                </el-col>
-              </el-row>
-            </el-form>
+                    >
+                      人民币：
+                      <el-input
+                        v-model="item.payOfflinePay.amount"
+                        :disabled="
+                          item.priceType.includes('人民币') &&
+                          item.priceType.length == 1
+                            ? true
+                            : false
+                        "
+                      ></el-input>
+                    </el-checkbox>
+                  </el-checkbox-group>
+                </el-form-item>
+                <el-row>
+                  <el-col>
+                    <el-form-item
+                      label="票种备注："
+                      label-width="200"
+                      prop="remarks"
+                    >
+                      <el-input
+                        style="width: 650px"
+                        placeholder="请输入备注内容"
+                        type="textarea"
+                        v-model="item.remarks"
+                        :rows="4"
+                      ></el-input>
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+              </el-form>
+              <i class="icon-ticket-remove el-icon-delete" @click="removeTicket(i)"></i>
+            </div>
           </el-card>
         </el-form-item>
       </el-form>
@@ -1095,6 +1098,15 @@ export default {
       this.baseFormData.ticketingManagements.push(setTicketData);
     },
 
+    // 删除票务
+    removeTicket (index) {
+      if (this.baseFormData.ticketingManagements.length > 1) {
+        this.baseFormData.ticketingManagements.splice(index, 1);
+      } else {
+        this.$message.info('至少需保留一张票')
+      }
+    },
+
     // 返回输入建议
     querySearch(queryString, cb) {
       let results = [];
@@ -1617,5 +1629,13 @@ export default {
 ::v-deep .el-input-number__increase {
   right: 0px !important;
   border-left: 1px solid #dcdfe6 !important;
+}
+.icon-ticket-remove {
+  position: absolute;
+  right: 0;
+  top: 0;
+  font-size: 20px;
+  cursor: pointer;
+  color: #babec0;
 }
 </style>
