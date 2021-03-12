@@ -91,7 +91,6 @@ export default {
     toUpdateTicket ({id}) {
       getTicketDetail({id}).then(({ data }) => {
         this.$refs.form.open(this.activityId, data.data.data)
-        console.log(data)
       })
     },
     toDeleteTicket ({id}) {

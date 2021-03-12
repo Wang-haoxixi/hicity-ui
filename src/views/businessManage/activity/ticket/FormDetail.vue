@@ -33,7 +33,10 @@
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="票种审核：" prop="needAudit">
+            <el-form-item v-if="formData.ticketingType == 1" label="允许退票：" prop="allowedRefund">
+              <el-switch v-model="formData.allowedRefund" :active-value="1" :inactive-value="0"></el-switch>
+            </el-form-item>
+            <el-form-item v-if="formData.ticketingType == 2" label="票种审核：" prop="needAudit">
               <el-switch v-model="formData.needAudit" :active-value="true" :inactive-value="false"></el-switch>
             </el-form-item>
           </el-col>
@@ -100,8 +103,8 @@ export default {
     priceValidator (rules, value, callback) {
       try {
         let price = parseFloat(this.priceTemp)
-        if (price == 0) {
-          price = 0.01
+        if (price == 0 || isNaN(price)) {
+          price = this.price
         } else {
           price = price.toFixed(2)
         }
@@ -118,6 +121,7 @@ export default {
         this.price = ticket.rmb || 0.01
         this.priceTemp = this.price.toFixed(2)
       } else {
+        ticket.allowedRefund = ticket.allowedRefund ? 1 : 0
         this.price = 0.01
         this.priceTemp = '0.01'
       }
@@ -128,6 +132,7 @@ export default {
         number: 1,
         limitTicket: 1,
         needAudit: true,
+        allowedRefund: 0,
         ...ticket
       }
       this.resetFormData = deepClone(this.formData)
