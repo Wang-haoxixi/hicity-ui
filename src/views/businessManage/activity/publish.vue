@@ -1248,7 +1248,13 @@ export default {
       });
       this.baseFormData.submitType = 1;
       this.baseFormData.id = this.$route.query.id;
-
+      this.customList.forEach(item=>{
+        if(item.type == 'input' || item.type == 'textarea'){
+          item.placeholder = "请输入" + item.label
+        }else if(item.type == 'radio' || item.type == 'checkbox'){
+          item.placeholder = "请选择" + item.label
+        }
+      })
       this.baseFormData.conferenceFormList = [...this.defaultList,...this.customList]
 
       this.$refs.baseFormDataRef.validate((valid1) => {
@@ -1311,6 +1317,13 @@ export default {
         }
       });
       this.baseFormData.submitType = 1;
+      this.customList.forEach(item=>{
+        if(item.type == 'input' || item.type == 'textarea'){
+          item.placeholder = "请输入" + item.label
+        }else if(item.type == 'radio' || item.type == 'checkbox'){
+          item.placeholder = "请选择" + item.label
+        }
+      })
       this.baseFormData.conferenceFormList = [...this.defaultList,...this.customList]
       console.log(this.baseFormData)
       this.$refs.baseFormDataRef.validate((valid1) => {
@@ -1358,6 +1371,13 @@ export default {
         }
       });
       this.baseFormData.submitType = 0;
+      this.customList.forEach(item=>{
+        if(item.type == 'input' || item.type == 'textarea'){
+          item.placeholder = "请输入" + item.label
+        }else if(item.type == 'radio' || item.type == 'checkbox'){
+          item.placeholder = "请选择" + item.label
+        }
+      })
       this.baseFormData.conferenceFormList = [...this.defaultList,...this.customList]
       this.$refs.baseFormDataRef.validate((valid1) => {
         this.$refs.setTicketDataRef.forEach((item) => {
@@ -1395,6 +1415,13 @@ export default {
       });
       this.baseFormData.submitType = 0;
       this.baseFormData.id = this.$route.query.id;
+      this.customList.forEach(item=>{
+        if(item.type == 'input' || item.type == 'textarea'){
+          item.placeholder = "请输入" + item.label
+        }else if(item.type == 'radio' || item.type == 'checkbox'){
+          item.placeholder = "请选择" + item.label
+        }
+      })
       this.baseFormData.conferenceFormList = [...this.defaultList,...this.customList]
       // console.log(this.baseFormData)
       this.$refs.baseFormDataRef.validate((valid1) => {
