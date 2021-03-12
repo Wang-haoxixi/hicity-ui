@@ -140,6 +140,7 @@
               v-for="(item, i) in signInCodeData"
               :label="item"
               :key="i"
+              :disabled="item.writeOffStatus == 0 ? false : true"
               >{{ item.orderNo }}</el-checkbox
             >
           </el-checkbox-group>
@@ -156,7 +157,7 @@
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
           :current-page="query.current"
-          :page-sizes="[10,20,30,40,50,100]"
+          :page-sizes="[10, 20, 30, 40, 50, 100]"
           :page-size="query.size"
           :total="total"
           background
@@ -195,7 +196,6 @@ export default {
       applyInfoForm: [],
       annotation: "",
       enroleId: "",
-
       checkAll: false,
       isIndeterminate: true,
       checkedSignInCode: [], //已选择
@@ -274,24 +274,29 @@ export default {
     },
     getPeopleManagementList() {
       peopleManagement(this.query).then((res) => {
-        // console.log("res", res);
+        console.log("res", res);
         if (res.data.code != 0) {
           return this.$message.error("获取列表失败");
         }
         this.tableData = res.data.data.data.records;
+        this.total = res.data.data.data.total;
       });
     },
     handleSizeChange(val) {
-      this.query.size = val
-      this.getPeopleManagementList()
+      this.query.size = val;
+      this.getPeopleManagementList();
     },
     handleCurrentChange(val) {
-      this.query.current = val
-      this.getPeopleManagementList()
+      this.query.current = val;
+      this.getPeopleManagementList();
     },
     handleCheckAllChange(val) {
       console.log(val);
-      this.checkedSignInCode = val ? this.signInCodeData : [];
+      let writeOffStatusCode = this.signInCodeData.filter((item) => {
+        return item.writeOffStatus == "0";
+      });
+      console.log(writeOffStatusCode);
+      this.checkedSignInCode = val ? writeOffStatusCode : [];
       this.isIndeterminate = false;
     },
     handleCheckedCitiesChange(value) {
