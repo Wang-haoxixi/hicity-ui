@@ -58,5 +58,15 @@ export default [
         component: () => import("@/views/businessManage/activity/personnel/personnel.vue")
       }
     ]
+  },
+  {
+    path: "/activity",
+    component: Layout,
+    children: [
+      {
+        path: "ticket/:id",
+        component: () => import("@/views/businessManage/activity/ticket/index.vue")
+      }
+    ]
   }
 ];
