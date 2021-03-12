@@ -1241,6 +1241,7 @@ export default {
 
       // 遍历票种数组
       this.baseFormData.ticketingManagements.forEach((item) => {
+        item.payMethodList = []
         // 保存时将支付方式列表清空并重新
         if (item.ticketingType == '2') {
           item.payMethodList.push(item.payOfflinePay);
@@ -1304,15 +1305,11 @@ export default {
     publish() {
       let that = this;
       this.baseFormData.details = this.quillContent.content;
-
       // 遍历票种数组
       this.baseFormData.ticketingManagements.forEach((item) => {
-        // 保存时将支付方式列表清空并重新赋值
-        item.payMethodList = [];
-        if (item.priceType.includes("能贝")) {
-          item.payMethodList.push(item.payWeCanPay);
-        }
-        if (item.priceType.includes("人民币")) {
+        item.payMethodList = []
+        // 保存时将支付方式列表清空并重新
+        if (item.ticketingType == '2') {
           item.payMethodList.push(item.payOfflinePay);
         }
       });
@@ -1358,15 +1355,11 @@ export default {
     saveManuscript() {
       let that = this;
       this.baseFormData.details = this.quillContent.content;
-
       // 遍历票种数组
       this.baseFormData.ticketingManagements.forEach((item) => {
+        item.payMethodList = []
         // 保存时将支付方式列表清空并重新
-        item.payMethodList = [];
-        if (item.priceType.includes("能贝")) {
-          item.payMethodList.push(item.payWeCanPay);
-        }
-        if (item.priceType.includes("人民币")) {
+        if (item.ticketingType == '2') {
           item.payMethodList.push(item.payOfflinePay);
         }
       });
@@ -1409,6 +1402,7 @@ export default {
       this.baseFormData.details = this.quillContent.content;
       // 遍历票种数组
       this.baseFormData.ticketingManagements.forEach((item) => {
+        item.payMethodList = []
         if (item.ticketingType == '2') {
           item.payMethodList.push(item.payOfflinePay);
         }
