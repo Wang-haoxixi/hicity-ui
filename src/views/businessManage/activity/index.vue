@@ -296,7 +296,11 @@ export default {
       // this.$router.push("/personnel");
     },
     // 票务管理
-    ticketManagement() {},
+    ticketManagement({row}) {
+      this.$router.push({
+        path: "/activity/ticket/" + row.id,
+      });
+    },
   },
   created() {
     this.getActivitiesListFn();
