@@ -189,7 +189,7 @@
           cancal () {
             this.dialogRoleVisible = false
           },
-          addFun(row, next) {
+          addFun(row, next, loading) {
             addObj({...row, lockFlag: '0'}).then(() => {
               this.$refs.hcCrud.refresh()
               next()
@@ -199,9 +199,11 @@
                 type: 'success',
                 duration: 2000
               })
+            }).finally(() => {
+              loading()
             })
           },
-          updateFun(row, next) {
+          updateFun(row, next, loading) {
             if (row.phone && row.phone.indexOf('*') > 0) {
               this.form.phone = undefined
             }
@@ -214,6 +216,8 @@
                 type: 'success',
                 duration: 2000
               })
+            }).finally(() => {
+              loading()
             })
           },
           deletes(row, index) {

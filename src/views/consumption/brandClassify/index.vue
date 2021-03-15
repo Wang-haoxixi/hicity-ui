@@ -72,7 +72,7 @@
             </avue-crud>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="handleSave">保存</el-button>
+            <el-button type="primary" :loading="formLoading" @click="handleSave">保 存</el-button>
           </el-form-item>
         </el-form>
       </template>
@@ -156,22 +156,23 @@ export default {
       boxLoading: false,
       brandList: [],
       brandLoading: false,
+      formLoading: false
     }
   },
   computed: {
     ...mapGetters(['userInfo']),
     title () {
       if (!this.publish) {
-        return '商品分类'
+        return '品牌分类'
       } else {
         if (this.publishType == 'add') {
-          return '商品分类-新增'
+          return '品牌分类-新增'
         } else if (this.publishType == 'edit') {
-          return '商品分类-编辑'
+          return '品牌分类-编辑'
         } else if (this.publishType == 'view') {
-          return '商品分类-详情'
+          return '品牌分类-详情'
         } else {
-          return '商品分类'
+          return '品牌分类'
         }
       }
     },
@@ -254,6 +255,7 @@ export default {
       })
     },
     handleSave() {
+      this.formLoading = true
       this.$refs.form.validate(validate => {
         if (validate) {
           let relations = []
@@ -275,7 +277,8 @@ export default {
               })
               this.publish = false
               this.$refs.hcCrud.refresh()
-            }).catch(() => {
+            }).finally(() => {
+              this.formLoading = false
             })
           } else if (this.publishType == 'add') {
             addBrandClassify(formData).then(({data}) => {
@@ -287,10 +290,12 @@ export default {
               })
               this.publish = false
               this.$refs.hcCrud.refresh({currentPage: 1})
-            }).catch(() => {
-              loading()
+            }).finally(() => {
+              this.formLoading = false
             })
           }
+        } else {
+          this.formLoading = false
         }
       })
     },

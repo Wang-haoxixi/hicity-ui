@@ -283,7 +283,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="submit">确 定</el-button>
+        <el-button type="primary" :loading="formLoading" @click="submit">确 定</el-button>
       </div>
     </el-dialog>
 
@@ -446,7 +446,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogEditFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="editSubmit">确 定</el-button>
+        <el-button type="primary" :loading="formLoading" @click="editSubmit">确 定</el-button>
       </div>
     </el-dialog>
   </basic-container>
@@ -555,6 +555,7 @@ export default {
       pageSize: 20,
       total: 30,
       tableLoading: false,
+      formLoading: false
     };
   },
   methods: {
@@ -575,7 +576,6 @@ export default {
     },
     // 新增 选中值发生变化时触发
     valChange(data) {
-      console.log(data);
       if (this.adslotGroup) {
         this.adslotGroup.forEach((item) => {
           if (item.adslotId === data) {
@@ -607,7 +607,6 @@ export default {
         this.adslotGroup = res.data.data.data.records.filter((item) => {
           return item.authority == true;
         });
-        console.log("adslotGroup", this.adslotGroup);
       });
     },
 
@@ -619,7 +618,6 @@ export default {
         size: this.pageSize, //条数
       })
         .then((res) => {
-          console.log("广告分页", res);
           let arr = res.data.data.data.records;
           this.tableData = arr;
           this.total = res.data.data.data.total;
@@ -639,7 +637,6 @@ export default {
     // 获取活动数据
     getActivitiePageFn(cityId) {
       activitiePage({ cityId: cityId }).then((res) => {
-        console.log("获取活动数据", res);
         this.jumpObjArr = res.data.data.data.records;
       });
     },
@@ -656,12 +653,13 @@ export default {
         });
         this.dialogFormVisible = false;
         this.getList();
+      }).finally(() => {
+        this.formLoading = false
       });
     },
 
     // 编辑按钮
     handleEdit(row) {
-      console.log(row);
       this.editForm = { ...row };
       this.adslotGroup.forEach((item) => {
         if (item.cityId === row.cityId) {
@@ -702,6 +700,7 @@ export default {
 
     // 广告编辑 提交
     editSubmit() {
+      this.formLoading = true
       this.$refs.ruleEditForm.validate((valid) => {
         if (valid) {
           updateAd(this.editForm).then((res) => {
@@ -714,8 +713,11 @@ export default {
             });
             this.dialogEditFormVisible = false;
             this.getList();
+          }).finally(() => {
+            this.formLoading = false
           });
         } else {
+          this.formLoading = false
           return this.$message.error("请填写必填信息！");
         }
       });
@@ -729,7 +731,6 @@ export default {
         type: "warning",
       })
         .then(() => {
-          console.log("成功");
           delAd(row.adId).then((res) => {
             if (res.data.code !== 0) {
               return this.$message.error("广告删除失败！");
@@ -758,10 +759,11 @@ export default {
 
     // 广告新增 提交
     submit() {
+      this.formLoading = true
       this.$refs.ruleAddForm.validate((valid) => {
-        console.log(valid, this.form);
         // 校验未通过
         if (!valid) {
+          this.formLoading = false
           return this.$message.error("请填写必填信息！");
         }
         // 调用接口
@@ -777,7 +779,6 @@ export default {
 
     //编辑图片上传成功时的钩子
     handleEditPicSuccess(res) {
-      console.log("编辑上传成功", res);
       this.imageUrl = res.data.data.url;
       this.editForm.imageUrl = res.data.data.url;
     },

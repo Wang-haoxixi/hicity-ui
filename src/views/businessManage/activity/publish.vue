@@ -480,14 +480,14 @@
 
       <div class="footer-btn">
         <!-- this.$route.query.id是否有参数传递过来,没有参数说明走新建,否则走编辑   -->
-        <el-button v-if="!this.$route.query.id" @click="publish" type="danger"
+        <el-button v-if="!this.$route.query.id" :loading="formLoading" @click="publish" type="danger"
           >发布活动</el-button
         >
-        <el-button v-else @click="editSave" type="danger">发布活动</el-button>
-        <el-button v-if="!this.$route.query.id" @click="saveManuscript"
+        <el-button v-else @click="editSave" :loading="formLoading" type="danger">发布活动</el-button>
+        <el-button v-if="!this.$route.query.id" :loading="formLoading" @click="saveManuscript"
           >保存草稿</el-button
         >
-        <el-button v-else-if="statusFlag != '1'" @click="saveManuscriptUpdate">保存草稿</el-button>
+        <el-button v-else-if="statusFlag != '1'" :loading="formLoading" @click="saveManuscriptUpdate">保存草稿</el-button>
         <el-button @click="backClick">取消</el-button>
       </div>
       <!-- 海报弹窗 -->
@@ -532,6 +532,7 @@ export default {
   components: { HcQuill, HcCitySelect },
   data() {
     return {
+      formLoading: false,
       isInput:false,
       tagLabel:'',//tag值
       showFormCollect:false,
@@ -1236,6 +1237,7 @@ export default {
     },
     // 编辑 - 发布活动1
     editSave() {
+      this.formLoading = true
       let that = this;
       this.baseFormData.details = this.quillContent.content;
 
@@ -1271,8 +1273,11 @@ export default {
               this.baseFormData.fileList = [];
               this.defaultList = []
               this.$router.go(-1);
+            }).finally(() => {
+              this.formLoading = false
             });
           } else {
+            this.formLoading = false
             this.$message.error("活动信息填写不完整");
             this.validRst = [];
             this.defaultList = []
@@ -1294,15 +1299,19 @@ export default {
             this.fileList = [];
             this.baseFormData.fileList = [];
             this.$router.go(-1);
+          }).finally(() => {
+            this.formLoading = false
           });
         } else {
           this.$message.error("活动信息填写不完整");
           this.validRst = [];
+          this.formLoading = false
         }
       });
     },
     // 新增 - 发布活动
     publish() {
+      this.formLoading = true
       let that = this;
       this.baseFormData.details = this.quillContent.content;
       // 遍历票种数组
@@ -1343,16 +1352,20 @@ export default {
             this.$router.go(-1);
             this.validRst = [];
             this.defaultList = []
+          }).finally(() => {
+            this.formLoading = false
           });
         } else {
           this.$message.error("活动信息填写不完整");
           this.validRst = [];
           this.defaultList = []
+          this.formLoading = false
         }
       });
     },
     // 新增 - 保存草稿
     saveManuscript() {
+      this.formLoading = true
       let that = this;
       this.baseFormData.details = this.quillContent.content;
       // 遍历票种数组
@@ -1388,16 +1401,20 @@ export default {
             this.fileList = [];
             this.baseFormData.fileList = [];
             this.$router.go(-1);
+          }).finally(() => {
+            this.formLoading = false
           });
         } else {
           this.$message.error("活动信息填写不完整");
           this.validRst = [];
+          this.formLoading = false
         }
       });
     },
 
     // 编辑 - 保存草稿0
     saveManuscriptUpdate() {
+      this.formLoading = true
       let that = this;
       this.baseFormData.details = this.quillContent.content;
       // 遍历票种数组
@@ -1430,10 +1447,13 @@ export default {
               this.fileList = [];
               this.baseFormData.fileList = [];
               this.$router.go(-1);
+            }).finally(() => {
+              this.formLoading = false
             });
           } else {
             this.$message.error("活动信息填写不完整");
             this.validRst = [];
+            this.formLoading = false
           }
           return;
         }
@@ -1452,10 +1472,13 @@ export default {
             this.fileList = [];
             this.baseFormData.fileList = [];
             this.$router.go(-1);
+          }).finally(() => {
+            this.formLoading = false
           });
         } else {
           this.$message.error("活动信息填写不完整");
           this.validRst = [];
+          this.formLoading = false
         }
       });
     },

@@ -41,6 +41,7 @@
         <el-button
           type="primary"
           size="small"
+          :loading="formLoading"
           @click="handleOpen()">开 通
         </el-button>
         <el-button
@@ -76,7 +77,8 @@ export default {
       formRule: {
         username: {required: true, message: '请输入账号', trigger: 'blur'},
         password: {required: true, message: '请输入密码', trigger: 'blur'}
-      }
+      },
+      formLoading: false
     }
   },
   computed: {
@@ -112,6 +114,7 @@ export default {
       this.dialogRoleVisible = true
     },
     handleOpen () {
+      this.formLoading = true
       this.$refs.form.validate(valid => {
         if (valid) {
           adminCityOpen(this.formData).then(({data}) => {
@@ -123,7 +126,11 @@ export default {
               duration: 2000
             })
             this.dialogRoleVisible = false
+          }).finally(() => {
+            this.formLoading = false
           })
+        } else {
+          this.formLoading = false
         }
       })
     },

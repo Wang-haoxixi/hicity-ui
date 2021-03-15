@@ -118,8 +118,8 @@
           <!-- 事件按钮 -->
           <el-form-item>
             <el-button @click="handlePreview">预览</el-button>
-            <el-button @click="handleDraft">保存草稿</el-button>
-            <el-button @click="handleCreate">直接发布</el-button>
+            <el-button @click="handleDraft" :loading="formLoading">保存草稿</el-button>
+            <el-button @click="handleCreate" :loading="formLoading">直接发布</el-button>
           </el-form-item>
         </el-form>
         <hc-preview v-if="preview" @close="preview = false">
@@ -176,6 +176,7 @@ export default {
   },
   data() {
     return {
+      formLoading: false,
       isShow: true, //是否显示资讯列表
       uploadPicUrl: "/api/admin/sys_file/oss/upload",
       headersOpt: {
@@ -399,6 +400,7 @@ export default {
     },
     // 保存草稿
     handleDraft() {
+      this.formLoading = true
       this.urlList.forEach((item) => {
         item.imageSizeType = this.addform.imageSizeType;
       });
@@ -423,7 +425,11 @@ export default {
               });
               this.isShow = true
               this.$refs.hcCrud.refresh();
+            }).finally(() => {
+              this.formLoading = false
             });
+          } else {
+            this.formLoading = false
           }
         });
       } else {
@@ -440,13 +446,18 @@ export default {
               this.isShow = true
               this.$refs.hcCrud.refresh();
               this.fileList = [];
+            }).finally(() => {
+              this.formLoading = false
             });
+          } else {
+            this.formLoading = false
           }
         });
       }
     },
     // 直接发布
     handleCreate() {
+      this.formLoading = true
       this.urlList.forEach((item) => {
         item.imageSizeType = this.addform.imageSizeType; //标题图添加图片尺寸属性
       });
@@ -482,7 +493,11 @@ export default {
               // this.getOfficialReleaseList();
               this.$refs.hcCrud.refresh();
               this.isShow = true;
+            }).finally(() => {
+              this.formLoading = false
             });
+          } else {
+            this.formLoading = false
           }
         });
       }
@@ -512,7 +527,11 @@ export default {
               this.isShow = true;
               // this.getOfficialReleaseList();
               this.$refs.hcCrud.refresh();
+            }).finally(() => {
+              this.formLoading = false
             });
+          } else {
+            this.formLoading = false
           }
         });
       }

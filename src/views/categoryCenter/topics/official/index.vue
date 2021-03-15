@@ -63,7 +63,7 @@ export default {
         }, error => reject(error))
       })
     },
-    addFun(row, done) {
+    addFun(row, done, loading) {
       let form = {
         topicsName: row.topicsName,
       }
@@ -78,9 +78,11 @@ export default {
           type: 'success',
           duration: 2000
         })
+      }).finally(() => {
+        loading()
       })
     },
-    updateFun(row, done) {
+    updateFun(row, done, loading) {
       let form = {
         id: row.id,
         topicsName: row.topicsName,
@@ -96,6 +98,8 @@ export default {
           type: 'success',
           duration: 2000
         })
+      }).finally(() => {
+        loading()
       })
     },
     deleteFun({ id }) {

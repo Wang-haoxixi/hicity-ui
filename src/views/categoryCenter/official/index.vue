@@ -116,7 +116,7 @@ export default {
         })
       })
     },
-    addFun(formData, next) {
+    addFun(formData, next, loading) {
       addColumn({
         cityIdList: [this.userInfo.manageCityId],
         ...formData
@@ -128,12 +128,14 @@ export default {
           duration: 2000
         })
         next()
+      }).finally(() => {
+        loading()
       })
     },
     handleUpdate (row) {
       this.$refs.hcCrud.rowEdit(row)
     },
-    updateFun(formData, next) {
+    updateFun(formData, next, loading) {
       updateColumn(formData).then(({data}) => {
         this.formDialogVisible = false
         this.$notify({
@@ -143,6 +145,8 @@ export default {
           duration: 2000
         })
         next()
+      }).finally(() => {
+        loading()
       })
     },
     cityView (columnId) {

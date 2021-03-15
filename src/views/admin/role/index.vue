@@ -156,7 +156,7 @@ export default {
     handleView(row) {
       this.$refs.hcCrud.rowView(row)
     },
-    addFun(row, next) {
+    addFun(row, next, loading) {
       addObj({
         ...row,
         cityId: this.userInfo.manageCityId
@@ -169,9 +169,11 @@ export default {
           type: 'success',
           duration: 2000
         })
+      }).finally(() => {
+        loading()
       })
     },
-    updateFun(row, next) {
+    updateFun(row, next, loading) {
       putObj(row).then(() => {
         this.$refs.hcCrud.refresh()
         next()
@@ -181,6 +183,8 @@ export default {
           type: 'success',
           duration: 2000
         })
+      }).finally(() => {
+        loading()
       })
     },
     cancal () {

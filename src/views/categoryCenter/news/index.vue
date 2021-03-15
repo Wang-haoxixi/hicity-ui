@@ -126,7 +126,7 @@ export default {
         })
       })
     },
-    addFun(formData, next) {
+    addFun(formData, next, loading) {
       addColumn({
         cityIdList: [this.userInfo.manageCityId],
         ...formData
@@ -138,6 +138,8 @@ export default {
           duration: 2000
         })
         next()
+      }).finally(() => {
+        loading()
       })
     },
     handleUpdate ({newsColumnId}) {
@@ -152,7 +154,7 @@ export default {
         this.$refs.hcCrud.rowEdit(formData)
       })
     },
-    updateFun(formData, next) {
+    updateFun(formData, next, loading) {
       updateColumn(formData).then(({data}) => {
         this.$notify({
           title: '成功',
@@ -161,6 +163,8 @@ export default {
           duration: 2000
         })
         next()
+      }).finally(() => {
+        loading()
       })
     },
     cityView (columnId) {

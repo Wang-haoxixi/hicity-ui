@@ -50,15 +50,17 @@ export default {
       })
     },
     // 广告位新增 提交
-    addFun(formData, next) {
+    addFun(formData, next, loading) {
       addAdPosition(formData).then((res) => {
         if (res.data.code === 0) {
           next()
         }
+      }).finally(() => {
+        loading()
       });
     },
     // 广告位编辑 提交编辑
-    updateFun(formData, next) {
+    updateFun(formData, next, loading) {
       editPlace(formData).then((res) => {
         if (res.data.code === 0) {
           this.dialogEditFormVisible = false;
@@ -70,6 +72,8 @@ export default {
         } else {
           this.$message.error("编辑广告位失败！");
         }
+      }).finally(() => {
+        loading()
       });
     },
     deleteFun(row) {

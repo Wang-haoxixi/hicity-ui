@@ -125,8 +125,8 @@ export default {
         }
         //解析定位错误信息
         function onError(data) {
-          document.getElementById('status').innerHTML='定位失败'
-          document.getElementById('result').innerHTML = '失败原因排查信息:'+data.message;
+          // document.getElementById('status').innerHTML='定位失败'
+          // document.getElementById('result').innerHTML = '失败原因排查信息:'+data.message;
         }
       }
     },
