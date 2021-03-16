@@ -63,7 +63,6 @@ export default {
       getTicketList({
         activityId: this.activityId
       }).then(({data}) => {
-        console.log(data)
         this.tableData = data.data.data
       })
     },

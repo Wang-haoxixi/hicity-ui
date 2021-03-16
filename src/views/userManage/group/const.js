@@ -11,7 +11,7 @@ export const tableOption = (admin = false) => {
     },
     {
       label: '创建者',
-      prop: 'telephone',
+      prop: 'phone',
       width: 120
     },
     {
@@ -21,8 +21,11 @@ export const tableOption = (admin = false) => {
     },
     {
       label: '圈子状态',
-      prop: 'state',
-      width: 120
+      prop: 'isLock',
+      width: 120,
+      formatter: function (row) {
+        return row.isLock ? '锁定' : '正常'
+      }
     },
     {
       label: '成员',
@@ -31,7 +34,7 @@ export const tableOption = (admin = false) => {
     },
     {
       label: '注册城市',
-      prop: 'createByCity',
+      prop: 'city',
       width: 120
     },
     

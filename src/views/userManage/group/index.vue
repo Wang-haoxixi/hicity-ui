@@ -13,16 +13,22 @@
             <div class="info-others">
               <div class="info-others-line">
                 <div class="info-item">圈子ID：{{formData.circleId}}</div>
-                <div class="info-item">创建城市：{{formData.createByCity}}</div>
+                <div class="info-item">创建城市：{{formData.city}}</div>
               </div>
               <div class="info-others-line" style="margin-top: 10px;">
-                <div class="info-item">创建者：{{formData.telephone}}</div>
+                <div class="info-item">创建者：{{formData.phone}}</div>
                 <div class="info-item">群主姓名：{{formData.createByName}}</div>
                 <div class="info-item">注册时间：{{formData.createTime}}</div>
               </div>
             </div>
           </div>
         </div>
+        <el-tabs v-model="infoType" v-if="viewShow">
+          <el-tab-pane label="被举报详情" name="report">暂无数据</el-tab-pane>
+          <el-tab-pane label="圈子日志" name="log">
+            <hc-crud ref="logCrud" :option="logOption" :fetchListFun="logFetchListFun"></hc-crud>
+          </el-tab-pane>
+        </el-tabs>
       </template>
     </hc-table-form>
   </basic-container>
@@ -31,7 +37,7 @@
 <script>
 import { tableOption } from "./const";
 import { mapGetters } from "vuex";
-import { getCircleList, dismissCircle, circleDetail } from "@/api/admin/circle"
+import { getCircleList, dismissCircle, circleDetail, getCircleLog } from "@/api/admin/circle"
 
 export default {
   data() {
@@ -39,6 +45,30 @@ export default {
       viewShow: false,
       formData: {},
       showDetail: false,
+      infoType: '',
+      circleId: '',
+      logOption: {
+        columns: [
+          {
+            label: '事件类型',
+            prop: 'logType',
+            type: 'select',
+            dicName: 'CIRCLE_LOG_TYPE'
+          },
+          {
+            label: '事件详情',
+            prop: 'content',
+          },
+          {
+            label: '操作人',
+            prop: 'operatorName',
+          },
+          {
+            label: '日期',
+            prop: 'createTime',
+          },
+        ]
+      }
     };
   },
   computed: {
@@ -67,10 +97,27 @@ export default {
         }, error => reject(error))
       })
     },
+    logFetchListFun (params) {
+      return new Promise((resolve, reject) => {
+        getCircleLog({
+          ...params,
+          circleId: this.circleId
+        }).then(({ data }) => {
+          resolve({
+            records: data.data.data.records,
+            page: {
+              total: data.data.data.total
+            }
+          })
+        }, error => reject(error))
+      })
+    },
     goBack () {
+      this.infoType = 'report'
       this.viewShow = false
     },
     groupView ({circleId}) {
+      this.circleId = circleId
       circleDetail({circleId}).then(({ data }) => {
         this.viewShow = true
         this.formData = data.data.data
