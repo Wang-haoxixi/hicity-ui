@@ -1,5 +1,5 @@
 <template>
-  <hc-city-box ref="box" :single="single" @save="save"></hc-city-box>
+  <hc-city-box ref="box" :title="title" :single="single" @save="save"></hc-city-box>
 </template>
 
 <script>
@@ -57,7 +57,11 @@ export default {
     single: {
       type: Boolean,
       default: false
-    }
+    },
+    title: {
+      type: String,
+      default: '展示城市'
+    },
   },
   data () {
     return {
