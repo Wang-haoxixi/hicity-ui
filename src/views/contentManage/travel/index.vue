@@ -106,11 +106,11 @@ export default {
       initCityList: [],
       topicName: '',
       formRule: {
-        travelName: [{required: true, message: '请输入名称'}],
-        topicsBankIdSet: [{required: true, message: '请选择话题'}],
+        // travelName: [{required: true, message: '请输入名称'}],
+        // topicsBankIdSet: [{required: true, message: '请选择话题'}],
         cityList: [{required: true, message: '请选择城市'}],
         images: [{required: true, message: '请添加游记图片'}],
-        content: [{required: true, message: '请输入内容'}],
+        // content: [{required: true, message: '请输入内容'}],
       },
       preview: false,
       swiperOptions: {
@@ -197,15 +197,17 @@ export default {
       getTravelDetail(id).then(({ data }) => {
         let formData = data.data.data
         let topicsBankIdSet = []
-        for (let i = 0; i < formData.topicsBankList.length; i++) {
-          topicsBankIdSet.push(formData.topicsBankList[i].id)
+        if (formData.topicsBankList && formData.topicsBankList.length > 0) {
+          for (let i = 0; i < formData.topicsBankList.length; i++) {
+            topicsBankIdSet.push(formData.topicsBankList[i].id)
+          }
         }
         this.formData = {
           id: formData.id,
           travelName: formData.travelName,
           topicsBankIdSet,
           images: formData.imageUrls,
-          cityList: formData.cityIds,
+          cityList: formData.cityIds || [],
           content: formData.content,
           publishedSources: formData.publishedSources
         }
