@@ -167,7 +167,7 @@ export default {
     },
     formRule () {
       let formRule = this.formRuleInit
-      formRule.percentageMoney = [{required: true, message: `请输入${this.percentageLabel}`, trigger: 'change'}]
+      formRule.percentageMoney = [{required: true, message: `请输入${this.percentageLabel}`, trigger: 'blur'}]
       return formRule
     },
     percentageLabel () {
