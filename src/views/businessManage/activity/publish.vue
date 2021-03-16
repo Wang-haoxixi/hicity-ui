@@ -22,17 +22,25 @@
           "
           label="所属城市："
         >
-          <hc-city-select
-            v-model="baseFormData.cityIdList"
-            :city-id="userInfo.manageCityId"
-          ></hc-city-select>
+          <el-row>
+            <el-col :span="20">
+              <hc-city-select
+                v-model="baseFormData.cityIdList"
+                :city-id="userInfo.manageCityId"
+              ></hc-city-select>
+            </el-col>
+          </el-row>
         </el-form-item>
         <!-- 活动标题 -->
         <el-form-item prop="name" label="活动标题：">
-          <el-input
-            v-model="baseFormData.name"
-            placeholder="不小于5个字，不超过40个字"
-          ></el-input>
+          <el-row>
+            <el-col :span="20">
+              <el-input
+                v-model="baseFormData.name"
+                placeholder="不小于5个字，不超过40个字"
+              ></el-input>
+            </el-col>
+          </el-row>
         </el-form-item>
         <!-- 举办时间 -->
         <el-form-item label="举办时间：" required>
@@ -101,7 +109,7 @@
                 placement="top"
                 width="300"
                 trigger="hover"
-                content="精致的海报让活动锦上添花，更便于传播与吸引报名，也将提升在我能平台的推荐机会。"
+                content="精致的海报让活动锦上添花，更便于传播与吸引报名，也将提升在超能平台的推荐机会。"
               >
               </el-popover>
               <i class="el-icon-info" v-popover:popoverPoster></i>
@@ -131,7 +139,7 @@
         </el-form-item>
         <!-- 活动地址 -->
         <!-- <el-form-item prop="cityId" label="活动地址："> -->
-        <el-form-item label="活动地址：">
+        <el-form-item label="活动地址：" required>
           <div class="addressbox">
             <div v-if="!baseFormData.onLine" class="addressItem">
               <el-form-item prop="cityId">
@@ -187,30 +195,33 @@
           <el-button
             size="small"
             v-if="!haveInputVal"
-            @click="haveInputVal = true"
+            @click="editTag"
             class="el-icon-edit"
             >编辑</el-button
           >
           <!-- 填写标签 -->
           <el-autocomplete
-            @blur="handleBlur"
+            ref="autocompleteRef"
+            @keyup.enter.native="handleTagValFn"
             size="small"
-            autofocus
             v-if="haveInputVal"
             v-model="actInpVal"
             :fetch-suggestions="querySearch"
-            @keyup.enter.native="handleTagValFn"
             @select="handleTagValFn"
           ></el-autocomplete>
         </el-form-item>
         <!-- 活动亮点 -->
         <el-form-item prop="spot" label="活动亮点：">
-          <el-input
-            :rows="4"
-            placeholder="请填写几句活动核心亮点，便于分享摘要以及百度等搜索引擎搜索（150个字）"
-            type="textarea"
-            v-model="baseFormData.spot"
-          ></el-input>
+          <el-row>
+            <el-col :span="20">
+              <el-input
+                :rows="4"
+                placeholder="请填写几句活动核心亮点，便于分享摘要以及百度等搜索引擎搜索（150个字）"
+                type="textarea"
+                v-model="baseFormData.spot"
+              ></el-input>
+            </el-col>
+          </el-row>
         </el-form-item>
         <!-- 活动详情 -->
         <el-form-item prop="details" label="活动详情：">
@@ -309,7 +320,7 @@
                     </el-form-item>
                   </el-col>
                   <el-col :span="7">
-                    <el-form-item
+                    <!-- <el-form-item
                       v-if="item.ticketingType === '1'"
                       label="票种审核："
                       label-width="100"
@@ -320,7 +331,7 @@
                         inactive-color="#cccccc"
                       >
                       </el-switch>
-                    </el-form-item>
+                    </el-form-item> -->
                     <el-form-item
                       v-if="item.ticketingType === '2'"
                       label="允许退票："
@@ -419,6 +430,7 @@
       </el-form>
 
       <div class="form-collect">报名表单收集：</div>
+      
       <div class="tips" @click="toFormCollect" v-if="!showFormCollect">
         <i class="el-icon-plus"></i>
         如果您需要收集参与者的必要信息，请添加；若没有则跳过
@@ -1144,10 +1156,16 @@ export default {
       });
       cb(results);
     },
-    handleBlur() {},
-
+    handleBlur(){
+      // this.actInpVal = ''
+      this.haveInputVal = false
+    },
     // 选择活动标签
     handleTagValFn() {
+      if(this.actInpVal==''){
+        this.haveInputVal = false;
+        return
+      }
       this.baseFormData.label.push(this.actInpVal);
       this.actInpVal = "";
       this.haveInputVal = false;
@@ -1157,6 +1175,12 @@ export default {
     handleClose(tag) {
       this.baseFormData.label.splice(this.baseFormData.label.indexOf(tag), 1);
       this.$refs.baseFormDataRef.validateField("label");
+    },
+    editTag(){
+      this.haveInputVal = true
+      this.$nextTick(_=>{
+        this.$refs.autocompleteRef.focus()
+      })
     },
     // 活动附件上传成功的钩子
     handleAccessorySuccess(res, file) {
@@ -1578,13 +1602,14 @@ export default {
   margin-right: 60px;
 }
 .box-card {
-  width: 1100px;
+  width: 1050px;
 }
 .form-collect {
   width: 120px;
   text-align: right;
 }
 .tips {
+  width: 1000px;
   margin: 30px 0 30px 120px;
   border-radius: 10px;
   border: 1px solid #eff0f1;
@@ -1601,6 +1626,7 @@ export default {
   }
 }
 .form-card {
+  width: 1000px;
   margin: 30px 0 30px 120px;
   border-radius: 10px;
   border: 1px solid #eff0f1;

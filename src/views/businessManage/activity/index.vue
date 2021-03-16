@@ -198,7 +198,7 @@ export default {
         current: this.currentPage,
         size: this.pageSize,
       }).then((res) => {
-        // console.log(res);
+        console.log(res);
         if (res.data.code !== 0) {
           return this.$message.error("获取活动数据失败！");
         }

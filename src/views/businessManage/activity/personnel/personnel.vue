@@ -7,7 +7,7 @@
       </div>
       <div>
         <el-table :data="tableData" style="width: 100%">
-          <el-table-column prop="name" label="能者" width="180">
+          <el-table-column prop="name" label="名称" width="180">
           </el-table-column>
           <el-table-column label="报名信息" width="180">
             <template slot-scope="scope">
@@ -94,7 +94,7 @@
             >
             <el-form>
               <el-form-item
-                required
+                :required='formItem.must'
                 v-for="(formItem, indexF) in applyInfo.formItems || []"
                 :key="indexF"
                 :label="formItem.label"
@@ -103,7 +103,33 @@
                   :value="formItem.value"
                   disabled
                   autocomplete="off"
+                  v-if="formItem.type == 'input'"
                 ></el-input>
+                <el-input
+                  v-if="formItem.type == 'textarea'"
+                  disabled
+                  type="textarea"
+                  :rows="2"
+                  :value="formItem.value"
+                >
+                </el-input>
+                <el-radio
+                  v-else-if="formItem.type == 'radio'"
+                  v-for="(radioItem, indexR) in formItem.optionsList"
+                  disabled
+                  :key="indexR"
+                  :label="true"
+                  v-model="radioItem.select"
+                  >{{ radioItem.label }}</el-radio
+                >
+                <el-checkbox
+                  disabled
+                  v-else-if="formItem.type == 'checkbox'"
+                  v-for="(checkboxItem, indexC) in formItem.optionsList"
+                  v-model="checkboxItem.select"
+                  :key="indexC"
+                  :label="checkboxItem.label"
+                ></el-checkbox>
               </el-form-item>
             </el-form>
           </div>
