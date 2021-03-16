@@ -48,7 +48,7 @@
             <hc-image-upload :limit="1" v-model="formData.imageUrl"></hc-image-upload>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="handleSave">保存</el-button>
+            <el-button type="primary" :loading="formLoading" @click="handleSave">保 存</el-button>
           </el-form-item>
         </el-form>
         <avue-crud
@@ -84,7 +84,7 @@
             </el-form-item>
           </el-form>
           <div slot="footer">
-            <el-button v-show="formType == 'add'" type="primary" @click="addTopic">保 存</el-button>
+            <el-button v-show="formType == 'add'" type="primary" :loading="formLoading" @click="addTopic">保 存</el-button>
             <el-button @click="topicDialogVisible = false">取 消</el-button>
           </div>
         </el-dialog>
@@ -164,7 +164,8 @@ export default {
       formRule: {
         classifyName: [{required: true, message: '分类名称不能为空'}]
       },
-      boxLoading: false
+      boxLoading: false,
+      formLoading: false
     }
   },
   computed: {
@@ -241,6 +242,7 @@ export default {
       })
     },
     handleSave() {
+      this.formLoading = true
       this.$refs.form.validate(validate => {
         if (validate) {
           if (this.publishType == 'edit') {
@@ -253,7 +255,8 @@ export default {
               })
               this.publish = false
               this.$refs.hcCrud.refresh()
-            }).catch(() => {
+            }).finally(() => {
+              this.formLoading = false
             })
           } else if (this.publishType == 'add') {
             let form = {...this.formData}
@@ -271,8 +274,12 @@ export default {
               })
               this.publish = false
               this.$refs.hcCrud.refresh()
+            }).finally(() => {
+              this.formLoading = false
             })
           }
+        } else {
+          this.formLoading = false
         }
       })
     },
@@ -310,6 +317,7 @@ export default {
     },
     addTopic () {
       if (this.topicAdd.length > 0) {
+        this.formLoading = true
         if (this.publishType == 'edit') {
           let topicsBankIds = []
           let topicAdd = this.topicAdd
@@ -335,10 +343,13 @@ export default {
             }).then(({data}) => {
               this.tableData = data.data.data.records
             })
+          }).finally(() => {
+            this.formLoading = false
           })
         } else if (this.publishType == 'add') {
           this.tableData = [...this.tableData, ...this.topicAdd]
           this.topicDialogVisible = false
+          this.formLoading = false
         }
       }
     },

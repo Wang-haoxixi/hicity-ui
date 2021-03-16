@@ -84,8 +84,8 @@
           </el-form-item>
           <el-form-item>
             <el-button @click="handlePreview">预览</el-button>
-            <el-button @click="handleDraft">保存草稿</el-button>
-            <el-button @click="handleCreate">直接发布</el-button>
+            <el-button :loading="formLoading" @click="handleDraft">保存草稿</el-button>
+            <el-button :loading="formLoading" @click="handleCreate">直接发布</el-button>
           </el-form-item>
         </el-form>
         <hc-preview v-if="preview" @close="preview = false">
@@ -177,7 +177,8 @@ export default {
         cityIdList: [{required: true, message: '请选择城市'}],
         content: [{validator: this.contentValidator, required: true}]
       },
-      preview: false
+      preview: false,
+      formLoading: false,
     };
   },
   computed: {
@@ -289,9 +290,12 @@ export default {
       })
     },
     handleCreate() {
+      this.formLoading = true
       this.$refs.form.validate(valid => {
         if (valid) {
           this.save(1)
+        } else {
+          this.formLoading = false
         }
       })
     },
@@ -317,6 +321,8 @@ export default {
             duration: 2000,
           });
           this.$refs.hcCrud.refresh();
+        }).finally(() => {
+          this.formLoading = false
         });
       } else {
         updateNews({ ...formData, state }).then(({ data }) => {
@@ -328,6 +334,8 @@ export default {
             duration: 2000,
           });
           this.$refs.hcCrud.refresh();
+        }).finally(() => {
+          this.formLoading = false
         });
       }
     },
@@ -351,9 +359,12 @@ export default {
       });
     },
     handleDraft() {
+      this.formLoading = true
       this.$refs.form.validate(valid => {
         if (valid) {
           this.save(0)
+        } else {
+          this.formLoading = false
         }
       })
     },

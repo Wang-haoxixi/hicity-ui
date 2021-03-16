@@ -80,7 +80,7 @@
             </el-col>
           </el-row>
           <el-form-item label="关联品牌：" prop="brandId">
-            <hc-remote-select v-model="formData.brandId" :remote-fun="getAllBrand" :show-word="formData.brandName"></hc-remote-select>
+            <hc-remote-select style="width: 250px;" v-model="formData.brandId" :remote-fun="getAllBrand" :show-word="formData.brandName"></hc-remote-select>
           </el-form-item>
           <el-form-item label="店铺状态：" prop="merchantStatus">
             <el-radio-group v-model="formData.merchantStatus">
@@ -88,18 +88,26 @@
             </el-radio-group>
           </el-form-item>
           <el-form-item label="会员折扣：" prop="discount">
+            <hc-input style="width: 250px;" v-model="formData.discount" :decimal="2" maxlength="10" :max="9.99" :min="0.01">
+              <div slot="append">折</div>
+            </hc-input>
             <el-input v-model="formData.discount" maxlength="10"></el-input>
           </el-form-item>
           <el-form-item label="抽成类型：" prop="percentageType">
-            <el-select v-model="formData.percentageType" placeholder="请选择抽成类型" @change="percentageTypeChange">
+            <el-select style="width: 250px;" v-model="formData.percentageType" placeholder="请选择抽成类型" @change="percentageTypeChange">
               <el-option v-for="item in dicList['PERCENTAGE_TYPE']" :key="item.value" :value="item.value" :label="item.label">{{item.label}}</el-option>
             </el-select>
           </el-form-item>
           <el-form-item v-if="formData.percentageType == 2 || formData.percentageType == 3" :label="percentageLabel + '：'" prop="percentageMoney">
-            <el-input v-model="formData.percentageMoney" maxlength="100" :placeholder="'请输入' + percentageLabel"></el-input>
+            <hc-input v-if="formData.percentageType == 3" style="width: 250px;" v-model="formData.percentageMoney" :decimal="2" maxlength="20" :min="0">
+              <div slot="append">元</div>
+            </hc-input>
+            <hc-input v-else style="width: 250px;" v-model="formData.percentageMoney" :decimal="2" maxlength="10" :max="99.99" :min="0.01">
+              <div slot="append">%</div>
+            </hc-input>
           </el-form-item>
           <el-form-item>
-            <el-button v-if="publishType != 'view'" @click="handleCreate">保存</el-button>
+            <el-button v-if="publishType != 'view'" type="primary" :loading="formLoading" @click="handleCreate">保 存</el-button>
           </el-form-item>
         </el-form>
       </template>
@@ -124,8 +132,9 @@ import HcEmptyData from "@/views/components/HcEmptyData/index"
 import HcMapSelect from "@/views/components/HcMap/HcMapSelect/index"
 import HcRemoteSelect from "@/views/components/HcForm/HcRemoteSelect/index"
 import HcCitySelect from "@/views/components/HcCity/HcCitySelect/index"
+import HcInput from "@/views/components/HcForm/HcInput/index"
 export default {
-  components: { HcImageUpload, HcTableForm, HcEmptyData, HcMapSelect, HcRemoteSelect, HcCitySelect },
+  components: { HcImageUpload, HcTableForm, HcEmptyData, HcMapSelect, HcRemoteSelect, HcCitySelect, HcInput },
   data() {
     return {
       formData: {
@@ -144,19 +153,20 @@ export default {
       brandList: [],
       brandLoading: false,
       formRuleInit: {
-        merchantName: [{required: true, message: '请输入商户名称', trigger: 'change'}],
-        merchantSynopsis: [{required: true, message: '请输入商户介绍', trigger: 'change'}],
-        merchantLogo: [{required: true, message: '请添加商户Logo', trigger: 'change'}],
-        merchantUserName: [{required: true, message: '请输入联系人', trigger: 'change'}],
-        merchantUserPhone: [{required: true, message: '请输入联系电话', trigger: 'change'}],
-        cityId: [{required: true, message: '请选择所在城市', trigger: 'change'}],
-        address: [{required: true, message: '请输入详细地址', trigger: 'change'}],
-        brandId: [{required: true, message: '请选择关联品牌', trigger: 'change'}],
-        merchantStatus: [{required: true, message: '请选择店铺状态', trigger: 'change'}],
-        discount: [{required: true, message: '请输入会员折扣', trigger: 'change'}],
+        merchantName: [{required: true, message: '请输入商户名称', trigger: 'blur'}],
+        merchantSynopsis: [{required: true, message: '请输入商户介绍', trigger: 'blur'}],
+        merchantLogo: [{required: true, message: '请添加商户Logo', trigger: 'blur'}],
+        merchantUserName: [{required: true, message: '请输入联系人', trigger: 'blur'}],
+        merchantUserPhone: [{required: true, message: '请输入联系电话', trigger: 'blur'}],
+        cityId: [{required: true, message: '请选择所在城市', trigger: 'blur'}],
+        address: [{required: true, message: '请输入详细地址', trigger: 'blur'}],
+        brandId: [{required: true, message: '请选择关联品牌', trigger: 'blur'}],
+        merchantStatus: [{required: true, message: '请选择店铺状态', trigger: 'blur'}],
+        discount: [{required: true, message: '请输入会员折扣', trigger: 'blur'}],
         locationAddr: [{validator: this.locationAddrValidator, required: true, message: '请选择定位地址', trigger: 'change'}],
-        percentageType: [{required: true, message: '请选择抽成类型', trigger: 'change'}],
-      }
+        percentageType: [{required: true, message: '请选择抽成类型', trigger: 'blur'}],
+      },
+      formLoading: false
     };
   },
   computed: {
@@ -286,9 +296,12 @@ export default {
       this.barndList = []
     },
     handleCreate() {
+      this.formLoading = true
       this.$refs.form.validate(valid => {
         if (valid) {
           this.save(1)
+        } else {
+          this.formLoading = false
         }
       })
     },
@@ -309,6 +322,8 @@ export default {
             duration: 2000,
           });
           this.$refs.hcCrud.refresh()
+        }).finally(() => {
+          this.formLoading = false
         });
       } else {
         updateMerchant({ ...formData, merchantId: this.formData.merchantId }).then(({ data }) => {
@@ -320,6 +335,8 @@ export default {
             duration: 2000,
           });
           this.$refs.hcCrud.refresh()
+        }).finally(() => {
+          this.formLoading = false
         });
       }
     },

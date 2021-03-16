@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-input @focus="toSelect" :value="cityName" readonly></el-input>
-    <hc-city-box ref="hcCityBox" :single="single" @save="save"></hc-city-box>
+    <hc-city-box ref="hcCityBox" :title="title" :single="single" @save="save"></hc-city-box>
   </div>
 </template>
 
@@ -113,7 +113,11 @@ export default {
     single: {
       type: Boolean,
       default: false
-    }
+    },
+    title: {
+      type: String,
+      default: '展示城市'
+    },
   },
   data () {
     return {

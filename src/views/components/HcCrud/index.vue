@@ -99,6 +99,7 @@
       <hc-crud-form
         ref="form"
         :option="optionC"
+        :loading="formLoading"
         @handle-edit="handleUpdate"
         @handle-add="handleAdd"
       >
@@ -156,6 +157,7 @@ export default {
       tableLoading: false,
       searchForm: {},
       searchFormShow: {},
+      formLoading: false,
       page: {
         currentPage: 1,
         pageSize: 10,
@@ -312,15 +314,23 @@ export default {
       this.handleAutoEvent({type: 'delete', row})
     },
     handleAdd (row) {
+      this.formLoading = true
       this.addFun(row, () => {
+        this.formLoading = false
         this.$refs.form.close();
         this.refresh();
+      }, () => {
+        this.formLoading = false
       });
     },
     handleUpdate(row) {
+      this.formLoading = true
       this.updateFun(row, () => {
+        this.formLoading = false
         this.$refs.form.close();
         this.refresh();
+      }, () => {
+        this.formLoading = false
       });
     },
     toSearch() {

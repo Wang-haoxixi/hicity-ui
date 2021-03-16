@@ -1,15 +1,20 @@
 <template>
   <div>
     <el-dialog
-      title="展示城市"
+      :title="title"
       :visible.sync="dialogVisible"
       append-to-body
       width="70%">
       <div class="hc-city-box">
         <div class="city-result">
           <div class="city-result-label">展示范围：</div>
-          <div class="city-result-list">
-            <div v-for="(city, index) in cityShowSelected" :key="index" class="city-result-list-item">{{city}}</div>
+          <div v-if="viewOnly" class="city-result-list">
+            <div v-for="(city, index) in cityShowSelected" :key="index" class="city-result-list-item view">{{city.name}}</div>
+          </div>
+          <div v-else class="city-result-list">
+            <div v-for="(city, index) in cityShowSelected" :key="index" class="city-result-list-item">
+              <el-tag closable @close="handleClose(city)" style="height: 24px;line-height: 24px;">{{city.name}}</el-tag>
+            </div>
           </div>
         </div>
         <div class="city-select">
@@ -33,7 +38,7 @@
         <el-button v-if="!viewOnly" type="primary" @click="save">确 定</el-button>
       </div>
     </el-dialog>
-    <hc-city-box v-if="handleNext" ref="box" :single="single" @save="saveSelect"></hc-city-box>
+    <hc-city-box v-if="handleNext" ref="box" :title="title" :single="single" @save="saveSelect"></hc-city-box>
   </div>
 </template>
 
@@ -93,6 +98,10 @@ export default {
   name: 'HcCityBox',
   components: { HcCityBox, CityName },
   props: {
+    title: {
+      type: String,
+      default: '展示城市'
+    },
     single: {
       type: Boolean,
       default: false
@@ -121,14 +130,21 @@ export default {
         if (citySelected.children && citySelected.children.length > 0) {
           for (let i = 0; i < citySelected.children.length; i++) {
             let child = citySelected.children[i]
-            if (child.children && child.children.length > 0) {
-              citys.push(`${child.regionName}(${child.children.length})`)
-            } else {
-              citys.push(`${child.regionName}`)
+            let data = {
+              id: child.id
             }
+            if (child.children && child.children.length > 0) {
+              data.name = `${child.regionName}(${child.children.length})`
+            } else {
+              data.name = `${child.regionName}`
+            }
+            citys.push(data)
           }
         } else {
-          citys.push(`${citySelected.regionName}`)
+          citys.push({
+            id: citySelected.id,
+            name: citySelected.regionName
+          })
         }
       }
       return citys
@@ -234,6 +250,22 @@ export default {
                 regionName: city.regionName
               }]
             }
+          }
+        }
+      }
+    },
+    handleClose (city) {
+      if (this.citySelected.id == city.id) {
+        this.citySelected = null
+      } else {
+        let children = this.citySelected.children
+        for (let i = 0; i < children.length; i++) {
+          if (city.id == children[i].id) {
+            children.splice(i, 1)
+            if (children.length == 0) {
+              this.citySelected = null
+            }
+            break
           }
         }
       }
@@ -377,10 +409,16 @@ export default {
         height: 30px;
         line-height: 30px;
         &:not(:last-child) {
-          &::after {
-            content: '/';
-            padding: 0 5px;
-            color: #D9D9D9;
+          margin-right: 10px;
+        }
+        &.view {
+          &:not(:last-child) {
+            margin-right: 0;
+            &::after {
+              content: '/';
+              padding: 0 5px;
+              color: #D9D9D9;
+            }
           }
         }
       }

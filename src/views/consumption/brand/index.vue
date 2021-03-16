@@ -43,7 +43,7 @@
             <el-input type="textarea" v-model="formData.brandSynopsis" :autosize="{minRows: 5, maxRows: 10}" maxlength="250"></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button v-if="publishType != 'view'" @click="handleCreate">保存</el-button>
+            <el-button v-if="publishType != 'view'" type="primary" :loading="formLoading" @click="handleCreate">保 存</el-button>
           </el-form-item>
         </el-form>
       </template>
@@ -86,6 +86,7 @@ export default {
         brandSynopsis: [{required: true, message: '请输入品牌介绍', trigger: 'blur'}],
         brandLogo: [{required: true, message: '请添加品牌Logo', trigger: 'blur'}],
       },
+      formLoading: false
     };
   },
   computed: {
@@ -140,9 +141,12 @@ export default {
       }
     },
     handleCreate() {
+      this.formLoading = true
       this.$refs.form.validate(valid => {
         if (valid) {
           this.save(1)
+        } else {
+          this.formLoading = false
         }
       })
     },
@@ -163,6 +167,8 @@ export default {
             duration: 2000,
           });
           this.$refs.hcCrud.refresh({currentPage: 1})
+        }).finally(() => {
+          this.formLoading = false
         });
       } else {
         updateBrand({ ...formData, brandId: this.formData.brandId }).then(({ data }) => {
@@ -174,6 +180,8 @@ export default {
             duration: 2000,
           });
           this.$refs.hcCrud.refresh()
+        }).finally(() => {
+          this.formLoading = false
         });
       }
     },

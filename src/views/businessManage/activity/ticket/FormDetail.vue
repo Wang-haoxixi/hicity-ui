@@ -33,11 +33,11 @@
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item v-if="formData.ticketingType == 1" label="允许退票：" prop="allowedRefund">
-              <el-switch v-model="formData.allowedRefund" :active-value="1" :inactive-value="0"></el-switch>
-            </el-form-item>
-            <el-form-item v-if="formData.ticketingType == 2" label="票种审核：" prop="needAudit">
+            <el-form-item v-if="formData.ticketingType == 1" label="票种审核：" prop="needAudit">
               <el-switch v-model="formData.needAudit" :active-value="true" :inactive-value="false"></el-switch>
+            </el-form-item>
+            <el-form-item v-if="formData.ticketingType == 2" label="允许退票：" prop="allowedRefund">
+              <el-switch v-model="formData.allowedRefund" :active-value="1" :inactive-value="0"></el-switch>
             </el-form-item>
           </el-col>
         </el-row>
@@ -120,8 +120,8 @@ export default {
       if (ticket.ticketingType == '2') {
         this.price = ticket.rmb || 0.01
         this.priceTemp = this.price.toFixed(2)
-      } else {
         ticket.allowedRefund = ticket.allowedRefund ? 1 : 0
+      } else {
         this.price = 0.01
         this.priceTemp = '0.01'
       }
