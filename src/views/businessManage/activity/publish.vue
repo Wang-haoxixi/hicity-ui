@@ -160,7 +160,7 @@
                 ></el-input>
               </el-form-item>
             </div>
-            <el-checkbox v-model="baseFormData.onLine">线上举办</el-checkbox>
+            <el-checkbox v-model="baseFormData.onLine" class="checkbox">线上举办</el-checkbox>
           </div>
         </el-form-item>
         <!-- 活动分类 -->
@@ -208,6 +208,7 @@
             v-model="actInpVal"
             :fetch-suggestions="querySearch"
             @select="handleTagValFn"
+            @blur="handleBlur"
           ></el-autocomplete>
         </el-form-item>
         <!-- 活动亮点 -->
@@ -480,7 +481,7 @@
             </div>
             <div class="option-list" v-if="item.optionsList == [] || item.optionsList">
               <div>选项列表</div>
-              <div style="display: flex;align-items: center;">
+              <div class="list">
                 <el-tag class="tagitem" closable v-for="(tag,i) in item.optionsList" :key="i" @close="handleCloseOption(item,tag,i)">{{tag.label}}</el-tag>
                 <el-input ref="saveTagInput" @keyup.enter.native="handleSaveTag(item,index)" @blur="handleSaveTag(item,index)" v-if="item.isInput" v-model="item.inputValue" style="width:150px" size="mini"></el-input>
                 <el-button v-else icon="el-icon-plus" size="mini" @click="showInput(item,index)"></el-button>
@@ -525,6 +526,7 @@
 
 <script>
 import store from "@/store";
+import {dateFormat} from "@/util/date.js";
 import HcQuill from "@/views/components/HcQuill";
 import HcCitySelect from "@/views/components/HcCity/HcCitySelect/index";
 import { mapGetters } from "vuex";
@@ -546,7 +548,6 @@ export default {
     return {
       formLoading: false,
       isInput:false,
-      tagLabel:'',//tag值
       showFormCollect:false,
       defaultList: [],
       // 系统预置项
@@ -790,7 +791,7 @@ export default {
         ticketingManagements: [
           {
             ticketingType: "1", //票务种类
-            ticketingName: "", //票务名称
+            ticketingName: "免费票", //票务名称
             number: 1, //票种数量
             limitTicket: 1, //单次购票数量
             allowedRefund: false, //是否允许退款
@@ -1105,7 +1106,7 @@ export default {
     addTic() {
       let setTicketData = {
         ticketingType: "1", //票务种类
-        ticketingName: "", //票务名称
+        ticketingName: "免费票", //票务名称
         number: 1, //票种数量
         limitTicket: 1, //单次购票数量
         allowedRefund: false, //是否允许退款
@@ -1159,7 +1160,7 @@ export default {
     },
     handleBlur(){
       // this.actInpVal = ''
-      this.haveInputVal = false
+      // this.haveInputVal = false
     },
     // 选择活动标签
     handleTagValFn() {
@@ -1234,6 +1235,9 @@ export default {
       item.optionsList.splice(i,1)
     },
     showInput(item,index){
+      if(item.optionsList.length>=30){
+        return this.$message.warning('子项最多可以添加30条')
+      }
       this.customList.forEach((m,i)=>{
         if(i==index){
           m.isInput = true
@@ -1247,6 +1251,13 @@ export default {
         item.isInput = false
         return
       }
+      // 此处判断标签数组中是否与输入值一致，若一致返回true
+      let rst =  item.optionsList.some(tagItem=>{
+        return tagItem.label == item.inputValue
+      })
+      if(rst){
+        return this.$message.warning('选项已存在')
+      }
       let num = item.optionsList.length
       let opt = {
         label: item.inputValue,
@@ -1254,8 +1265,6 @@ export default {
         value: num + 1
       }
       item.optionsList.push(opt)
-      if(this.tagLabel){
-      }
       item.inputValue = ''
       item.isInput = false
     },
@@ -1409,14 +1418,15 @@ export default {
         }
       })
       this.baseFormData.conferenceFormList = [...this.defaultList,...this.customList]
-      this.$refs.baseFormDataRef.validate((valid1) => {
-        this.$refs.setTicketDataRef.forEach((item) => {
-          item.validate((valid2) => {
-            that.validRst.push(valid2);
-            return false;
-          });
-        });
-        if (!this.validRst.includes(false) && valid1) {
+      console.log(this.baseFormData)
+      // this.$refs.baseFormDataRef.validate((valid1) => {
+      //   this.$refs.setTicketDataRef.forEach((item) => {
+      //     item.validate((valid2) => {
+      //       that.validRst.push(valid2);
+      //       return false;
+      //     });
+      //   });
+      //   if (!this.validRst.includes(false) && valid1) {
           savePublish(this.baseFormData).then((res) => {
             if (res.data.code !== 0) {
               return this.$message.error("保存草稿失败");
@@ -1428,12 +1438,12 @@ export default {
           }).finally(() => {
             this.formLoading = false
           });
-        } else {
-          this.$message.error("活动信息填写不完整");
-          this.validRst = [];
-          this.formLoading = false
-        }
-      });
+      //   } else {
+      //     this.$message.error("活动信息填写不完整");
+      //     this.validRst = [];
+      //     this.formLoading = false
+      //   }
+      // });
     },
 
     // 编辑 - 保存草稿0
@@ -1514,8 +1524,17 @@ export default {
     mouseLeave() {
       this.showDelete = false;
     },
+    // 获取当前时间
+    getCurrentTime(){
+      this.baseFormData.startTime = dateFormat(new Date())
+    },
+    getNextTime(){
+      this.baseFormData.endTime = dateFormat(new Date(new Date().getTime() + 1000*3600*24))
+    }
   },
   created() {
+    this.getCurrentTime()
+    this.getNextTime()
     this.getActivityClassify();
     this.getCityTree();
     this.getActivityType();
@@ -1535,7 +1554,7 @@ export default {
   align-items: center;
 }
 .elForm {
-  width: 1100px;
+  max-width: 1100px;
 }
 .poster-box {
   width: 400px;
@@ -1581,11 +1600,18 @@ export default {
   display: flex;
   .addressItem{
     display: flex;
+    .el-form-item:first-child{
+      // flex-shrink:0;
+    }
     .el-form-item:last-child{
+      flex: 1;
       ::v-deep .el-form-item__error{
         padding-left: 10px;
       }
     }
+  }
+  .checkbox{
+
   }
 }
 .posterInpBox {
@@ -1693,8 +1719,21 @@ export default {
     .option-list{
       margin-left: 60px;
       margin-bottom: 15px;
-      .tagitem{
-        margin-right: 10px;
+      .list{
+        display: flex;
+        flex-direction: column;
+        .tagitem{
+          // margin-right: 10px;
+          width: fit-content;
+          margin-top: 10px;
+        }
+        .el-button{
+          width: fit-content;
+          margin-top: 10px;
+        }
+        .el-input{
+          margin-top: 10px;
+        }
       }
     }
   }

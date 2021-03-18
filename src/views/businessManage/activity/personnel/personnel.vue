@@ -83,12 +83,14 @@
           width="50%"
         >
           <div>
+              <!-- :plain='item.actived' -->
             <el-button
               size="mini"
               type="primary"
               class="tagInfo"
               @click="changeName(item, index)"
               v-for="(item, index) in applyInfoForm"
+              plain
               :key="index"
               >{{ item.formItems[0].value }}</el-button
             >
@@ -260,6 +262,9 @@ export default {
       formInquire({ enroleId: enroleId }).then((res) => {
         // console.log(res);
         this.applyInfoForm = res.data.data.data;
+        // this.applyInfoForm.forEach(item=>{
+        //   item.actived = true
+        // })
         if (this.applyInfoForm && this.applyInfoForm.length > 0) {
           this.applyInfo = this.applyInfoForm[0];
         }
@@ -307,8 +312,9 @@ export default {
       this.getPeopleManagementList();
     },
     changeName(item, index) {
-      // console.log(item, index);
+      // item.actived = false
       this.applyInfo = item;
+      
     },
     handleCheckAllChange(val) {
       // console.log(val);
