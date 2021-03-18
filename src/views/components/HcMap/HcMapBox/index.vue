@@ -11,7 +11,7 @@
       <div id="hc-map"></div>
     </div>
     <div slot="footer">
-      <el-button @click="dialogVisible = false">取 消</el-button>
+      <el-button @click="cancel">取 消</el-button>
       <el-button type="primary" @click="addressSelect">确 定</el-button>
     </div>
   </el-dialog>
@@ -165,7 +165,18 @@ export default {
       this.$emit('select', {address : {...this.tempAddress}, city: this.city})
       this.dialogVisible = false
     },
+    mapClean () {
+      this.map && this.map.clearMap()
+      this.searchAddress = ''
+      this.tempAddress = {}
+    },
+    cancel () {
+      this.mapClean()
+      this.dialogVisible = false
+      
+    },
     dialogBeforeClose (next) {
+      this.mapClean()
       next()
     }
   }
