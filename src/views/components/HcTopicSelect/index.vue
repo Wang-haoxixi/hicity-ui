@@ -27,6 +27,7 @@
         </div>
       </div>
       <div slot="footer">
+        <el-button @click="clearSelect" type="danger">清 空</el-button>
         <el-button @click="classifyChooseDialogVisible = false">取 消</el-button>
       </div>
     </el-dialog>
@@ -133,6 +134,12 @@ export default {
       this.topicChooseDialogVisible = false
       this.topicShow = topic.topicsName
       this.$emit('input', [topic.id])
+    },
+    clearSelect () {
+      this.classifyChooseDialogVisible = false
+      this.topicChooseDialogVisible = false
+      this.topicShow = ''
+      this.$emit('input', [])
     }
   }
 }

@@ -88,7 +88,7 @@
             :key="relation.brandId"
             class="brand-list-item">
             <el-image class="brand-list-item-logo" :src="relation.brandLogo"></el-image>
-            <div class="brand-list-item-name">{{relation.brandName}}</div>
+            <hc-text-line :text="relation.brandName" class="brand-list-item-name" text-align="center"></hc-text-line>
           </div>
         </div>
         <hc-empty-data v-else></hc-empty-data>
@@ -109,8 +109,9 @@ import HcTableForm from "@/views/components/HcTableForm/index"
 import HcEmptyData from "@/views/components/HcEmptyData/index"
 import ModuleBgList from './ModuleBgList.vue'
 import HcRemoteSelect from "@/views/components/HcForm/HcRemoteSelect/index"
+import HcTextLine from "@/views/components/HcTextLine/index"
 export default {
-  components: { HcImageUpload, HcTableForm, HcEmptyData, ModuleBgList, HcRemoteSelect },
+  components: { HcImageUpload, HcTableForm, HcEmptyData, ModuleBgList, HcRemoteSelect, HcTextLine },
   data () {
     return {
       formData: {
@@ -150,7 +151,8 @@ export default {
         ]
       },
       formRule: {
-        // classifyName: [{required: true, message: '分类名称不能为空'}]
+        brandClassificationName: [{required: true, message: '分类名称不能为空'}],
+        brandClassificationBg: [{required: true, message: '模板图片不能为空'}],
       },
       relations: [],
       boxLoading: false,
@@ -457,7 +459,6 @@ export default {
     }
     .brand-list-item-name {
       margin-top: 20px;
-      height: 30px;
       line-height: 30px;
       text-align: center;
     }

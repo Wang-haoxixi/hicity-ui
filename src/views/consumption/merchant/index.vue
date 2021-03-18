@@ -13,17 +13,8 @@
             @click="toCreate"
             >新建</el-button>
         </template>
-        <template v-slot:qrcode>
-          <el-popover
-            placement="left"
-            trigger="click">
-            <template v-slot:reference>
-              <el-button type="text" size="mini">查看</el-button>
-            </template>
-            <template v-slot>
-              <el-image class="qr-image" src="/img/image-qrcode.png"></el-image>
-            </template>
-          </el-popover>
+        <template v-slot:qrcode="scope">
+          <merchant-qr-code :id="scope.row.merchantId"></merchant-qr-code>
         </template>
         <template slot="menu" slot-scope="scope">
           <template>
@@ -91,7 +82,6 @@
             <hc-input style="width: 250px;" v-model="formData.discount" :decimal="2" maxlength="10" :max="9.99" :min="0.01">
               <div slot="append">折</div>
             </hc-input>
-            <el-input v-model="formData.discount" maxlength="10"></el-input>
           </el-form-item>
           <el-form-item label="抽成类型：" prop="percentageType">
             <el-select style="width: 250px;" v-model="formData.percentageType" placeholder="请选择抽成类型" @change="percentageTypeChange">
@@ -133,8 +123,9 @@ import HcMapSelect from "@/views/components/HcMap/HcMapSelect/index"
 import HcRemoteSelect from "@/views/components/HcForm/HcRemoteSelect/index"
 import HcCitySelect from "@/views/components/HcCity/HcCitySelect/index"
 import HcInput from "@/views/components/HcForm/HcInput/index"
+import MerchantQrCode from "@/views/components/BusinessComponents/MerchantQrCode/index"
 export default {
-  components: { HcImageUpload, HcTableForm, HcEmptyData, HcMapSelect, HcRemoteSelect, HcCitySelect, HcInput },
+  components: { HcImageUpload, HcTableForm, HcEmptyData, HcMapSelect, HcRemoteSelect, HcCitySelect, HcInput, MerchantQrCode },
   data() {
     return {
       formData: {
@@ -176,7 +167,7 @@ export default {
     },
     formRule () {
       let formRule = this.formRuleInit
-      formRule.percentageMoney = [{required: true, message: `请输入${this.percentageLabel}`, trigger: 'change'}]
+      formRule.percentageMoney = [{required: true, message: `请输入${this.percentageLabel}`, trigger: 'blur'}]
       return formRule
     },
     percentageLabel () {

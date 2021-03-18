@@ -37,3 +37,10 @@ export function deleteMerchant (data) {
     data
   })
 }
+
+export function getMerchantQrCode (params) {
+  return request({
+    url: '/mms/merchant/get/qr/code',
+    params
+  })
+}

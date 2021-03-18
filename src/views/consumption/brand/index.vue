@@ -100,7 +100,7 @@ export default {
       } else {
         if (this.publishType == 'add') {
           return '品牌信息-新增'
-        } else if (this.publishType == 'eidit') {
+        } else if (this.publishType == 'edit') {
           return '品牌信息-编辑'
         } else if (this.publishType == 'view') {
           return '品牌信息-详情'

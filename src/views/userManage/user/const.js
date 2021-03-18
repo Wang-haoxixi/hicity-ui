@@ -58,6 +58,7 @@ export const tableOption = {
     type: 'password',
     editValue: '',
     hidden: true,
+    maxlength: 20,
     span: 24,
     rules: [{
       min: 6,

@@ -374,7 +374,7 @@ export default {
       // console.log()
     },
     toDelete({ newsId }) {
-      this.$confirm("是否确认删除该条资讯?", "警告", {
+      this.$confirm("是否确认删除该条城市新闻?", "警告", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
