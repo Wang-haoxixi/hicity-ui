@@ -24,9 +24,8 @@ export const tableOption = (admin = false) => {
   }
 
   let option = {
-    menuWidth: 120,
+    menuWidth: 100,
     menu: true,
-    header: true,
     columns
   }
   

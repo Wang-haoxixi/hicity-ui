@@ -211,7 +211,7 @@ export default {
           content: formData.content,
           publishedSources: formData.publishedSources
         }
-        this.topicName = formData.topicsBankList && formData.topicsBankList[0].topicsName || ''
+        this.topicName = formData.topicsBankList && formData.topicsBankList.length > 0 && formData.topicsBankList[0].topicsName || ''
         this.publish = true;
         this.publishType = "edit";
       });

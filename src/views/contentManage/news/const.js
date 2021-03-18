@@ -64,7 +64,6 @@ export const tableOption = (admin = false) => {
     ],
     menuWidth: 120,
     columns,
-    header: true,
   }
   return option
 }

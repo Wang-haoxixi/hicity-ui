@@ -58,7 +58,7 @@ export default {
       tagList: [],
       boxLoading: false,
       tableOption: {
-        menu: ['add'],
+        addBtn: true,
         labelWidth: '150px',
         columns: [
           {
@@ -205,7 +205,6 @@ export default {
 
 <style lang="scss" scoped>
 .column-box {
-  margin-top: 24px;
   display: grid;
   grid-template-columns: repeat(auto-fill, 250px);
   grid-template-rows: repeat(auto-fill, 90px);

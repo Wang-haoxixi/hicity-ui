@@ -1,14 +1,6 @@
 <template>
   <div class="user">
     <hc-crud ref="hcCrud" :option="tableOption" :fetchListFun="fetchListFun" :addFun="addFun" :updateFun="updateFun">
-      <template slot="menuLeft">
-        <el-button
-          type="primary"
-          size="mini"
-          icon="el-icon-plus"
-          @click="handleCreate"
-          >新建</el-button>
-      </template>
       <template
         v-if="userInfo.userId !== scope.row.userId"
         slot="menu"

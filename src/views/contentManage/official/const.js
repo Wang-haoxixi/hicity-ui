@@ -59,9 +59,8 @@ export const tableOption = (admin = false) => {
         fun: "toDelete"
       }
     ],
-    menuWidth: "180px",
+    menuWidth: "100px",
     columns,
-    header: true
   };
   return option;
 };

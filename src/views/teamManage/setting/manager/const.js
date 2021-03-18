@@ -89,9 +89,8 @@ export const tableOption = (edit = false) => {
   ]
   let option = {
     labelWidth: '150px',
-    header: true,
     menu: true,
-    menuWidth: 220,
+    menuWidth: 200,
     columns
   }
   return option

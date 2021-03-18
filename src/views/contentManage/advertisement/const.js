@@ -54,10 +54,10 @@ export const tableOption = (admin = false) => {
   }
 
   let option = {
-    menuWidth: 120,
-    menu: ['add', 'edit', 'delete'],
+    menuWidth: 100,
+    addBtn: true,
+    menu: ['edit', 'delete'],
     labelWidth: '120px',
-    header: true,
     columns
   }
   

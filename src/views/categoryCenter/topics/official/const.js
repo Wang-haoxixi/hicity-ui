@@ -24,8 +24,9 @@ export const tableOption = (admin = false) => {
   let option = {
     index: true,
     labelWidth: '160px',
-    menuWidth: 150,
-    menu: ['add', 'edit', 'delete'],
+    addBtn: true,
+    menuWidth: 100,
+    menu: ['edit', 'delete'],
     columns
   }
   

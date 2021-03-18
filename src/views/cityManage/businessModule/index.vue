@@ -168,7 +168,6 @@ export default {
   justify-content: space-between;
 }
 .city-box {
-  margin-top: 24px;
   display: grid;
   grid-template-columns: repeat(auto-fill, 250px);
   grid-template-rows: repeat(auto-fill, 90px);

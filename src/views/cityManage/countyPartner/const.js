@@ -1,7 +1,7 @@
 export const tableOption = (edit = false, admin = false) => {
   let option = {
     labelWidth: 160,
-    menuWidth: 220,
+    menuWidth: 90,
     menu: true,
     columns: [
       {

@@ -1,5 +1,6 @@
 export const tableOption = {
-  menu: ['add', 'edit', 'delete'],
+  addBtn: true,
+  menu: ['edit', 'delete'],
   labelWidth: '150px',
   columns: [
     {

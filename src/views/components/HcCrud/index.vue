@@ -39,15 +39,14 @@
       </el-form>
     </slot>
     <!-- 新建 -->
-    <div v-if="optionC.header || autoAdd" class="hc-crud-header">
+    <div v-if="optionC.header" class="hc-crud-header">
       <div class="menu-left">
-        <el-button v-if="autoAdd" type="primary" size="mini" icon="el-icon-plus" @click="toCreate">新建</el-button>
-        <template v-else>
-          <slot  name="menuLeft"></slot>
-        </template>
+        <el-button v-if="optionC.addBtn" type="primary" :size="optionC.headerSize" icon="el-icon-plus" @click="toCreate">新建</el-button>
+        <slot name="menuLeft"></slot>
       </div>
-      <div v-if="optionC.header" class="menu-right">
+      <div class="menu-right">
         <slot name="menuRight"></slot>
+        <el-button v-if="optionC.refresh" icon="el-icon-refresh" circle :size="optionC.headerSize" @click="handleRefresh"></el-button>
       </div>
     </div>
     <!-- 表格 -->
@@ -167,6 +166,8 @@ export default {
   computed: {
     optionC () {
       return {
+        header: true,
+        headerSize: 'mini',
         refresh: true,
         ...this.option
       }
@@ -248,6 +249,11 @@ export default {
         ...page,
       };
       return this.getList();
+    },
+    handleRefresh () {
+      this.refresh({
+        currentPage: 1
+      })
     },
     getList() {
       return new Promise((resolve, reject) => {

@@ -163,7 +163,6 @@ export default {
 
 <style lang="scss" scoped>
 .tag-box {
-  margin-top: 24px;
   display: grid;
   grid-template-columns: repeat(auto-fill, 250px);
   grid-template-rows: repeat(auto-fill, 90px);

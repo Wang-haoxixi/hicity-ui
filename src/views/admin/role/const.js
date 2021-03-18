@@ -43,7 +43,6 @@ export const tableOption = (admin = false) => {
     index: true,
     indexLabel: '序号',
     labelWidth: '150px',
-    header: true,
     menu: true,
     menuWidth: 240,
     columns

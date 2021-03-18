@@ -4,7 +4,7 @@
       :title="title"
       :formVisible="publish"
       @go-back="publish = false">
-      <hc-crud ref="hcCrud" :option="{header: true}" :fetchListFun="fetchListFun">
+      <hc-crud ref="hcCrud" :fetchListFun="fetchListFun">
         <el-button
           slot="menuLeft"
           class="filter-item"
@@ -393,7 +393,6 @@ export default {
 
 <style lang="scss" scoped>
 .classify-box {
-  margin-top: 24px;
   display: grid;
   grid-template-columns: repeat(auto-fill, 250px);
   grid-template-rows: repeat(auto-fill, 292px);

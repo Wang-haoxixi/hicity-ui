@@ -1,15 +1,10 @@
 export const tableOption = {
-  menuWidth: "180px",
-  // header: true,
+  menuWidth: 100,
   menu: [
     {
       label: "查看详情",
       fun: "handleView"
     },
-    // "add",
-    // "view",
-    // "edit",
-    // "delete"
   ],
   columns: [
     {

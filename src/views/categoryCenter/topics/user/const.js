@@ -10,7 +10,7 @@ export const tableOption = (admin = false) => {
     menu: true,
     index: true,
     labelWidth: '160px',
-    menuWidth: 150,
+    menuWidth: 100,
     columns
   }
   

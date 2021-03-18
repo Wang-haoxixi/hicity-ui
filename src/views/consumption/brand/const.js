@@ -19,10 +19,9 @@ export const tableOption = (admin = false) => {
   ]
 
   let option = {
-    header: true,
     menu: true,
     labelWidth: 160,
-    menuWidth: 150,
+    menuWidth: 120,
     columns
   }
   
