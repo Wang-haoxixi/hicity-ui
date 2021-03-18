@@ -12,6 +12,7 @@
         @row-update="handleUpdate"
         @row-save="handleSave"
         @search-change="searchChange"
+        @refresh-change="refreshChange"
         @row-del="rowDel">
         <template
           slot-scope="scope"
@@ -186,6 +187,9 @@ export default {
     searchChange(form) {
       this.searchForm = form
       this.getList(this.page, form)
+    },
+    refreshChange() {
+      this.getList(this.page)
     },
     handleItem: function(row) {
       this.dictId = row.id

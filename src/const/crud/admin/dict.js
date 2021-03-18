@@ -7,8 +7,9 @@ export const tableOption = {
   stripe: true,
   menuAlign: 'center',
   align: 'center',
-  refreshBtn: false,
   showClomnuBtn: false,
+  searchBtn: false,
+  columnBtn: false,
   searchSize: 'mini',
   column: [{
     label: '类型',

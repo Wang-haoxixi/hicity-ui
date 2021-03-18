@@ -9,6 +9,7 @@ export const tableOption = (admin = false) => {
     {
       label: '名称',
       prop: 'title',
+      slot: true
     },
     {
       label: '标签',
@@ -19,6 +20,7 @@ export const tableOption = (admin = false) => {
     {
       label: '发布者',
       prop: 'createByName',
+      width: 180
     },
     {
       label: '状态',
@@ -39,6 +41,7 @@ export const tableOption = (admin = false) => {
     {
       label: '创建时间',
       prop: 'createTime',
+      width: 160
     },
     
   ]

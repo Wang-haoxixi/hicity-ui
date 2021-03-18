@@ -16,6 +16,8 @@ export const tableOption = {
   addBtn: false,
   editBtn: false,
   viewBtn: true,
+  searchBtn: false,
+  columnBtn: false,
   props: {
     label: 'label',
     value: 'value'

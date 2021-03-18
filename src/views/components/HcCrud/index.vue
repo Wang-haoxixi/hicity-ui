@@ -251,9 +251,7 @@ export default {
       return this.getList();
     },
     handleRefresh () {
-      this.refresh({
-        currentPage: 1
-      })
+      this.refresh()
     },
     getList() {
       return new Promise((resolve, reject) => {

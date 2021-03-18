@@ -34,7 +34,7 @@
           :disabled="publishType == 'view'"
         >
           <el-form-item label="品牌名称：" prop="brandName">
-            <el-input v-model="formData.brandName" maxlength="200"></el-input>
+            <el-input v-model="formData.brandName" maxlength="10"></el-input>
           </el-form-item>
           <el-form-item label="品牌Logo：" prop="brandLogo">
             <hc-image-upload :limit="1" v-model="formData.brandLogo"></hc-image-upload>

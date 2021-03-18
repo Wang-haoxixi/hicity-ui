@@ -5,6 +5,9 @@
       :formVisible="publish"
       @go-back="goBack">
       <hc-crud ref="hcCrud" :option="tableOption" :fetchListFun="fetchListFun" @toUpdate="toUpdate" @toDelete="toDelete">
+        <template v-slot:title="scope">
+          <hc-text-line :text="scope.row.title" :lines="3" :line-height="20"></hc-text-line>
+        </template>
         <template slot="menuLeft">
           <el-button
             type="primary"
@@ -145,9 +148,10 @@ import HcImageUpload from "@/views/components/HcImageUpload/index";
 import HcTableForm from "@/views/components/HcTableForm/index"
 import HcEmptyData from "@/views/components/HcEmptyData/index"
 import HcPreview from "@/views/components/HcPreview/index"
+import HcTextLine from "@/views/components/HcTextLine/index";
 
 export default {
-  components: { HcQuill, HcCityBox, HcCitySelect, HcImageUpload, HcTableForm, HcEmptyData, HcPreview },
+  components: { HcQuill, HcCityBox, HcCitySelect, HcImageUpload, HcTableForm, HcEmptyData, HcPreview, HcTextLine },
   data() {
     return {
       formData: {

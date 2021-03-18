@@ -37,6 +37,7 @@ export const tableOption = () => {
     addBtn: false,
     labelWidth: 160,
     menuWidth: 220,
+    columnBtn: false,
     column: [
       {
         prop: "id",

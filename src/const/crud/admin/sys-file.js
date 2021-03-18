@@ -8,6 +8,8 @@ export const tableOption = {
   viewBtn:false,
   editBtn:false,
   addBtn: false,
+  searchBtn: false,
+  columnBtn: false,
   column: [
 	  {
       label: '编号',

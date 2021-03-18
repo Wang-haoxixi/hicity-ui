@@ -9,6 +9,9 @@
         @toDelete="toDelete"
         ref="hcCrud"
       >
+        <template v-slot:officialNewsName="scope">
+          <hc-text-line :text="scope.row.officialNewsName" :lines="3" :line-height="20"></hc-text-line>
+        </template>
         <div slot="menuLeft">
           <el-button
             @click="toCreate"
@@ -161,6 +164,7 @@ import { adminCityList } from "@/api/admin/city";
 import HcTableForm from "@/views/components/HcTableForm/index";
 import HcEmptyData from "@/views/components/HcEmptyData/index";
 import HcPreview from "@/views/components/HcPreview/index";
+import HcTextLine from "@/views/components/HcTextLine/index";
 
 // -------------
 import { tableOption } from "./const.js";
@@ -173,6 +177,7 @@ export default {
     HcTableForm,
     HcEmptyData,
     HcPreview,
+    HcTextLine
   },
   data() {
     return {

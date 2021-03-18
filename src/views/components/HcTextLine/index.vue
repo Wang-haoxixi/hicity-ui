@@ -47,12 +47,6 @@ export default {
       }
     }
   },
-  updated () {
-    let textHeight = this.$refs.text.clientHeight
-    if (this.lineHeight * this.lines < textHeight) {
-      this.ellipsis = true
-    }
-  },
   mounted() {
     let textHeight = this.$refs.text.clientHeight
     if (this.lineHeight * this.lines < textHeight) {

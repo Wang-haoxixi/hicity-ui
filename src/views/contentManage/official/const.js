@@ -4,19 +4,22 @@ export const tableOption = (admin = false) => {
       prop: "searchName",
       label: "名称",
       search: true,
-      hidden: true
+      hidden: true,
     },
     {
       prop: "officialNewsName",
-      label: "名称"
+      label: "名称",
+      slot: true,
     },
     {
       prop: "officialColumnName",
-      label: "栏目"
+      label: "栏目",
+      width: 120
     },
     {
       prop: "createByName",
-      label: "发布者"
+      label: "发布者",
+      width: 180,
     },
     {
       prop: "state",
@@ -36,7 +39,8 @@ export const tableOption = (admin = false) => {
     },
     {
       prop: "createTime",
-      label: "创建时间"
+      label: "创建时间",
+      width: 160
     }
   ];
   if (admin) {
