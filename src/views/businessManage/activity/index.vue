@@ -335,7 +335,6 @@ export default {
   text-align: right;
 }
 .managBtn {
-  color: #c0c4cc;
   font-size: 14px;
 }
 </style>
