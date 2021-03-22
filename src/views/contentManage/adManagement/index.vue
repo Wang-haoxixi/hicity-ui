@@ -1,128 +1,34 @@
 <template>
   <basic-container>
     <hc-table-form title="广告管理">
-      <template>
-        <div class="add-inp-more">
+      <hc-crud ref="hcCrud" :option="tableOption" :fetchListFun="fetchListFun">
+        <template v-slot:menuLeft>
           <el-button
             @click="dialogFormVisible = true"
             type="primary"
             size="mini"
             icon="el-icon-plus"
-            >新建</el-button
-          >
-          <div class="inp-more">
-            <!-- <el-input
-            clearable
-            size="mini"
-            class="inp"
-            v-model="input"
-            placeholder="请输入广告位名称"
-          >
-            <el-button slot="append" icon="el-icon-search"></el-button>
-          </el-input> -->
-            <el-button
-              icon="el-icon-more"
-              class="more"
-              @click="dialogOpenMoreVisible = true"
-            ></el-button>
-            <el-dialog
-              title="多 选"
-              :visible.sync="dialogOpenMoreVisible"
-              width="600px"
-            >
-              <el-checkbox-group v-model="checkList">
-                <el-checkbox label="广告排序"></el-checkbox>
-                <el-checkbox label="广告缩略图"></el-checkbox>
-                <el-checkbox label="广告名称"></el-checkbox>
-                <el-checkbox label="广告位"></el-checkbox>
-                <el-checkbox label="开始时间"></el-checkbox>
-                <el-checkbox label="结束时间"></el-checkbox>
-              </el-checkbox-group>
-            </el-dialog>
+            >新增</el-button>
+        </template>
+        <template v-slot:imageUrl="scope">
+          <div class="picbox">
+            <img :src="scope.row.imageUrl" class="pic" />
           </div>
-        </div>
-        <el-table
-          :data="tableData"
-          border
-          stripe
-          :header-cell-style="{ background: '#FAFAFA' }"
-          style="width: 100%; margin-top: 10px"
-          ref="multipleTable"
-          v-loading="tableLoading"
-        >
-          <!-- <el-table-column type="selection" width="55"></el-table-column> -->
-          <el-table-column
-            v-if="checkList.includes('广告排序')"
-            align="center"
-            prop="seq"
-            label="广告排序"
-            width="100"
-          ></el-table-column>
-          <el-table-column
-            v-if="checkList.includes('广告缩略图')"
-            align="center"
-            prop="imageUrl"
-            label="广告缩略图"
-            width="180"
-          >
-            <template slot-scope="scope">
-              <div class="picbox">
-                <img :src="scope.row.imageUrl" class="pic" />
-              </div>
-            </template>
-          </el-table-column>
-          <el-table-column
-            v-if="checkList.includes('广告名称')"
-            align="center"
-            prop="adName"
-            label="广告名称"
-          ></el-table-column>
-          <el-table-column
-            v-if="checkList.includes('广告位')"
-            align="center"
-            prop="adslotName"
-            label="广告位"
-          ></el-table-column>
-          <el-table-column
-            v-if="checkList.includes('开始时间')"
-            align="center"
-            prop="beginDate"
-            label="开始时间"
-          ></el-table-column>
-          <el-table-column
-            v-if="checkList.includes('结束时间')"
-            align="center"
-            prop="endDate"
-            label="结束时间"
-          ></el-table-column>
-          <el-table-column align="center" label="操作" width="150">
-            <template slot-scope="scope" v-if="scope.row.authority">
-              <el-button size="mini" type="text" @click="handleEdit(scope.row)"
-                >编辑</el-button
-              >
-              <el-button
-                size="mini"
-                type="text"
-                @click="handleDelete(scope.row)"
-                >删除</el-button
-              >
-            </template>
-          </el-table-column>
-          <template slot="empty">
-            <hc-empty-data></hc-empty-data>
+        </template>
+
+        <template v-slot:menu="scope">
+          <template v-if="scope.row.authority">
+            <el-button
+              size="mini"
+              type="text"
+              @click="handleEdit(scope.row)">编辑</el-button>
+            <el-button
+              size="mini"
+              type="text"
+              @click="handleDelete(scope.row)">删除</el-button>
           </template>
-        </el-table>
-        <el-pagination
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          :current-page="currentPage"
-          :page-sizes="[10, 20, 30, 40, 50, 100]"
-          :page-size="pageSize"
-          :total="total"
-          class="paging"
-          layout="total, sizes, prev, pager, next, jumper"
-        ></el-pagination>
-      </template>
+        </template>
+      </hc-crud>
     </hc-table-form>
     <!-- 广告新增 -->
     <el-dialog
@@ -462,6 +368,7 @@ import {
   addAd,
   updateAd,
 } from "@/api/content/ad";
+import { tableOption } from './const.js'
 import { adPosition } from "@/api/content/ad-position";
 import store from "@/store";
 import HcEmptyData from "@/views/components/HcEmptyData/index";
@@ -469,7 +376,7 @@ export default {
   components: { HcEmptyData },
   data() {
     return {
-      tableData: [],
+      tableOption: tableOption,
       imageUrl: "",
       baseUrl: "/api/admin/sys_file/oss/upload", //oss上传文件
       headersOpt: {
@@ -477,16 +384,6 @@ export default {
       },
       dialogFormVisible: false, //新增广告弹窗
       dialogEditFormVisible: false, //编辑广告弹窗
-      dialogOpenMoreVisible: false,
-      checkList: [
-        "广告排序",
-        "广告缩略图",
-        "广告名称",
-        "广告位",
-        "开始时间",
-        "结束时间",
-      ],
-
       pickerOptionsBeginDate: {
         disabledDate(time) {
           return time.getTime() < Date.now() - 8.64e7;
@@ -551,10 +448,6 @@ export default {
         text: [{ required: true, message: "请输入广告文字", trigger: "blur" }],
       },
 
-      currentPage: 1,
-      pageSize: 20,
-      total: 30,
-      tableLoading: false,
       formLoading: false
     };
   },
@@ -609,22 +502,17 @@ export default {
         });
       });
     },
-
-    // 获取广告分页
-    getList() {
-      this.tableLoading = true;
-      ads({
-        current: this.currentPage, //当前页
-        size: this.pageSize, //条数
-      })
-        .then((res) => {
-          let arr = res.data.data.data.records;
-          this.tableData = arr;
-          this.total = res.data.data.data.total;
+    fetchListFun (params) {
+      return new Promise((resolve, reject) => {
+        ads(params).then((res) => {
+          resolve({
+            records: res.data.data.data.records,
+            page: {
+              total: res.data.data.data.total
+            }
+          })
         })
-        .finally(() => {
-          this.tableLoading = false;
-        });
+      })
     },
 
     // 获取广告类型数据
@@ -652,7 +540,7 @@ export default {
           type: "success",
         });
         this.dialogFormVisible = false;
-        this.getList();
+        this.$refs.hcCrud.refresh()
       }).finally(() => {
         this.formLoading = false
       });
@@ -712,7 +600,7 @@ export default {
               type: "success",
             });
             this.dialogEditFormVisible = false;
-            this.getList();
+            this.$refs.hcCrud.refresh()
           }).finally(() => {
             this.formLoading = false
           });
@@ -739,22 +627,12 @@ export default {
               message: "广告删除成功！",
               type: "success",
             });
-            this.getList();
+            this.$refs.hcCrud.refresh()
           });
         })
         .catch(() => {
           this.$message("您已取消删除该广告！");
         });
-    },
-
-    handleSizeChange(val) {
-      this.pageSize = val;
-      this.getList();
-    },
-
-    handleCurrentChange(val) {
-      this.currentPage = val;
-      this.getList();
     },
 
     // 广告新增 提交
@@ -785,7 +663,6 @@ export default {
   },
 
   created() {
-    this.getList();
     this.getAdPosition();
     this.getDictByTypeFn();
   },
