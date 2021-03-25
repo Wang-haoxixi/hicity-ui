@@ -26,10 +26,10 @@ export default {
       type: Number,
       default: 0,
       validator: function (value) {
-        if (value != null && value != undefined) {
+        if (value !== '' && value !== null && value !== undefined) {
           return value >= 0
         }
-        return true
+        return false
       }
     },
     min: {
@@ -48,40 +48,40 @@ export default {
     }
   },
   created () {
-    if (this.decimal) {
-      this.inputValueTemp = this.inputValue = this.getValue(this.value)
-      this.$emit('input', this.inputValue ? parseFloat(this.inputValue) : '')
-    } else {
-      this.inputValue = this.value
-    }
+    this.inputValueTemp = this.inputValue = this.getValue(this.value)
+    this.$emit('input', (this.inputValue !== '' && this.inputValue !== null && this.inputValue !== undefined) ? parseFloat(this.inputValue) : '')
+    // if (this.decimal) {
+    // } else {
+    //   this.inputValue = this.value
+    // }
   },
   watch: {
     value (val) {
-      if (this.decimal) {
-        this.inputValueTemp = this.inputValue = this.getValue(val)
-        this.$emit('input', this.inputValue ? parseFloat(this.inputValue) : '')
-      } else {
-        this.inputValue = val
-      }
+      this.inputValueTemp = this.inputValue = this.getValue(val)
+      this.$emit('input', (this.inputValue !== '' && this.inputValue !== null && this.inputValue !== undefined) ? parseFloat(this.inputValue) : '')
+      // if (this.decimal) {
+      // } else {
+      //   this.inputValue = val
+      // }
     }
   },
   methods: {
     valueChange (val) {
-      if (!this.decimal) {
-        this.$emit('input', val)
-      } else {
-        this.inputValueTemp = val
-        this.inputValue = this.getValue(val)
-      }
+      // if (!this.decimal) {
+      //   this.$emit('input', val)
+      // } else {
+      // }
+      this.inputValueTemp = val
+      this.inputValue = this.getValue(val)
     },
     blur () {
-      if (this.decimal) {
-        this.inputValueTemp = this.inputValue = this.getValue(this.inputValueTemp)
-        this.$emit('input', this.inputValue ? parseFloat(this.inputValue) : '')
-      }
+      this.inputValueTemp = this.inputValue = this.getValue(this.inputValueTemp)
+      this.$emit('input', (this.inputValue !== '' && this.inputValue !== null && this.inputValue !== undefined) ? parseFloat(this.inputValue) : '')
+      // if (this.decimal) {
+      // }
     },
     getValue (value) {
-      if (value) {
+      if (value !== '' && value !== null && value !== undefined) {
         let valueC = 0
         try {
           valueC = parseFloat(value)

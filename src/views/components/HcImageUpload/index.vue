@@ -59,6 +59,25 @@ export default {
       this.fileList = [{url: this.value}]
     }
   },
+  watch: {
+    value (val) {
+      if (val) {
+        let fileList = []
+        if (this.multiple) {
+          for (let i = 0; i < val.length; i++) {
+            fileList.push({
+              url: val[i]
+            })
+          }
+          this.fileList = fileList
+        } else {
+          this.fileList = [{url: val}]
+        }
+      } else {
+        this.fileList = []
+      }
+    }
+  },
   methods: {
     dataMatch (fileList, dataList) {
       if (fileList.length != dataList.length) {
