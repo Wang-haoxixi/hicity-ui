@@ -14,7 +14,7 @@
       <template v-if="item.slot || item.type == 'select' || item.formatter" v-slot="scope">
         <slot v-if="item.slot" :name="item.prop" :row="scope.row">
         </slot>
-        <div v-else-if="item.type == 'select'">{{getDicValue(item.dicName, scope.row[item.prop])}}</div>
+        <div v-else-if="item.type == 'select'">{{getDicValue(item, scope.row[item.prop])}}</div>
         <div v-else>{{getFormatter(item.formatter, scope.row)}}</div>
       </template>
     </el-table-column>
@@ -101,7 +101,17 @@ export default {
     }
   },
   methods: {
-    getDicValue,
+    getDicValue (item, value) {
+      if (item.dicData && item.dicData.length > 0) {
+        for (let i = 0; i < item.dicData.length; i++) {
+          if (value === item.dicData[i].value) {
+            return item.dicData[i].label
+          }
+        }
+      } else {
+        return getDicValue(item.dicName, value)
+      }
+    },
     getFormatter (fun, row) {
       if (fun && typeof fun == 'function') {
         return fun(row)
