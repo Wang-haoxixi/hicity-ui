@@ -68,3 +68,12 @@ export function editSaveActivity(data) {
     data: data
   });
 }
+
+// 资讯管理-资讯查询（分页）（官方）
+export function officialReleaseList(data) {
+  return request({
+    url: "/cms/official_news/page",
+    method: "get",
+    params: data
+  });
+}

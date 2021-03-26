@@ -423,6 +423,34 @@
                     </el-form-item>
                   </el-col>
                 </el-row>
+                <!-- --------------- -->
+                <div class="more-options">其他内容</div>
+                <div class="option-box">
+                  <el-button @click="handleAddTicketOption(item,itemBtn)" v-for="(itemBtn,indexBtn) in item.ticketCustomForm" :key="indexBtn" type="danger" plain :title="'添加'+ itemBtn.typename">{{itemBtn.typename}}</el-button>
+                </div>
+
+                <div class="custom-box">
+                  <div v-for="(itemP,indexP) in item.conferenceFormDTOList" :key="indexP">
+                    <div class="item">
+                      <el-checkbox v-model="itemP.must">必填</el-checkbox>
+                      <el-input :placeholder="itemP.typename" v-model="itemP.label"></el-input>
+                      <i class="el-icon-remove" title="删除" @click="handleDeleteItem(item,indexP)"></i>
+                    </div>
+                    <div class="option-list">
+                      <div>选项列表</div>
+                      <div class="list" v-for="(itemO,indexO) in itemP.optionsList" :key="indexO">
+                        <div style="display:flex;align-items: center;">
+                          <el-input v-model="itemO.label" placeholder="请输入选项名称" style="width:400px"></el-input>
+                          <el-button v-if="!itemO.value" type="primary" round plain @click="showJumpDialog(itemO)" style="margin-left:10px;">选择跳转对象</el-button>
+                          <div style="flex:1;text-overflow: ellipsis;white-space:nowrap;overflow:hidden;margin-top: 10px;margin-left:10px">{{itemO.offcialName}}</div>
+                          <i v-if="itemO.value" class="el-icon-edit-outline" style="margin-top:10px;" title="修改跳转对象" @click="editJump(itemO)"></i>
+                          <i class="el-icon-remove" style="margin-top:10px;" title="删除该选项" @click="handleDeteleItemO(itemP,indexO)"></i>
+                        </div>
+                      </div>
+                      <el-button icon="el-icon-plus" size="mini" @click="handleAddOption(itemP)" style="margin-top:10px"></el-button>
+                    </div>
+                  </div>
+                </div>
               </el-form>
               <i class="icon-ticket-remove el-icon-delete" @click="removeTicket(i)"></i>
             </div>
@@ -505,6 +533,7 @@
       </div>
       <!-- 海报弹窗 -->
       <el-dialog
+        class="dialogPostersVisible"
         title="海报图库"
         :visible.sync="dialogPostersVisible"
         width="940px"
@@ -519,6 +548,31 @@
             <img :src="item.posterUrl" />
           </div>
         </div>
+      </el-dialog>
+      <!-- 选择跳转对象 -->
+      <el-dialog
+        :visible.sync="dialogJumpVisible"
+        width="50%"
+        class="jump"
+        @close='closeDialogJumpVisible'
+      >
+        <el-form ref="jumpTypeFormRef" :model="jumpTypeForm" label-width="100px">
+          <el-form-item label="跳转类型：">
+            <el-select v-model="jumpTypeForm.type" placeholder="请选择跳转类型" style="width:250px">
+              <el-option label="官方发布" value="officialRelease"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="跳转对象：">
+            <el-select :popper-append-to-body='false' value-key='officialNewsId' v-model="jumpTypeForm.obj" placeholder="请选择跳转对象" style="width:250px">
+              <el-option :label="item.officialNewsName" :value="item" v-for="(item,index) in officialReleaseData" :key="index"></el-option>
+            </el-select>
+          </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+          <!-- <el-button @click="$refs.jumpTypeFormRef.resetFields()">重置</el-button> -->
+          <el-button @click="dialogJumpVisible = false">取 消</el-button>
+          <el-button type="primary" @click="handleSaveSelect">确 定</el-button>
+        </span>
       </el-dialog>
     </basic-container>
   </div>
@@ -539,6 +593,7 @@ import {
   savePublish,
   activityInfo,
   editSaveActivity,
+  officialReleaseList
 } from "@/api/activity/publish";
 import { validateURL } from "../../../util/validate";
 import { Loading } from "element-ui";
@@ -550,6 +605,11 @@ export default {
       isInput:false,
       showFormCollect:false,
       defaultList: [],
+      jumpTypeForm:{
+        type:'officialRelease',
+        obj:'',
+      },
+      officialReleaseData:[],
       // 系统预置项
       systemopt:[
         {
@@ -623,6 +683,7 @@ export default {
           code: "remark",
         },
       ],
+      
       customList:[],
       customForm:[
         {
@@ -811,6 +872,34 @@ export default {
               type: "OfflinePay", //支付类型
               amount: 0.01, //金额
             },
+
+            conferenceFormDTOList:[],
+            ticketCustomForm:[
+              // {
+              //   "typename": '单选按钮框',
+              //   "label": "",
+              //   "value": "",
+              //   "type": "radio",
+              //   "must": false,
+              //   "fixedItem": false,
+              //   "placeholder": "",
+              //   "optionsList": [],
+              //   "isInput":false,
+              //   "inputValue": ""
+              // },
+              {
+                "typename": '多选按钮框',
+                "label": "",
+                "value": "",
+                "type": "checkbox",
+                "must": false,
+                "fixedItem": false,
+                "placeholder": "",
+                "optionsList": [],
+                "isInput":false,
+                "inputValue": ""
+              },
+            ],
           },
         ],
       },
@@ -847,6 +936,7 @@ export default {
       },
       // 控制海报图库弹窗
       dialogPostersVisible: false,
+      dialogJumpVisible:false,//跳转链接
       // 海报图库数据
       posterArr: [],
       // 活动类型数据
@@ -856,6 +946,7 @@ export default {
       // 控制删除
       showDelete: false,
       validRst: [],
+      handleItem: null
     };
   },
   computed: {
@@ -942,6 +1033,14 @@ export default {
         this.activityClassifyArr = res.data.data.data;
       });
     },
+    // 获取官方发布列表
+    getOfficialReleaseList(){
+      officialReleaseList({
+        size:50
+      }).then(res=>{
+        this.officialReleaseData = res.data.data.data.records
+      })
+    },
     // 获取活动详情
     getActivityInfo(id) {
       if (!id) {
@@ -954,7 +1053,6 @@ export default {
               return this.$message.error("获取活动详情失败！");
             }
             let data = res.data.data.data;
-            console.log('baseFormData',data)
             this.statusFlag = data.statusFlag;
             this.baseFormData.cityIdList = data.cityIdList;
             this.baseFormData.name = data.name;
@@ -1033,6 +1131,26 @@ export default {
               });
               this.baseFormData.ticketingManagements =
                 data.ticketingManagements;
+                console.log(111,this.baseFormData.ticketingManagements)
+              this.baseFormData.ticketingManagements.forEach(item=>{
+                console.log(item)
+                item.ticketCustomForm = [
+                  {
+                    "typename": '多选按钮框',
+                    "label": "",
+                    "value": "",
+                    "type": "checkbox",
+                    "must": false,
+                    "fixedItem": false,
+                    "placeholder": "",
+                    "optionsList": [],
+                    "isInput":false,
+                    "inputValue": ""
+                  },
+                ]
+                // item.ticketingconfigList
+                item.conferenceFormDTOList = [item.ticketingconfigList]
+              })
             }
           })
           .finally(() => {
@@ -1126,8 +1244,37 @@ export default {
           type: "OfflinePay", //支付类型
           amount: 0.01, //金额
         },
+
+        conferenceFormDTOList:[],
+        ticketCustomForm:[
+          // {
+          //   "typename": '单选按钮框',
+          //   "label": "",
+          //   "value": "",
+          //   "type": "radio",
+          //   "must": false,
+          //   "fixedItem": false,
+          //   "placeholder": "",
+          //   "optionsList": [],
+          //   "isInput":false,
+          //   "inputValue": ""
+          // },
+          {
+            "typename": '多选按钮框',
+            "label": "",
+            "value": "",
+            "type": "checkbox",
+            "must": false,
+            "fixedItem": false,
+            "placeholder": "",
+            "optionsList": [],
+            "isInput":false,
+            "inputValue": ""
+          },
+        ],
       };
       this.baseFormData.ticketingManagements.push(setTicketData);
+      // this.baseFormData.ticketingManagements.push();
     },
 
     // 删除票务
@@ -1213,7 +1360,6 @@ export default {
     },
     handleSwitch(item) {
       let i = this.defaultList.findIndex(m=> item.label == m.label && item.type == m.type)
-      console.log(i)
       if(i == -1){
         this.defaultList.push(item)
       }else{
@@ -1267,6 +1413,56 @@ export default {
       item.optionsList.push(opt)
       item.inputValue = ''
       item.isInput = false
+    },
+    handleAddTicketOption(item,itemBtn){
+      if(item.conferenceFormDTOList.length>=1){
+        return this.$message.warning('只能添加一条')
+      }
+      item.conferenceFormDTOList.push(JSON.parse(JSON.stringify(itemBtn)))
+    },
+    handleAddOption(item){
+      if(item.optionsList.length>=10){
+        return this.$message.warning('子项最多可以添加10条')
+      }
+      item.optionsList.push({
+        label:'',
+        type:'',
+        offcialName:'',
+        value:'',
+        link:false,
+      })
+    },
+    handleDeleteItem(item,index){//父项删除
+      item.conferenceFormDTOList.splice(index, 1);
+    },
+    handleDeteleItemO(item,indexO){//子项删除
+      item.optionsList.splice(indexO,1)
+    },
+    showJumpDialog(item){
+      this.getOfficialReleaseList()
+      this.handleItem = item
+      this.dialogJumpVisible = true
+    },
+    editJump(item){
+      console.log(item)
+      this.getOfficialReleaseList()
+      this.handleItem = item
+      this.dialogJumpVisible = true
+    },
+    handleSaveSelect(){
+      this.handleItem.type = this.jumpTypeForm.type
+      this.handleItem.offcialName = this.jumpTypeForm.obj.officialNewsName
+      this.handleItem.value = this.jumpTypeForm.obj.officialNewsId
+      this.dialogJumpVisible = false
+      if(this.handleItem.value&&this.handleItem.type){
+        this.handleItem.link = true
+      }
+    },
+    closeDialogJumpVisible(){
+      this.jumpTypeForm={
+        type:'officialRelease',
+        obj:'',
+      }
     },
     // 编辑 - 发布活动1
     editSave() {
@@ -1355,6 +1551,7 @@ export default {
           item.payMethodList.push(item.payOfflinePay);
         }
       });
+
       this.baseFormData.submitType = 1;
       this.customList.forEach(item=>{
         if(item.type == 'input' || item.type == 'textarea'){
@@ -1373,7 +1570,6 @@ export default {
           });
         });
         if (!this.validRst.includes(false) && valid1) {
-          // console.log("验证通过...");
           savePublish(this.baseFormData).then((res) => {
             if (res.data.code !== 0) {
               this.validRst = [];
@@ -1419,14 +1615,14 @@ export default {
       })
       this.baseFormData.conferenceFormList = [...this.defaultList,...this.customList]
       console.log(this.baseFormData)
-      // this.$refs.baseFormDataRef.validate((valid1) => {
-      //   this.$refs.setTicketDataRef.forEach((item) => {
-      //     item.validate((valid2) => {
-      //       that.validRst.push(valid2);
-      //       return false;
-      //     });
-      //   });
-      //   if (!this.validRst.includes(false) && valid1) {
+      this.$refs.baseFormDataRef.validate((valid1) => {
+        this.$refs.setTicketDataRef.forEach((item) => {
+          item.validate((valid2) => {
+            that.validRst.push(valid2);
+            return false;
+          });
+        });
+        if (!this.validRst.includes(false) && valid1) {
           savePublish(this.baseFormData).then((res) => {
             if (res.data.code !== 0) {
               return this.$message.error("保存草稿失败");
@@ -1438,12 +1634,12 @@ export default {
           }).finally(() => {
             this.formLoading = false
           });
-      //   } else {
-      //     this.$message.error("活动信息填写不完整");
-      //     this.validRst = [];
-      //     this.formLoading = false
-      //   }
-      // });
+        } else {
+          this.$message.error("活动信息填写不完整");
+          this.validRst = [];
+          this.formLoading = false
+        }
+      });
     },
 
     // 编辑 - 保存草稿0
@@ -1468,7 +1664,7 @@ export default {
         }
       })
       this.baseFormData.conferenceFormList = [...this.defaultList,...this.customList]
-      // console.log(this.baseFormData)
+      console.log(this.baseFormData)
       this.$refs.baseFormDataRef.validate((valid1) => {
         // 状态不为草稿
         if (this.statusFlag != "0") {
@@ -1610,9 +1806,6 @@ export default {
       }
     }
   }
-  .checkbox{
-
-  }
 }
 .posterInpBox {
   display: flex;
@@ -1622,9 +1815,10 @@ export default {
 }
 ::v-deep .el-dialog__body {
   overflow: hidden;
-  height: 500px;
+  max-height: 500px;
   overflow-y: auto;
 }
+
 .posterBox {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -1698,7 +1892,9 @@ export default {
       }
     }
   }
-  .more-options {
+  
+}
+.more-options {
     margin-bottom: 15px;
   }
   .option-box{
@@ -1722,6 +1918,12 @@ export default {
       .list{
         display: flex;
         flex-direction: column;
+        i{
+        margin-left: 10px;
+        color: #409EFF;
+        font-size: 18px;
+        cursor: pointer;
+      }
         .tagitem{
           // margin-right: 10px;
           width: fit-content;
@@ -1737,7 +1939,6 @@ export default {
       }
     }
   }
-}
 .footer-btn {
   margin-left: 120px;
 }
@@ -1755,5 +1956,8 @@ export default {
   font-size: 20px;
   cursor: pointer;
   color: #babec0;
+}
+::v-deep .el-select-dropdown__list {
+    width: 250px;
 }
 </style>

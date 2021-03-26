@@ -21,7 +21,12 @@
           </el-table-column>
           <el-table-column prop="createTime" label="报名时间">
           </el-table-column>
-          <el-table-column prop="ticketingName" label="票名"></el-table-column>
+          <el-table-column label="票名">
+            <template slot-scope="scope">
+              <el-button v-if="JSON.parse(scope.row.info).length>0" type="text" size="mini" @click="handleCheckTicketInfo(scope.row.info)">{{scope.row.ticketingName}}</el-button>
+              <span v-else>{{scope.row.ticketingName}}</span>
+            </template>
+          </el-table-column>
           <el-table-column prop="orderNum" label="购票数量"></el-table-column>
           <el-table-column prop="orderStatusName" label="订单状态">
           </el-table-column>
@@ -170,6 +175,19 @@
           </span>
         </el-dialog>
 
+        <el-dialog
+          title="用户选择"
+          :visible.sync="dialogUserSelectVisible"
+          width="50%"
+        >
+          <div>参加项目</div>
+          <el-checkbox v-for="(item,index) in infoList" :key="index" size="medium" v-model="item.select" disabled style="display:block;margin-top:10px">{{item.label}}</el-checkbox>
+          <span slot="footer" class="dialog-footer">
+            <el-button @click="dialogUserSelectVisible = false">取 消</el-button>
+            <el-button type="primary" @click="dialogUserSelectVisible = false">确 定</el-button>
+          </span>
+        </el-dialog>
+
         <el-pagination
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
@@ -210,6 +228,7 @@ export default {
       dialogAnnotationVisible: false,
       dialogApplyInfoVisible: false,
       dialogSignInVisible: false,
+      dialogUserSelectVisible:false,
       total: 0,
       applyInfoForm: [],
       annotation: "",
@@ -218,6 +237,7 @@ export default {
       isIndeterminate: true,
       checkedSignInCode: [], //已选择
       signInCodeData: [], //核销数组
+      infoList:[]
     };
   },
   created() {
@@ -246,6 +266,11 @@ export default {
       this.enroleId = row.enroleId;
       this.dialogAnnotationVisible = true;
       this.annotation = row.soRemarks;
+    },
+    handleCheckTicketInfo(info){
+      console.log(222,JSON.parse(info))
+      this.infoList = JSON.parse(info)
+      this.dialogUserSelectVisible = true
     },
     handleSaveAnnotation() {
       addAnnotation({
@@ -301,6 +326,7 @@ export default {
         }
         this.tableData = res.data.data.data.records;
         this.total = res.data.data.data.total;
+        // this.info = res.data.data.data
       });
     },
     handleSizeChange(val) {
@@ -352,4 +378,5 @@ export default {
 .tagInfo {
   margin-bottom: 15px;
 }
+
 </style>
