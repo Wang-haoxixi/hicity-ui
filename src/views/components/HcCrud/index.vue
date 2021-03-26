@@ -78,7 +78,7 @@
       </hc-crud-table>
     </slot>
     <!-- 分页 -->
-    <slot name="pagination">
+    <slot v-if="!allShow" name="pagination">
       <div class="pagination-box">
         <el-pagination
           style="display: inline-block"
@@ -128,6 +128,10 @@ export default {
     option: {
       type: Object,
       default: () => {}
+    },
+    allShow: {
+      type: Boolean,
+      default: false
     },
     fetchListFun: {
       type: Function,
@@ -262,6 +266,14 @@ export default {
             size: this.page.pageSize,
             ...this.searchForm,
           };
+          if (this.allShow) {
+            params = { ...this.searchForm }
+          }
+          for (let key in params) {
+            if (!params[key]) {
+              delete params[key]
+            }
+          }
           this.tableLoading = true;
           this.fetchListFun(params)
             .then(({ records, page }) => {
