@@ -188,7 +188,8 @@ export default {
           surplus: formData.surplus,
           upTime: formData.upTime,
           updateTime: formData.updateTime,
-          scopeOfUseCity: formData.scopeOfUseCity || ''
+          scopeOfUseCity: formData.scopeOfUseCity || '',
+          category: formData.category
         }
         this.formShow = true;
         this.formType = "edit";
