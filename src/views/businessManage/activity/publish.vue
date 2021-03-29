@@ -1194,9 +1194,9 @@ export default {
                     "inputValue": ""
                   },
                 ]
-                // item.ticketingconfigList.optionsList.forEach(obj=>{
-                //   obj.offcialName = obj.name
-                // })
+                item.ticketingconfigList.optionsList.forEach(obj=>{
+                  obj.offcialName = obj.name
+                })
                 item.conferenceFormDTOList = [item.ticketingconfigList]
               })
             }
