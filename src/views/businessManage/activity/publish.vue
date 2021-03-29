@@ -423,13 +423,13 @@
                     </el-form-item>
                   </el-col>
                 </el-row>
-                <!-- --------------- -->
                 <div class="more-options">其他内容</div>
                 <div class="option-box">
                   <el-button @click="handleAddTicketOption(item,itemBtn)" v-for="(itemBtn,indexBtn) in item.ticketCustomForm" :key="indexBtn" type="danger" plain :title="'添加'+ itemBtn.typename">{{itemBtn.typename}}</el-button>
                 </div>
 
                 <div class="custom-box">
+                  
                   <div v-for="(itemP,indexP) in item.conferenceFormDTOList" :key="indexP">
                     <div class="item">
                       <el-checkbox v-model="itemP.must">必填</el-checkbox>
@@ -563,9 +563,6 @@
             </el-select>
           </el-form-item>
           <el-form-item label="跳转对象：">
-            <!-- <el-select :popper-append-to-body='false' value-key='officialNewsId' v-model="jumpTypeForm.obj" placeholder="请选择跳转对象" style="width:250px">
-              <el-option :label="item.officialNewsName" :value="item" v-for="(item,index) in officialReleaseData" :key="index"></el-option>
-            </el-select> -->
             <div style="display:flex;justify-content: space-between;">
               <div style="width:600px;overflow: hidden;text-overflow:ellipsis;white-space: nowrap;">{{jumpTypeForm.officialNewsName}}</div>
               <el-input
@@ -605,7 +602,6 @@
           </el-pagination>
         </el-form>
         <span slot="footer" class="dialog-footer">
-          <!-- <el-button @click="$refs.jumpTypeFormRef.resetFields()">重置</el-button> -->
           <el-button @click="dialogJumpVisible = false">取 消</el-button>
           <el-button type="primary" @click="handleSaveSelect">确 定</el-button>
         </span>
@@ -1175,11 +1171,9 @@ export default {
                   };
                 }
               });
-              this.baseFormData.ticketingManagements =
-                data.ticketingManagements;
-                console.log(111,this.baseFormData.ticketingManagements)
+              this.baseFormData.ticketingManagements = data.ticketingManagements;
               this.baseFormData.ticketingManagements.forEach(item=>{
-                console.log(item)
+                console.log(111,item)
                 item.ticketCustomForm = [
                   {
                     "typename": '多选按钮框',
@@ -1194,10 +1188,13 @@ export default {
                     "inputValue": ""
                   },
                 ]
-                item.ticketingconfigList.optionsList.forEach(obj=>{
-                  obj.offcialName = obj.name
-                })
-                item.conferenceFormDTOList = [item.ticketingconfigList]
+                if(item.ticketingconfigList && item.ticketingconfigList.optionsList){
+                  item.ticketingconfigList.optionsList.forEach(obj=>{
+                    obj.offcialName = obj.name
+                  })
+                }
+                this.$set(item,'conferenceFormDTOList', item.ticketingconfigList ? [item.ticketingconfigList] : [])
+                // item.conferenceFormDTOList = [item.ticketingconfigList]
               })
             }
           })
@@ -1429,7 +1426,7 @@ export default {
       item.optionsList.splice(i,1)
     },
     showInput(item,index){
-      if(item.optionsList.length>=30){
+      if(item.optionsList && item.optionsList.length>=30){
         return this.$message.warning('子项最多可以添加30条')
       }
       this.customList.forEach((m,i)=>{
@@ -1469,7 +1466,7 @@ export default {
       item.conferenceFormDTOList.push(JSON.parse(JSON.stringify(itemBtn)))
     },
     handleAddOption(item){
-      if(item.optionsList.length>=10){
+      if(item.optionsList&&item.optionsList.length>=10){
         return this.$message.warning('子项最多可以添加10条')
       }
       item.optionsList.push({
@@ -1481,7 +1478,9 @@ export default {
       })
     },
     handleDeleteItem(item,index){//父项删除
-      item.conferenceFormDTOList.splice(index, 1);
+      console.log(222,item)
+      // item.conferenceFormDTOList.splice(index, 1);
+      item.conferenceFormDTOList = []
     },
     handleDeteleItemO(item,indexO){//子项删除
       item.optionsList.splice(indexO,1)
