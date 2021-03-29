@@ -53,6 +53,12 @@
         <el-form-item label="票务备注" prop="remarks">
           <el-input v-model="formData.remarks" type="textarea" maxlength="50" :autosize="{minRows: 4, maxRows: 8}" placeholder="请输入备注内容"></el-input>
         </el-form-item>
+        <el-form-item label="其他内容" prop="others">
+          <el-switch v-model="hasOthers"></el-switch>
+        </el-form-item>
+        <el-form-item v-if="hasOthers" label="" prop="ticketConfig">
+          <option-form ref="optionForm" :init-form="ticketConfig"></option-form>
+        </el-form-item>
       </el-form>
     </div>
     <div slot="footer">
@@ -66,7 +72,9 @@
 <script>
 import { addTicket, updateTicket } from "@/api/activity/ticketing"
 import { deepClone } from "@/util/util"
+import OptionForm from "./OptionForm.vue"
 export default {
+  components: { OptionForm },
   data () {
     return {
       dialogVisible: false,
@@ -85,13 +93,18 @@ export default {
         number: [{required: true, message: '请填写票种数量', trigger: 'blur'}],
         limitTicket: [{required: true, message: '请填写单词购票数量', trigger: 'blur'}],
         price: [{validator: this.priceValidator, message: '请填写票务金额', trigger: 'blur'}],
+        others: {validator: this.othersValidator, trigger: 'blur'}
       },
       price: 0.01,
       priceTemp: '0.01',
       priceReset: {
         price: 0.01,
         priceTemp: '0.01',
-      }
+      },
+      ticketConfig: {},
+      resetTicketConfig: {},
+      hasOthers: false,
+      resetHasOthers: false,
     }
   },
   computed: {
@@ -115,7 +128,19 @@ export default {
       }
       callback()
     },
+    othersValidator (rules, value, callback) {
+      if (this.hasOthers) {
+        this.$refs.optionForm.validator().then(() => {
+          callback()
+        }, () => {
+          callback(new Error(' '))
+        })
+      } else {
+        callback()
+      }
+    },
     open (activityId, ticket = {}) {
+      this.hasOthers = false
       this.detailType = ticket.id ? 'edit' : 'add'
       if (ticket.ticketingType == '2') {
         this.price = ticket.rmb || 0.01
@@ -135,7 +160,15 @@ export default {
         allowedRefund: 0,
         ...ticket
       }
+      if (ticket.ticketingconfigList && ticket.ticketingconfigList.id) {
+        this.hasOthers = true
+        this.ticketConfig = ticket.ticketingconfigList
+      } else {
+        this.ticketConfig = {}
+      }
       this.resetFormData = deepClone(this.formData)
+      this.resetTicketConfig = deepClone(this.ticketConfig)
+      this.resetHasOthers = this.hasOthers
       this.priceReset = {
         price: this.price,
         priceTemp: this.priceTemp
@@ -157,6 +190,11 @@ export default {
           activityId: this.activityId,
           ...this.formData,
         }
+        if (this.hasOthers) {
+          formData.conferenceFormDTOList = [this.$refs.optionForm.formData]
+        } else {
+          formData.conferenceFormDTOList = []
+        }
         let fun = formData.id ? updateTicket : addTicket
         if (formData.ticketingType == '2') {
           formData.payMethodList = [
@@ -165,6 +203,8 @@ export default {
               amount: this.price
             }
           ]
+        } else {
+          formData.payMethodList = []
         }
         if (valid) {
           fun(formData).then(({data}) => {
@@ -176,7 +216,9 @@ export default {
     },
     reset () {
       this.formData = deepClone(this.resetFormData)
+      this.hasOthers = this.resetHasOthers
       this.$nextTick(() => {
+        this.ticketConfig = deepClone(this.resetTicketConfig)
         this.price = this.priceReset.price
         this.priceTemp = this.priceReset.priceTemp
       })
