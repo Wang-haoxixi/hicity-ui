@@ -552,7 +552,7 @@
       <!-- 选择跳转对象 -->
       <el-dialog
         :visible.sync="dialogJumpVisible"
-        width="50%"
+        width="70%"
         class="jump"
         @close='closeDialogJumpVisible'
       >
@@ -563,10 +563,46 @@
             </el-select>
           </el-form-item>
           <el-form-item label="跳转对象：">
-            <el-select :popper-append-to-body='false' value-key='officialNewsId' v-model="jumpTypeForm.obj" placeholder="请选择跳转对象" style="width:250px">
+            <!-- <el-select :popper-append-to-body='false' value-key='officialNewsId' v-model="jumpTypeForm.obj" placeholder="请选择跳转对象" style="width:250px">
               <el-option :label="item.officialNewsName" :value="item" v-for="(item,index) in officialReleaseData" :key="index"></el-option>
-            </el-select>
+            </el-select> -->
+            <div style="display:flex;justify-content: space-between;">
+              <div style="width:600px;overflow: hidden;text-overflow:ellipsis;white-space: nowrap;">{{jumpTypeForm.officialNewsName}}</div>
+              <el-input
+                placeholder="查询跳转对象"
+                clearable
+                style="width:200px"
+                v-model="officialTitleValue"
+                @input='officialTitleValueChange'
+                @clear='clearOfficialTitleValue'
+                >
+              </el-input>
+            </div>
+            <el-table :data="officialReleaseData" style="margin-top:20px" stripe :header-cell-style="{ background: '#F5F7FA' }">
+              <el-table-column property="officialNewsName" label="标题" width="800px"></el-table-column>
+              <el-table-column label="操作" width="80px">
+                <template slot-scope="scope">
+                  <el-button
+                    size="mini"
+                    type="text"
+                    @click="selectJumpTitle(scope.row)"
+                  >选择</el-button>
+                </template>
+              </el-table-column>
+            </el-table>
           </el-form-item>
+          <!-- 分页 -->
+          <el-pagination
+            background
+            style="text-align:right;padding-right:30px"
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            :current-page="queryOfficial.current"
+            :page-sizes="[10,20,30,40,50,100]"
+            :page-size="queryOfficial.size"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="total">
+          </el-pagination>
         </el-form>
         <span slot="footer" class="dialog-footer">
           <!-- <el-button @click="$refs.jumpTypeFormRef.resetFields()">重置</el-button> -->
@@ -607,8 +643,17 @@ export default {
       defaultList: [],
       jumpTypeForm:{
         type:'officialRelease',
-        obj:'',
+        // obj:{},
+        officialNewsName:'',
+        officialNewsId:''
       },
+      officialTitleValue:'',
+      queryOfficial:{
+        size:10,
+        current:1,
+        searchName:''
+      },
+      total:0,
       officialReleaseData:[],
       // 系统预置项
       systemopt:[
@@ -946,7 +991,9 @@ export default {
       // 控制删除
       showDelete: false,
       validRst: [],
-      handleItem: null
+      handleItem: {
+        offcialName:''
+      }
     };
   },
   computed: {
@@ -1035,10 +1082,9 @@ export default {
     },
     // 获取官方发布列表
     getOfficialReleaseList(){
-      officialReleaseList({
-        size:50
-      }).then(res=>{
+      officialReleaseList(this.queryOfficial).then(res=>{
         this.officialReleaseData = res.data.data.data.records
+        this.total = res.data.data.data.total
       })
     },
     // 获取活动详情
@@ -1148,7 +1194,9 @@ export default {
                     "inputValue": ""
                   },
                 ]
-                // item.ticketingconfigList
+                // item.ticketingconfigList.optionsList.forEach(obj=>{
+                //   obj.offcialName = obj.name
+                // })
                 item.conferenceFormDTOList = [item.ticketingconfigList]
               })
             }
@@ -1439,30 +1487,62 @@ export default {
       item.optionsList.splice(indexO,1)
     },
     showJumpDialog(item){
+      console.log('showJumpDialog',item)
       this.getOfficialReleaseList()
       this.handleItem = item
       this.dialogJumpVisible = true
     },
     editJump(item){
-      console.log(item)
-      this.getOfficialReleaseList()
+      console.log('editJump',item)
       this.handleItem = item
       this.dialogJumpVisible = true
+      this.getOfficialReleaseList()
+      this.jumpTypeForm.type = item.type
+      this.jumpTypeForm.officialNewsName = item.offcialName
+      this.jumpTypeForm.officialNewsId = item.value
     },
     handleSaveSelect(){
       this.handleItem.type = this.jumpTypeForm.type
-      this.handleItem.offcialName = this.jumpTypeForm.obj.officialNewsName
-      this.handleItem.value = this.jumpTypeForm.obj.officialNewsId
+      this.handleItem.offcialName = this.jumpTypeForm.officialNewsName
+      this.handleItem.value = this.jumpTypeForm.officialNewsId
       this.dialogJumpVisible = false
-      if(this.handleItem.value&&this.handleItem.type){
+      if(this.handleItem.value && this.handleItem.type){
         this.handleItem.link = true
       }
     },
+    selectJumpTitle(row){
+      this.jumpTypeForm.officialNewsName = row.officialNewsName
+      this.jumpTypeForm.officialNewsId = row.officialNewsId
+      console.log('selectJumpTitle',this.jumpTypeForm)
+    },
+    officialTitleValueChange(e){
+      console.log(e)
+      this.queryOfficial.searchName = e
+      this.getOfficialReleaseList()
+    },
+    clearOfficialTitleValue(){
+      this.queryOfficial.searchName = ''
+      this.getOfficialReleaseList()
+    },
     closeDialogJumpVisible(){
+      this.queryOfficial = {
+        size:10,
+        current:1,
+        searchName:''
+      }
       this.jumpTypeForm={
         type:'officialRelease',
-        obj:'',
+        officialNewsName:'',
+        officialNewsId:''
       }
+    },
+    handleCurrentChange(val){
+      this.queryOfficial.current = val
+      this.getOfficialReleaseList()
+    },
+    handleSizeChange(val){
+      this.queryOfficial.size = val
+      this.getOfficialReleaseList()
     },
     // 编辑 - 发布活动1
     editSave() {
