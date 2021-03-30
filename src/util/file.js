@@ -59,7 +59,8 @@ export function getFileMimeType(file) {
     'FFD8FFE0': 'jpg',
     '89504E47': 'png',
     '47494638': 'gif',
-    "52494646": 'webp'
+    '52494646': 'webp',
+    '424D': 'bmp'
   }
 
   const reader = new FileReader();

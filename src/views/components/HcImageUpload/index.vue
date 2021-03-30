@@ -11,6 +11,7 @@
     :on-exceed="handleExceed"
     :file-list="fileList"
     :before-upload="onBeforeUpload"
+    accept=".jpg,.jpeg,.png,.gif,.bmp,.JPG,.JPEG,.PNG,.GIF,.BMP"
   >
     <el-image v-if="!multiple && fileList.length > 0" :src="fileList[0].url" class="avatar" />
     <i v-else class="el-icon-plus"></i>

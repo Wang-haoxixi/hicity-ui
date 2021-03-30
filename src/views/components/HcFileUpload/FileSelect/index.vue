@@ -8,6 +8,12 @@
 
 <script>
 export default {
+  props: {
+    accept: {
+      type: String,
+      default: ''
+    }
+  },
   data () {
     return {
       input: null,
@@ -18,6 +24,7 @@ export default {
     let input = document.createElement('input')
     input.type = 'file'
     input.multiple = 'multiple'
+    input.accept = this.accept
     input.onchange = () => {
       this.$emit('file-change', input.files)
       input.value = ''
@@ -32,6 +39,7 @@ export default {
       return new Promise((resolve, reject) => {
         let inputSingle = document.createElement('input')
         inputSingle.type = 'file'
+        inputSingle.accept = this.accept
         inputSingle.onchange = () => {
           resolve(inputSingle.files)
           inputSingle = null
