@@ -1,17 +1,19 @@
 export const tableOption = (admin = false) => {
   let columns = [
     {
-      label: '发布者',
-      prop: 'realName',
-    },
-    {
       label: '游记标题',
       prop: 'travelName',
       search: true,
     },
     {
+      label: '发布者',
+      prop: 'realName',
+      width: 160,
+    },
+    {
       label: '创建时间',
       prop: 'createTime',
+      width: 150,
     },
   ]
   if (admin) {
