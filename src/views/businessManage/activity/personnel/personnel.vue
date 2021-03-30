@@ -23,7 +23,7 @@
           </el-table-column>
           <el-table-column label="票名">
             <template slot-scope="scope">
-              <el-button v-if="JSON.parse(scope.row.info).length>0" type="text" size="mini" @click="handleCheckTicketInfo(scope.row.info)">{{scope.row.ticketingName}}</el-button>
+              <el-button v-if="scope.row.info && JSON.parse(scope.row.info).length>0" type="text" size="mini" @click="handleCheckTicketInfo(scope.row.info)">{{scope.row.ticketingName}}</el-button>
               <span v-else>{{scope.row.ticketingName}}</span>
             </template>
           </el-table-column>
@@ -324,6 +324,7 @@ export default {
         if (res.data.code != 0) {
           return this.$message.error("获取列表失败");
         }
+        console.log(22,res)
         this.tableData = res.data.data.data.records;
         this.total = res.data.data.data.total;
         // this.info = res.data.data.data

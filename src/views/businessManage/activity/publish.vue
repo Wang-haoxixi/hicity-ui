@@ -232,7 +232,7 @@
           ></hc-quill>
         </el-form-item>
         <!-- 活动附件 -->
-        <el-form-item prop="fileList" label="活动附件：">
+        <el-form-item label="活动附件：">
           <el-upload
             class="upload-demo"
             :limit="3"
@@ -354,7 +354,6 @@
                   label="票务金额："
                   v-if="item.ticketingType === '2'"
                 >
-                  
                   <!-- <el-checkbox-group v-model="item.priceType" class="checkGroup"> -->
                     <!-- priceType是否包含已选类目且长度为1 -->
                     <!-- <el-checkbox
@@ -401,17 +400,15 @@
                       ></el-input>
                     </el-checkbox>
                   </el-checkbox-group> -->
-
                   <el-input style="width: 200px;" v-model="item.payOfflinePay.amount" @blur="priceChange(item.payOfflinePay)">
                     <div slot="append">元</div>
                   </el-input>
                 </el-form-item>
-                <el-row>
+                <el-row style="padding-left:10px">
                   <el-col>
                     <el-form-item
                       label="票种备注："
                       label-width="200"
-                      prop="remarks"
                     >
                       <el-input
                         style="width: 650px"
@@ -427,9 +424,7 @@
                 <div class="option-box">
                   <el-button @click="handleAddTicketOption(item,itemBtn)" v-for="(itemBtn,indexBtn) in item.ticketCustomForm" :key="indexBtn" type="danger" plain :title="'添加'+ itemBtn.typename">{{itemBtn.typename}}</el-button>
                 </div>
-
                 <div class="custom-box">
-                  
                   <div v-for="(itemP,indexP) in item.conferenceFormDTOList" :key="indexP">
                     <div class="item">
                       <el-checkbox v-model="itemP.must">必填</el-checkbox>
@@ -457,9 +452,7 @@
           </el-card>
         </el-form-item>
       </el-form>
-
       <div class="form-collect">报名表单收集：</div>
-      
       <div class="tips" @click="toFormCollect" v-if="!showFormCollect">
         <i class="el-icon-plus"></i>
         如果您需要收集参与者的必要信息，请添加；若没有则跳过
@@ -499,7 +492,6 @@
         <div class="option-box">
           <el-button @click="handleAdd(item)" v-for="(item,index) in customForm" :key="index" type="danger" plain :title="'添加'+ item.typename">{{item.typename}}</el-button>
         </div>
-
         <div class="custom-box">
           <div v-for="(item,index) in customList" :key="index">
             <div class="item" >
@@ -518,7 +510,6 @@
           </div>
         </div>
       </div>
-
       <div class="footer-btn">
         <!-- this.$route.query.id是否有参数传递过来,没有参数说明走新建,否则走编辑   -->
         <el-button v-if="!this.$route.query.id" :loading="formLoading" @click="publish" type="danger"
@@ -609,7 +600,6 @@
     </basic-container>
   </div>
 </template>
-
 <script>
 import store from "@/store";
 import {dateFormat} from "@/util/date.js";
@@ -627,7 +617,6 @@ import {
   editSaveActivity,
   officialReleaseList
 } from "@/api/activity/publish";
-import { validateURL } from "../../../util/validate";
 import { Loading } from "element-ui";
 export default {
   components: { HcQuill, HcCitySelect },
@@ -639,7 +628,6 @@ export default {
       defaultList: [],
       jumpTypeForm:{
         type:'officialRelease',
-        // obj:{},
         officialNewsName:'',
         officialNewsId:''
       },
@@ -828,15 +816,14 @@ export default {
         details: [
           { required: true, message: "请输入活动详情", trigger: "blur" },
         ],
-        fileList: [
-          {
-            validator: this.validatorFileList,
-            required: true,
-            trigger: "change",
-          },
-        ],
+        // fileList: [
+        //   {
+        //     validator: this.validatorFileList,
+        //     required: true,
+        //     trigger: "change",
+        //   },
+        // ],
       },
-
       setTicketDataRules: {
         ticketingType: [
           { required: true, message: "请选择票务种类", trigger: "change" },
@@ -850,9 +837,9 @@ export default {
         limitTicket: [
           { required: true, message: "请输入购票数量", trigger: "blur" },
         ],
-        remarks: [
-          { required: true, message: "请输入票种备注", trigger: "blur" },
-        ],
+        // remarks: [
+        //   { required: true, message: "请输入票种备注", trigger: "blur" },
+        // ],
       },
 
       // 选择今天之后的日期
@@ -869,11 +856,9 @@ export default {
           );
         },
       },
-
       // 基本信息数据
       baseFormData: {
         conferenceFormList:[],
-
         cityIdList: [], //所属城市
         name: "",
         startTime: "",
@@ -913,21 +898,8 @@ export default {
               type: "OfflinePay", //支付类型
               amount: 0.01, //金额
             },
-
             conferenceFormDTOList:[],
             ticketCustomForm:[
-              // {
-              //   "typename": '单选按钮框',
-              //   "label": "",
-              //   "value": "",
-              //   "type": "radio",
-              //   "must": false,
-              //   "fixedItem": false,
-              //   "placeholder": "",
-              //   "optionsList": [],
-              //   "isInput":false,
-              //   "inputValue": ""
-              // },
               {
                 "typename": '多选按钮框',
                 "label": "",
@@ -944,7 +916,6 @@ export default {
           },
         ],
       },
-
       //活动分类
       classification: [],
       // 是否有输入标签内容
@@ -1028,7 +999,6 @@ export default {
         })
         .catch(() => {});
     },
-
     validatorPoster(rule, value, callback) {
       if (value) {
         callback();
@@ -1043,13 +1013,13 @@ export default {
         callback(new Error("请选择活动标签"));
       }
     },
-    validatorFileList(rule, value, callback) {
-      if (value.length != 0) {
-        callback();
-      } else {
-        callback(new Error("请上传活动附件"));
-      }
-    },
+    // validatorFileList(rule, value, callback) {
+    //   if (value.length != 0) {
+    //     callback();
+    //   } else {
+    //     callback(new Error("请上传活动附件"));
+    //   }
+    // },
 
     // 活动分类改变触发
     changeClassification(e) {
@@ -1173,7 +1143,6 @@ export default {
               });
               this.baseFormData.ticketingManagements = data.ticketingManagements;
               this.baseFormData.ticketingManagements.forEach(item=>{
-                console.log(111,item)
                 item.ticketCustomForm = [
                   {
                     "typename": '多选按钮框',
@@ -1194,8 +1163,13 @@ export default {
                   })
                 }
                 this.$set(item,'conferenceFormDTOList', item.ticketingconfigList ? [item.ticketingconfigList] : [])
-                // item.conferenceFormDTOList = [item.ticketingconfigList]
               })
+            }else{
+              let ticketingManagements = data.ticketingManagements
+              for (let i = 0; i < ticketingManagements.length; i++) {
+                ticketingManagements[i].conferenceFormDTOList = ticketingManagements[i].ticketingconfigList ? [ticketingManagements[i].ticketingconfigList] : []
+              }
+              this.baseFormData.ticketingManagements = data.ticketingManagements;
             }
           })
           .finally(() => {
@@ -1292,18 +1266,6 @@ export default {
 
         conferenceFormDTOList:[],
         ticketCustomForm:[
-          // {
-          //   "typename": '单选按钮框',
-          //   "label": "",
-          //   "value": "",
-          //   "type": "radio",
-          //   "must": false,
-          //   "fixedItem": false,
-          //   "placeholder": "",
-          //   "optionsList": [],
-          //   "isInput":false,
-          //   "inputValue": ""
-          // },
           {
             "typename": '多选按钮框',
             "label": "",
@@ -1319,7 +1281,6 @@ export default {
         ],
       };
       this.baseFormData.ticketingManagements.push(setTicketData);
-      // this.baseFormData.ticketingManagements.push();
     },
 
     // 删除票务
@@ -1382,7 +1343,7 @@ export default {
         original: file.name,
         attachFile: file.response.data.data.url,
       });
-      this.$refs.baseFormDataRef.validateField("fileList");
+      // this.$refs.baseFormDataRef.validateField("fileList");
     },
     // 活动附件移除
     handleAccessoryRemove(file, fileList) {
@@ -1396,7 +1357,7 @@ export default {
           this.baseFormData.fileList.splice(i, 1);
         }
       });
-      this.$refs.baseFormDataRef.validateField("fileList");
+      // this.$refs.baseFormDataRef.validateField("fileList");
     },
     onChange(res) {},
     toFormCollect(){
@@ -1478,7 +1439,6 @@ export default {
       })
     },
     handleDeleteItem(item,index){//父项删除
-      console.log(222,item)
       // item.conferenceFormDTOList.splice(index, 1);
       item.conferenceFormDTOList = []
     },
@@ -1486,13 +1446,11 @@ export default {
       item.optionsList.splice(indexO,1)
     },
     showJumpDialog(item){
-      console.log('showJumpDialog',item)
       this.getOfficialReleaseList()
       this.handleItem = item
       this.dialogJumpVisible = true
     },
     editJump(item){
-      console.log('editJump',item)
       this.handleItem = item
       this.dialogJumpVisible = true
       this.getOfficialReleaseList()
@@ -1512,10 +1470,8 @@ export default {
     selectJumpTitle(row){
       this.jumpTypeForm.officialNewsName = row.officialNewsName
       this.jumpTypeForm.officialNewsId = row.officialNewsId
-      console.log('selectJumpTitle',this.jumpTypeForm)
     },
     officialTitleValueChange(e){
-      console.log(e)
       this.queryOfficial.searchName = e
       this.getOfficialReleaseList()
     },
@@ -1557,6 +1513,7 @@ export default {
           item.payMethodList.push(item.payOfflinePay);
         }
       });
+      // delete this.baseFormData.ticketingManagements
       this.baseFormData.submitType = 1;
       this.baseFormData.id = this.$route.query.id;
       this.customList.forEach(item=>{
@@ -1640,7 +1597,6 @@ export default {
         }
       })
       this.baseFormData.conferenceFormList = [...this.defaultList,...this.customList]
-      console.log(this.baseFormData)
       this.$refs.baseFormDataRef.validate((valid1) => {
         this.$refs.setTicketDataRef.forEach((item) => {
           item.validate((valid2) => {
@@ -1693,7 +1649,6 @@ export default {
         }
       })
       this.baseFormData.conferenceFormList = [...this.defaultList,...this.customList]
-      console.log(this.baseFormData)
       this.$refs.baseFormDataRef.validate((valid1) => {
         this.$refs.setTicketDataRef.forEach((item) => {
           item.validate((valid2) => {
@@ -1743,7 +1698,6 @@ export default {
         }
       })
       this.baseFormData.conferenceFormList = [...this.defaultList,...this.customList]
-      console.log(this.baseFormData)
       this.$refs.baseFormDataRef.validate((valid1) => {
         // 状态不为草稿
         if (this.statusFlag != "0") {

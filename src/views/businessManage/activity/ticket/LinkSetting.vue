@@ -42,7 +42,12 @@ export default {
           {
             label: '标题',
             prop: 'officialNewsName',
-            search: true,
+          },
+          {
+            label: '标题',
+            prop: 'searchName',
+            hidden: true,
+            search: true
           }
         ],
         menu: true,
@@ -66,9 +71,9 @@ export default {
       }
       this.dialogVisible = true
     },
-    fetchListFun () {
+    fetchListFun (params) {
       return new Promise((resolve, reject) => {
-        officialReleaseList(this.queryOfficial).then(({data})=>{
+        officialReleaseList(params).then(({data})=>{
           resolve({
             records: data.data.data.records,
             page: {
