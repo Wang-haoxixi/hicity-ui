@@ -7,6 +7,7 @@
         class="search-box"
         label-width="auto"
         style="width: 100%"
+        @submit.native.prevent="toSearch"
       >
         <slot name="searchItems" :search-form="searchFormShow">
           <el-form-item
