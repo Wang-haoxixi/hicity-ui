@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import { getTagList, addTag, updateTag, deleteTag, addTagType, deleteTagType, getAllTagType } from "@/api/admin/positionTag"
+import { getTagList, addTag, updateTag, deleteTag, addTagType, deleteTagType, getAllTagType } from "@/api/recruit/positionTag"
 import HcRemoteSelect from "@/views/components/HcForm/HcRemoteSelect/index"
 import TagTypeItem from './TagTypeItem'
 export default {

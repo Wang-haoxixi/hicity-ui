@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import { updateTagType, deleteTagType } from "@/api/admin/positionTag"
+import { updateTagType, deleteTagType } from "@/api/recruit/positionTag"
 export default {
   props: {
     itemData: {
