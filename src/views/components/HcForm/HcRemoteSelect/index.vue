@@ -31,7 +31,7 @@ export default {
       default: ''
     },
     showWord: {
-      type: String,
+      type: [String, Number, Object],
       default: ''
     },
     placeholder: {

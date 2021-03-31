@@ -47,9 +47,18 @@ export function updateTagType(data) {
   })
 }
 
+
+export function deleteTagType(data) {
+  return request({
+    url: '/dms/recruit/lable/type_delete',
+    method: 'POST',
+    data
+  })
+}
+
 export function getAllTagType(params) {
   return request({
-    url: '/dms/recruit/lable/type_page',
+    url: '/dms/recruit/lable/type_list',
     params
   })
 }

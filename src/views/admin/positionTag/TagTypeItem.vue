@@ -7,13 +7,13 @@
     <div class="type-item-options">
       <i v-show="!isEdit" class="el-icon-edit" @click="toEdit"></i>
       <i v-show="isEdit" class="el-icon-check" @click="updateTagType"></i>
-      <i class="el-icon-delete" style="margin-left: 10px;"></i>
+      <i class="el-icon-delete" style="margin-left: 10px;" @click="deleteTagType"></i>
     </div>
   </div>
 </template>
 
 <script>
-import { updateTagType } from "@/api/admin/positionTag"
+import { updateTagType, deleteTagType } from "@/api/admin/positionTag"
 export default {
   props: {
     itemData: {
@@ -46,6 +46,7 @@ export default {
           positionLableTypeId: this.itemData.positionLableTypeId,
           positionLableType: this.editText,
         }).then(({data}) => {
+          this.$message.success('修改成功')
           this.itemData.positionLableType = this.editText
           this.isEdit = false
           this.$emit('loading', false)
@@ -53,6 +54,9 @@ export default {
           this.isUpdate = false
         })
       }
+    },
+    deleteTagType () {
+      this.$emit('delete-item')
     },
     blur () {
       setTimeout(() => {
@@ -80,6 +84,9 @@ export default {
   .type-item-options {
     height: 30px;
     line-height: 30px;
+    i {
+      cursor: pointer;
+    }
   }
 }
 </style>
