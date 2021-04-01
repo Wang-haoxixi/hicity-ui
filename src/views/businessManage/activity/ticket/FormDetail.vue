@@ -51,7 +51,7 @@
           </el-col>
         </el-row>
         <el-form-item label="票务备注" prop="remarks">
-          <el-input v-model="formData.remarks" type="textarea" maxlength="50" :autosize="{minRows: 4, maxRows: 8}" placeholder="请输入备注内容"></el-input>
+          <el-input v-model="formData.remarks" type="textarea" maxlength="100" show-word-limit :autosize="{minRows: 4, maxRows: 8}" placeholder="请输入备注内容"></el-input>
         </el-form-item>
         <el-form-item label="其他内容" prop="others">
           <el-switch v-model="hasOthers"></el-switch>

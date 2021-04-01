@@ -413,6 +413,8 @@
                       <el-input
                         style="width: 650px"
                         placeholder="请输入备注内容"
+                        maxlength="100"
+                        show-word-limit
                         type="textarea"
                         v-model="item.remarks"
                         :rows="4"
