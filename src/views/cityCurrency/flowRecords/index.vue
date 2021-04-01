@@ -1,13 +1,10 @@
 <template>
-  <devPage></devPage>
+  <div>
+  </div>
 </template>
 
 <script>
-import devPage from '@/views/devPage/index'
 export default {
-  components: {
-    devPage
-  },
   data () {
     return {
     }

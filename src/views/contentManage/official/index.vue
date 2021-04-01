@@ -92,6 +92,8 @@
               :on-success="handlePicSuccess"
               :file-list="fileList"
               :headers="headersOpt"
+              :before-upload="onBeforeUpload"
+              accept=".jpg,.jpeg,.png,.gif,.bmp,.JPG,.JPEG,.PNG,.GIF,.BMP"
             >
               <i class="el-icon-plus"></i>
             </el-upload>
@@ -168,6 +170,7 @@ import HcTextLine from "@/views/components/HcTextLine/index";
 
 // -------------
 import { tableOption } from "./const.js";
+import { getFileMimeType } from "@/util/file"
 
 export default {
   components: {
@@ -236,6 +239,24 @@ export default {
     },
   },
   methods: {
+    onBeforeUpload(file) {
+      return new Promise((resolve, reject) => {
+        getFileMimeType(file).then(res => {
+          if (res) {
+            const isLt1M = file.size / 1024 / 1024 < 50;
+            if (!isLt1M) {
+              this.$message.warning("上传文件大小不能超过 50MB!");
+              reject()
+            } else {
+              resolve(true)
+            }
+          } else {
+            this.$message.warning("暂不支持该文件类型！");
+            reject();
+          }
+        })
+      })
+    },
     fetchListFun(params) {
       return new Promise((resolve, reject) => {
         officialReleaseList(params).then((res) => {

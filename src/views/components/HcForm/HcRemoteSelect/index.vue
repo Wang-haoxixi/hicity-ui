@@ -5,15 +5,21 @@
     remote
     :placeholder="placeholder"
     :remote-method="remote"
+    :value-key="valueKey"
+    :disabled="disabled"
     @change="selectChange"
+    maxlength="10"
     :loading="loading">
-    <el-option
-      v-for="option in options"
-      :key="option.value"
-      :label="option.label"
-      :value="option.value"
-      :disabled="disabledItems.includes(option.value)">
-    </el-option>
+    <slot>
+      <el-option
+        v-for="option in options"
+        :key="option.value"
+        :label="option[labelKey]"
+        :value="isObject ? option : option.value"
+        :disabled="disabledItems.includes(option.value)">
+        <slot name="option" :option="option"></slot>
+      </el-option>
+    </slot>
   </el-select>
 </template>
 
@@ -21,11 +27,11 @@
 export default {
   props: {
     value: {
-      type: [String, Number],
+      type: [String, Number, Object],
       default: ''
     },
     showWord: {
-      type: String,
+      type: [String, Number, Object],
       default: ''
     },
     placeholder: {
@@ -39,6 +45,22 @@ export default {
     disabledItems: {
       type: Array,
       default: () => []
+    },
+    valueKey: {
+      type: String,
+      default: 'value'
+    },
+    isObject: {
+      type: Boolean,
+      default: false
+    },
+    labelKey: {
+      type: String,
+      default: 'label'
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -69,7 +91,6 @@ export default {
       if (query !== '') {
         this.loading = true;
         this.remoteFun(query).then(data => {
-          console.log(data)
           this.options = data
           this.loading = false
         })
@@ -80,6 +101,7 @@ export default {
     selectChange (value) {
       this.selectData = value
       this.$emit('input', value)
+      this.$emit('change', value)
     }
   }
 }

@@ -6,12 +6,21 @@
       @go-back="publish = false">
 
       <hc-crud ref="hcCrud" :fetchListFun="fetchListFun" :option="tableOption">
+        <template slot="menuLeft">
+          <el-button
+            class="filter-item"
+            type="primary"
+            size="mini"
+            icon="el-icon-plus"
+            @click="toCreate"
+            >新建</el-button>
+        </template>
         <template slot="cityList" slot-scope="scope">
           <el-button type="text" size="mini" @click="cityView(scope.row.id)">查看</el-button>
         </template>
         <template slot="menu" slot-scope="scope">
-          <template>
-            <el-button type="text" size="mini" @click="toView(scope.row)">详情</el-button>
+          <template v-if="userType <= scope.row.publishedSources">
+            <el-button type="text" size="mini" @click="toUpdate(scope.row)">编辑</el-button>
             <el-button type="text" size="mini" @click="toDelete(scope.row)">删除</el-button>
           </template>
         </template>
@@ -22,27 +31,20 @@
           class="dialog-main-tree"
           :model="formData"
           label-width="180px"
-          :disabled="publishType == 'view'"
           :rules="formRule">
-          <el-form-item label="游记名称：" prop="travelName">
+          <el-form-item v-if="formData.publishedSources ? (userType != 3 && userType == formData.publishedSources) : (userType == 1 || userType == 2)" label="发布城市：" prop="cityList">
+            <hc-city-select v-model="formData.cityList" :city-id="userInfo.manageCityId"></hc-city-select>
+          </el-form-item>
+          <el-form-item label="话题名称：" prop="travelName">
             <el-input v-model="formData.travelName" maxlength="30"></el-input>
           </el-form-item>
-          <el-form-item label="关联话题：" prop="topicsBankIdSet">
-            <hc-topic-select v-model="formData.topicsBankIdSet" :topic-name="topicName"></hc-topic-select>
-          </el-form-item>
-          <el-form-item label="游记图片：" prop="images">
-            <hc-image-upload v-model="formData.images" :limit="10"></hc-image-upload>
-          </el-form-item>
-          <!-- <el-form-item v-if="formData.publishedSources ? (userType != 3 && userType == formData.publishedSources) : (userType == 1 || userType == 2)" label="发布城市：" prop="cityList">
-            <hc-city-select v-model="formData.cityList" :city-id="userInfo.manageCityId"></hc-city-select>
-          </el-form-item> -->
           <el-form-item label="内容：" prop="content">
             <el-input type="textarea" v-model="formData.content" :autosize="{minRows: 5, maxRows: 10}" maxlength="250"></el-input>
           </el-form-item>
-        </el-form>
-        <el-form label-width="180px">
           <el-form-item>
             <el-button @click="handlePreview">预览</el-button>
+            <el-button :loading="formLoading" @click="handleDraft">保存草稿</el-button>
+            <el-button :loading="formLoading" @click="handleCreate">直接发布</el-button>
           </el-form-item>
         </el-form>
         <hc-preview v-if="preview" @close="preview = false">
@@ -100,8 +102,8 @@ export default {
       formRule: {
         // travelName: [{required: true, message: '请输入名称'}],
         // topicsBankIdSet: [{required: true, message: '请选择话题'}],
-        // cityList: [{required: true, message: '请选择城市'}],
-        // images: [{required: true, message: '请添加游记图片'}],
+        cityList: [{required: true, message: '请选择城市'}],
+        images: [{required: true, message: '请添加游记图片'}],
         // content: [{required: true, message: '请输入内容'}],
       },
       preview: false,
@@ -109,7 +111,8 @@ export default {
         pagination: {
           el: '.swiper-pagination'
         },
-      }
+      },
+      formLoading: false,
     };
   },
   computed: {
@@ -119,9 +122,13 @@ export default {
     },
     title () {
       if (!this.publish) {
-        return '用户发布'
+        return '官方游记'
       } else {
-        return '用户发布-详情'
+        if (this.publishType == 'add') {
+          return '官方游记-新增'
+        } else {
+          return '官方游记-编辑'
+        }
       }
     }
   },
@@ -133,7 +140,7 @@ export default {
       return new Promise((resolve, reject) => {
         getTravelList({
           ...params,
-          queryType: 1
+          queryType: 0
         }).then(({ data }) => {
           resolve({
             records: data.data.data.records,
@@ -146,11 +153,45 @@ export default {
         })
       })
     },
-    toView({ id }) {
+    toCreate() {
+      this.formData = {
+        cityList: [this.userInfo.manageCityId],
+        images: [],
+      };
+      this.topicName = ''
+      this.publish = true;
+      this.publishType = "add";
+    },
+    handleCreate() {
+      this.formLoading = true
+      this.$refs.form.validate(valid => {
+        if (valid) {
+          this.save(1)
+        } else {
+          this.formLoading = false
+        }
+      })
+    },
+    save (state) {
+      let formData = this.formData;
+      saveTravel({ ...formData, state }).then(({ data }) => {
+        this.publish = false;
+        this.$notify({
+          title: "成功",
+          message: state ? '保存成功！' : this.publishType == 'add' ? "发布成功！" : "编辑成功！",
+          type: "success",
+          duration: 2000,
+        });
+        this.$refs.hcCrud.refresh()
+      }).finally(() => {
+        this.formLoading = false
+      });
+    },
+    toUpdate({ id }) {
       getTravelDetail(id).then(({ data }) => {
         let formData = data.data.data
         let topicsBankIdSet = []
-        if (formData.topicsBankList) {
+        if (formData.topicsBankList && formData.topicsBankList.length > 0) {
           for (let i = 0; i < formData.topicsBankList.length; i++) {
             topicsBankIdSet.push(formData.topicsBankList[i].id)
           }
@@ -160,14 +201,24 @@ export default {
           travelName: formData.travelName,
           topicsBankIdSet,
           images: formData.imageUrls,
-          cityList: formData.cityIds,
+          cityList: formData.cityIds || [],
           content: formData.content,
           publishedSources: formData.publishedSources
         }
-        this.topicName = formData.topicsBankList && formData.topicsBankList[0].topicsName || ''
+        this.topicName = formData.topicsBankList && formData.topicsBankList.length > 0 && formData.topicsBankList[0].topicsName || ''
         this.publish = true;
-        this.publishType = "view";
+        this.publishType = "edit";
       });
+    },
+    handleDraft() {
+      this.formLoading = true
+      this.$refs.form.validate(valid => {
+        if (valid) {
+          this.save(0)
+        } else {
+          this.formLoading = false
+        }
+      })
     },
     handlePreview() {
       this.preview = true

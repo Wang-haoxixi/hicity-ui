@@ -95,6 +95,8 @@
               :on-success="handlePosterSuccess"
               :show-file-list="false"
               :headers="headersOpt"
+              :before-upload="onBeforeUpload"
+              accept=".jpg,.jpeg,.png,.gif,.bmp,.JPG,.JPEG,.PNG,.GIF,.BMP"
             >
               <el-button icon="el-icon-upload">点击上传</el-button>
             </el-upload>
@@ -608,6 +610,7 @@ import {dateFormat} from "@/util/date.js";
 import HcQuill from "@/views/components/HcQuill";
 import HcCitySelect from "@/views/components/HcCity/HcCitySelect/index";
 import { mapGetters } from "vuex";
+import { getFileMimeType } from "@/util/file"
 import {
   activityClassify,
   cityTree,
@@ -969,6 +972,24 @@ export default {
     ...mapGetters(["userType", "userInfo"]),
   },
   methods: {
+    onBeforeUpload(file) {
+      return new Promise((resolve, reject) => {
+        getFileMimeType(file).then(res => {
+          if (res) {
+            const isLt1M = file.size / 1024 / 1024 < 50;
+            if (!isLt1M) {
+              this.$message.warning("上传文件大小不能超过 50MB!");
+              reject()
+            } else {
+              resolve(true)
+            }
+          } else {
+            this.$message.warning("暂不支持该文件类型！");
+            reject();
+          }
+        })
+      })
+    },
     priceChange (item) {
       let val = item.amount
       try {

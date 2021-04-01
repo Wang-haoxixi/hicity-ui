@@ -347,7 +347,7 @@ export default {
           deltas.insert(op.insert, op.attributes)
         }
       })
-      const converter = new QuillDeltaToHtmlConverter(deltas.ops, {})
+      const converter = new QuillDeltaToHtmlConverter(deltas.ops, {inlineStyles: true})
       const html = converter.convert()
       this.$emit('input', {content: html, structuredContent: JSON.stringify(deltas.ops)})
     });

@@ -20,7 +20,9 @@
       @upload-success="fileChangeFormal"
       @upload-error="fileRemove"
       @change-success="fileChangeFormal"
-      @change-error="fileChangeBack">
+      @change-error="fileChangeBack"
+      accept=".jpg,.jpeg,.png,.gif,.bmp,.JPG,.JPEG,.PNG,.GIF,.BMP"
+      :before-upload="onBeforeUpload">
       <template v-slot:trigger>
         <div v-if="disabled"></div>
         <div v-else class="image-box">
@@ -38,6 +40,7 @@
 <script>
 import { v4 as uuidv4 } from 'uuid'
 import FileUpload from './FileUpload/index'
+import { getFileMimeType } from "@/util/file"
 
 export default {
   components: { FileUpload },
@@ -66,6 +69,24 @@ export default {
     }
   },
   methods: {
+    onBeforeUpload(file) {
+      return new Promise((resolve, reject) => {
+        getFileMimeType(file).then(res => {
+          if (res) {
+            const isLt1M = file.size / 1024 / 1024 < 50;
+            if (!isLt1M) {
+              this.$message.warning("上传文件大小不能超过 50MB!");
+              reject()
+            } else {
+              resolve(true)
+            }
+          } else {
+            this.$message.warning("暂不支持该文件类型！");
+            reject();
+          }
+        })
+      })
+    },
     fileAddTemp (file) {
       this.fileList.push({
         ...file,

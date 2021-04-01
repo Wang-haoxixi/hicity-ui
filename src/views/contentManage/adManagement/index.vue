@@ -172,6 +172,8 @@
             :show-file-list="false"
             :on-success="handleAvatarSuccess"
             :headers="headersOpt"
+            :before-upload="onBeforeUpload"
+            accept=".jpg,.jpeg,.png,.gif,.bmp,.JPG,.JPEG,.PNG,.GIF,.BMP"
           >
             <img v-if="imageUrl" :src="form.imageUrl" class="avatar" />
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -372,6 +374,7 @@ import { tableOption } from './const.js'
 import { adPosition } from "@/api/content/ad-position";
 import store from "@/store";
 import HcEmptyData from "@/views/components/HcEmptyData/index";
+import { getFileMimeType } from "@/util/file"
 export default {
   components: { HcEmptyData },
   data() {
@@ -452,6 +455,24 @@ export default {
     };
   },
   methods: {
+    onBeforeUpload(file) {
+      return new Promise((resolve, reject) => {
+        getFileMimeType(file).then(res => {
+          if (res) {
+            const isLt1M = file.size / 1024 / 1024 < 50;
+            if (!isLt1M) {
+              this.$message.warning("上传文件大小不能超过 50MB!");
+              reject()
+            } else {
+              resolve(true)
+            }
+          } else {
+            this.$message.warning("暂不支持该文件类型！");
+            reject();
+          }
+        })
+      })
+    },
     // 重置新增表单
     dialogFormVisibleClose() {
       this.$refs.ruleAddForm.resetFields();

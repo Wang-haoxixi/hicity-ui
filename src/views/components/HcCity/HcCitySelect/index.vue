@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-input @focus="toSelect" :value="cityName" readonly></el-input>
+    <el-input :disabled="disabled" :value="cityName" readonly @focus="toSelect"></el-input>
     <hc-city-box ref="hcCityBox" :title="title" :single="single" @save="save"></hc-city-box>
   </div>
 </template>
@@ -118,6 +118,14 @@ export default {
       type: String,
       default: '展示城市'
     },
+    viewOnly: {
+      type: Boolean,
+      default: false
+    },
+    disabled: {
+      type: Boolean,
+      default: false
+    }
   },
   data () {
     return {
@@ -154,7 +162,7 @@ export default {
       this.citySelected = !this.single ? getCityShow(cityTree) : getLastCity(cityTree)
     },
     toSelect () {
-      this.$refs.hcCityBox.open(this.cityId, this.single ? (this.value ? [this.value] : []) : (this.value || []))
+      this.$refs.hcCityBox.open(this.cityId, this.single ? (this.value ? [this.value] : []) : (this.value || []), this.viewOnly)
     },
     save (city) {
       this.citySelected = !this.single ? getCityShow(city) : getLastCity(city)
