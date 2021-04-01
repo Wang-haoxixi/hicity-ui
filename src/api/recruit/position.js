@@ -14,3 +14,19 @@ export function getPositionDetail(params) {
     params
   })
 }
+
+export function offShelf(data) {
+  return request({
+    url: '/dms/recruit/off_shelf',
+    method: 'post',
+    data
+  })
+}
+
+export function audit(data) {
+  return request({
+    url: '/dms/recruit/audit',
+    method: 'post',
+    data
+  })
+}

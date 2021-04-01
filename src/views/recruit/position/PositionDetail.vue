@@ -9,7 +9,7 @@
     <el-form-item label="职位描述：">
       <div style="max-width: 400px;">{{positionDetail.describe}}</div>
     </el-form-item>
-    <el-form-item label="职位标签：">{{positionDetail.lableInfoList.map(item => item.positionLable).join(' , ')}}</el-form-item>
+    <el-form-item label="职位标签：">{{positionDetail.lableInfoList && positionDetail.lableInfoList.map(item => item.positionLable).join(' , ') || ''}}</el-form-item>
   </el-form>
 </template>
 

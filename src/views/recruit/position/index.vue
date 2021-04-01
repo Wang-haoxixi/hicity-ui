@@ -7,11 +7,11 @@
       <hc-crud ref="hcCrud" :fetchListFun="fetchListFun" :option="tableOption">
         <template v-slot:menu="scope">
           <el-button type="text" size="mini" @click="toView(scope.row)">详情</el-button>
-          <template v-if="scope.row.status == '1' && scope.row.auditStatus == '1'">
-            <el-button type="text" size="mini">上架</el-button>
-            <el-button type="text" size="mini">拒绝</el-button>
+          <template v-if="scope.row.status == '3' && scope.row.auditStatus == '1'">
+            <el-button type="text" size="mini" @click="audit(scope.row, 'pass')">上架</el-button>
+            <el-button type="text" size="mini" @click="audit(scope.row, 'reject')">拒绝</el-button>
           </template>
-          <el-button v-if="scope.row.status == '1' && (scope.row.auditStatus == '0' || scope.row.auditStatus == '2')" type="text" size="mini">下架</el-button>
+          <el-button v-if="scope.row.status == '1'" type="text" size="mini" @click="offShelf(scope.row)">下架</el-button>
         </template>
       </hc-crud>
       <position-detail slot="form" :position-detail="positionDetail"></position-detail>
@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import { getPositionList, getPositionDetail } from "@/api/recruit/position"
+import { getPositionList, getPositionDetail, offShelf, audit } from "@/api/recruit/position"
 import PositionDetail from "./PositionDetail"
 export default {
   components: { PositionDetail },
@@ -37,7 +37,8 @@ export default {
           },
           {
             label: '职位名称',
-            prop: 'name'
+            prop: 'name',
+            search: true,
           },
           {
             label: '发布人',
@@ -55,17 +56,17 @@ export default {
             width: 100,
             formatter: function (row) {
               if (row.status == '1') {
-                if (row.auditStatus == '1') {
-                  return '待审核'
-                } else if (row.auditStatus == '2' || row.auditStatus == '0') {
-                  return '招聘中'
-                } else if (row.auditStatus == '3') {
-                  return '审核未通过'
-                }
+                return '招聘中'
               } else if (row.status == '2') {
                 return '已关闭'
               } else if (row.status == '3') {
-                return '已下架'
+                if (row.auditStatus == '1') {
+                  return '待审核'
+                } else if (row.auditStatus == '3') {
+                  return '审核未通过'
+                } else if (row.auditStatus === '0') {
+                  return '已下架'
+                }
               }
               return ''
             },
@@ -77,7 +78,7 @@ export default {
           }
         ],
         menu: true,
-        menuWidth: 100
+        menuWidth: 120
       },
       positionDetail: {}
     }
@@ -115,6 +116,60 @@ export default {
         this.positionDetail = data.data.data
         this.viewDetail = true
       })
+    },
+    audit ({recruitPositionId}, sign) {
+      let text = sign == 'pass' ? '上架' : '拒绝'
+      this.$prompt(`${text}理由：`, text, {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        inputType: 'textarea',
+        inputPlaceholder: `请输入${text}理由`,
+        inputValidator: function (value) {
+          if (value && value.length < 51) {
+            return true
+          } else if (!value) {
+            return `${text}理由不能为空`
+          } else {
+            return `${text}理由不能超过50字`
+          }
+        },
+      }).then(({ value }) => {
+        audit({
+          recruitPositionId,
+          remarks: value,
+          sign
+        }).then(({ data }) => {
+          this.$message.success(`${text}成功`)
+          this.$refs.hcCrud.refresh()
+        })
+      }).catch(() => {
+      });
+    },
+    offShelf ({recruitPositionId}) {
+      this.$prompt('下架理由：', '下架', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        inputType: 'textarea',
+        inputPlaceholder: '请输入下架理由',
+        inputValidator: function (value) {
+          if (value && value.length < 51) {
+            return true
+          } else if (!value) {
+            return '下架理由不能为空'
+          } else {
+            return '下架理由不能超过50字'
+          }
+        },
+      }).then(({ value }) => {
+        offShelf({
+          recruitPositionId,
+          remarks: value
+        }).then(({ data }) => {
+          this.$message.success('下架成功')
+          this.$refs.hcCrud.refresh()
+        })
+      }).catch(() => {
+      });
     }
   }
 }
