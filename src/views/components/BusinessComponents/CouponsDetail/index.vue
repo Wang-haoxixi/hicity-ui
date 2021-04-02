@@ -37,7 +37,7 @@
 
     <h3 class="form-title">领取限制</h3>
     <el-form-item v-if="detail.type == '1'" label="发布城市：">
-      {{detail.scopeOfUseCity}}
+      <hc-city-select :value="detail.scopeOfUseCity.split(',').map(item => parseInt(item))" viewOnly :city-id="$store.getters.userInfo.manageCityId"></hc-city-select>
     </el-form-item>
     <el-form-item label="用户可领个数：">
       活动期间每个用户可参与 {{detail.limitNum}} 个
@@ -46,7 +46,10 @@
 </template>
 
 <script>
+import HcCitySelect from "@/views/components/HcCity/HcCitySelect/index"
+
 export default {
+  components: { HcCitySelect },
   props: {
     detail: {
       type: Object,
