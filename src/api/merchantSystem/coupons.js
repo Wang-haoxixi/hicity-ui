@@ -57,3 +57,17 @@ export function getCityList (params) {
     params
   })
 }
+
+export function getCityReceiveList (params) {
+  return request({
+    url: '/mms/coupons/receive/city/select/page',
+    params
+  })
+}
+
+export function getPlatformReceiveList (params) {
+  return request({
+    url: '/mms/coupons/receive/platform/select/page',
+    params
+  })
+}
