@@ -234,7 +234,7 @@ export default {
     deductionPriceValidator (rules, value, callback) {
       let formData = this.formData
       if (formData.deductionPrice) {
-        if (formData.conditionPrice && formData.deductionPrice > formData.conditionPrice) {
+        if (formData.conditionPrice && formData.deductionPrice >= formData.conditionPrice) {
           callback(new Error('抵扣价不能高于满足条件'))
           return
         } else if (formData.conditionPrice) {
@@ -251,7 +251,7 @@ export default {
     conditionPriceValidator (rules, value, callback) {
       let formData = this.formData
       if (formData.conditionPrice) {
-        if (formData.deductionPrice && formData.deductionPrice > formData.conditionPrice) {
+        if (formData.deductionPrice && formData.deductionPrice >= formData.conditionPrice) {
           callback(new Error('满足条件不能低于抵扣价'))
         } else if (formData.deductionPrice) {
           this.$refs.form.clearValidate('deductionPrice')
