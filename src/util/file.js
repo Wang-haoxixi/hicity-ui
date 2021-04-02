@@ -57,6 +57,8 @@ export function uploadImage (url) {
 export function getFileMimeType(file) {
   const map = {
     'FFD8FFE0': 'jpg',
+    'FFD8FFE1': 'jpg',
+    'FFD8FFE8': 'jpg',
     '89504E47': 'png',
     '47494638': 'gif',
     '52494646': 'webp',
