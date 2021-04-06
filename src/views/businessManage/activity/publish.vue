@@ -238,6 +238,7 @@
           <el-upload
             class="upload-demo"
             :limit="3"
+            :on-exceed="handleExceed"
             :action="uploadPicUrl"
             :file-list="fileList"
             :headers="headersOpt"
@@ -975,6 +976,7 @@ export default {
     onBeforeUpload(file) {
       return new Promise((resolve, reject) => {
         getFileMimeType(file).then(res => {
+          console.log('海报校验',res)
           if (res) {
             const isLt1M = file.size / 1024 / 1024 < 50;
             if (!isLt1M) {
@@ -1362,11 +1364,15 @@ export default {
     },
     // 活动附件上传成功的钩子
     handleAccessorySuccess(res, file) {
+      console.log(res)
       this.baseFormData.fileList.push({
         original: file.name,
         attachFile: file.response.data.data.url,
       });
       // this.$refs.baseFormDataRef.validateField("fileList");
+    },
+    handleExceed(files, fileList) {
+      this.$message.warning(`活动附件最多上传3份`);
     },
     // 活动附件移除
     handleAccessoryRemove(file, fileList) {
@@ -1895,7 +1901,8 @@ export default {
   margin-right: 60px;
 }
 .box-card {
-  width: 1050px;
+  // width: 1050px;
+  width: 1002px;
 }
 .form-collect {
   width: 120px;
