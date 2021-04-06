@@ -2,12 +2,14 @@
   <el-input v-if="option.type == 'text' || option.type == 'textarea' || option.type == 'password'"
     :type="option.type"
     :value="value"
+    clearable
     :maxlength="option.maxlength"
     :disabled="disabled"
     :placeholder="option.placeholder || `请输入${option.label}`"
     @input="change"></el-input>
   <el-select v-else-if="option.type == 'select'"
     :value="value"
+    clearable
     :disabled="disabled"
     @change="change">
     <el-option v-for="(item, index) in dicData" :key="index" :value="item.value" :label="item.label">{{item.label}}</el-option>
@@ -22,10 +24,11 @@
   </el-radio-group>
   <el-date-picker v-else-if="option.type == 'datetime'"
     :value="value"
-    @input="change"
+    clearable
     :format="option.format"
     type="datetime"
-    placeholder="选择日期时间">
+    placeholder="选择日期时间"
+    @input="change">
   </el-date-picker>
   <el-switch v-else-if="option.type == 'switch'"
     :value="value"
@@ -34,7 +37,6 @@
     :active-text="option.activeText || '是'"
     :inactive-value="option.inactiveValue"
     :inactive-text="option.inactiveText || '否'"></el-switch>
-
 </template>
 
 <script>

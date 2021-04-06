@@ -129,7 +129,7 @@
     </el-form-item>
 
     <h3 class="form-title">领取限制</h3>
-    <el-form-item v-if="isPlatform" label="适用范围：" prop="limit">
+    <el-form-item v-if="isPlatform" label="适用范围：" prop="cityIds">
       <hc-city-select v-model="cityIds" :city-id="userInfo.manageCityId"></hc-city-select>
     </el-form-item>
     <el-form-item label="用户可领个数：" prop="limit">
@@ -192,7 +192,8 @@ export default {
           {validator: this.endTimeValidator, trigger: 'blur', message: '下架时间须早于可用结束时间'},
         ],
         limit: {required: true, message: '请输入用户可领个数', trigger: 'blur'},
-        logo: {validator: this.logoValidator, required: true, trigger: 'blur'}
+        logo: {validator: this.logoValidator, required: true, trigger: 'blur'},
+        cityIds: {required: true, validator: this.cityValidator, message: '请选择适用范围', trigger: 'change'},
       },
     };
   },
@@ -213,7 +214,7 @@ export default {
       } else {
         this.upTimeType = '2'
       }
-      let cityIds = this.formData.scopeOfUseCity.split(',')
+      let cityIds = this.formData.scopeOfUseCity ? this.formData.scopeOfUseCity.split(',') : []
       for (let i = 0; i < cityIds.length; i++) {
         cityIds.splice(i, 1, parseInt(cityIds[i]))
       }
@@ -233,7 +234,7 @@ export default {
     deductionPriceValidator (rules, value, callback) {
       let formData = this.formData
       if (formData.deductionPrice) {
-        if (formData.conditionPrice && formData.deductionPrice > formData.conditionPrice) {
+        if (formData.conditionPrice && formData.deductionPrice >= formData.conditionPrice) {
           callback(new Error('抵扣价不能高于满足条件'))
           return
         } else if (formData.conditionPrice) {
@@ -250,7 +251,7 @@ export default {
     conditionPriceValidator (rules, value, callback) {
       let formData = this.formData
       if (formData.conditionPrice) {
-        if (formData.deductionPrice && formData.deductionPrice > formData.conditionPrice) {
+        if (formData.deductionPrice && formData.deductionPrice >= formData.conditionPrice) {
           callback(new Error('满足条件不能低于抵扣价'))
         } else if (formData.deductionPrice) {
           this.$refs.form.clearValidate('deductionPrice')
@@ -336,6 +337,13 @@ export default {
         } else {
           callback(new Error('请选择图片，或者选择复用商户logo'))
         }
+      }
+    },
+    cityValidator (rules, value, callback) {
+      if (this.cityIds && this.cityIds.length > 0) {
+        callback()
+      } else {
+        callback(new Error('请选择适用范围'))
       }
     },
     handleSave() {
