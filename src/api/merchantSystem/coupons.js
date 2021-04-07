@@ -1,8 +1,15 @@
 import request from '@/router/axios'
 
-export function getCouponsPage (params) {
+export function getPlatformCouponsPage (params) {
   return request({
-    url: '/mms/coupons/select/page',
+    url: '/mms/coupons/platform/select/page',
+    params
+  })
+}
+
+export function getCityCouponsPage (params) {
+  return request({
+    url: '/mms/coupons/city/select/page',
     params
   })
 }
@@ -68,6 +75,49 @@ export function getCityReceiveList (params) {
 export function getPlatformReceiveList (params) {
   return request({
     url: '/mms/coupons/receive/platform/select/page',
+    params
+  })
+}
+
+export function couponsRecommend (params) {
+  return request({
+    url: '/mms/coupons/city/top/deal',
+    method: 'POST',
+    params
+  })
+}
+
+export function getRecommendList (params) {
+  return request({
+    url: '/mms/coupons/city/top/list',
+    params
+  })
+}
+
+export function getPlatformWriteoffList (params) {
+  return request({
+    url: '/mms/coupons/platform/write_off/page',
+    params
+  })
+}
+
+export function getCityWriteoffList (params) {
+  return request({
+    url: '/mms/coupons/city/write_off/page',
+    params
+  })
+}
+
+export function getOrderDetail (params) {
+  return request({
+    url: '/mms/coupons/order/detail',
+    params
+  })
+}
+
+export function getWriteoffDetail (params) {
+  return request({
+    url: '/mms/coupons/write_off/detail',
     params
   })
 }
