@@ -121,3 +121,11 @@ export function getWriteoffDetail (params) {
     params
   })
 }
+
+export function recommendBatch (data) {
+  return request({
+    url: '/mms/coupons/city/top/batch/deal',
+    method: 'post',
+    data
+  })
+}
