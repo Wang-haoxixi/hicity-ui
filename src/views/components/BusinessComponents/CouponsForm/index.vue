@@ -220,7 +220,9 @@ export default {
         scopeOfUseCity: '',
         isPermanent: '0',
         isCopyLogo: false, 
-        upTime: '',
+        upTime: '', 
+        downTime: '',
+        availableStartTime: '',
         availableEndTime: '',
         ...initForm
       }
@@ -386,7 +388,7 @@ export default {
   },
 };
 </script>
-<style lang="scss" scope>
+<style lang="scss" scoped>
 .form-item-available {
   &.is-error {
     .form-item-available-start.is-error {
