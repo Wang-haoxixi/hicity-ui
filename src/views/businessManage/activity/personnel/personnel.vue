@@ -23,7 +23,7 @@
           </el-table-column>
           <el-table-column label="票名">
             <template slot-scope="scope">
-              <el-button v-if="scope.row.info && JSON.parse(scope.row.info).length>0" type="text" size="mini" @click="handleCheckTicketInfo(scope.row.info)">{{scope.row.ticketingName}}</el-button>
+              <el-button v-if="scope.row.info != 'null'" type="text" size="mini" @click="handleCheckTicketInfo(scope.row.info)">{{scope.row.ticketingName}}</el-button>
               <span v-else>{{scope.row.ticketingName}}</span>
             </template>
           </el-table-column>
@@ -268,7 +268,7 @@ export default {
       this.annotation = row.soRemarks;
     },
     handleCheckTicketInfo(info){
-      console.log(222,JSON.parse(info))
+      console.log('票名',JSON.parse(info))
       this.infoList = JSON.parse(info)
       this.dialogUserSelectVisible = true
     },
@@ -277,7 +277,6 @@ export default {
         id: this.enroleId,
         soRemarks: this.annotation,
       }).then((res) => {
-        // console.log(res)
         this.getPeopleManagementList();
       });
       this.dialogAnnotationVisible = false;
@@ -285,49 +284,39 @@ export default {
     handleCheck(enroleId) {
       this.dialogApplyInfoVisible = true;
       formInquire({ enroleId: enroleId }).then((res) => {
-        // console.log(res);
         this.applyInfoForm = res.data.data.data;
-        // this.applyInfoForm.forEach(item=>{
-        //   item.actived = true
-        // })
         if (this.applyInfoForm && this.applyInfoForm.length > 0) {
           this.applyInfo = this.applyInfoForm[0];
         }
       });
     },
     handleSaveSignIn() {
-      // console.log(this.checkedSignInCode);
       let codeArr = this.checkedSignInCode.map((item) => {
         return item.orderNo;
       });
       checkCode({
         orderNos: codeArr,
       }).then((res) => {
-        // console.log(res);
         this.getPeopleManagementList();
       });
       this.dialogSignInVisible = false;
     },
     // 核销签到
     handleSignIn(row) {
-      // console.log(row)
       this.dialogSignInVisible = true;
       this.enroleId = row.enroleId;
       signInCode({ enroleId: this.enroleId }).then((res) => {
         this.signInCodeData = res.data.data.data;
-        // console.log(this.signInCodeData);
       });
     },
     getPeopleManagementList() {
       peopleManagement(this.query).then((res) => {
-        // console.log("res", res);
         if (res.data.code != 0) {
           return this.$message.error("获取列表失败");
         }
-        console.log(22,res)
+        console.log('列表',res)
         this.tableData = res.data.data.data.records;
         this.total = res.data.data.data.total;
-        // this.info = res.data.data.data
       });
     },
     handleSizeChange(val) {
@@ -344,16 +333,13 @@ export default {
       
     },
     handleCheckAllChange(val) {
-      // console.log(val);
       let writeOffStatusCode = this.signInCodeData.filter((item) => {
         return item.writeOffStatus == "0";
       });
-      // console.log(writeOffStatusCode);
       this.checkedSignInCode = val ? writeOffStatusCode : [];
       this.isIndeterminate = false;
     },
     handleCheckedCitiesChange(value) {
-      // console.log(value);
       let checkedCount = value.length;
       this.checkAll = checkedCount === this.checkedSignInCode.length;
       this.isIndeterminate =
