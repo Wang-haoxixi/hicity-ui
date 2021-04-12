@@ -253,7 +253,7 @@
         }
     }
 </script>
-<style lang="scss" scope>
+<style lang="scss" scoped>
   .user {
     height: 100%;
 

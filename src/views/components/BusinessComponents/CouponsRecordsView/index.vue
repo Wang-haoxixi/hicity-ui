@@ -7,24 +7,24 @@
       <el-tab-pane label="订单信息" name="order">
         <template>
           <div class="coupons-info">
-            <el-image class="coupons-img"></el-image>
-            <div class="coupons-name">三只鱼儿满100减15元券</div>
+            <el-image class="coupons-img" :src="orderDetail.logo"></el-image>
+            <div class="coupons-name">{{orderDetail.name}}</div>
           </div>
           <div class="order-info">
-            <p>用户名：齐小</p>
-            <p>联系电话：13666666666</p>
-            <p>领取时间：2020-01-01</p>
+            <p>用户名：{{orderDetail.userName}}</p>
+            <p>联系电话：{{orderDetail.phone}}</p>
+            <p>领取时间：{{orderDetail.createTime}}</p>
           </div>
         </template>
       </el-tab-pane>
-      <el-tab-pane label="核销信息" name="writeOff">
+      <el-tab-pane label="核销信息" name="writeOff" :disabled="!writeOff">
         <div class="off-info">
-          <p>核销券名：爱消费新人5元代金券爱消费官方</p>
-          <p>核销商户：衡阳市高新技术产业开发区惠怡美烟酒公安店</p>
-          <p>核销人员：暂无</p>
-          <p>核销人员手机号：13666666666</p>
-          <p>核销时间：2020-01-01</p>
-          <p>核销券码：202103011731413PiZor6a</p>
+          <p>核销券名：{{writeoffDetail.name}}</p>
+          <p>核销商户：{{writeoffDetail.merchantName}}</p>
+          <p>核销人员：{{writeoffDetail.writeOffUserName}}</p>
+          <p>核销人员手机号：{{writeoffDetail.writeOffUserPhone}}</p>
+          <p>核销时间：{{writeoffDetail.writeOffTime}}</p>
+          <p>核销券码：{{writeoffDetail.merchantNum}}</p>
         </div>
       </el-tab-pane>
     </el-tabs>
@@ -32,17 +32,30 @@
 </template>
 
 <script>
+import { getOrderDetail, getWriteoffDetail } from "@/api/merchantSystem/coupons"
 export default {
   data () {
     return {
       type: 'order',
       dialogVisible: false,
+      orderDetail: {},
+      writeoffDetail: {},
+      writeOff: true
     }
   },
   methods: {
-    open (type = 'order', id) {
+    open (type = 'order', id, writeOff = true) {
       this.type = type
+      this.writeOff = writeOff
       this.dialogVisible = true
+      if (writeOff) {
+        getWriteoffDetail({id}).then(({ data }) => {
+          this.writeoffDetail = data.data.data
+        })
+      }
+      getOrderDetail({id}).then(({data}) => {
+        this.orderDetail = data.data.data
+      })
     },
     dialogBeforeClose (next) {
       next()

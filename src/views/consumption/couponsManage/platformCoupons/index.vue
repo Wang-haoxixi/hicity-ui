@@ -62,7 +62,7 @@
 <script>
 import { tableOption } from "./const";
 import { mapGetters } from "vuex";
-import { getCouponsPage, createCoupons, getCouponsDetail, updateCoupons, deleteCouponsBatch, couponsDown } from "@/api/merchantSystem/coupons"
+import { getPlatformCouponsPage, getCityCouponsPage, createCoupons, getCouponsDetail, updateCoupons, deleteCouponsBatch, couponsDown } from "@/api/merchantSystem/coupons"
 import HcImageUpload from "@/views/components/HcImageUpload/index";
 import HcTableForm from "@/views/components/HcTableForm/index";
 import HcInput from "@/views/components/HcForm/HcInput/index"
@@ -83,6 +83,13 @@ export default {
     ...mapGetters(["permissions", "userInfo", "dicList", "userType"]),
     tableOption() {
       return tableOption(this.userType == 1 || this.userType == 2);
+    },
+    getCouponsPage () {
+      if (this.userType == 1) {
+        return getPlatformCouponsPage
+      } else if (this.userType == 2 || this.userType == 3) {
+        return getCityCouponsPage
+      }
     },
     title () {
       if (!this.formShow) {
@@ -122,7 +129,7 @@ export default {
   methods: {
     fetchListFun (params) {
       return new Promise((resolve, reject) => {
-        getCouponsPage({
+        this.getCouponsPage({
           ...params,
           type: '1',
         }).then(({ data }) => {
@@ -243,7 +250,7 @@ export default {
   },
 };
 </script>
-<style lang="scss" scope>
+<style lang="scss" scoped>
 .container {
   /deep/.el-input-number__increase {
     right: 1px !important;

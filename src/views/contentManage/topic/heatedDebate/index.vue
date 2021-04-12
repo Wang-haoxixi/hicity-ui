@@ -202,14 +202,14 @@ export default {
     },
     title() {
       if (!this.publish) {
-        return "用户热议";
+        return "官方热议";
       } else {
         if (this.publishType == "add") {
-          return "用户热议-新增";
+          return "官方热议-新增";
         } else if (this.publishType == "edit") {
-          return "用户热议-编辑";
+          return "官方热议-编辑";
         } else if (this.publishType == "view") {
-          return "用户热议-详情";
+          return "官方热议-详情";
         } else {
           return ''
         }
@@ -431,7 +431,7 @@ export default {
   },
 };
 </script>
-<style lang="scss" scope>
+<style lang="scss" scoped>
 .user {
   height: 100%;
 

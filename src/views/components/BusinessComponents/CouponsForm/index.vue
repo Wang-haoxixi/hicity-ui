@@ -42,6 +42,7 @@
           v-model="formData.availableStartTime"
           @change="$refs.form.validateField('availableTime')"
           type="datetime"
+          :picker-options="pickerOptions"
           value-format="yyyy-MM-dd HH:mm:ss"
           placeholder="选择开始时间">
         </el-date-picker>
@@ -52,6 +53,7 @@
           v-model="formData.availableEndTime"
           @change="$refs.form.validateField('availableTime')"
           type="datetime"
+          :picker-options="pickerOptions"
           value-format="yyyy-MM-dd HH:mm:ss"
           placeholder="选择结束时间">
         </el-date-picker>
@@ -89,7 +91,8 @@
         <el-date-picker v-if="upTimeType == 2"
           v-model="formData.upTime"
           type="datetime"
-        value-format="yyyy-MM-dd HH:mm:ss"
+          :picker-options="pickerOptions"
+          value-format="yyyy-MM-dd HH:mm:ss"
           placeholder="选择上架时间">
         </el-date-picker>
         <div style="display: flex;align-items: center;height: 36px;">
@@ -102,6 +105,7 @@
         v-if="formData.isPermanent == '0'"
         v-model="formData.downTime"
         type="datetime"
+        :picker-options="pickerOptions"
         value-format="yyyy-MM-dd HH:mm:ss"
         placeholder="选择下架时间">
       </el-date-picker>
@@ -159,6 +163,15 @@ export default {
   },
   data() {
     return {
+      pickerOptions: {
+        disabledDate(date){
+          let zero = new Date().setHours(0, 0, 0, 0);
+          if(date.getTime() > zero){
+              return false;
+          }
+          return true;
+        }
+      },
       formData: {
         logo: '',
       },
@@ -207,6 +220,10 @@ export default {
         scopeOfUseCity: '',
         isPermanent: '0',
         isCopyLogo: false, 
+        upTime: '', 
+        downTime: '',
+        availableStartTime: '',
+        availableEndTime: '',
         ...initForm
       }
       if (this.formData.status == 0 && this.formData.isDepository == '1') {
@@ -371,7 +388,7 @@ export default {
   },
 };
 </script>
-<style lang="scss" scope>
+<style lang="scss" scoped>
 .form-item-available {
   &.is-error {
     .form-item-available-start.is-error {

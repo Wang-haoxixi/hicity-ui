@@ -5,9 +5,13 @@
       :formVisible="formShow"
       @go-back="goBack">
       <hc-crud ref="hcCrud" :fetchListFun="fetchListFun" :option="tableOption">
+        <template v-if="userType == 2 || userType == 3" v-slot:menuLeft="">
+          <el-button size="mini" @click="recommendManage">推荐管理</el-button>
+        </template>
         <template slot="menu" slot-scope="scope">
           <el-button type="text" size="mini" @click="toView(scope.row)">查看</el-button>
-          <el-button v-if="scope.row.shelfStatus == 1" type="text" size="mini" @click="toDelete(scope.row)">下架</el-button>
+          <el-button v-if="scope.row.shelfStatus == 1" type="text" size="mini" @click="toShelfOff(scope.row)">下架</el-button>
+          <el-button v-if="(userType == 2 || userType == 3) && scope.row.isTop == '0'" type="text" size="mini" @click="recommend(scope.row)">推荐</el-button>
         </template>
       </hc-crud>
       <template slot="form">
@@ -15,19 +19,21 @@
         <merchant-detail v-if="formType == 'merchant'" :detail="merchantDetail"></merchant-detail>
       </template>
     </hc-table-form>
+    <recommend-manage ref="recommend" @refresh="recommendRefresh"></recommend-manage>
   </basic-container>
 </template>
 
 <script>
 import { tableOption } from "./const";
 import { mapGetters } from "vuex";
-import { getCouponsPage, getCouponsDetail, couponsDown } from "@/api/merchantSystem/coupons"
+import { getPlatformCouponsPage, getCityCouponsPage, getCouponsDetail, couponsDown, couponsRecommend } from "@/api/merchantSystem/coupons"
 import { getMerchantDetail } from "@/api/mms/merchant";
 import CouponsDetail from "@/views/components/BusinessComponents/CouponsDetail/index"
 import MerchantDetail from "@/views/components/BusinessComponents/MerchantDetail/index"
+import RecommendManage from './RecommendManage'
 export default {
   name: "SysUser",
-  components: { CouponsDetail, MerchantDetail },
+  components: { CouponsDetail, MerchantDetail, RecommendManage },
   data() {
     return {
       formShow: false,
@@ -40,6 +46,13 @@ export default {
     ...mapGetters(["permissions", "userInfo", "dicList", "userType"]),
     tableOption() {
       return tableOption(this.userType == 1 || this.userType == 2);
+    },
+    getCouponsPage () {
+      if (this.userType == 1) {
+        return getPlatformCouponsPage
+      } else if (this.userType == 2 || this.userType == 3) {
+        return getCityCouponsPage
+      }
     },
     title () {
       if (!this.formShow) {
@@ -65,7 +78,7 @@ export default {
     },
     fetchListFun (params) {
       return new Promise((resolve, reject) => {
-        getCouponsPage({
+        this.getCouponsPage({
           ...params,
           type: '0',
         }).then(({ data }) => {
@@ -105,6 +118,18 @@ export default {
         });
       }).catch(function () {});
     },
+    recommend ({ id }) {
+      couponsRecommend({id}).then(({data}) => {
+        this.$message.success('操作成功')
+        this.$refs.hcCrud.refresh()
+      })
+    },
+    recommendManage () {
+      this.$refs.recommend.open()
+    },
+    recommendRefresh () {
+      this.$refs.hcCrud.refresh()
+    },
     merchantView (merchantId) {
       getMerchantDetail({ merchantId }).then(({ data }) => {
         this.merchantDetail = data.data.data;
@@ -115,7 +140,7 @@ export default {
   },
 };
 </script>
-<style lang="scss" scope>
+<style lang="scss" scoped>
 .container {
   /deep/.el-input-number__increase {
     right: 1px !important;
