@@ -67,23 +67,23 @@ export default {
     }
   },
   watch: {
-    // value (val) {
-    //   if (val) {
-    //     let fileList = []
-    //     if (this.multiple) {
-    //       for (let i = 0; i < val.length; i++) {
-    //         fileList.push({
-    //           url: val[i]
-    //         })
-    //       }
-    //       this.fileList = fileList
-    //     } else {
-    //       this.fileList = [{url: val}]
-    //     }
-    //   } else {
-    //     this.fileList = []
-    //   }
-    // }
+    value (val) {
+      if (val) {
+        let fileList = []
+        if (this.multiple) {
+          for (let i = 0; i < val.length; i++) {
+            fileList.push({
+              url: val[i]
+            })
+          }
+          this.fileList = fileList
+        } else {
+          this.fileList = [{url: val}]
+        }
+      } else {
+        this.fileList = []
+      }
+    }
   },
   methods: {
     dataMatch (fileList, dataList) {
@@ -115,15 +115,6 @@ export default {
           }
         })
       })
-      // if (!file.type) {
-      //   this.$message.error("无法上传无类型文件！");
-      //   return false;
-      // }
-      // const isLt1M = file.size / 1024 / 1024 < 100;
-      // if (!isLt1M) {
-      //   this.$message.error("上传文件大小不能超过 100MB!");
-      // }
-      // return isLt1M;
     },
     handleError() {
       this.$message.error("错了哦，请检查文件服务器");
