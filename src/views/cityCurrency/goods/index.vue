@@ -82,8 +82,9 @@
               :file-list="annex"
               :headers="headersOpt"
               :on-success="handleAccessorySuccess"
-              :on-remove="handleAccessoryRemove">
-              <el-button size="small">点击上传</el-button>
+              :on-remove="handleAccessoryRemove"
+              :on-exceed="handleExceed">
+              <el-button size="small" >点击上传</el-button>
             </el-upload>
           </el-form-item>
           <el-form-item>
@@ -374,6 +375,9 @@ export default {
     // 活动附件移除
     handleAccessoryRemove(file, fileList) {
       this.annex = []
+    },
+    handleExceed () {
+      this.$message.warning('最多上传一个附件')
     }
   },
 };
