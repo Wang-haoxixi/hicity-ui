@@ -5,6 +5,7 @@ export const tableOption = () => {
       prop: 'name',
       search: true,
       slot: true,
+      maxlength: 50,
     },
     {
       label: '用户名',

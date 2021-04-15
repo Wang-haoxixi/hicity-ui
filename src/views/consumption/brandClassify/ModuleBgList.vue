@@ -59,8 +59,8 @@ export default {
       this.$emit('input', moduleBg.brandClassificationBgUrl)
       this.dialogVisible = false
     },
-    dialogBeforeClose () {
-
+    dialogBeforeClose (next) {
+      next()
     }
   }
 }

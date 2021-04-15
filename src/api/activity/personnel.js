@@ -57,3 +57,47 @@ export function checkCode(data) {
     data: data
   });
 }
+
+export function dataExport (id) {
+  return request({
+    url: `/dms/conference_enrole_form/download?conferenceId=${id}`,
+    responseType: "arraybuffer"
+  }).then(res => {
+    let disposition = res.headers['content-disposition']
+    downloadExe(res, decodeURI(disposition.substring(disposition.indexOf('fileName=') + 9)))
+  })
+}
+
+
+function downloadExe(response, name) {
+  // 处理返回的文件流
+  // let filename = getTitle(response.headers['content-disposition'].replace(/"/g, ''))
+  // console.log(filename)
+  const blob = new Blob([response.data], { type: 'application/vnd.ms-excel' })
+  // ie 兼容
+  if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+    window.navigator.msSaveOrOpenBlob(blob)
+  } else {
+    const link = document.createElement('a')
+    link.href = window.URL.createObjectURL(blob)
+    link.download = name
+    document.body.appendChild(link)
+    link.style.display = 'none'
+    link.click()
+    link.remove()
+  }
+}
+
+function getTitle (contentDisposition) {
+  let obj = ''
+  let list = contentDisposition.split('; ')
+  list.forEach(item=>{
+    let n = item.split('=')
+    if (n[1]) {
+      obj = n[1]
+    } else {
+      obj = n[0]
+    }
+  })
+  return obj
+}

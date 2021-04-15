@@ -9,7 +9,7 @@
           <el-form class="search-box" inline :model="tempSearch">
             <div class="serach-box-left">
               <el-form-item label="城市搜索：">
-                <el-input v-model="tempSearch.cityName" placeholder="请输入城市名称" clearable=""></el-input>
+                <el-input v-model="tempSearch.cityName" maxlength="50" placeholder="请输入城市名称" clearable=""></el-input>
               </el-form-item>
               <el-form-item>
               <el-button

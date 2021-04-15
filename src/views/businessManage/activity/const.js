@@ -4,6 +4,7 @@ export const tableOption = (isAdmin) => {
       label: '活动名称',
       prop: 'name',
       search: true,
+      maxlength: 50,
       hidden: true
     },
     {

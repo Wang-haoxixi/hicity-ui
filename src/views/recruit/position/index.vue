@@ -39,6 +39,7 @@ export default {
             label: '职位名称',
             prop: 'name',
             search: true,
+            maxlength: 50,
           },
           {
             label: '发布人',

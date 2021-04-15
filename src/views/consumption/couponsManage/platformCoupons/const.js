@@ -9,10 +9,11 @@ export const tableOption = () => {
       label: '券名称',
       prop: 'name',
       search: true,
+      maxlength: 50,
     },
     {
       label: '发布城市',
-      prop: 'businessName',
+      prop: 'cityName',
     },
     {
       label: '使用范围',
@@ -31,7 +32,7 @@ export const tableOption = () => {
     },
     {
       label: '库存',
-      prop: 'stock',
+      prop: 'surplus',
       width: 100,
     },
     {
@@ -45,24 +46,19 @@ export const tableOption = () => {
       width: 100,
     },
     {
-      label: '过期数量',
-      prop: '过期数量',
-      width: 100,
-    },
-    {
       label: '上架状态',
-      prop: 'shelfStatus',
+      prop: 'status',
       width: 100,
       formatter: function (row) {
-        if (row.shelfStatus === 0) {
+        if (row.status === 0) {
           return '待上架'
-        } else if (row.shelfStatus === 1) {
+        } else if (row.status === 1) {
           return '已上架'
-        } else if (row.shelfStatus === 2) {
+        } else if (row.status === 2) {
           return '已售罄'
-        } else if (row.shelfStatus === 3) {
+        } else if (row.status === 3) {
           return '已下架'
-        } else if (row.shelfStatus === 4) {
+        } else if (row.status === 4) {
           return '仓库中'
         } else {
           return ''
@@ -73,6 +69,17 @@ export const tableOption = () => {
       label: '领取状态',
       prop: 'sellStatus',
       width: 100,
+      formatter: function (row) {
+        if (row.sellStatus === 0) {
+          return '未开领'
+        } else if (row.sellStatus === 1) {
+          return '已开领'
+        } else if (row.sellStatus === 2) {
+          return '已领完'
+        } else {
+          return ''
+        }
+      }
     },
   ]
 

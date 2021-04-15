@@ -271,7 +271,7 @@ export default {
             params = { ...this.searchForm }
           }
           for (let key in params) {
-            if (!params[key]) {
+            if (params[key] === undefined || params[key] === null || params[key] === '') {
               delete params[key]
             }
           }
@@ -351,7 +351,10 @@ export default {
       });
     },
     toSearch() {
-      this.searchForm = this.searchFormShow;
+      this.searchForm = {
+        ...this.searchForm,
+        ...this.searchFormShow
+      }
       this.page.currentPage = 1
       this.getList();
     },

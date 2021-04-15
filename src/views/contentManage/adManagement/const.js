@@ -11,7 +11,8 @@ export const tableOption = {
     {
       label: '广告名称',
       prop: 'adName',
-      search: true
+      search: true,
+      maxlength: 50,
     },
     {
       label: '广告位',

@@ -8,6 +8,8 @@ export const tableOption = (admin = false) => {
     {
       label: '商户门店',
       prop: 'merchantName',
+      search: true,
+      maxlength: 50,
     },
     {
       label: '品牌',

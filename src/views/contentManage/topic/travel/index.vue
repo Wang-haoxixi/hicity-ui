@@ -32,11 +32,17 @@
           :model="formData"
           label-width="180px"
           :rules="formRule">
+          <el-form-item label="游记名称：" prop="travelName">
+            <el-input v-model="formData.travelName" maxlength="30"></el-input>
+          </el-form-item>
+          <el-form-item label="关联话题：" prop="topicsBankIdSet">
+            <hc-topic-select v-model="formData.topicsBankIdSet" :topic-name="topicName"></hc-topic-select>
+          </el-form-item>
+          <el-form-item label="游记图片：" prop="images">
+            <hc-image-upload v-model="formData.images" :limit="10"></hc-image-upload>
+          </el-form-item>
           <el-form-item v-if="formData.publishedSources ? (userType != 3 && userType == formData.publishedSources) : (userType == 1 || userType == 2)" label="发布城市：" prop="cityList">
             <hc-city-select v-model="formData.cityList" :city-id="userInfo.manageCityId"></hc-city-select>
-          </el-form-item>
-          <el-form-item label="话题名称：" prop="travelName">
-            <el-input v-model="formData.travelName" maxlength="30"></el-input>
           </el-form-item>
           <el-form-item label="内容：" prop="content">
             <el-input type="textarea" v-model="formData.content" :autosize="{minRows: 5, maxRows: 10}" maxlength="250"></el-input>

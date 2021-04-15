@@ -4,6 +4,7 @@ export const tableOption = (admin = false) => {
       label: '热议话题',
       prop: 'title',
       search: true,
+      maxlength: 50,
     },
     {
       label: '发布者',

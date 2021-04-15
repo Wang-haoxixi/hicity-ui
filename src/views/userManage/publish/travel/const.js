@@ -4,6 +4,7 @@ export const tableOption = (admin = false) => {
       label: '游记标题',
       prop: 'travelName',
       search: true,
+      maxlength: 50,
     },
     {
       label: '发布者',

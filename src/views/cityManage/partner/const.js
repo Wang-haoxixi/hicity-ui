@@ -9,6 +9,7 @@ export const tableOption = (edit = false, admin = false) => {
         prop: 'cityName',
         span: 24,
         search: true,
+        maxlength: 50,
         searchPlaceholder: '请输入城市名称'
       }, 
       {

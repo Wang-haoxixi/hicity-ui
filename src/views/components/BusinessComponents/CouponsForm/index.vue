@@ -31,12 +31,15 @@
       <div>例如：满100元可用</div>
     </el-form-item>
     <el-form-item label="供应量：" prop="supply">
-      <el-input-number v-model="formData.supply" :min="1"></el-input-number>
+      <el-input-number v-model="formData.supply" :min="1" :max="99999999"></el-input-number>
     </el-form-item>
-    <el-form-item label="是否永久有效：" prop="isPermanent">
+    <el-form-item label="是否放入仓库：" prop="isDepository">
+      <el-switch v-model="formData.isDepository" active-text="是" active-value="1" inactive-text="否" inactive-value="0" :disabled="formData.status == '3' || formData.status == '2'" @change="depositoryChange"></el-switch>
+    </el-form-item>
+    <el-form-item v-if="formData.isDepository != '1'" label="是否永久有效：" prop="isPermanent">
       <el-switch v-model="formData.isPermanent" active-text="是" active-value="1" inactive-text="否" inactive-value="0" @change="permanetChange"></el-switch>
     </el-form-item>
-    <el-form-item class="form-item-available" label="可用时间：" prop="availableTime" style="padding-bottom: 20px;">
+    <el-form-item v-if="formData.isDepository != '1'" class="form-item-available" label="可用时间：" prop="availableTime" style="padding-bottom: 20px;">
       <el-form-item class="form-item-available-start" labelWidth="0" prop="availableStartTime" style="display: inline-block">
         <el-date-picker
           v-model="formData.availableStartTime"
@@ -79,66 +82,65 @@
       ></el-input>
     </el-form-item>
 
-    <h3 class="form-title">上下架时间</h3>
-    <el-form-item label="上架时间：" prop="upTime">
-      <el-radio-group v-model="upTimeType" @change="upTimeTypeChange">
-        <div style="display: flex;align-items: center;height: 36px;">
-          <el-radio label="1">立即上架售卖</el-radio>
-        </div>
-        <div style="display: flex;align-items: center;height: 36px;">
-          <el-radio label="2">自定义上架时间</el-radio>
-        </div>
-        <el-date-picker v-if="upTimeType == 2"
-          v-model="formData.upTime"
-          type="datetime"
-          :picker-options="pickerOptions"
-          value-format="yyyy-MM-dd HH:mm:ss"
-          placeholder="选择上架时间">
-        </el-date-picker>
-        <div style="display: flex;align-items: center;height: 36px;">
-          <el-radio label="3" :disabled="formData.status == '3' || formData.status == '2'">暂不售卖，放入仓库</el-radio>
-        </div>
-      </el-radio-group>
-    </el-form-item>
-    <el-form-item label="下架时间：" prop="downTime">
-      <el-date-picker
-        v-if="formData.isPermanent == '0'"
-        v-model="formData.downTime"
-        type="datetime"
-        :picker-options="pickerOptions"
-        value-format="yyyy-MM-dd HH:mm:ss"
-        placeholder="选择下架时间">
-      </el-date-picker>
-      <template v-else>
-        长期有效
-      </template>
-      
-      <!-- <el-radio-group disabled :value="formData.isPermanent">
-        <div style="display: flex;align-items: center;height: 36px;">
-          <el-radio label="1">长期有效</el-radio>
-          <span>当券库存为0时，会放到『已售罄』的券列表里，可加库存或下架该券;下架后，该券放到『仓库中』的券列表里</span>
-        </div>
-        <div style="display: flex;align-items: center;height: 36px;">
-          <el-radio label="0">自定义下架时间</el-radio>
-          <span>期间券库存为0时，会放到『已售罄』的券列表里，可在下架时间前加库存继续开售或直接下架该券;下架后，该券放到『仓库中』的券列表里</span>
-        </div>
+    <template v-if="formData.isDepository != '1'">
+      <h3 class="form-title">上下架时间</h3>
+      <el-form-item label="上架时间：" prop="upTime">
+        <el-radio-group v-model="upTimeType" @change="upTimeTypeChange">
+          <div style="display: flex;align-items: center;height: 36px;">
+            <el-radio label="1">立即上架售卖</el-radio>
+          </div>
+          <div style="display: flex;align-items: center;height: 36px;">
+            <el-radio label="2">自定义上架时间</el-radio>
+          </div>
+          <el-date-picker v-if="upTimeType == 2"
+            v-model="formData.upTime"
+            type="datetime"
+            :picker-options="pickerOptions"
+            value-format="yyyy-MM-dd HH:mm:ss"
+            placeholder="选择上架时间">
+          </el-date-picker>
+        </el-radio-group>
+      </el-form-item>
+      <el-form-item label="下架时间：" prop="downTime">
         <el-date-picker
           v-if="formData.isPermanent == '0'"
           v-model="formData.downTime"
           type="datetime"
+          :picker-options="pickerOptions"
           value-format="yyyy-MM-dd HH:mm:ss"
-          placeholder="选择日期时间">
+          placeholder="选择下架时间">
         </el-date-picker>
-      </el-radio-group> -->
-    </el-form-item>
+        <template v-else>
+          长期有效
+        </template>
+        
+        <!-- <el-radio-group disabled :value="formData.isPermanent">
+          <div style="display: flex;align-items: center;height: 36px;">
+            <el-radio label="1">长期有效</el-radio>
+            <span>当券库存为0时，会放到『已售罄』的券列表里，可加库存或下架该券;下架后，该券放到『仓库中』的券列表里</span>
+          </div>
+          <div style="display: flex;align-items: center;height: 36px;">
+            <el-radio label="0">自定义下架时间</el-radio>
+            <span>期间券库存为0时，会放到『已售罄』的券列表里，可在下架时间前加库存继续开售或直接下架该券;下架后，该券放到『仓库中』的券列表里</span>
+          </div>
+          <el-date-picker
+            v-if="formData.isPermanent == '0'"
+            v-model="formData.downTime"
+            type="datetime"
+            value-format="yyyy-MM-dd HH:mm:ss"
+            placeholder="选择日期时间">
+          </el-date-picker>
+        </el-radio-group> -->
+      </el-form-item>
+    </template>
 
     <h3 class="form-title">领取限制</h3>
     <el-form-item v-if="isPlatform" label="适用范围：" prop="cityIds">
       <hc-city-select v-model="cityIds" :city-id="userInfo.manageCityId"></hc-city-select>
     </el-form-item>
-    <el-form-item label="用户可领个数：" prop="limit">
+    <el-form-item label="用户可领个数：" prop="limitNum">
       活动期间每个用户可参与
-      <el-input-number v-model="formData.limit" :max="99999999" :min="1"></el-input-number>
+      <el-input-number v-model="formData.limitNum" :max="99999999" :min="1"></el-input-number>
       个
     </el-form-item>
     <el-form-item>
@@ -166,7 +168,7 @@ export default {
       pickerOptions: {
         disabledDate(date){
           let zero = new Date().setHours(0, 0, 0, 0);
-          if(date.getTime() > zero){
+          if(date.getTime() >= zero){
               return false;
           }
           return true;
@@ -194,6 +196,7 @@ export default {
           {validator: this.availableEndTimeRequiredValidator, required: true, trigger: 'blur'},
           {validator: this.endTimeValidator, trigger: 'blur', message: '可用结束时间不能早于下架时间'}
         ],
+        instructions: [{required: true, message: '请输入使用说明', trigger: 'blur'}],
         upTime: [
           {validator: this.upTimeRequiredValidator, required: true, trigger: 'blur'},
           {validator: this.updownTimeDiffValidator, trigger: 'blur', message: '上架时间须早于下架时间'},
@@ -204,7 +207,7 @@ export default {
           {validator: this.updownTimeDiffValidator, trigger: 'blur', message: '下架时间须晚于上架时间'},
           {validator: this.endTimeValidator, trigger: 'blur', message: '下架时间须早于可用结束时间'},
         ],
-        limit: {required: true, message: '请输入用户可领个数', trigger: 'blur'},
+        limitNum: {required: true, message: '请输入用户可领个数', trigger: 'blur'},
         logo: {validator: this.logoValidator, required: true, trigger: 'blur'},
         cityIds: {required: true, validator: this.cityValidator, message: '请选择适用范围', trigger: 'change'},
       },
@@ -226,10 +229,12 @@ export default {
         availableEndTime: '',
         ...initForm
       }
-      if (this.formData.status == 0 && this.formData.isDepository == '1') {
-        this.upTimeType = '3'
-      } else {
-        this.upTimeType = '2'
+      this.upTimeType = '2'
+      if (this.formData.isDepository == '1') {
+        this.formData.upTime = ''
+        this.formData.downTime = ''
+        this.formData.availableStartTime = ''
+        this.formData.availableEndTime = ''
       }
       let cityIds = this.formData.scopeOfUseCity ? this.formData.scopeOfUseCity.split(',') : []
       for (let i = 0; i < cityIds.length; i++) {
@@ -243,6 +248,12 @@ export default {
       this.formData.downTime = ''
       this.$refs.form.clearValidate('downTime')
       this.$refs.form.validateField('availableTime')
+    },
+    depositoryChange () {
+      this.formData.upTime = ''
+      this.formData.downTime = ''
+      this.formData.availableStartTime = ''
+      this.formData.availableEndTime = ''
     },
     upTimeTypeChange () {
       this.formData.upTime = ''
@@ -372,14 +383,12 @@ export default {
           if (this.isPlatform) {
             formData.scopeOfUseCity = this.cityIds.join(',')
           }
-          if (this.upTimeType == 1) {
+         if (this.upTimeType == 1) {
             formData.isImmediatelyPut = true
+            formData.status = '1'
           } else {
             formData.isImmediatelyPut = false
-            if (this.upTimeType == 3) {
-              formData.isDepository = '1'
-              formData.status = '0'
-            }
+            formData.status = '0'
           }
           this.$emit('save', formData)
         }

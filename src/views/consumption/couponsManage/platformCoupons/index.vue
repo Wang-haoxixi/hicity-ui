@@ -26,25 +26,21 @@
           <el-button type="text" size="mini" @click="cityView(scope.row)">查看</el-button>
         </template>
         <template slot="menu" slot-scope="scope">
-          <template v-if="scope.row.shelfStatus == 0">
-            <el-button type="text" size="mini" @click="toView(scope.row)">查看</el-button>
+          <el-button type="text" size="mini" @click="toView(scope.row)">查看</el-button>
+          <template v-if="scope.row.status == 0 && scope.row.releaseCity == userInfo.manageCityId">
             <el-button type="text" size="mini" @click="toUpdate(scope.row)">编辑</el-button>
             <el-button type="text" size="mini" @click="toDelete(scope.row)">删除</el-button>
           </template>
-          <template v-if="scope.row.shelfStatus == 1">
-            <el-button type="text" size="mini" @click="toView(scope.row)">查看</el-button>
+          <template v-if="scope.row.status == 1">
             <el-button type="text" size="mini" @click="toShelfOff(scope.row)">下架</el-button>
           </template>
-          <template v-if="scope.row.shelfStatus == 2">
-            <el-button type="text" size="mini" @click="toView(scope.row)">查看</el-button>
+          <template v-if="scope.row.status == 2 && scope.row.releaseCity == userInfo.manageCityId">
             <el-button type="text" size="mini" @click="toUpdate(scope.row)">编辑</el-button>
           </template>
-          <template v-if="scope.row.shelfStatus == 3">
-            <el-button type="text" size="mini" @click="toView(scope.row)">查看</el-button>
+          <template v-if="scope.row.status == 3 && scope.row.releaseCity == userInfo.manageCityId">
             <el-button type="text" size="mini" @click="toUpdate(scope.row)">编辑</el-button>
           </template>
-          <template v-if="scope.row.shelfStatus == 4">
-            <el-button type="text" size="mini" @click="toView(scope.row)">查看</el-button>
+          <template v-if="scope.row.status == 4 && scope.row.releaseCity == userInfo.manageCityId">
             <el-button type="text" size="mini" @click="toUpdate(scope.row)">编辑</el-button>
             <el-button type="text" size="mini" @click="toDelete(scope.row)">删除</el-button>
           </template>
@@ -187,7 +183,7 @@ export default {
           downTime: formData.downTime,
           instructions: formData.instructions,
           isPermanent: formData.isPermanent,
-          limit: formData.limitNum,
+          limitNum: formData.limitNum,
           isCopyLogo: false,
           logo: formData.logo,
           name: formData.name,
@@ -196,7 +192,8 @@ export default {
           upTime: formData.upTime,
           updateTime: formData.updateTime,
           scopeOfUseCity: formData.scopeOfUseCity || '',
-          category: formData.category
+          status: formData.status,
+          category: formData.category,
         }
         this.formShow = true;
         this.formType = "edit";

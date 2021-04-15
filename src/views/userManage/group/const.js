@@ -9,6 +9,7 @@ export const tableOption = (admin = false) => {
       label: '圈子名称',
       prop: 'name',
       search: true,
+      maxlength: 50,
     },
     {
       label: '创建者',

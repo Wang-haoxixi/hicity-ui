@@ -47,7 +47,7 @@
           :rules="formRule"
           :disabled="publishType == 'view'"
         >
-          <el-form-item label="游记名称：" prop="travelName">
+          <el-form-item label="热议话题：" prop="titleObj">
             <hc-remote-select v-model="titleObj" value-key="heatedDebateId" label-key="title" is-object :remote-fun="getAllTitle" :show-word="titleShow" :disabled="publishType == 'edit' && formData.state != '0'" @change="titleChange">
               <template v-slot:option="scope">
                 <div class="title-select-item">
@@ -73,7 +73,7 @@
               :city-id="userInfo.manageCityId"
             ></hc-city-select>
           </el-form-item>
-          <el-form-item label="游记图片：" prop="images">
+          <el-form-item label="热议图片：" prop="images">
             <hc-image-upload
               :disabled="publishType == 'view'"
               v-model="formData.images"
@@ -180,10 +180,10 @@ export default {
       initCityList: [],
       topicName: "",
       formRule: {
-        // travelName: [{required: true, message: '请输入名称'}],
+        titleObj: [{validator: this.titleObjValidator, required: true, message: '请输入热议话题'}],
         // topicsBankIdSet: [{required: true, message: '请选择话题'}],
         cityList: [{ required: true, message: "请选择城市" }],
-        images: [{ required: true, message: "请添加游记图片" }],
+        // images: [{ required: true, message: "请添加热议图片" }],
         // content: [{required: true, message: '请输入内容'}],
       },
       preview: false,
@@ -219,6 +219,13 @@ export default {
   created() {},
   methods: {
     dateFormat,
+    titleObjValidator (rules, value, callback) {
+      if (this.titleObj.heatedDebateId) {
+        callback()
+      } else {
+        callback(new Error('请填写热议话题'))
+      }
+    },
     titleChange (title) {
       if (title.heatedDebateId && title.heatedDebateId !== 0) {
         this.formData.cityList = []

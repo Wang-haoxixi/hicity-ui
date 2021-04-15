@@ -3,6 +3,8 @@ export const tableOption = (admin = false) => {
     {
       label: '分类',
       prop: 'classifyName',
+      search: true,
+      maxlength: 50,
     },
     {
       label: '图片',

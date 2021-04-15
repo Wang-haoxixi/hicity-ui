@@ -9,6 +9,7 @@ export const tableOption = () => {
       label: '商品名称',
       prop: 'name',
       search: true,
+      maxlength: 50,
     },
     {
       label: '商品分类',

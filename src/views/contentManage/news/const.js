@@ -4,6 +4,7 @@ export const tableOption = (admin = false) => {
       label: '名称',
       prop: 'searchName',
       hidden: true,
+      maxlength: 50,
       search: true
     },
     {

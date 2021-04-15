@@ -5,7 +5,7 @@
       :formVisible="publish"
       @go-back="publish = false">
       <template>
-        <hc-crud ref="hcCrud" :fetchListFun="fetchListFun" :option="{header: true}">
+        <hc-crud ref="hcCrud" :fetchListFun="fetchListFun" :search-query="searchQuery">
           <el-button
             slot="menuLeft"
             class="filter-item"
@@ -40,7 +40,7 @@
           :rules="formRule"
           label-width="180px">
           <el-form-item label="分类名称：" prop="brandClassificationName">
-            <el-input v-model="formData.brandClassificationName"></el-input>
+            <el-input v-model="formData.brandClassificationName" maxlength="6"></el-input>
           </el-form-item>
           <el-form-item label="模板选择：" prop="brandClassificationBg">
             <module-bg-list v-model="formData.brandClassificationBg"></module-bg-list>
@@ -80,6 +80,7 @@
     <el-dialog
       title="关联品牌"
       :visible.sync="brandViewDialogVisible"
+      :before-close="dialogBeforeClose"
       width="70%"
     >
       <template>
@@ -125,6 +126,14 @@ export default {
       relativeBrandList: [],
       publish: false,
       publishType: "",
+      searchQuery: [
+        {
+          type: 'text',
+          maxlength: 10,
+          label: '品牌分类',
+          prop: 'brandClassificationName'
+        }
+      ],
       tableOption: {
         border: true,
         stripe: true,
@@ -350,7 +359,10 @@ export default {
       .then(() => {
         this.formData.relations.splice(row.$index, 1)
       }).catch(function () {});
-    }
+    },
+    dialogBeforeClose (next) {
+      next()
+    },
   }
 }
 </script>
