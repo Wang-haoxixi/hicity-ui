@@ -6,6 +6,7 @@
         <el-button @click="backClick">返回</el-button>
       </div>
       <div>
+        <el-button v-if="tableData.length > 0" type="primary" @click="exportData" size="mini">导出</el-button>
         <el-table :data="tableData" style="width: 100%">
           <el-table-column prop="name" label="名称" width="180">
           </el-table-column>
@@ -212,6 +213,7 @@ import {
   // remarkInfo,
   signInCode,
   checkCode,
+  dataExport,
 } from "@/api/activity/personnel";
 export default {
   data() {
@@ -258,6 +260,9 @@ export default {
     },
   },
   methods: {
+    exportData () {
+      dataExport(this.$route.query.id)
+    },
     backClick() {
       this.$router.go(-1);
     },
