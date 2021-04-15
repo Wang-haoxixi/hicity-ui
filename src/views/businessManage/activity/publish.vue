@@ -188,7 +188,7 @@
             closable
             v-for="tag in baseFormData.label"
             :key="tag"
-            :disable-transitions="false"
+            :disable-transitions="true"
             @close="handleClose(tag)"
           >
             {{ tag }}
@@ -507,8 +507,8 @@
             <div class="option-list" v-if="item.optionsList == [] || item.optionsList">
               <div>选项列表</div>
               <div class="list">
-                <el-tag class="tagitem" closable v-for="(tag,i) in item.optionsList" :key="i" @close="handleCloseOption(item,tag,i)">{{tag.label}}</el-tag>
-                <el-input ref="saveTagInput" @keyup.enter.native="handleSaveTag(item,index)" @blur="handleSaveTag(item,index)" v-if="item.isInput" v-model="item.inputValue" style="width:150px" size="mini"></el-input>
+                <el-tag class="tagitem" :disable-transitions="true" closable v-for="(tag,i) in item.optionsList" :key="i" @close="handleCloseOption(item,tag,i)">{{tag.label}}</el-tag>
+                <el-input ref="saveTagInput" show-word-limit maxlength='50' @keyup.enter.native="handleSaveTag(item,index)" @blur="handleSaveTag(item,index)" v-if="item.isInput" v-model="item.inputValue" style="width:150px" size="mini"></el-input>
                 <el-button v-else icon="el-icon-plus" size="mini" @click="showInput(item,index)"></el-button>
               </div>
             </div>
@@ -1858,9 +1858,6 @@ export default {
   display: flex;
   .addressItem{
     display: flex;
-    .el-form-item:first-child{
-      // flex-shrink:0;
-    }
     .el-form-item:last-child{
       flex: 1;
       ::v-deep .el-form-item__error{
@@ -1901,15 +1898,16 @@ export default {
   margin-right: 60px;
 }
 .box-card {
-  // width: 1050px;
-  width: 1002px;
+  max-width: 1002px;
+  display: flex;
+  flex-direction: column;
 }
 .form-collect {
   width: 120px;
   text-align: right;
 }
 .tips {
-  width: 1000px;
+  max-width: 960px;
   margin: 30px 0 30px 120px;
   border-radius: 10px;
   border: 1px solid #eff0f1;
@@ -1926,7 +1924,7 @@ export default {
   }
 }
 .form-card {
-  width: 1000px;
+  max-width: 960px;
   margin: 30px 0 30px 120px;
   border-radius: 10px;
   border: 1px solid #eff0f1;
@@ -1979,6 +1977,7 @@ export default {
       margin-left: 60px;
       margin-bottom: 15px;
       .list{
+        width:100%;
         display: flex;
         flex-direction: column;
         i{
@@ -1988,9 +1987,13 @@ export default {
         cursor: pointer;
       }
         .tagitem{
-          // margin-right: 10px;
           width: fit-content;
+          max-width: 100%;
           margin-top: 10px;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          word-break: break-all;
         }
         .el-button{
           width: fit-content;
