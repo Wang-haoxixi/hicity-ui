@@ -21,7 +21,8 @@ export const tableOption = {
       label: "姓名",
       // slot: true,
       // formSlot: true,
-      search: true
+      search: true,
+      maxlength: 50,
     },
     {
       prop: "mobile",

@@ -36,6 +36,7 @@ export const tableOption = () => {
       prop: 'name',
       slot: true,
       search: true,
+      maxlength: 50,
     },
     {
       label: '核销商户',

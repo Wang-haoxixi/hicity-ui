@@ -39,6 +39,7 @@ export const tableOption = {
     prop: 'username',
     editDisabled: true,
     search: true,
+    maxlength: 50,
     span: 24,
     rules: [{
       required: true,

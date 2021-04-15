@@ -5,7 +5,7 @@
       :formVisible="publish"
       @go-back="publish = false">
       <template>
-        <hc-crud ref="hcCrud" :fetchListFun="fetchListFun" :option="{header: true}">
+        <hc-crud ref="hcCrud" :fetchListFun="fetchListFun" :search-query="searchQuery">
           <el-button
             slot="menuLeft"
             class="filter-item"
@@ -126,6 +126,14 @@ export default {
       relativeBrandList: [],
       publish: false,
       publishType: "",
+      searchQuery: [
+        {
+          type: 'text',
+          maxlength: 10,
+          label: '品牌分类',
+          prop: 'brandClassificationName'
+        }
+      ],
       tableOption: {
         border: true,
         stripe: true,
