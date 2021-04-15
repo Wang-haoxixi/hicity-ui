@@ -1,5 +1,6 @@
 <template>
   <el-upload
+    :disabled="disabled"
     :action="action"
     :headers="headers"
     :on-remove="handleRemove"
@@ -34,6 +35,10 @@ export default {
       type: String,
       default: `/api/admin/sys_file/oss/upload`,
     },
+    disabled: {
+      type: Boolean,
+      default: false
+    }
   },
   data() {
     return {
