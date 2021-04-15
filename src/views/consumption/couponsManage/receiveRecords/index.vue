@@ -78,7 +78,7 @@ export default {
       })
     },
     toView (row) {
-      this.$refs.view.open('order', row.couponsId, row.writeOffStatus == '1')
+      this.$refs.view.open('order', row.id, row.writeOffStatus == '1')
     },
     couponsView (couponsId) {
       getCouponsDetail(couponsId).then(({ data }) => {
