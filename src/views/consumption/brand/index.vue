@@ -19,8 +19,8 @@
         <template slot="menu" slot-scope="scope">
           <template>
             <el-button type="text" size="mini" @click="toView(scope.row)">详情</el-button>
-            <el-button v-if="scope.row.hasJurisdiction" type="text" size="mini" @click="toUpdate(scope.row)">编辑</el-button>
-            <el-button v-if="scope.row.hasJurisdiction" type="text" size="mini" @click="toDelete(scope.row)">删除</el-button>
+            <el-button v-if="scope.row.hasJurisdiction == '1'" type="text" size="mini" @click="toUpdate(scope.row)">编辑</el-button>
+            <el-button v-if="scope.row.hasJurisdiction == '1'" type="text" size="mini" @click="toDelete(scope.row)">删除</el-button>
           </template>
         </template>
       </hc-crud>
@@ -114,8 +114,8 @@ export default {
     goBack () {
       this.publish = false
     },
-    refresh () {
-      this.$refs.hcCrud.refresh({currentPage: 1})
+    refresh (val) {
+      this.$refs.hcCrud.refresh({currentPage: 1}, {isOwn: val ? '1' : '0'})
     },
     fetchListFun (params) {
       return new Promise((resolve, reject) => {
