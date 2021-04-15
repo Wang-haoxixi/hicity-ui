@@ -7,6 +7,8 @@ export const tableOption = (admin = false) => {
     {
       label: '品牌名称',
       prop: 'brandName',
+      search: true,
+      maxlength: 50,
     },
     {
       label: '下设门店',
