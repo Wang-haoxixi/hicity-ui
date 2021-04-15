@@ -83,7 +83,9 @@
               :headers="headersOpt"
               :on-success="handleAccessorySuccess"
               :on-remove="handleAccessoryRemove"
-              :on-exceed="handleExceed">
+              :on-exceed="handleExceed"
+              :before-upload="onBeforeUploadAnnex"
+              :accept="annexFileTypes.join(',')">
               <el-button size="small" >点击上传</el-button>
             </el-upload>
           </el-form-item>
@@ -100,6 +102,7 @@
 import { tableOption } from "./const";
 import { mapGetters } from "vuex";
 import { getGoodsList, saveGoods, getGoodsDetail, deleteGoods, setGoodsState } from "@/api/cityCurrency/goods"
+import { annexFileTypes } from "@/util/file"
 import HcInput from "@/views/components/HcForm/HcInput/index"
 import HcFileUploadImage from "@/views/components/HcFileUpload/image"
 import HcFileUpload from "@/views/components/HcFileUpload/index"
@@ -107,6 +110,7 @@ export default {
   components: { HcInput, HcFileUpload, HcFileUploadImage },
   data() {
     return {
+      annexFileTypes,
       formData: {},
       images: [],
       publish: false,
@@ -170,6 +174,15 @@ export default {
         callback()
       } else {
         callback(new Error('请添加附件'))
+      }
+    },
+    onBeforeUploadAnnex (file) {
+      let fileType = file.name.substring(file.name.lastIndexOf('.'))
+      if (this.annexFileTypes.includes(fileType)) {
+        return true
+      } else {
+        this.$message.warning("暂不支持该文件类型！")
+        return false
       }
     },
     goBack () {

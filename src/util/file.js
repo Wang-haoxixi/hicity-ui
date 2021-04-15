@@ -82,3 +82,5 @@ export function getFileMimeType(file) {
     };
   });
 }
+
+export const annexFileTypes = ['.m4a', '.mp3', '.mid', '.xmf', '.ogg', '.wav', '.3gp', '.mp4', '.jpg', '.gif', '.png', '.jpeg', '.bmp', '.apk', '.ppt', '.xls', '.doc', '.pdf', '.chm', '.txt']

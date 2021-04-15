@@ -244,6 +244,8 @@
             :headers="headersOpt"
             :on-success="handleAccessorySuccess"
             :on-remove="handleAccessoryRemove"
+            :before-upload="onBeforeUploadAnnex"
+            :accept="annexFileTypes.join(',')"
           >
             <el-button size="small">点击上传</el-button>
           </el-upload>
@@ -611,7 +613,7 @@ import {dateFormat} from "@/util/date.js";
 import HcQuill from "@/views/components/HcQuill";
 import HcCitySelect from "@/views/components/HcCity/HcCitySelect/index";
 import { mapGetters } from "vuex";
-import { getFileMimeType } from "@/util/file"
+import { getFileMimeType, annexFileTypes } from "@/util/file"
 import {
   activityClassify,
   cityTree,
@@ -628,6 +630,7 @@ export default {
   components: { HcQuill, HcCitySelect },
   data() {
     return {
+      annexFileTypes,
       formLoading: false,
       isInput:false,
       showFormCollect:false,
@@ -991,6 +994,15 @@ export default {
           }
         })
       })
+    },
+    onBeforeUploadAnnex (file) {
+      let fileType = file.name.substring(file.name.lastIndexOf('.'))
+      if (this.annexFileTypes.includes(fileType)) {
+        return true
+      } else {
+        this.$message.warning("暂不支持该文件类型！")
+        return false
+      }
     },
     priceChange (item) {
       let val = item.amount
