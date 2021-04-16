@@ -39,7 +39,7 @@
                   <i v-else class="el-icon-plus avatar-uploader-icon"/>
                 </el-upload>
               </el-form-item>
-              <el-form-item
+              <!-- <el-form-item
                 label="社交登录"
                 prop="social">
                 <a
@@ -54,7 +54,7 @@
                   href="#"
                   style="color: blue"
                   @click="handleClick('osc')">开源中国</a>
-              </el-form-item>
+              </el-form-item> -->
               <el-form-item>
                 <el-button
                   type="primary"
@@ -172,7 +172,10 @@ export default {
           request({
             url: '/admin/user/edit',
             method: 'put',
-            data: this.ruleForm2
+            data: {
+              ...this.ruleForm2,
+              userId: this.userInfo.userId
+            }
           }).then(response => {
             if (response.data.data) {
               this.$notify.success('修改成功')
@@ -186,7 +189,6 @@ export default {
               this.$notify.error(response.data.msg)
             }
           }).catch(() => {
-            this.$notify.error('修改失败')
           })
         } else {
           return false

@@ -80,7 +80,7 @@
         <!-- <img
           id="thumbnail"
           class="top-bar__img" src="../../../../public/img/logo.png"/> -->
-        <img class="top-bar__img" src="../../../../public/img/logo.png" />
+        <img class="top-bar__img" :src="userInfo.avatar || '/img/logo.png'" />
       </el-tooltip>
       <el-dropdown>
         <span class="el-dropdown-link">
