@@ -6,7 +6,7 @@
     :rules="formRule">
     <h3 class="form-title">基本信息</h3>
     <el-form-item label="券名称：" prop="name">
-      <el-input v-model="formData.name" maxlength="50" placeholder="品牌+商品类型+金额+代金券+商铺名称，如食品 西朵曼生日蛋糕100元代金券 雁峰区希朵曼"></el-input>
+      <el-input v-model="formData.name" maxlength="15" placeholder="品牌+商品类型+金额+代金券+商铺名称，如食品 西朵曼生日蛋糕100元代金券 雁峰区希朵曼"></el-input>
     </el-form-item>
     <el-form-item label="券门类：" prop="category">
       <el-select v-model="formData.category">
