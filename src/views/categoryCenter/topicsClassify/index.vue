@@ -42,7 +42,7 @@
           :rules="formRule"
           label-width="180px">
           <el-form-item label="分类名称：" prop="classifyName">
-            <el-input v-model="formData.classifyName"></el-input>
+            <el-input v-model="formData.classifyName" maxlength="5"></el-input>
           </el-form-item>
           <el-form-item label="图片：">
             <hc-image-upload :limit="1" v-model="formData.imageUrl"></hc-image-upload>
