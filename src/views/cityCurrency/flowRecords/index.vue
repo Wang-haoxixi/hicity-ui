@@ -15,7 +15,9 @@ export default {
         columns: [
           {
             label: '流水号',
-            prop: 'flowId'
+            prop: 'flowId',
+            search: true,
+            maxlength: 20,
           },
           {
             label: '主题',
@@ -25,6 +27,7 @@ export default {
             label: '类型',
             prop: 'type',
             type: 'select',
+            search: true,
             dicData: [
               {
                 label: '收入',
@@ -42,12 +45,28 @@ export default {
           },
           {
             label: '用户名',
-            prop: 'userName'
+            prop: 'userName',
+            search: true,
+            maxlength: 20,
           },
           {
             label: '日期',
             prop: 'createTime'
-          }
+          },
+          {
+            label: '开始时间',
+            prop: 'startTime',
+            type: 'datetime',
+            hidden: true,
+            search: true
+          },
+          {
+            label: '结束时间',
+            prop: 'endTime',
+            type: 'datetime',
+            hidden: true,
+            search: true
+          },
         ]
       }
     }
