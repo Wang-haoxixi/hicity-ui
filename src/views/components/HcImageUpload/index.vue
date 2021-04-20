@@ -69,12 +69,21 @@ export default {
   watch: {
     value (val) {
       if (val) {
-        let fileList = []
         if (this.multiple) {
+          let fileList = this.fileList
           for (let i = 0; i < val.length; i++) {
-            fileList.push({
-              url: val[i]
-            })
+            let add = false
+            for (let j = 0; j < fileList.length; j++) {
+              if (fileList[j].url == val[i]) {
+                add = false
+                break
+              }
+            }
+            if (add) {
+              fileList.push({
+                url: val[i]
+              })
+            }
           }
           this.fileList = fileList
         } else {

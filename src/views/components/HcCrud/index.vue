@@ -189,7 +189,7 @@ export default {
               type: 'text',
               ...columns[i]
             })
-            this.$set(this.searchFormShow, columns[i].prop, '')
+            this.$set(this.searchFormShow, columns[i].prop, undefined)
           }
         }
         return list;
@@ -359,7 +359,10 @@ export default {
       this.getList();
     },
     resetSearch() {
-      this.searchFormShow = {};
+      let searchFormShow = this.searchFormShow
+      for (var key in searchFormShow) {
+        searchFormShow[key] = undefined
+      }
     },
   },
 };
