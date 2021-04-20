@@ -3,8 +3,8 @@
     <el-form-item label="职位名称：">{{positionDetail.name}}</el-form-item>
     <el-form-item label="工作城市：">{{positionDetail.city}}</el-form-item>
     <el-form-item label="工作地点：">{{positionDetail.detailsAddress}}</el-form-item>
-    <el-form-item label="经验：">{{positionDetail.experience}}</el-form-item>
-    <el-form-item label="学历：">{{positionDetail.education}}</el-form-item>
+    <el-form-item label="经验：">{{positionDetail.experienceLable}}</el-form-item>
+    <el-form-item label="学历：">{{positionDetail.educationLable}}</el-form-item>
     <el-form-item label="薪资范围：">{{positionDetail.salaryLable}}</el-form-item>
     <el-form-item label="职位描述：">
       <div style="max-width: 400px;">{{positionDetail.describe}}</div>

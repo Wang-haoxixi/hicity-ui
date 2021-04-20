@@ -24,10 +24,6 @@ export const tableOption = () => {
       prop: 'supply',
     },
     {
-      label: '供应量',
-      prop: 'supply',
-    },
-    {
       label: '已领数量',
       prop: 'receivedNum',
     },

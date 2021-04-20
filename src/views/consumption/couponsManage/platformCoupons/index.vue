@@ -113,7 +113,7 @@ export default {
         params.isDepository = '0'
       } else if (status == '4') {
         params = {
-          status: '0',
+          status: undefined,
           isDepository: '1'
         }
       } else {
@@ -194,6 +194,7 @@ export default {
           scopeOfUseCity: formData.scopeOfUseCity || '',
           status: formData.status,
           category: formData.category,
+          receivedNum: formData.receivedNum,
         }
         this.formShow = true;
         this.formType = "edit";

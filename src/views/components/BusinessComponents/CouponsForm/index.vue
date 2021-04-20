@@ -6,10 +6,10 @@
     :rules="formRule">
     <h3 class="form-title">基本信息</h3>
     <el-form-item label="券名称：" prop="name">
-      <el-input v-model="formData.name" maxlength="15" placeholder="品牌+商品类型+金额+代金券+商铺名称，如食品 西朵曼生日蛋糕100元代金券 雁峰区希朵曼"></el-input>
+      <el-input v-model="formData.name" maxlength="15" :disabled="formData.status == '3' || formData.status == '2'" placeholder="品牌+商品类型+金额+代金券+商铺名称，如食品 西朵曼生日蛋糕100元代金券 雁峰区希朵曼"></el-input>
     </el-form-item>
     <el-form-item label="券门类：" prop="category">
-      <el-select v-model="formData.category">
+      <el-select v-model="formData.category" :disabled="formData.status == '3' || formData.status == '2'">
         <el-option label="餐饮外卖" :value="0">餐饮外卖</el-option>
         <el-option label="商超购物" :value="1">商超购物</el-option>
         <el-option label="出行玩乐" :value="2">出行玩乐</el-option>
@@ -17,14 +17,14 @@
       </el-select>
     </el-form-item>
     <el-form-item label="抵扣价：" prop="deductionPrice">
-      <hc-input v-model="formData.deductionPrice" :decimal="2" :min="0.01" maxlength="10" style="width: 200px;" :disabled="formData.status == '3' || formData.status == '2'">
+      <hc-input v-model="formData.deductionPrice" :decimal="1" :min="0.1" :max="99.9" maxlength="4" style="width: 200px;" :disabled="formData.status == '3' || formData.status == '2'">
         <div slot="append">元</div>
       </hc-input>
       <div>抵扣价指商户核销该券时抵扣的价格，该价格用于计算展示用户到店支付金额</div>
     </el-form-item>
     <el-form-item label="满足条件：" prop="conditionPrice">
       满
-      <hc-input v-model="formData.conditionPrice" :decimal="2" :min="0.01" maxlength="10" style="width: 200px;" :disabled="formData.status == '3' || formData.status == '2'">
+      <hc-input v-model="formData.conditionPrice" :decimal="1" :min="0.1" :max="999.9" maxlength="5" style="width: 200px;" :disabled="formData.status == '3' || formData.status == '2'">
         <div slot="append">元</div>
       </hc-input>
       可用
@@ -32,6 +32,9 @@
     </el-form-item>
     <el-form-item label="供应量：" prop="supply">
       <el-input-number v-model="formData.supply" :min="1" :max="99999999"></el-input-number>
+    </el-form-item>
+    <el-form-item v-if="formData.receivedNum != undefined && formData.receivedNum != null" label="已领数量：">
+      {{formData.receivedNum}}
     </el-form-item>
     <el-form-item label="是否放入仓库：" prop="isDepository">
       <el-switch v-model="formData.isDepository" active-text="是" active-value="1" inactive-text="否" inactive-value="0" :disabled="formData.status == '3' || formData.status == '2'" @change="depositoryChange"></el-switch>
@@ -66,14 +69,14 @@
       </template>
     </el-form-item>
     <el-form-item label="logo设置：" prop="logo">
-      <el-checkbox v-if="!isPlatform" v-model="formData.isCopyLogo" label="复用商户logo" border @change="$refs.form.validateField('logo')"></el-checkbox>
+      <el-checkbox v-if="!isPlatform" v-model="formData.isCopyLogo" label="复用商户logo" :disabled="formData.status == '3' || formData.status == '2'" border @change="$refs.form.validateField('logo')"></el-checkbox>
       <template v-if="!formData.isCopyLogo">
         <div>图片建议尺寸:120像素*120像素，大小不超过1M，支持JPG、PNG格式。如不上传，默认使用超能支付logo</div>
-        <hc-image-upload v-model="formData.logo" :limit="1" @change="$refs.form.validateField('logo')"></hc-image-upload>
+        <hc-image-upload v-model="formData.logo" :limit="1" @change="$refs.form.validateField('logo')" :disabled="formData.status == '3' || formData.status == '2'"></hc-image-upload>
       </template>
     </el-form-item>
     <el-form-item label="使用说明：" prop="instructions">
-      <el-input type="textarea" v-model="formData.instructions" :autosize="{minRows: 6, maxRows: 10}" maxlength="200" style="width: 400px;"
+      <el-input type="textarea" v-model="formData.instructions" :disabled="formData.status == '3' || formData.status == '2'" :autosize="{minRows: 6, maxRows: 10}" maxlength="200" style="width: 400px;"
       placeholder="例如：
 美食满300元-100元（酒水、饮料、槟榔、香烟除外）；
 本券不兑现，不找零，不可与本店其他优惠活动同时享受；
@@ -136,11 +139,11 @@
 
     <h3 class="form-title">领取限制</h3>
     <el-form-item v-if="isPlatform" label="适用范围：" prop="cityIds">
-      <hc-city-select v-model="cityIds" :city-id="userInfo.manageCityId"></hc-city-select>
+      <hc-city-select v-model="cityIds" :city-id="userInfo.manageCityId" :view-only="formData.status == '3' || formData.status == '2'"></hc-city-select>
     </el-form-item>
     <el-form-item label="用户可领个数：" prop="limitNum">
       活动期间每个用户可参与
-      <el-input-number v-model="formData.limitNum" :max="99999999" :min="1"></el-input-number>
+      <el-input-number v-model="formData.limitNum" :max="99999999" :min="1" :disabled="formData.status == '3' || formData.status == '2'"></el-input-number>
       个
     </el-form-item>
     <el-form-item>
