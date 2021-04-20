@@ -39,7 +39,7 @@
             <hc-topic-select v-model="formData.topicsBankIdSet" :topic-name="topicName"></hc-topic-select>
           </el-form-item>
           <el-form-item label="游记图片：" prop="images">
-            <hc-image-upload v-model="formData.images" :limit="10"></hc-image-upload>
+            <hc-image-upload v-model="formData.images" :limit="9"></hc-image-upload>
           </el-form-item>
           <el-form-item v-if="formData.publishedSources ? (userType != 3 && userType == formData.publishedSources) : (userType == 1 || userType == 2)" label="发布城市：" prop="cityList">
             <hc-city-select v-model="formData.cityList" :city-id="userInfo.manageCityId"></hc-city-select>
@@ -106,7 +106,7 @@ export default {
       initCityList: [],
       topicName: '',
       formRule: {
-        // travelName: [{required: true, message: '请输入名称'}],
+        travelName: [{required: true, message: '请输入名称'}],
         // topicsBankIdSet: [{required: true, message: '请选择话题'}],
         cityList: [{required: true, message: '请选择城市'}],
         images: [{required: true, message: '请添加游记图片'}],

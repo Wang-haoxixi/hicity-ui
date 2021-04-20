@@ -16,9 +16,23 @@ export const tableOption = (admin = false) => {
       prop: 'createTime',
       width: 160,
     },
+    {
+      label: '状态',
+      prop: 'state',
+      formatter: function (row) {
+        if (row.state == '0') {
+          return '草稿'
+        } else if (row.state == '1') {
+          return '已发布'
+        } else {
+          return ''
+        }
+      },
+      width: 80
+    },
   ]
   if (admin) {
-    columns.push({
+    columns.splice(2, 0, {
       label: '展示范围',
       prop: 'cityList',
       slot: true,
