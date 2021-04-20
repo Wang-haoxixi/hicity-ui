@@ -1,5 +1,5 @@
 <template>
-  <el-table :data="tableData" stripe border style="width: 100%" header-row-class-name="hc-crud-table-header" :header-cell-style="{backgroundColor: '#FAFAFA', color: '#333333'}" v-loading="tableLoading">
+  <el-table :data="tableData" stripe border style="width: 100%" header-row-class-name="hc-crud-table-header" :header-cell-style="{backgroundColor: '#FAFAFA', color: '#333333'}" v-loading="tableLoading" :default-expand-all="option.defaultExpand">
     <el-table-column v-if="option.expand" type="expand" width="50px">
       <template v-slot="scope">
         <slot name="expand" :row="scope.row"></slot>

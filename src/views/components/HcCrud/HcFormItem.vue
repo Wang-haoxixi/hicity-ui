@@ -7,6 +7,15 @@
     :disabled="disabled"
     :placeholder="option.placeholder || `请输入${option.label}`"
     @input="change"></el-input>
+  <el-input-number v-else-if="option.type == 'number'"
+    :max="option.max || 999999999"
+    :min="option.min || 0"
+    :value="value"
+    clearable
+    :maxlength="option.maxlength"
+    :disabled="disabled"
+    :placeholder="option.placeholder || `请输入${option.label}`"
+    @input="change"></el-input-number>
   <el-select v-else-if="option.type == 'select'"
     :value="value"
     clearable
@@ -84,5 +93,9 @@ export default {
 }
 </script>
 
-<style lang="" scoped>
+<style lang="scss" scoped>
+::v-deep .el-input-number__increase {
+  right: 0px !important;
+  border-left: 1px solid #dcdfe6 !important;
+}
 </style>
