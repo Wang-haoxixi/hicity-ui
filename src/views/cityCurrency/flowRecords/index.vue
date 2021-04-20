@@ -18,6 +18,10 @@ export default {
             prop: 'flowId',
             search: true,
             maxlength: 20,
+            type: 'number',
+            max: 2147483647,
+            min: 1,
+            maxlength: 11
           },
           {
             label: '主题',

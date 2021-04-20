@@ -4,7 +4,9 @@ export const tableOption = (admin = false) => {
       label: '话题名称',
       prop: 'topicsName',
       span: 24,
-      rules: [{required: true, message: '请输入话题名称'}]
+      rules: [{required: true, message: '请输入话题名称'}],
+      search: true,
+      maxlength: 50,
     },
     {
       label: '所属分类',

@@ -4,7 +4,7 @@
       :title="title"
       :formVisible="publish"
       @go-back="publish = false">
-      <hc-crud ref="hcCrud" :fetchListFun="fetchListFun">
+      <hc-crud ref="hcCrud" :fetchListFun="fetchListFun" :search-query="searchQuery">
         <el-button
           slot="menuLeft"
           class="filter-item"
@@ -165,7 +165,15 @@ export default {
         classifyName: [{required: true, message: '分类名称不能为空'}]
       },
       boxLoading: false,
-      formLoading: false
+      formLoading: false,
+      searchQuery: [
+        {
+          type: 'text',
+          maxlength: 10,
+          label: '品牌分类',
+          prop: 'classifyName'
+        }
+      ],
     }
   },
   computed: {

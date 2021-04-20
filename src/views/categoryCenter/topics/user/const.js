@@ -4,6 +4,8 @@ export const tableOption = (admin = false) => {
       label: '话题名称',
       prop: 'topicsName',
       span: 24,
+      search: true,
+      maxlength: 50,
     },
   ]
   let option = {
