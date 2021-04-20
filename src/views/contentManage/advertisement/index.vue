@@ -2,9 +2,9 @@
   <basic-container>
     <hc-table-form title="广告位管理">
       <hc-crud ref="hcCrud" :fetchListFun="fetchListFun" :addFun="addFun" :updateFun="updateFun" :deleteFun="deleteFun" :option="tableOption">
-        <template v-slot:cityIdForm="scope">
+        <!-- <template v-slot:cityIdForm="scope">
           <hc-city-select v-model="scope.formData.cityId" :city-id="userInfo.manageCityId" single></hc-city-select>
-        </template>
+        </template> -->
         <template v-slot:typeForm="scope">
           <el-radio-group v-model="scope.formData.type">
             <el-radio :label="1">文字</el-radio>
@@ -51,6 +51,7 @@ export default {
     },
     // 广告位新增 提交
     addFun(formData, next, loading) {
+      formData.cityId = 1
       addAdPosition(formData).then((res) => {
         if (res.data.code === 0) {
           next()

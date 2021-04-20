@@ -40,17 +40,17 @@ export const tableOption = (admin = false) => {
     },
   ]
   if (admin) {
-    columns.splice(4, 0, {
-      label: '城市',
-      prop: 'cityId',
-      value: '',
-      formatter: function (row) {
-        return row.cityName
-      },
-      formSlot: true,
-      width: 80,
-      rules: [{ required: true, message: "请选择城市", trigger: "change" }]
-    })
+    // columns.splice(4, 0, {
+    //   label: '城市',
+    //   prop: 'cityId',
+    //   value: '',
+    //   formatter: function (row) {
+    //     return row.cityName
+    //   },
+    //   formSlot: true,
+    //   width: 80,
+    //   rules: [{ required: true, message: "请选择城市", trigger: "change" }]
+    // })
   }
 
   let option = {

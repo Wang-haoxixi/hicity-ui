@@ -63,6 +63,7 @@
             <el-button type="text" @click="handleDelete(scope.row)"
               >删除</el-button
             >
+            <el-button type="text" @click="handleShowCode(scope.row)">生成签到码</el-button>
           </template>
         </template>
       </hc-crud>
@@ -70,6 +71,21 @@
 
     <!-- 查看城市范围弹窗 -->
     <hc-city-box ref="hcCityBox"></hc-city-box>
+
+    <!-- 签到码弹框 -->
+    <el-dialog
+      title="活动签到码"
+      :visible.sync="showCodeDialogVisible"
+      width="30%"
+      >
+      <div class="code-img">
+        <el-image :src="img"></el-image>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="downloadCode()">下载签到码</el-button>
+        <el-button type="primary" @click="showCodeDialogVisible = false">关 闭</el-button>
+      </span>
+    </el-dialog>
   </basic-container>
 </template>
 
@@ -87,6 +103,8 @@ export default {
   data() {
     return {
       showCityDialogVisible: false, //控制展示城市
+      showCodeDialogVisible: false, //展示签到码
+      img:'',//签到码
     };
   },
   computed: {
@@ -140,6 +158,20 @@ export default {
         .catch(() => {
           // this.$message("取消删除成功!");
         });
+    },
+    // 展示签到码
+    handleShowCode(row){
+      this.showCodeDialogVisible = true
+      this.img = row.weChatCode
+    },
+    // 下载签到码
+    downloadCode(){
+      var a = document.createElement('a')
+      a.download = name || '签到码'
+      
+      a.href = this.img;// 设置图片地址
+      a.click();
+      // download(this.img, '签到码.png', 'image/png')
     },
     // 查看
     check(id) {
@@ -206,5 +238,12 @@ export default {
 }
 .managBtn {
   font-size: 14px;
+}
+.code-img{
+  text-align: center;
+  .el-image{
+    width: 250px;
+    height: 250px;
+  }
 }
 </style>

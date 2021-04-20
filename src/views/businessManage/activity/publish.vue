@@ -267,14 +267,16 @@
                 ref="setTicketDataRef"
                 :model="item"
                 :rules="setTicketDataRules"
+                inline
               >
-                <el-row>
-                  <el-col :span="8">
+                <!-- <el-row>
+                  <el-col :span="8"> -->
                     <!-- 票务种类 -->
                     <el-form-item
                       label="票务种类："
                       label-width="100"
                       prop="ticketingType"
+                      style="margin-right:30px"
                     >
                       <el-select
                         v-model="item.ticketingType"
@@ -284,8 +286,8 @@
                         <el-option label="付费票" value="2"></el-option>
                       </el-select>
                     </el-form-item>
-                  </el-col>
-                  <el-col :span="10">
+                  <!-- </el-col> -->
+                  <!-- <el-col :span="10"> -->
                     <el-form-item
                       label="票务名称："
                       label-width="100"
@@ -297,35 +299,37 @@
                         placeholder="如早餐票、普通票、VIP票"
                       ></el-input>
                     </el-form-item>
-                  </el-col>
-                </el-row>
+                  <!-- </el-col>
+                </el-row> -->
 
-                <el-row style="margin: 15px 0">
-                  <el-col :span="8">
+                <!-- <el-row style="margin: 15px 0">
+                  <el-col :span="8"> -->
                     <el-form-item
                       label="票种数量："
                       label-width="100"
                       prop="number"
+                      style="margin: 20px 28px 20px 0"
                     >
                       <el-input-number
                         v-model="item.number"
                         :min="1"
                       ></el-input-number>
                     </el-form-item>
-                  </el-col>
-                  <el-col :span="8">
+                  <!-- </el-col> -->
+                  <!-- <el-col :span="8"> -->
                     <el-form-item
                       label="单次购票数量："
                       label-width="100"
                       prop="limitTicket"
+                      style="margin: 20px 0"
                     >
                       <el-input-number
                         v-model="item.limitTicket"
                         :min="1"
                       ></el-input-number>
                     </el-form-item>
-                  </el-col>
-                  <el-col :span="7">
+                  <!-- </el-col> -->
+                  <!-- <el-col :span="7"> -->
                     <!-- <el-form-item
                       v-if="item.ticketingType === '1'"
                       label="票种审核："
@@ -350,8 +354,8 @@
                       >
                       </el-switch>
                     </el-form-item>
-                  </el-col>
-                </el-row>
+                  <!-- </el-col>
+                </el-row> -->
                 <!-- 票务金额 付费票时显示 ticketingType:1不显示2显示  -->
                 <el-form-item
                   style="margin-bottom: 15px"
@@ -503,7 +507,7 @@
           <div v-for="(item,index) in customList" :key="index">
             <div class="item" >
               <el-checkbox v-model="item.must">必填</el-checkbox>
-              <el-input :placeholder="item.typename" v-model="item.label"></el-input>
+              <el-input :placeholder="item.typename" show-word-limit maxlength="250"  v-model="item.label"></el-input>
               <i class="el-icon-remove" title="删除" @click="handleDelete(index)"></i>
             </div>
             <div class="option-list" v-if="item.optionsList == [] || item.optionsList">
@@ -838,7 +842,8 @@ export default {
           { required: true, message: "请选择票务种类", trigger: "change" },
         ],
         ticketingName: [
-          { required: true, message: "请输入票务名称", trigger: "blur" },
+          { required: true, message: '请输入票务名称', trigger: 'blur' },
+          { message: "票务名称最多20字", max: 20, trigger: "blur" },
         ],
         number: [
           { required: true, message: "请输入票种数量", trigger: "blur" },

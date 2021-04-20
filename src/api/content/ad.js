@@ -33,12 +33,51 @@ export function getDictByType(data) {
   });
 }
 
-// 会议大厅分页查询
+// 活动分页查询
 export function activitiePage(data) {
   return request({
     url: "/dms/activity_publish/activity_page",
     method: "get",
     params: data
+  });
+}
+// 城市打卡分页
+export function travelPage(data) {
+  return request({
+    url: "/cms/travel/mobile/simple_list",
+    method: "get",
+    params: data
+  });
+}
+// 城市热议分页
+export function heated_debatePage(data) {
+  return request({
+    url: "/cms/heated_debate/mobile/page",
+    method: "get",
+    params: data
+  });
+}
+// 城市新闻分页
+export function newsPage(data) {
+  return request({
+    url: "/cms/official_news/page",
+    method: "get",
+    params: data
+  });
+}
+// 官方发布分页
+export function official_columnPage(data) {
+  return request({
+    url: "/cms/official_column/page",
+    method: "get",
+    params: data
+  });
+}
+// 广告详情查询
+export function adCheckDetail(data) {
+  return request({
+    url: "cms/info_ad/" + data,
+    method: "get",
   });
 }
 
