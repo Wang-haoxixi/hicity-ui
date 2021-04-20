@@ -2,7 +2,7 @@
   <div>
     <el-form ref="form" label-width="auto" :model="formData" :rules="formRules">
       <el-form-item label="选项题目" prop="label">
-        <el-input v-model="formData.label" placeholder="请输入选项题目"></el-input>
+        <el-input v-model="formData.label" placeholder="请输入选项题目" maxlength="255"></el-input>
       </el-form-item>
       <el-form-item label="是否必填" style="margin-top: 30px;">
         <el-switch v-model="formData.must"></el-switch>
@@ -11,14 +11,14 @@
         <el-button @click="addOptions">添加选项</el-button>
         <el-row v-for="(option, index) in formData.optionsList" :key="index" style="margin-top: 10px;">
           <el-col :span="12">
-            <el-input v-model="option.label" placeholder="请输入选项名称"></el-input>
+            <el-input v-model="option.label" placeholder="请输入选项名称" maxlength="50"></el-input>
           </el-col>
           <el-col :span="12">
             <div class="options-right">
-              <el-button v-if="!option.link" type="primary" round @click="toSetLink(option)">选择跳转对象</el-button>
+              <el-button v-if="!option.link" type="primary" round @click="toSetLink(option, index)">选择跳转对象</el-button>
               <div v-else>{{option.name}}</div>
               <div class="right-button-list">
-                <i class="el-icon-edit-outline" @click="toSetLink(option)"></i>
+                <i class="el-icon-edit-outline" @click="toSetLink(option, index)"></i>
                 <i class="el-icon-remove" @click="removeOptions(index)"></i>
               </div>
             </div>
@@ -110,8 +110,8 @@ export default {
         this.$message.warning('子项最多可以添加10条')
       }
     },
-    toSetLink (option) {
-      this.handleOption = option
+    toSetLink (option, index) {
+      this.handleOption = index
       this.$refs.linkSetting.open({
         type: option.type,
         name: option.name,
@@ -124,10 +124,13 @@ export default {
       }
     },
     linkSelect (link) {
-      this.handleOption.link = true
-      this.handleOption.value = link.id
-      this.handleOption.type = link.type
-      this.handleOption.name = link.name
+      this.formData.optionsList.splice(this.handleOption, 1, {
+        ...this.formData.optionsList[this.handleOption],
+        link: true,
+        value: link.id,
+        type: link.type,
+        name: link.name 
+      })
       this.$refs.linkSetting.close()
     }
   }

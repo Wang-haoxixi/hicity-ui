@@ -17,7 +17,7 @@
           </el-col>
           <el-col :span="16">
             <el-form-item label="票务名称：" prop="ticketingName">
-              <el-input v-model="formData.ticketingName" placeholder="如早鸟票、普通票、VIP票" style="width: 80%;"></el-input>
+              <el-input v-model="formData.ticketingName" placeholder="如早鸟票、普通票、VIP票" style="width: 80%;" maxlength="20"></el-input>
             </el-form-item>
           </el-col>
         </el-row>
