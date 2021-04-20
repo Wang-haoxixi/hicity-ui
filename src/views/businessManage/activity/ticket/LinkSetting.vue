@@ -47,7 +47,8 @@ export default {
             label: '标题',
             prop: 'searchName',
             hidden: true,
-            search: true
+            search: true,
+            maxlength: 50,
           }
         ],
         menu: true,
