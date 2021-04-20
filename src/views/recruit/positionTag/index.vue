@@ -47,12 +47,16 @@ export default {
           },
           {
             label: '标签名称',
-            prop: 'positionLable'
+            prop: 'positionLable',
+            rules: [{required: true, message: '请输入标签名称'}],
+            maxlength: 50
           },
           {
             label: '标签分类',
             prop: 'positionLableTypeId',
             formSlot: true,
+            rules: [{required: true, message: '请输入标签分类'}],
+            maxlength: 50,
             formatter: function (row) {
               return row.positionLableType
             }
