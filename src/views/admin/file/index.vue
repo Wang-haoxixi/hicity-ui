@@ -1,6 +1,28 @@
 <template>
   <div class="execution">
     <basic-container>
+      <el-form class="search-box" inline :model="tempSearch" @submit.native.prevent="toSearch">
+        <div class="serach-box-left">
+          <el-form-item label="文件名：">
+            <el-input v-model="tempSearch.fileName" maxlength="50" placeholder="请输入文件名" clearable></el-input>
+          </el-form-item>
+          <el-form-item>
+          <el-button
+            class="search-item"
+            type="primary"
+            icon="el-icon-search"
+            @click="toSearch"
+            >搜 索</el-button
+          >
+          <el-button
+            class="search-item"
+            icon="el-icon-refresh"
+            @click="resetSearch"
+            >重 置</el-button
+          >
+        </el-form-item>
+        </div>
+      </el-form>
       <avue-crud
         ref="crud"
         :page="page"
@@ -39,6 +61,7 @@ export default {
   name: 'sys_file',
   data() {
     return {
+      tempSearch: {},
       searchForm: {},
       tableData: [],
       page: {
@@ -103,6 +126,18 @@ export default {
     searchChange(form) {
       this.getList(this.page, form)
     },
+    toSearch () {
+      this.searchForm = this.tempSearch
+      this.getList(this.page)
+    },
+    resetSearch () {
+      this.searchForm = {
+        fileName: undefined,
+      }
+      this.tempSearch = {
+        fileName: undefined,
+      }
+    },
     /**
        * 刷新回调
        */
@@ -117,5 +152,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.search-box {
+  display: flex;
+  justify-content: space-between;
+}
 </style>
 

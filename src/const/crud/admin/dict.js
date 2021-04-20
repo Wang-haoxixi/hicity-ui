@@ -14,7 +14,6 @@ export const tableOption = {
   column: [{
     label: '类型',
     prop: 'type',
-    'search': true,
     rules: [{
       required: true,
       message: '请输入字典类型',
@@ -35,7 +34,6 @@ export const tableOption = {
     dicData: getDic('dict_type'),
     addDisplay: false,
     editDisplay: false,
-    search: true
   }, {
     label: '备注信息',
     prop: 'remarks'

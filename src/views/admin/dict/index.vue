@@ -1,6 +1,33 @@
 <template>
   <div class="execution">
     <basic-container>
+      <el-form class="search-box" inline :model="tempSearch" @submit.native.prevent="toSearch">
+        <div class="serach-box-left">
+          <el-form-item label="类型：">
+            <el-input v-model="tempSearch.type" maxlength="50" placeholder="请输入类型" clearable></el-input>
+          </el-form-item>
+          <el-form-item label="字典类型：">
+            <el-select v-model="tempSearch.system" clearable>
+              <el-option v-for="(option, index) in dicList['dict_type']" :key="index" :value="option.value" :label="option.label">{{option.label}}</el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item>
+          <el-button
+            class="search-item"
+            type="primary"
+            icon="el-icon-search"
+            @click="toSearch"
+            >搜 索</el-button
+          >
+          <el-button
+            class="search-item"
+            icon="el-icon-refresh"
+            @click="resetSearch"
+            >重 置</el-button
+          >
+        </el-form-item>
+        </div>
+      </el-form>
       <avue-crud
         ref="crud"
         :page="page"
@@ -57,6 +84,7 @@ export default {
   name: 'Dict',
   data() {
     return {
+      tempSearch: {},
       searchForm: {},
       form: {
         type: undefined,
@@ -82,7 +110,7 @@ export default {
   mounted: function() {
   },
   computed: {
-    ...mapGetters(['permissions']),
+    ...mapGetters(['permissions', 'dicList']),
     permissionList() {
       return {
         addBtn: this.vaildData(this.permissions.sys_dict_add, false),
@@ -184,6 +212,18 @@ export default {
         done()
       })
     },
+    toSearch () {
+      this.searchForm = this.tempSearch
+      this.getList(this.page)
+    },
+    resetSearch () {
+      this.searchForm = {
+        fileName: undefined,
+      }
+      this.tempSearch = {
+        fileName: undefined,
+      }
+    },
     searchChange(form) {
       this.searchForm = form
       this.getList(this.page, form)
@@ -218,5 +258,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.search-box {
+  display: flex;
+  justify-content: space-between;
+}
 </style>
 

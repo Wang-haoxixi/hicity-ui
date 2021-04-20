@@ -25,9 +25,6 @@ export const tableOption = {
       label: '文件名',
       prop: 'fileName',
       overHidden:true,
-      search: {
-        maxLength: 20
-      },
     },
 	  {
       label: '原文件名',
