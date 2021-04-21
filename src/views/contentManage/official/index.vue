@@ -93,6 +93,8 @@
               :file-list="fileList"
               :headers="headersOpt"
               :before-upload="onBeforeUpload"
+              :on-exceed="handleExceed"
+              :limit="9"
               accept=".jpg,.jpeg,.png,.gif,.bmp,.JPG,.JPEG,.PNG,.GIF,.BMP"
             >
               <i class="el-icon-plus"></i>
@@ -256,6 +258,13 @@ export default {
           }
         })
       })
+    },
+    handleExceed(files, fileList) {
+      this.$message.warning(
+        `当前限制选择50个文件，本次选择了 ${
+          files.length
+        } 个文件，共选择了 ${files.length + fileList.length} 个文件`,
+      );
     },
     fetchListFun(params) {
       return new Promise((resolve, reject) => {

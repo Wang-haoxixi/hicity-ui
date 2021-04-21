@@ -70,7 +70,7 @@
             <hc-city-select v-model="formData.cityIdList" :city-id="userInfo.manageCityId"></hc-city-select>
           </el-form-item>
           <el-form-item label="标题图：" prop="titleImage">
-            <hc-image-upload v-model="titleImage" :limit="50"></hc-image-upload>
+            <hc-image-upload v-model="titleImage" :limit="9"></hc-image-upload>
           </el-form-item>
           <el-form-item label="图片展示比例：" prop="imageSizeType">
             <el-radio-group v-model="formData.imageSizeType">
