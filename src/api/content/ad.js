@@ -76,7 +76,7 @@ export function official_columnPage(data) {
 // 广告详情查询
 export function adCheckDetail(data) {
   return request({
-    url: "cms/info_ad/" + data,
+    url: "/cms/info_ad/" + data,
     method: "get",
   });
 }
