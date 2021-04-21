@@ -18,7 +18,7 @@ export const initForm = () => {
   return {
     parentId: 0, // 父ID
     name: "", // 类型名称
-    number: "", // 类型编码
+    introduction: "", // 类型编码
     sort: 0, // 排序
     type: 1,
   };

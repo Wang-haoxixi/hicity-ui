@@ -1,6 +1,6 @@
 <template>
   <el-dialog :visible.sync="dialogShow" :title="`${methodName}`" width="500px" @close="_close()">
-    <el-form class="el-form-detail" :model="form" ref="form" label-width="120px">
+    <el-form class="el-form-detail" :model="form" ref="form" label-width="120px" :rules="formRules">
       <el-form-item v-if="form.type!=='0'" label="上级行业" prop="parentId">
         <el-select v-model="form.parentId" filterable :disabled="isChild" placeholder="请选择上级行业">
           <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
@@ -8,10 +8,10 @@
         </el-select>
       </el-form-item>
       <el-form-item label="行业名称" prop="name">
-        <el-input v-model.trim="form.name" placeholder="请输入行业名称"></el-input>
+        <el-input v-model.trim="form.name" placeholder="请输入行业名称" maxlength="100"></el-input>
       </el-form-item>
-      <el-form-item label="行业说明" prop="number">
-        <el-input v-model.trim="form.introduction" placeholder="请输入行业说明"></el-input>
+      <el-form-item label="行业说明" prop="introduction">
+        <el-input v-model.trim="form.introduction" placeholder="请输入行业说明" maxlength="255"></el-input>
       </el-form-item>
     </el-form>
     <template slot="footer">
@@ -35,12 +35,19 @@ export default {
       formRequestFn: () => {},
       options: [],
       isChild: false,
+      formRules: {
+        parentId: {required: true, message: "请选择上级岗位", trigger: "blur"},
+        name: {required: true, message: "请输入岗位名称", trigger: "blur"},
+      }
     };
   },
   methods: {
     open (options = [], data, edit = false, isChild = false) {
       this.methodName = edit ? '编辑' : '创建'
       this.dialogShow = true
+      this.$nextTick(() => {
+        this.$refs.form.clearValidate()
+      })
       this.options = [
         {value: 0, label: '最高级'},
         ...options
@@ -57,33 +64,37 @@ export default {
       }
     },
     save () {
-      let fn = null
-      let form = {}
-      if (this.edit) {
-        fn = updateIndustry
-        form = {
-          id: this.form.id,
-          introduction: this.form.introduction,
-          name: this.form.name,
-          parentId: this.form.parentId,
-          type: this.form.type,
-          spell: this.form.spell
+      this.$refs.form.validate(valid => {
+        if (valid) {
+          let fn = null
+          let form = {}
+          if (this.edit) {
+            fn = updateIndustry
+            form = {
+              id: this.form.id,
+              introduction: this.form.introduction,
+              name: this.form.name,
+              parentId: this.form.parentId,
+              type: this.form.type,
+              spell: this.form.spell
+            }
+          } else {
+            fn = addIndustry
+            form = {
+              introduction: this.form.introduction,
+              name: this.form.name,
+              parentId: this.form.parentId,
+            }
+          }
+          fn(form).then(({data}) => {
+            this.$message({
+              showClose: true,
+              message: '添加成功',
+              type: 'success'
+            })
+            this.close()
+          })
         }
-      } else {
-        fn = addIndustry
-        form = {
-          introduction: this.form.introduction,
-          name: this.form.name,
-          parentId: this.form.parentId,
-        }
-      }
-      fn(form).then(({data}) => {
-        this.$message({
-          showClose: true,
-          message: '添加成功',
-          type: 'success'
-        })
-        this.close()
       })
     },
     _close() {
