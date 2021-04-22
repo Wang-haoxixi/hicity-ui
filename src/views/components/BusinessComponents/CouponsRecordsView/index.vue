@@ -5,7 +5,7 @@
     :before-close="dialogBeforeClose">
     <el-tabs v-model="type">
       <el-tab-pane label="订单信息" name="order">
-        <template>
+        <template v-if="orderDetail">
           <div class="coupons-info">
             <el-image class="coupons-img" :src="orderDetail.logo"></el-image>
             <div class="coupons-name">{{orderDetail.name}}</div>
@@ -18,7 +18,7 @@
         </template>
       </el-tab-pane>
       <el-tab-pane label="核销信息" name="writeOff" :disabled="!writeOff">
-        <div class="off-info">
+        <div v-if="writeoffDetail" class="off-info">
           <p>核销券名：{{writeoffDetail.name}}</p>
           <p>核销商户：{{writeoffDetail.merchantName}}</p>
           <p>核销人员：{{writeoffDetail.writeOffUserName}}</p>
@@ -48,6 +48,8 @@ export default {
       this.type = type
       this.writeOff = writeOff
       this.dialogVisible = true
+      this.orderDetail = null
+      this.writeoffDetail = null
       if (writeOff) {
         getWriteoffDetail({id}).then(({ data }) => {
           this.writeoffDetail = data.data.data

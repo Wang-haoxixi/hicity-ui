@@ -123,7 +123,7 @@
             })
           },
           editAuth (userType) {
-            userType = userType == '5' ? '2.5' : userType
+            userType = (userType == '5' || userType == '6') ? '2.5' : userType
             return this.userInfo.userType >= userType
           },
           handleCreate() {
