@@ -11,9 +11,7 @@
 </template>
 
 <script>
-    import {addObj, delObj, fetchList, putObj} from '@/api/admin/user'
-    import {deptRoleList} from '@/api/admin/role'
-    import {fetchTree} from '@/api/admin/dept'
+    import { delObj, fetchList, putObj} from '@/api/admin/user'
     import {tableOption} from './const'
     import {mapGetters} from 'vuex'
 
