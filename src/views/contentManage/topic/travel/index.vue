@@ -33,7 +33,7 @@
           label-width="180px"
           :rules="formRule">
           <el-form-item label="游记名称：" prop="travelName">
-            <el-input v-model="formData.travelName" maxlength="30"></el-input>
+            <el-input v-model.trim="formData.travelName" maxlength="30"></el-input>
           </el-form-item>
           <el-form-item label="关联话题：" prop="topicsBankIdSet">
             <hc-topic-select v-model="formData.topicsBankIdSet" :topic-name="topicName"></hc-topic-select>

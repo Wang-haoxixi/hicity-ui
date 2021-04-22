@@ -40,7 +40,7 @@
           :rules="formRule"
           label-width="180px">
           <el-form-item label="分类名称：" prop="brandClassificationName">
-            <el-input v-model="formData.brandClassificationName" maxlength="6"></el-input>
+            <el-input v-model.trim="formData.brandClassificationName" maxlength="6"></el-input>
           </el-form-item>
           <el-form-item label="模板选择：" prop="brandClassificationBg">
             <module-bg-list v-model="formData.brandClassificationBg"></module-bg-list>

@@ -6,7 +6,7 @@
     :rules="formRule">
     <h3 class="form-title">基本信息</h3>
     <el-form-item label="券名称：" prop="name">
-      <el-input v-model="formData.name" maxlength="15" :disabled="formData.status == '3' || formData.status == '2'" placeholder="品牌+商品类型+金额+代金券+商铺名称，如食品 西朵曼生日蛋糕100元代金券 雁峰区希朵曼"></el-input>
+      <el-input v-model.trim="formData.name" maxlength="15" :disabled="formData.status == '3' || formData.status == '2'" placeholder="品牌+商品类型+金额+代金券+商铺名称，如食品 西朵曼生日蛋糕100元代金券 雁峰区希朵曼"></el-input>
     </el-form-item>
     <el-form-item label="券门类：" prop="category">
       <el-select v-model="formData.category" :disabled="formData.status == '3' || formData.status == '2'">
@@ -72,11 +72,11 @@
       <el-checkbox v-if="!isPlatform" v-model="formData.isCopyLogo" label="复用商户logo" :disabled="formData.status == '3' || formData.status == '2'" border @change="$refs.form.validateField('logo')"></el-checkbox>
       <template v-if="!formData.isCopyLogo">
         <div>图片建议尺寸:120像素*120像素，大小不超过1M，支持JPG、PNG格式。如不上传，默认使用超能支付logo</div>
-        <hc-image-upload v-model="formData.logo" :limit="1" @change="$refs.form.validateField('logo')" :disabled="formData.status == '3' || formData.status == '2'"></hc-image-upload>
+        <hc-image-upload v-model="formData.logo" single :limit="1" @change="$refs.form.validateField('logo')" :disabled="formData.status == '3' || formData.status == '2'"></hc-image-upload>
       </template>
     </el-form-item>
     <el-form-item label="使用说明：" prop="instructions">
-      <el-input type="textarea" v-model="formData.instructions" :disabled="formData.status == '3' || formData.status == '2'" :autosize="{minRows: 6, maxRows: 10}" maxlength="200" style="width: 400px;"
+      <el-input type="textarea" v-model.trim="formData.instructions" :disabled="formData.status == '3' || formData.status == '2'" :autosize="{minRows: 6, maxRows: 10}" maxlength="200" style="width: 400px;"
       placeholder="例如：
 美食满300元-100元（酒水、饮料、槟榔、香烟除外）；
 本券不兑现，不找零，不可与本店其他优惠活动同时享受；

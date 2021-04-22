@@ -34,10 +34,10 @@
           :disabled="publishType == 'view'"
         >
           <el-form-item label="品牌名称：" prop="brandName">
-            <el-input v-model="formData.brandName" maxlength="10"></el-input>
+            <el-input v-model.trim="formData.brandName" maxlength="10"></el-input>
           </el-form-item>
           <el-form-item label="品牌Logo：" prop="brandLogo">
-            <hc-image-upload :limit="1" v-model="formData.brandLogo"></hc-image-upload>
+            <hc-image-upload single :limit="1" v-model="formData.brandLogo"></hc-image-upload>
           </el-form-item>
           <el-form-item label="品牌介绍：" prop="brandSynopsis">
             <el-input type="textarea" v-model="formData.brandSynopsis" :autosize="{minRows: 5, maxRows: 10}" maxlength="250"></el-input>

@@ -42,7 +42,7 @@
           <!-- 名称 -->
           <el-form-item label="名称" prop="officialNewsName">
             <el-input
-              v-model="addform.officialNewsName"
+              v-model.trim="addform.officialNewsName"
               maxlength="200"
             ></el-input>
           </el-form-item>

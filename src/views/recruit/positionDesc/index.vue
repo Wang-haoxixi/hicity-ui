@@ -25,6 +25,7 @@ export default {
             label: '职位描述',
             prop: 'content',
             search: true,
+            trim: true,
             maxlength: 100,
             rules: [{required: true, message: '请输入职位描述', trigger: 'blur'}]
           },

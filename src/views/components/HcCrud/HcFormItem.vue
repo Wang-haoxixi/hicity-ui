@@ -35,8 +35,18 @@
     :value="value"
     clearable
     :format="option.format"
+    :value-format="option.valueFormat"
     type="datetime"
-    placeholder="选择日期时间"
+    placeholder="选择日期"
+    @input="change">
+  </el-date-picker>
+  <el-date-picker v-else-if="option.type == 'date'"
+    :value="value"
+    clearable
+    :format="option.format"
+    :value-format="option.valueFormat"
+    type="date"
+    placeholder="选择日期"
     @input="change">
   </el-date-picker>
   <el-switch v-else-if="option.type == 'switch'"
@@ -87,7 +97,11 @@ export default {
   },
   methods: {
     change (value) {
-      this.$emit('input', value)
+      if (this.option.trim) {
+        this.$emit('input', value.trim())
+      } else {
+        this.$emit('input', value)
+      }
     }
   }
 }

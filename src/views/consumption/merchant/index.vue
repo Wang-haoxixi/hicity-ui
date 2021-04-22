@@ -41,19 +41,19 @@
           :rules="formRule"
         >
           <el-form-item label="店铺名称：" prop="merchantName">
-            <el-input v-model="formData.merchantName" maxlength="50"></el-input>
+            <el-input v-model.trim="formData.merchantName" maxlength="50"></el-input>
           </el-form-item>
           <el-form-item label="店铺Logo：" prop="merchantLogo">
-            <hc-image-upload :limit="1" v-model="formData.merchantLogo" @change="logoChange"></hc-image-upload>
+            <hc-image-upload single :limit="1" v-model="formData.merchantLogo" @change="logoChange"></hc-image-upload>
           </el-form-item>
           <el-form-item label="店铺介绍：" prop="merchantSynopsis">
             <el-input type="textarea" v-model="formData.merchantSynopsis" :autosize="{minRows: 5, maxRows: 10}" maxlength="1000"></el-input>
           </el-form-item>
           <el-form-item label="联系人：" prop="merchantUserName">
-            <el-input v-model="formData.merchantUserName" maxlength="50"></el-input>
+            <el-input v-model.trim="formData.merchantUserName" maxlength="50"></el-input>
           </el-form-item>
           <el-form-item label="联系电话：" prop="merchantUserPhone">
-            <el-input v-model="formData.merchantUserPhone" maxlength="20"></el-input>
+            <el-input v-model.trim="formData.merchantUserPhone" maxlength="20"></el-input>
           </el-form-item>
           <el-form-item label="定位地址：" prop="locationAddr">
             <hc-map-select v-model="locationAddr" @city-change="cityChange" @change="locationAddrChange"></hc-map-select>
@@ -66,7 +66,7 @@
             </el-col>
             <el-col :span="12">
               <el-form-item label="详细地址：" prop="address">
-                <el-input v-model="formData.address" maxlength="100"></el-input>
+                <el-input v-model.trim="formData.address" maxlength="100"></el-input>
               </el-form-item>
             </el-col>
           </el-row>
