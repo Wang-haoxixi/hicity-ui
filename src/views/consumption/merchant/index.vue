@@ -44,7 +44,7 @@
             <el-input v-model.trim="formData.merchantName" maxlength="50"></el-input>
           </el-form-item>
           <el-form-item label="店铺Logo：" prop="merchantLogo">
-            <hc-image-upload single :limit="1" v-model="formData.merchantLogo" @change="logoChange"></hc-image-upload>
+            <hc-image-upload single :limit="1" v-model="formData.merchantLogo" :disabled="publishType == 'view'" @change="logoChange"></hc-image-upload>
           </el-form-item>
           <el-form-item label="店铺介绍：" prop="merchantSynopsis">
             <el-input type="textarea" v-model="formData.merchantSynopsis" :autosize="{minRows: 5, maxRows: 10}" maxlength="1000"></el-input>
