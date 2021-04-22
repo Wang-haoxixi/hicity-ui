@@ -93,6 +93,10 @@ export default {
         this.remoteFun(query).then(data => {
           this.options = data
           this.loading = false
+        }, () => {
+          this.options = []
+        }).finally(() => {
+          this.loading = false
         })
       } else {
         this.options = [];

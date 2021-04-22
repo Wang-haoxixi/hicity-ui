@@ -1,93 +1,98 @@
 <template>
-  <el-upload
-    :disabled="disabled"
-    :action="action"
-    :headers="headers"
-    :on-remove="handleRemove"
-    :on-success="handleSuccess"
-    :on-error="handleError"
-    :limit="!multiple ? 0 : limit"
-    list-type="picture-card"
-    :show-file-list="multiple"
-    :on-exceed="handleExceed"
-    :file-list="fileList"
-    :before-upload="onBeforeUpload"
-    accept=".jpg,.jpeg,.png,.gif,.bmp,.JPG,.JPEG,.PNG,.GIF,.BMP"
-  >
-    <el-image v-if="!multiple && fileList.length > 0" :src="fileList[0].url" class="avatar" />
-    <i v-else class="el-icon-plus"></i>
-  </el-upload>
+  <div class="hc-upload-image-container">
+    <div v-for="(file, index) in fileList" :key="index" class="image-box upload">
+      <div class="image-box-content">
+        <img v-if="file.type == 'formal'" class="image-box-content-image" fit="fill" :src="file.url"/>
+        <el-progress v-if="file.type == 'temp'" type="circle" :percentage="0"></el-progress>
+        <div v-if="!disabled" class="image-box-cotent-shadow" @click.stop="">
+          <i class="el-icon-refresh" @click="changeFile(file, index)"></i>
+          <i class="el-icon-delete" @click="removeFile(index)"></i>
+        </div>
+      </div>
+    </div>
+    <file-upload 
+      v-show="!single || fileList.length == 0"
+      ref="fileUpload"
+      key="fileUpload"
+      @file-add="fileAddTemp"
+      @file-change="fileChangeTemp"
+      @upload-success="fileChangeFormal"
+      @upload-error="fileRemove"
+      @change-success="fileChangeFormal"
+      @change-error="fileChangeBack"
+      accept=".jpg,.jpeg,.png,.gif,.bmp,.JPG,.JPEG,.PNG,.GIF,.BMP"
+      :before-upload="onBeforeUpload">
+      <template v-slot:trigger>
+        <div v-if="disabled"></div>
+        <div v-else class="image-box">
+          <slot>
+            <div class="image-box-content">
+              <i class="el-icon-plus"></i>
+            </div>
+          </slot>
+        </div>
+      </template>
+    </file-upload>
+  </div>
 </template>
+
 <script>
-import store from "@/store";
+import { v4 as uuidv4 } from 'uuid'
+import FileUpload from '@/views/components/HcFileUpload/FileUpload/index'
 import { getFileMimeType } from "@/util/file"
+
 export default {
+  components: { FileUpload },
   props: {
+    disabled: {
+      type: Boolean,
+      default: false
+    },
+    initData: {
+      type: [String, Array],
+      default: null
+    },
     value: {
-      type: [Array, String],
-      required: true,
+      type: [String, Array],
+      default: null
     },
     limit: {
       type: Number,
-      default: 1,
+      default: 9
     },
-    action: {
-      type: String,
-      default: `/api/admin/sys_file/oss/upload`,
-    },
-    disabled: {
+    single: {
       type: Boolean,
       default: false
     }
   },
-  data() {
+  data () {
     return {
-      headers: {
-        Authorization: "Bearer " + store.getters.access_token,
-      },
-      fileList: []
-    };
-  },
-  computed: {
-    multiple() {
-      return this.limit > 1
+      fileList: [],
+      cacheFileMap: {}
     }
   },
   created () {
-    let fileList = []
-    if (this.multiple) {
+    if (this.single && this.value) {
+      this.fileList = [{type: 'formal', url: this.value}]
+    } else if (this.value && this.value.length > 0) {
       for (let i = 0; i < this.value.length; i++) {
-        fileList.push({
+        this.fileList.push({
+          type: 'formal',
           url: this.value[i]
         })
       }
-      this.fileList = fileList
-    } else if (this.value) {
-      this.fileList = [{url: this.value}]
     }
   },
   watch: {
-    value (val) {
-      if (val) {
-        if (this.multiple) {
-          let fileList = this.fileList
-          for (let i = 0; i < val.length; i++) {
-            let add = false
-            for (let j = 0; j < fileList.length; j++) {
-              if (fileList[j].url == val[i]) {
-                add = false
-                break
-              }
-            }
-            if (add) {
-              fileList.push({
-                url: val[i]
-              })
-            }
-          }
-          this.fileList = fileList
-        } else {
-          this.fileList = [{url: val}]
+    initData (val) {
+      if (this.single && val) {
+        this.fileList = [{type: 'formal', url: val}]
+      } else if (val && val.length > 0) {
+        for (let i = 0; i < val.length; i++) {
+          this.fileList.push({
+            type: 'formal',
+            url: val[i]
+          })
         }
       } else {
         this.fileList = []
@@ -95,96 +100,229 @@ export default {
     }
   },
   methods: {
-    dataMatch (fileList, dataList) {
-      if (fileList.length != dataList.length) {
-        return false
-      } else {
-        for (let i = 0; i < fileList.length; i++) {
-          if (!dataList.includes(fileList[i].url)) {
-            return false
-          }
-        }
-        return true
+    onBeforeUpload(files, isChange) {
+      let fileList = []
+      for (let i = 0; i < files.length; i++) {
+        fileList.push(files[i])
       }
-    },
-    onBeforeUpload(file) {
       return new Promise((resolve, reject) => {
-        getFileMimeType(file).then(res => {
-          if (res) {
-            const isLt1M = file.size / 1024 / 1024 < 100;
-            if (!isLt1M) {
-              this.$message.warning("上传文件大小不能超过 100MB!");
-              reject()
-            } else {
-              resolve(true)
+        let promiseList = []
+        for (let i = 0; i < fileList.length; i++) {
+          let file = fileList[i]
+          let promise = new Promise((resolve, reject) => {
+            getFileMimeType(file).then(res => {
+              if (res) {
+                const isLt1M = file.size / 1024 / 1024 < 50;
+                if (!isLt1M) {
+                  resolve({
+                    type: 'error',
+                    index: i,
+                    message: '上传文件大小不能超过 50MB!'
+                  })
+                } else {
+                  resolve({
+                    type: 'success',
+                    index: i
+                  })
+                }
+              } else {
+                resolve({
+                  type: 'error',
+                  index: i,
+                  message: '暂不支持该文件类型！'
+                })
+              }
+            })
+          })
+          promiseList.push(promise)
+        }
+        Promise.all(promiseList).then((results) => {
+          let errorList = []
+          let errorObjects = []
+          for (let i = 0; i < results.length; i++) {
+            if (results[i].type == 'error') {
+              errorObjects.push(results[i])
+              errorList.push(results[i].index)
             }
+          }
+          errorList.sort()
+          for (let i = errorList.length - 1; i >= 0; i--) {
+            fileList.splice(i, 1)
+          }
+          if (!isChange && fileList.length + this.fileList.length > this.limit) {
+            this.$message.warning(`本次选择${fileList.length}张有效图片，共计选择${fileList.length + this.fileList.length}张，已超出限制的${this.limit}张`)
+            resolve([])
           } else {
-            this.$message.warning("暂不支持该文件类型！");
-            reject();
+            resolve(fileList)
           }
         })
       })
     },
-    handleError() {
-      this.$message.error("错了哦，请检查文件服务器");
+    fileAddTemp (file) {
+      this.fileList.push({
+        ...file,
+        type: 'temp'
+      })
     },
-    handleSuccess(res, file) {
-      if (res.code) {
-        if (!res.data) {
-          if (res.msg) {
-            this.$message.error(res.msg);
+    fileChangeTemp (file) {
+      let fileList = this.fileList
+      for (let i = 0; i < fileList.length; i++) {
+        if (file.uuid === fileList[i].uuid) {
+          fileList.splice(i, 1, {
+            ...file,
+            type: 'temp'
+          })
+        }
+      }
+    },
+    fileChangeFormal ({uuid, name, file}) {
+      let fileList = this.fileList
+      let valueList = []
+      for (let i = 0; i < fileList.length; i++) {
+        if (uuid === fileList[i].uuid) {
+          fileList.splice(i, 1, {
+            name,
+            url: file.url,
+            type: 'formal'
+          })
+          valueList.push(file.url)
+          continue
+        }
+        if (fileList[i].type == 'formal') {
+          valueList.push(fileList[i].url)
+        }
+      }
+      if (this.single && valueList.length > 0) {
+        this.$emit('input', valueList[0])
+        this.$emit('change', valueList[0])
+      } else if (valueList.length > 0) {
+        this.$emit('input', valueList)
+        this.$emit('change', valueList)
+      } else if (!this.single) {
+        this.$emit('input', [])
+        this.$emit('change', [])
+      } else {
+        this.$emit('input', '')
+        this.$emit('change', '')
+      }
+    },
+    fileChangeBack (uuid) {
+      let fileList = this.fileList
+      for (let i = 0; i < fileList.length; i++) {
+        if (uuid === fileList[i].uuid) {
+          if (this.cacheFileMap[uuid]) {
+            fileList.splice(i, 1, this.cacheFileMap[uuid])
+            delete this.cacheFileMap[uuid]
           } else {
-            this.$message.error("错了哦，请检查文件服务器");
+            fileList.splice(i, 1)
           }
-        } else {
-          this.$message.error(res.msg);
         }
-        if (this.multiple) {
-          this.$emit("input", [])
-          this.$emit("change", [])
-        } else {
-          this.$emit("input", '')
-          this.$emit("change", '')
-        }
-      } else {
-        const url = res.data.data.url;
-        if (this.multiple) {
-          this.$emit("input", [...this.value, url])
-          this.$emit("change", [...this.value, url])
-        } else {
-          this.fileList = [{url}]
-          this.$emit("input", url)
-          this.$emit("change", url)
-        }
-        this.$message.success("上传成功");
       }
     },
-    handleRemove(res) {
-      let tempData = [...this.value]
-      let url = ''
-      if (res.response) {
-        url = res.response.data.data.url
-      } else {
-        url = res.url
+    fileRemove (uuid) {
+      let fileList = this.fileList
+      for (let i = 0; i < fileList.length; i++) {
+        if (uuid === fileList[i].uuid) {
+          fileList.splice(i, 1)
+        }
       }
-      tempData.splice(tempData.indexOf(url), 1)
-      this.$emit("input", tempData)
-      this.$emit("change", tempData)
     },
-    handleExceed(files, fileList) {
-      this.$message.warning(
-        `当前限制选择 ${this.limit} 个文件，本次选择了 ${
-          files.length
-        } 个文件，共选择了 ${files.length + fileList.length} 个文件`,
-      );
+    changeFile (file, index) {
+      let uuid = uuidv4()
+      this.cacheFileMap[uuid] = file
+      this.fileList.splice(index, 1, {
+        ...file,
+        uuid
+      })
+      this.$refs.fileUpload.changeFile(uuid)
     },
-  },
-};
+    removeFile (index) {
+      let valueList = []
+      let fileList = this.fileList
+      fileList.splice(index, 1)
+      for (let i = 0; i < fileList.length; i++) {
+        let file = fileList[i]
+        if (file.type == 'formal') {
+          valueList.push(file.url)
+        }
+      }
+      if (this.single && valueList.length > 0) {
+        this.$emit('input', valueList[0])
+        this.$emit('change', valueList[0])
+      } else if (valueList.length > 0) {
+        this.$emit('input', valueList)
+        this.$emit('change', valueList)
+      } else if (!this.single) {
+        this.$emit('input', [])
+        this.$emit('change', [])
+      } else {
+        this.$emit('input', '')
+        this.$emit('change', '')
+      }
+    },
+  }
+}
 </script>
+
 <style lang="scss" scoped>
-.avatar {
-  height: 100%;
-  width: 100%;
-  margin: 0;
+.hc-upload-image-container {
+  display: inline-block;
+  .image-box {
+    display: inline-block;
+    width: 148px;
+    vertical-align: top;
+    &.upload {
+      padding: 0 10px 10px 0;
+      .image-box-content {
+        border-style: solid;
+      }
+    }
+    .image-box-content {
+      position: relative;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      border: 1px dashed #c0ccda;
+      border-radius: 6px;
+      box-sizing: border-box;
+      width: 148px;
+      height: 148px;
+      vertical-align: top;
+      text-align: center;
+      cursor: pointer;
+      outline: 0;
+      font-size: 20px;
+      color: #8c939d;
+      overflow: hidden;
+      .image-box-cotent-shadow {
+        display: none;
+        position: absolute;
+        justify-content: center;
+        align-items: center;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        color: #ffffff;
+        cursor: auto;
+        i {
+          cursor: pointer;
+          &:not(:first-child) {
+            margin-left: 10px;
+          }
+        }
+      }
+      &:hover {
+        .image-box-cotent-shadow {
+          display: flex;
+        }
+      }
+      .image-box-content-image {
+        height: 146px;
+        width: 146px;
+      }
+    }
+  }
 }
 </style>

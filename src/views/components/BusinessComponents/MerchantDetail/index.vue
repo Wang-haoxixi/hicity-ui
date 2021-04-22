@@ -8,7 +8,7 @@
       <el-input v-model="formData.merchantName" maxlength="50"></el-input>
     </el-form-item>
     <el-form-item label="店铺Logo：" prop="merchantLogo">
-      <hc-image-upload :limit="1" v-model="formData.merchantLogo"></hc-image-upload>
+      <hc-image-upload single :limit="1" v-model="formData.merchantLogo" disabled></hc-image-upload>
     </el-form-item>
     <el-form-item label="店铺介绍：" prop="merchantSynopsis">
       <el-input type="textarea" v-model="formData.merchantSynopsis" :autosize="{minRows: 5, maxRows: 10}" maxlength="1000"></el-input>
@@ -25,7 +25,7 @@
     <el-row>
       <el-col :span="12">
         <el-form-item label="城市/地区：" prop="cityId">
-          <hc-city-select v-model="formData.cityId" :city-id="userInfo.manageCityId" single></hc-city-select>
+          <hc-city-select v-model="formData.cityId" :city-id="1" single></hc-city-select>
         </el-form-item>
       </el-col>
       <el-col :span="12">

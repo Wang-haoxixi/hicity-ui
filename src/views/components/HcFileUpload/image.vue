@@ -69,21 +69,56 @@ export default {
     }
   },
   methods: {
-    onBeforeUpload(file) {
+    onBeforeUpload(files) {
+      let fileList = []
+      for (let i = 0; i < files.length; i++) {
+        fileList.push(files[i])
+      }
       return new Promise((resolve, reject) => {
-        getFileMimeType(file).then(res => {
-          if (res) {
-            const isLt1M = file.size / 1024 / 1024 < 50;
-            if (!isLt1M) {
-              this.$message.warning("上传文件大小不能超过 50MB!");
-              reject()
-            } else {
-              resolve(true)
+        let promiseList = []
+        for (let i = 0; i < fileList.length; i++) {
+          let file = fileList[i]
+          let promise = new Promise((resolve, reject) => {
+            getFileMimeType(file).then(res => {
+              if (res) {
+                const isLt1M = file.size / 1024 / 1024 < 50;
+                if (!isLt1M) {
+                  resolve({
+                    type: 'error',
+                    index: i,
+                    message: '上传文件大小不能超过 50MB!'
+                  })
+                } else {
+                  resolve({
+                    type: 'success',
+                    index: i
+                  })
+                }
+              } else {
+                resolve({
+                  type: 'error',
+                  index: i,
+                  message: '暂不支持该文件类型！'
+                })
+              }
+            })
+          })
+          promiseList.push(promise)
+        }
+        Promise.all(promiseList).then((results) => {
+          let errorList = []
+          let errorObjects = []
+          for (let i = 0; i < results.length; i++) {
+            if (results[i].type == 'error') {
+              errorObjects.push(results[i])
+              errorList.push(results[i].index)
             }
-          } else {
-            this.$message.warning("暂不支持该文件类型！");
-            reject();
           }
+          errorList.sort()
+          for (let i = errorList.length - 1; i >= 0; i--) {
+            fileList.splice(i, 1)
+          }
+          resolve(fileList)
         })
       })
     },
