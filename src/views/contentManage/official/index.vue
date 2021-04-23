@@ -229,7 +229,7 @@ export default {
         urlList: [
           { required: true, message: "请添加标题图", trigger: "change" },
         ],
-        titleImage: [{validator: this.imageValidator, required: true, trigger: 'blur'}],
+        // titleImage: [{validator: this.imageValidator, required: true, trigger: 'blur'}],
         imageSizeType: [
           { required: true, message: "请选择图片展示比例", trigger: "change" },
         ],
