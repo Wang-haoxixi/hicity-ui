@@ -70,7 +70,7 @@
           prop="adName"
           :label-width="formLabelWidth"
         >
-          <el-input v-model="form.adName" autocomplete="off"></el-input>
+          <el-input v-model.trim="form.adName" autocomplete="off"></el-input>
         </el-form-item>
         <!-- 开始时间 -->
         <el-form-item
@@ -227,7 +227,7 @@
           prop="adName"
           :label-width="formLabelWidth"
         >
-          <el-input v-model="editForm.adName" autocomplete="off"></el-input>
+          <el-input v-model.trim="editForm.adName" autocomplete="off"></el-input>
         </el-form-item>
         <!-- 开始时间 -->
         <el-form-item

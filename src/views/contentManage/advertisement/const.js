@@ -10,6 +10,7 @@ export const tableOption = (admin = false) => {
       label: '广告位名称',
       prop: 'adslotName',
       width: 180,
+      trim: true,
       rules: [
         { required: true, message: "请输入广告位名称", trigger: "blur" },
         { min: 1, message: "请输入广告位名称", trigger: "blur" },
@@ -19,6 +20,7 @@ export const tableOption = (admin = false) => {
       label: '广告位描述',
       prop: 'adslotDescription',
       type: 'textarea',
+      trim: true,
       rules: [
         { required: true, message: "请输入广告位描述", trigger: "blur" },
       ]
@@ -27,6 +29,7 @@ export const tableOption = (admin = false) => {
       label: '广告位编码',
       prop: 'adslotNumber',
       width: 100,
+      trim: true,
       rules: [
         { required: true, message: "请输入广告位编码", trigger: "blur" },
       ]

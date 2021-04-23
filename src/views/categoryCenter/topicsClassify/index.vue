@@ -42,10 +42,10 @@
           :rules="formRule"
           label-width="180px">
           <el-form-item label="分类名称：" prop="classifyName">
-            <el-input v-model="formData.classifyName" maxlength="5"></el-input>
+            <el-input v-model.trim="formData.classifyName" maxlength="5"></el-input>
           </el-form-item>
-          <el-form-item label="图片：">
-            <hc-image-upload :limit="1" v-model="formData.imageUrl"></hc-image-upload>
+          <el-form-item label="图片：" prop="imageUrl">
+            <hc-image-upload single :limit="1" v-model="formData.imageUrl" @change="$refs.form.validateField('imageUrl')"></hc-image-upload>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" :loading="formLoading" @click="handleSave">保 存</el-button>
@@ -162,7 +162,8 @@ export default {
       topicAdd: [],
       topicSelectList: [],
       formRule: {
-        classifyName: [{required: true, message: '分类名称不能为空'}]
+        classifyName: [{required: true, message: '分类名称不能为空'}],
+        imageUrl: [{required: true, message: '请选择图片', trigger: 'change'}],
       },
       boxLoading: false,
       formLoading: false,

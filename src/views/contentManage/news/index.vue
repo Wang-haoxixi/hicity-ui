@@ -46,7 +46,7 @@
           :rules="formRule"
         >
           <el-form-item label="名称：" prop="title">
-            <el-input v-model="formData.title" maxlength="200"></el-input>
+            <el-input v-model.trim="formData.title" maxlength="200"></el-input>
           </el-form-item>
           <el-form-item label="标签：" prop="lableIdList">
             <el-select

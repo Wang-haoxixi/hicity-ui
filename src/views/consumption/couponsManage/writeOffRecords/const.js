@@ -50,7 +50,7 @@ export const tableOption = () => {
     },
     {
       label: '核销员手机号',
-      prop: 'writeOffStatus',
+      prop: 'writeOffUserPhone',
       width: 120,
     },
   ]

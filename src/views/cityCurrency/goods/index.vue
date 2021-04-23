@@ -57,7 +57,7 @@
           :rules="formRule"
         >
           <el-form-item label="商品名称：" prop="name">
-            <el-input v-model="formData.name" maxlength="50"></el-input>
+            <el-input v-model.trim="formData.name" maxlength="50"></el-input>
           </el-form-item>
           <el-form-item label="商品分类：" prop="type">
             <el-select v-model="formData.type">
@@ -68,7 +68,7 @@
             <hc-file-upload-image ref="images" :init-data="images" :disabled="publishType == 'view'"></hc-file-upload-image>
           </el-form-item>
           <el-form-item label="商品介绍：" prop="description">
-            <el-input type="textarea" v-model="formData.description" :autosize="{minRows: 5, maxRows: 10}" maxlength="1000"></el-input>
+            <el-input type="textarea" v-model.trim="formData.description" :autosize="{minRows: 5, maxRows: 10}" maxlength="1000"></el-input>
           </el-form-item>
           <el-form-item label="商品价格：" prop="price">
             <hc-input style="width: 250px;" v-model="formData.price" :decimal="0" maxlength="9" :min="1" :max="99999999">

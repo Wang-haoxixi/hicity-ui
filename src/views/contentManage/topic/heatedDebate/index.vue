@@ -180,7 +180,7 @@ export default {
       initCityList: [],
       topicName: "",
       formRule: {
-        titleObj: [{validator: this.titleObjValidator, required: true, message: '请输入热议话题'}],
+        titleObj: [{ required: true, validator: this.titleObjValidator,message: '请输入热议话题'}],
         // topicsBankIdSet: [{required: true, message: '请选择话题'}],
         cityList: [{ required: true, message: "请选择城市" }],
         // images: [{ required: true, message: "请添加热议图片" }],
@@ -220,7 +220,7 @@ export default {
   methods: {
     dateFormat,
     titleObjValidator (rules, value, callback) {
-      if (this.titleObj.heatedDebateId) {
+      if (this.titleObj.heatedDebateId || this.titleObj.heatedDebateId === 0) {
         callback()
       } else {
         callback(new Error('请填写热议话题'))
@@ -234,13 +234,16 @@ export default {
       }
     },
     getAllTitle (title) {
+      title = title.trim()
       return new Promise((resolve, reject) => {
-        if (title.length <= 30) {
+        if (!title) {
+          resolve([])
+        } else if (title.length <= 30) {
           debateMatchList({title}).then(({data}) => {
             let hasTitle = false
             let titles = data.data.data.records
             for (let i = 0; i < titles.length; i++) {
-              if (titles[i].title == title) {
+              if (titles[i].title == title.trim()) {
                 hasTitle = true
                 break
               }
@@ -366,7 +369,8 @@ export default {
           state: formData.state
         };
         this.titleObj = {
-          title: formData.title
+          title: formData.title,
+          heatedDebateId: formData.heatedDebateId
         }
         this.titleShow = formData.title
         this.publish = true;

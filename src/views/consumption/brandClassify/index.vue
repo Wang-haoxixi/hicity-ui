@@ -40,7 +40,7 @@
           :rules="formRule"
           label-width="180px">
           <el-form-item label="分类名称：" prop="brandClassificationName">
-            <el-input v-model="formData.brandClassificationName" maxlength="6"></el-input>
+            <el-input v-model.trim="formData.brandClassificationName" maxlength="6"></el-input>
           </el-form-item>
           <el-form-item label="模板选择：" prop="brandClassificationBg">
             <module-bg-list v-model="formData.brandClassificationBg"></module-bg-list>
@@ -59,10 +59,10 @@
                 </el-button>
               </template>
               <template v-slot:brandName="scope">
-                <hc-remote-select v-model="scope.row.brandId" :remote-fun="getAllBrand" :show-word="scope.row.brandName" :disabled-items="brandSelected"></hc-remote-select>
+                <hc-remote-select :key="scope.row.brandId" v-model="scope.row.brandId" :remote-fun="getAllBrand" :show-word="scope.row.brandName" :disabled-items="brandSelected" @label-change="scope.row.brandName = $event"></hc-remote-select>
               </template>
               <template v-slot:sort="scope">
-                <el-input-number v-model="scope.row.sortNumber" :min="1"></el-input-number>
+                <el-input-number v-model="scope.row.sortNumber" :min="1" :max="9999"></el-input-number>
               </template>
               <template slot="menu" slot-scope="scope">
                 <template>
@@ -345,12 +345,16 @@ export default {
       .catch(function () {});
     },
     toAddBrand () {
-      this.formData.relations.push([{
+      this.formData.relations.push({
         brandId: '',
         sortNumber: '',
-      }])
+        brandName: '',
+      })
     },
     toDeleteBrand (row) {
+      console.log(row)
+      console.log(this.formData.relations)
+      // return
       this.$confirm("是否确认删除该品牌?", "警告", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",

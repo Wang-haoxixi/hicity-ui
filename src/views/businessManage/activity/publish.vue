@@ -36,7 +36,7 @@
           <el-row>
             <el-col :span="20">
               <el-input
-                v-model="baseFormData.name"
+                v-model.trim="baseFormData.name"
                 placeholder="不小于5个字，不超过40个字"
               ></el-input>
             </el-col>
@@ -157,7 +157,7 @@
                 <!-- 活动地址 -->
                 <el-input
                   style="width: 600px; margin: 0 10px"
-                  v-model="baseFormData.field"
+                  v-model.trim="baseFormData.field"
                   placeholder="请输入活动地址"
                 ></el-input>
               </el-form-item>
@@ -441,7 +441,9 @@
                   <div v-for="(itemP,indexP) in item.conferenceFormDTOList" :key="indexP">
                     <div class="item">
                       <el-checkbox v-model="itemP.must">必填</el-checkbox>
+
                       <el-input :placeholder="itemP.typename" show-word-limit maxlength="250"  v-model="itemP.label"></el-input>
+
                       <i class="el-icon-remove" title="删除" @click="handleDeleteItem(item,indexP)"></i>
                     </div>
                     <div class="option-list">
@@ -509,14 +511,14 @@
           <div v-for="(item,index) in customList" :key="index">
             <div class="item" >
               <el-checkbox v-model="item.must">必填</el-checkbox>
-              <el-input :placeholder="item.typename" show-word-limit maxlength="250"  v-model="item.label"></el-input>
+              <el-input :placeholder="item.typename" show-word-limit maxlength="250"  v-model.trim="item.label"></el-input>
               <i class="el-icon-remove" title="删除" @click="handleDelete(index)"></i>
             </div>
             <div class="option-list" v-if="item.optionsList == [] || item.optionsList">
               <div>选项列表</div>
               <div class="list">
                 <el-tag class="tagitem" :disable-transitions="true" closable v-for="(tag,i) in item.optionsList" :key="i" @close="handleCloseOption(item,tag,i)">{{tag.label}}</el-tag>
-                <el-input ref="saveTagInput" show-word-limit maxlength='50' @keyup.enter.native="handleSaveTag(item,index)" @blur="handleSaveTag(item,index)" v-if="item.isInput" v-model="item.inputValue" style="width:150px" size="mini"></el-input>
+                <el-input ref="saveTagInput" show-word-limit maxlength='50' @keyup.enter.native="handleSaveTag(item,index)" @blur="handleSaveTag(item,index)" v-if="item.isInput" v-model.trim="item.inputValue" style="width:150px" size="mini"></el-input>
                 <el-button v-else icon="el-icon-plus" size="mini" @click="showInput(item,index)"></el-button>
               </div>
             </div>

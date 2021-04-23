@@ -60,14 +60,16 @@ export default {
           {
             label: '开始时间',
             prop: 'startTime',
-            type: 'datetime',
+            type: 'date',
+            valueFormat: 'yyyy-MM-dd',
             hidden: true,
             search: true
           },
           {
             label: '结束时间',
             prop: 'endTime',
-            type: 'datetime',
+            type: 'date',
+            valueFormat: 'yyyy-MM-dd',
             hidden: true,
             search: true
           },

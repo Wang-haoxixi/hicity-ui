@@ -183,6 +183,7 @@ export default {
           downTime: formData.downTime,
           instructions: formData.instructions,
           isPermanent: formData.isPermanent,
+          isDepository: formData.isDepository,
           limitNum: formData.limitNum,
           isCopyLogo: false,
           logo: formData.logo,
