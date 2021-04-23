@@ -67,6 +67,8 @@
           width="50%"
         >
           <el-input
+            maxlength='300'
+            show-word-limit
             type="textarea"
             :rows="4"
             placeholder="您可以输入对这个报名者的备注，方便您的管理与服务"

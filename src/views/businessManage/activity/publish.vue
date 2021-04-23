@@ -218,8 +218,10 @@
           <el-row>
             <el-col :span="20">
               <el-input
-                :rows="4"
-                placeholder="请填写几句活动核心亮点，便于分享摘要以及百度等搜索引擎搜索（150个字）"
+                maxlength='250'
+                show-word-limit
+                :rows="5"
+                placeholder="请填写几句活动核心亮点，便于分享摘要以及百度等搜索引擎搜索（250个字）"
                 type="textarea"
                 v-model="baseFormData.spot"
               ></el-input>
@@ -439,14 +441,14 @@
                   <div v-for="(itemP,indexP) in item.conferenceFormDTOList" :key="indexP">
                     <div class="item">
                       <el-checkbox v-model="itemP.must">必填</el-checkbox>
-                      <el-input :placeholder="itemP.typename" v-model="itemP.label"></el-input>
+                      <el-input :placeholder="itemP.typename" show-word-limit maxlength="250"  v-model="itemP.label"></el-input>
                       <i class="el-icon-remove" title="删除" @click="handleDeleteItem(item,indexP)"></i>
                     </div>
                     <div class="option-list">
                       <div>选项列表</div>
                       <div class="list" v-for="(itemO,indexO) in itemP.optionsList" :key="indexO">
                         <div style="display:flex;align-items: center;">
-                          <el-input v-model="itemO.label" placeholder="请输入选项名称" style="width:400px"></el-input>
+                          <el-input v-model="itemO.label" show-word-limit maxlength="50" placeholder="请输入选项名称" style="width:400px"></el-input>
                           <el-button v-if="!itemO.value" type="primary" round plain @click="showJumpDialog(itemO)" style="margin-left:10px;">选择跳转对象</el-button>
                           <div style="flex:1;text-overflow: ellipsis;white-space:nowrap;overflow:hidden;margin-top: 10px;margin-left:10px">{{itemO.offcialName}}</div>
                           <i v-if="itemO.value" class="el-icon-edit-outline" style="margin-top:10px;" title="修改跳转对象" @click="editJump(itemO)"></i>
@@ -825,7 +827,10 @@ export default {
             trigger: "change",
           },
         ],
-        spot: [{ required: true, message: "请输入活动亮点", trigger: "blur" }],
+        spot: [
+          { required: true, message: "请输入活动亮点", trigger: "blur" },
+          { message: "票务名称最多250字", max: 250, trigger: "blur" },
+        ],
         details: [
           { required: true, message: "请输入活动详情", trigger: "blur" },
         ],

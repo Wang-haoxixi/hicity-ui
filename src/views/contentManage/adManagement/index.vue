@@ -174,6 +174,7 @@
             v-model="form.seq"
             controls-position="right"
             :min="1"
+            :max="100"
           ></el-input-number>
         </el-form-item>
       </el-form>
@@ -331,6 +332,7 @@
             v-model="editForm.seq"
             controls-position="right"
             :min="1"
+            :max="100"
           ></el-input-number>
         </el-form-item>
       </el-form>
@@ -797,9 +799,11 @@ export default {
     // 获取广告位分页
     getAdPosition() {
       adPosition().then((res) => {
-        this.adslotGroup = res.data.data.data.records.filter((item) => {
-          return item.authority == true;
-        });
+        console.log('adslotName',res)
+        // this.adslotGroup = res.data.data.data.records.filter((item) => {
+        //   return item.authority == true;
+        // });
+        this.adslotGroup = res.data.data.data.records
       });
     },
     fetchListFun(params) {
@@ -1090,7 +1094,6 @@ export default {
   margin-top: 20px;
   text-align: right;
 }
-
 ::v-deep .avatar-uploader .el-upload {
   border: 1px dashed #d9d9d9;
   border-radius: 6px;
@@ -1114,7 +1117,6 @@ export default {
   height: 178px;
   display: block;
 }
-
 .picbox {
   width: 180px;
   height: 40px;
