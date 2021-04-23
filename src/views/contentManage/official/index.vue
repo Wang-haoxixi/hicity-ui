@@ -84,8 +84,9 @@
           </el-row>
 
           <!-- 标题图 -->
-          <el-form-item label="标题图" prop="urlList">
-            <el-upload
+          <el-form-item label="标题图" prop="titleImage">
+            <hc-image-upload v-model="titleImage" :limit="9"></hc-image-upload>
+            <!-- <el-upload
               :action="uploadPicUrl"
               list-type="picture-card"
               :on-remove="handleRemove"
@@ -98,7 +99,7 @@
               accept=".jpg,.jpeg,.png,.gif,.bmp,.JPG,.JPEG,.PNG,.GIF,.BMP"
             >
               <i class="el-icon-plus"></i>
-            </el-upload>
+            </el-upload> -->
           </el-form-item>
 
           <!-- 图片展示比例 -->
@@ -169,6 +170,7 @@ import HcTableForm from "@/views/components/HcTableForm/index";
 import HcEmptyData from "@/views/components/HcEmptyData/index";
 import HcPreview from "@/views/components/HcPreview/index";
 import HcTextLine from "@/views/components/HcTextLine/index";
+import HcImageUpload from "@/views/components/HcImageUpload/index";
 
 // -------------
 import { tableOption } from "./const.js";
@@ -182,10 +184,12 @@ export default {
     HcTableForm,
     HcEmptyData,
     HcPreview,
-    HcTextLine
+    HcTextLine,
+    HcImageUpload
   },
   data() {
     return {
+      titleImage: [],
       formLoading: false,
       isShow: true, //是否显示资讯列表
       uploadPicUrl: "/api/admin/sys_file/oss/upload",
@@ -225,6 +229,7 @@ export default {
         urlList: [
           { required: true, message: "请添加标题图", trigger: "change" },
         ],
+        titleImage: [{validator: this.imageValidator, required: true, trigger: 'blur'}],
         imageSizeType: [
           { required: true, message: "请选择图片展示比例", trigger: "change" },
         ],
@@ -241,6 +246,13 @@ export default {
     },
   },
   methods: {
+    imageValidator (rule, value, callback) {
+      if (this.titleImage && this.titleImage.length > 0) {
+        callback()
+      } else {
+        callback(new Error('请添加标题图'))
+      }
+    },
     onBeforeUpload(file) {
       return new Promise((resolve, reject) => {
         getFileMimeType(file).then(res => {
@@ -325,6 +337,7 @@ export default {
         if (!officialMatch) {
           res.data.data.data.officialColumnId = "";
         }
+        this.titleImage = res.data.data.data.urlList;
         this.addform = res.data.data.data;
         this.quillContent = {
           content: res.data.data.data.officialNewsContent,
@@ -502,6 +515,16 @@ export default {
       addform.officialNewsContent = this.quillContent.content;
       addform.structuredContent = this.quillContent.structuredContent;
       addform.state = 1;
+
+      let titleImage = [];
+      for (let i = 0; i < this.titleImage.length; i++) {
+        titleImage.push({
+          type: "image",
+          newsUrl: this.titleImage[i],
+        });
+      }
+      addform.urlList = titleImage;
+      
       // 新增
       if (this.publishType == "add") {
         this.$refs.addformRef.validate((valid) => {

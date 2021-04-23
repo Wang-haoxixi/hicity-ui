@@ -44,9 +44,12 @@
         <el-row v-if="formData.ticketingType == 2">
           <el-col :span="8">
             <el-form-item label="票务金额：" prop="price">
-              <el-input v-model="priceTemp">
+              <hc-input v-model="priceTemp" :decimal="2" :min="0.01" :max="99999999.99" maxlength="11" style="width: 200px;">
                 <div slot="append">元</div>
-              </el-input>
+              </hc-input>
+              <!-- <el-input v-model="priceTemp">
+                <div slot="append">元</div>
+              </el-input> -->
             </el-form-item>
           </el-col>
         </el-row>
@@ -73,8 +76,9 @@
 import { addTicket, updateTicket } from "@/api/activity/ticketing"
 import { deepClone } from "@/util/util"
 import OptionForm from "./OptionForm.vue"
+import HcInput from "@/views/components/HcForm/HcInput/index"
 export default {
-  components: { OptionForm },
+  components: { OptionForm, HcInput },
   data () {
     return {
       dialogVisible: false,
@@ -203,8 +207,10 @@ export default {
               amount: this.price
             }
           ]
+          formData.rmb = this.price
         } else {
           formData.payMethodList = []
+          formData.rmb = 0
         }
         if (valid) {
           fun(formData).then(({data}) => {

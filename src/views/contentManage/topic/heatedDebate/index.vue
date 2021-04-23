@@ -180,7 +180,7 @@ export default {
       initCityList: [],
       topicName: "",
       formRule: {
-        titleObj: [{validator: this.titleObjValidator, required: true, message: '请输入热议话题'}],
+        titleObj: [{ required: true, validator: this.titleObjValidator,message: '请输入热议话题'}],
         // topicsBankIdSet: [{required: true, message: '请选择话题'}],
         cityList: [{ required: true, message: "请选择城市" }],
         // images: [{ required: true, message: "请添加热议图片" }],
@@ -369,7 +369,8 @@ export default {
           state: formData.state
         };
         this.titleObj = {
-          title: formData.title
+          title: formData.title,
+          heatedDebateId: formData.heatedDebateId
         }
         this.titleShow = formData.title
         this.publish = true;

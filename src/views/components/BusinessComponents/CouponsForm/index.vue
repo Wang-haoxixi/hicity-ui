@@ -187,7 +187,7 @@ export default {
         name: [{required: true, message: '请输入券名称', trigger: 'blur'}],
         deductionPrice: [{validator: this.deductionPriceValidator, required: true, trigger: 'blur'}],
         conditionPrice: [{validator: this.conditionPriceValidator, required: true, trigger: 'blur'}],
-        supply: [{required: true, message: '请输入供应量', trigger: 'blur'}],
+        supply: [{validator: this.supplyValidator, required: true, message: '请输入供应量', trigger: 'blur'}],
         availableTime: [
           {validator: this.availableTimeDiffValidator, required: true, trigger: 'blur'},
         ],
@@ -226,7 +226,7 @@ export default {
         scopeOfUseCity: '',
         isPermanent: '0',
         isCopyLogo: false, 
-        upTime: '', 
+        upTime: '',
         downTime: '',
         availableStartTime: '',
         availableEndTime: '',
@@ -295,6 +295,13 @@ export default {
         callback(new Error('请输入满足条件'))
       }
     },
+    supplyValidator (rules, value, callback) {
+      if (this.formData.receivedNum && this.formData.supply < this.formData.receivedNum) {
+        callback(new Error('供应量不能小于已领数量'))
+      } else {
+        callback()
+      }
+    },
     availableTimeRequiredValidator (rules, value, callback) {
       if (!this.formData.availableStartTime) {
         callback(new Error('请输入可用开始时间'))
@@ -312,7 +319,7 @@ export default {
       }
     },
     availableTimeDiffValidator (rules, value, callback) {
-      if (this.formData.availableStartTime && this.formData.availableEndTime && this.formData.availableStartTime >= this.formData.availableEndTime) {
+      if (this.formData.isPermanent == '0' && this.formData.availableStartTime && this.formData.availableEndTime && this.formData.availableStartTime >= this.formData.availableEndTime) {
         callback(new Error('可用开始时间须早于可用结束时间'))
       } else {
         callback()
@@ -386,7 +393,7 @@ export default {
           if (this.isPlatform) {
             formData.scopeOfUseCity = this.cityIds.join(',')
           }
-         if (this.upTimeType == 1) {
+          if (this.upTimeType == 1) {
             formData.isImmediatelyPut = true
             formData.status = '1'
           } else {
