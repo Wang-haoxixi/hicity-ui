@@ -60,7 +60,7 @@ export function heated_debatePage(data) {
 // 城市新闻分页
 export function newsPage(data) {
   return request({
-    url: "/cms/official_news/page",
+    url: "/cms/news/news_page",
     method: "get",
     params: data
   });
@@ -68,7 +68,7 @@ export function newsPage(data) {
 // 官方发布分页
 export function official_columnPage(data) {
   return request({
-    url: "/cms/official_column/page",
+    url: "/cms/official_news/page",
     method: "get",
     params: data
   });

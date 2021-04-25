@@ -409,9 +409,9 @@
         style="width: 100%"
         v-loading='jumpLoading'
       >
-        <el-table-column prop="officialColumnId" label="id" width="80">
+        <el-table-column prop="newsId" label="id" width="80">
         </el-table-column>
-        <el-table-column prop="officialColumnName" label="跳转名称">
+        <el-table-column prop="title" label="跳转名称">
         </el-table-column>
         <el-table-column label="操作" width="80">
           <template slot-scope="scope">
@@ -432,7 +432,7 @@
       >
         <el-table-column prop="officialColumnId" label="id" width="80">
         </el-table-column>
-        <el-table-column prop="officialColumnName" label="跳转名称">
+        <el-table-column prop="officialNewsName" label="跳转名称">
         </el-table-column>
         <el-table-column label="操作" width="80">
           <template slot-scope="scope">
@@ -529,9 +529,9 @@
         style="width: 100%"
         v-loading='jumpLoading'
       >
-        <el-table-column prop="officialColumnId" label="id" width="80">
+        <el-table-column prop="newsId" label="id" width="80">
         </el-table-column>
-        <el-table-column prop="officialColumnName" label="跳转名称">
+        <el-table-column prop="title" label="跳转名称">
         </el-table-column>
         <el-table-column label="操作" width="80">
           <template slot-scope="scope">
@@ -552,7 +552,7 @@
       >
         <el-table-column prop="officialColumnId" label="id" width="80">
         </el-table-column>
-        <el-table-column prop="officialColumnName" label="跳转名称">
+        <el-table-column prop="officialNewsName" label="跳转名称">
         </el-table-column>
         <el-table-column label="操作" width="80">
           <template slot-scope="scope">
@@ -957,11 +957,11 @@ export default {
         this.form.relationId = row.heatedDebateId;
         this.jumpDialogVisible = false;
       } else if (this.form.type === "news") {
-        this.jumpName = row.officialColumnName;
-        this.form.relationId = row.officialColumnId;
+        this.jumpName = row.title;
+        this.form.relationId = row.newsId;
         this.jumpDialogVisible = false;
       } else if (this.form.type === "official_column") {
-        this.jumpName = row.officialColumnName;
+        this.jumpName = row.officialNewsName;
         this.form.relationId = row.officialColumnId;
         this.jumpDialogVisible = false;
       }
@@ -980,11 +980,11 @@ export default {
         this.editForm.relationId = row.heatedDebateId;
         this.editJumpDialogVisible = false;
       } else if (this.editForm.type === "news") {
-        this.jumpName = row.officialColumnName;
-        this.editForm.relationId = row.officialColumnId;
+        this.jumpName = row.title;
+        this.editForm.relationId = row.newsId;
         this.editJumpDialogVisible = false;
       } else if (this.editForm.type === "official_column") {
-        this.jumpName = row.officialColumnName;
+        this.jumpName = row.officialNewsName;
         this.editForm.relationId = row.officialColumnId;
         this.editJumpDialogVisible = false;
       }
