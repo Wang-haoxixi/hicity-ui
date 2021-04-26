@@ -141,7 +141,17 @@
                   :label="checkboxItem.label"
                 ></el-checkbox>
               </el-form-item>
+              <el-form-item label="标记为VIP：">
+                <el-switch v-model="applyInfo.isVip"></el-switch>
+              </el-form-item>
+              <el-form-item label="座位号">
+                <el-input v-model="applyInfo.seatNumber"></el-input>
+              </el-form-item>
             </el-form>
+            <div slot="footer" style="text-align:right">
+              <el-button @click="dialogApplyInfoVisible = false">取 消</el-button>
+              <el-button type="primary" @click="handleSaveInfo">保 存</el-button>
+            </div>
           </div>
         </el-dialog>
 
@@ -216,6 +226,7 @@ import {
   signInCode,
   checkCode,
   dataExport,
+  saveInfo,
 } from "@/api/activity/personnel";
 export default {
   data() {
@@ -291,6 +302,7 @@ export default {
     handleCheck(enroleId) {
       this.dialogApplyInfoVisible = true;
       formInquire({ enroleId: enroleId }).then((res) => {
+        console.log(111,res)
         this.applyInfoForm = res.data.data.data;
         if (this.applyInfoForm && this.applyInfoForm.length > 0) {
           this.applyInfo = this.applyInfoForm[0];
@@ -337,6 +349,7 @@ export default {
     changeName(item, index) {
       // item.actived = false
       this.applyInfo = item;
+      console.log('applyInfo',this.applyInfo)
       
     },
     handleCheckAllChange(val) {
@@ -352,6 +365,16 @@ export default {
       this.isIndeterminate =
         checkedCount > 0 && checkedCount < this.checkedSignInCode.length;
     },
+    handleSaveInfo(){
+      saveInfo(...this.applyInfoForm).then(res=>{
+        console.log('res',res)
+        if(res.data.code != 0){
+          return this.$message.error("保存失败");
+        }
+        this.$message.success("保存成功");
+        this.dialogApplyInfoVisible = false
+      })
+    }
   },
 };
 </script>

@@ -48,6 +48,14 @@ export function signInCode(data) {
     params: data
   });
 }
+// 保存报名信息
+export function saveInfo(data) {
+  return request({
+    url: "dms/conference_enrole_form/save/enrole_contacts",
+    method: "post",
+    data: data
+  });
+}
 
 // 核销签到码
 export function checkCode(data) {

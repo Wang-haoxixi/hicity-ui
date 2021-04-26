@@ -430,7 +430,7 @@
         style="width: 100%"
         v-loading='jumpLoading'
       >
-        <el-table-column prop="officialColumnId" label="id" width="80">
+        <el-table-column prop="officialNewsId" label="id" width="80">
         </el-table-column>
         <el-table-column prop="officialNewsName" label="跳转名称">
         </el-table-column>
@@ -550,7 +550,7 @@
         style="width: 100%"
         v-loading='jumpLoading'
       >
-        <el-table-column prop="officialColumnId" label="id" width="80">
+        <el-table-column prop="officialNewsId" label="id" width="80">
         </el-table-column>
         <el-table-column prop="officialNewsName" label="跳转名称">
         </el-table-column>
@@ -962,7 +962,7 @@ export default {
         this.jumpDialogVisible = false;
       } else if (this.form.type === "official_column") {
         this.jumpName = row.officialNewsName;
-        this.form.relationId = row.officialColumnId;
+        this.form.relationId = row.officialNewsId;
         this.jumpDialogVisible = false;
       }
     },
@@ -985,7 +985,7 @@ export default {
         this.editJumpDialogVisible = false;
       } else if (this.editForm.type === "official_column") {
         this.jumpName = row.officialNewsName;
-        this.editForm.relationId = row.officialColumnId;
+        this.editForm.relationId = row.officialNewsId;
         this.editJumpDialogVisible = false;
       }
     },
