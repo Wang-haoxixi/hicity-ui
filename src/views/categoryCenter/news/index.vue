@@ -195,7 +195,7 @@ export default {
       }).then(({data}) => {
         if (data.code === 0) {
           this.$message.success('操作成功')
-          this.getList()
+          this.$refs.hcCrud.refresh()
         }
       })
     }, 

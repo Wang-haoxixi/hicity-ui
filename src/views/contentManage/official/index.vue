@@ -506,10 +506,12 @@ export default {
     // 直接发布
     handleCreate() {
       this.formLoading = true
-      this.urlList.forEach((item) => {
-        item.imageSizeType = this.addform.imageSizeType; //标题图添加图片尺寸属性
-      });
-      this.addform.urlList = this.urlList;
+      // this.urlList.forEach((item) => {
+      //   item.imageSizeType = this.addform.imageSizeType; //标题图添加图片尺寸属性
+      // });
+      // console.log(this.urlList)
+      // // return
+      // this.addform.urlList = this.urlList;
       let addform = this.addform;
 
       addform.officialNewsContent = this.quillContent.content;
@@ -521,6 +523,7 @@ export default {
         titleImage.push({
           type: "image",
           newsUrl: this.titleImage[i],
+          imageSizeType: this.addform.imageSizeType
         });
       }
       addform.urlList = titleImage;

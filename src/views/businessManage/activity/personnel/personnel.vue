@@ -10,7 +10,7 @@
         <el-table :data="tableData" style="width: 100%">
           <el-table-column prop="name" label="名称" width="180">
           </el-table-column>
-          <el-table-column label="报名信息" width="180">
+          <el-table-column label="报名信息" width="100">
             <template slot-scope="scope">
               <el-button
                 type="text"
@@ -20,7 +20,7 @@
               >
             </template>
           </el-table-column>
-          <el-table-column prop="createTime" label="报名时间">
+          <el-table-column prop="createTime" label="报名时间" width="160">
           </el-table-column>
           <el-table-column label="票名">
             <template slot-scope="scope">
@@ -39,7 +39,7 @@
               {{ scope.row.auditStatus | auditStatusFilters }}
             </template>
           </el-table-column>
-          <el-table-column label="批注">
+          <el-table-column label="批注" width="80">
             <template slot-scope="scope">
               <el-button
                 type="text"
@@ -49,7 +49,7 @@
               >
             </template>
           </el-table-column>
-          <el-table-column label="操作" fixed="right">
+          <el-table-column label="操作" fixed="right" width="100">
             <template slot-scope="scope">
               <el-button
                 type="text"

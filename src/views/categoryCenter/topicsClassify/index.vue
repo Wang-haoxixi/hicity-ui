@@ -76,9 +76,9 @@
           title="新增关联"
           :visible.sync="topicDialogVisible"
           width="70%">
-          <el-form :model="formData" labelWidth="150px">
+          <el-form :model="formData" labelWidth="100px">
             <el-form-item label="选择话题：">
-              <el-select v-model="topicAdd" multiple value-key="id">
+              <el-select v-model="topicAdd" multiple value-key="id" style="width: 100%">
                 <el-option v-for="item in topicSelectList" :key="item.id" :value="item" :label="item.topicsName">{{item.topicsName}}</el-option>
               </el-select>
             </el-form-item>
@@ -171,7 +171,7 @@ export default {
         {
           type: 'text',
           maxlength: 10,
-          label: '品牌分类',
+          label: '分类名称',
           prop: 'classifyName'
         }
       ],

@@ -135,14 +135,14 @@ export default {
       })
     }, 
     handleSort (row, index) {
-      this.$prompt('大于0的整数', '请输入排序', {
+      this.$prompt('0~99999999的整数', '请输入排序', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         inputType: 'number',
         inputValidator: (val) => {
-          return /^[1-9]+0*$/.test(val)
+          return val.length < 9 && /^[1-9]+0*$/.test(val) && parseInt(val) < 100000000
         },
-        inputErrorMessage: '请输入大于0的整数'
+        inputErrorMessage: '请输入0~99999999的整数'
       }).then(({ value }) => {
         if (value) {
           setTagSort({

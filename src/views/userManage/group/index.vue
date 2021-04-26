@@ -14,6 +14,7 @@
               <div class="info-others-line">
                 <div class="info-item">圈子ID：{{formData.circleId}}</div>
                 <div class="info-item">创建城市：{{formData.city}}</div>
+                <div class="info-item"></div>
               </div>
               <div class="info-others-line" style="margin-top: 10px;">
                 <div class="info-item">创建者：{{formData.phone}}</div>
@@ -156,10 +157,12 @@ export default {
   .circle-detail-image {
     height: 120px;
     width: 120px;
+    flex: 120px 0 0;
   }
   .circle-detail-info {
     margin-left: 24px;
     height: 120px;
+    flex: 100px 1 1;
     .info-name {
       margin-top: 11px;
       height: 22px;
@@ -178,7 +181,7 @@ export default {
         .info-item {
           height: 22px;
           line-height: 22px;
-          flex: 200px 0 0;
+          flex: 200px 1 1;
           color: #666666;
           font-size: 14px;
         }
