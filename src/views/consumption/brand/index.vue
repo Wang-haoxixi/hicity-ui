@@ -83,7 +83,7 @@ export default {
       titleImage: [],
       formRule: {
         brandName: [{required: true, message: '请输入品牌名称', trigger: 'blur'}],
-        brandSynopsis: [{required: true, message: '请输入品牌介绍', trigger: 'blur'}],
+        brandSynopsis: [{required: true, validator: this.brandSynopsisValidator, message: '请输入品牌介绍', trigger: 'blur'}],
         brandLogo: [{required: true, message: '请添加品牌Logo', trigger: 'blur'}],
       },
       formLoading: false
@@ -111,6 +111,13 @@ export default {
     }
   },
   methods: {
+    brandSynopsisValidator (rules, value, callback) {
+      if (!value.trim()) {
+        callback(new Error())
+      } else {
+        callback()
+      }
+    },
     goBack () {
       this.publish = false
     },

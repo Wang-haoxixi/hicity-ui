@@ -127,7 +127,7 @@
         <el-form-item
           v-if="form.type  && form.type!='false'"
           label="跳转对象 :"
-          prop="jumpType"
+          prop="relationId"
           :label-width="formLabelWidth"
           class="jump-item"
         >
@@ -153,7 +153,7 @@
         </el-form-item>
 
         <!-- 广告图片 -->
-        <el-form-item label="广告图片 :" :label-width="formLabelWidth">
+        <el-form-item label="广告图片 :" :label-width="formLabelWidth" prop="imageUrl">
           <el-upload
             class="avatar-uploader"
             :action="baseUrl"
@@ -268,6 +268,7 @@
           :label-width="formLabelWidth"
         >
           <el-select
+            @change="typeChange"
             v-model="editForm.type"
             placeholder="请选择广告类型"
           >
@@ -632,7 +633,7 @@ export default {
       },
       pickerOptionsEndDate: {
         disabledDate: (time) => {
-          return time.getTime() < new Date(this.form.beginDate).getTime();
+          return time.getTime() < Date.now() - 8.64e7 || time.getTime() < new Date(this.form.beginDate).getTime();
         },
       },
 
@@ -643,7 +644,7 @@ export default {
       },
       pickerOptionsEditEndDate: {
         disabledDate: (time) => {
-          return time.getTime() < new Date(this.editForm.beginDate).getTime();
+          return time.getTime() < Date.now() - 8.64e7 || time.getTime() < new Date(this.editForm.beginDate).getTime();
         },
       },
       // 新增广告表单
@@ -681,15 +682,21 @@ export default {
           { min: 2, message: "长度大于 1 个字符", trigger: "blur" },
         ],
         beginDate: [
-          { required: true, message: "请选择开始时间", trigger: "change" },
+          { required: true, validator: this.beginDataValidator, trigger: "change" },
         ],
         endDate: [
-          { required: true, message: "请选择结束时间", trigger: "change" },
+          { required: true, validator: this.endDataValidator, trigger: "change" },
         ],
         type: [
           { required: true, message: "请选择广告类型", trigger: "change" },
         ],
         text: [{ required: true, message: "请输入广告文字", trigger: "blur" }],
+        relationId: [
+          { required: true, message: "请选择跳转对象", trigger: "change" },
+        ],
+        imageUrl: [
+          { required: true, message: "请添加广告图片", trigger: "change" },
+        ],
       },
 
       formLoading: false,
@@ -700,6 +707,30 @@ export default {
     };
   },
   methods: {
+    beginDataValidator (rules, value, callback) {
+      if (!value) {
+        callback(new Error('请选择开始时间'))
+        return
+      }
+      let formData = this.dialogEditFormVisible ? this.editForm : this.form
+      if (value && formData.endDate && value >= formData.endDate) {
+        callback(new Error('开始时间须早于结束时间'))
+      } else {
+        callback()
+      }
+    },
+    endDataValidator (rules, value, callback) {
+      if (!value) {
+        callback(new Error('请选择结束时间'))
+        return
+      }
+      let formData = this.dialogEditFormVisible ? this.editForm : this.form
+      if (value && formData.beginDate && value <= formData.beginDate) {
+        callback(new Error('结束时间须晚于开始时间'))
+      } else {
+        callback()
+      }
+    },
     onBeforeUpload(file) {
       return new Promise((resolve, reject) => {
         getFileMimeType(file).then((res) => {
@@ -898,6 +929,9 @@ export default {
     },
     // 监听广告类型变化
     typeChange(val) {
+      this.form.relationId = ''
+      this.editForm.relationId = ''
+      this.jumpName = ''
       if (val === "activity") {
         this.getActivitiePageFn(this.form.cityId); //活动
       } else if (val === "travel") {
@@ -1011,7 +1045,7 @@ export default {
             });
         } else {
           this.formLoading = false;
-          return this.$message.error("请填写必填信息！");
+          return this.$message.error("请填写正确信息！");
         }
       });
     },
@@ -1045,7 +1079,7 @@ export default {
         // 校验未通过
         if (!valid) {
           this.formLoading = false
-          return this.$message.error("请填写必填信息！");
+          return this.$message.error("请填写正确信息！");
         }
         this.addAdFn();
       });

@@ -17,7 +17,7 @@
                   </div>
                   <div class="tag-item-option-right">
                     <el-button v-if="!isAdmin" type="text" size="mini" @click="handleSort(tag)">排序</el-button>
-                    <template v-if="isAdmin || !tag.isPlatform">
+                    <template v-if="tag.isCanEdit">
                       <el-button type="text" size="mini" @click="handleUpdate(tag)">编辑</el-button>
                       <el-button type="text" size="mini" @click="handleDel(tag.tagId)">删除</el-button>
                     </template>

@@ -981,7 +981,8 @@ export default {
       validRst: [],
       handleItem: {
         offcialName:''
-      }
+      },
+      timeout: null
     };
   },
   computed: {
@@ -1343,22 +1344,27 @@ export default {
 
     // 返回输入建议
     querySearch(queryString, cb) {
-      let results = [];
+      let results = []
+      for (let i = 0; i < this.allTagArr.length; i++) {
+        if (!this.baseFormData.label.includes(this.allTagArr[i].value)) {
+          results.push(this.allTagArr[i])
+        }
+      }
 
       // 未输入
-      if (!queryString) {
-        results = this.allTagArr;
+      if (!queryString.trim()) {
         cb(results);
         return;
+      } else {
+        // 输入有值
+        results = results.filter((item) => {
+          return (
+            //返回 有数据的项
+            item.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0
+          );
+        });
+        cb(results);
       }
-      // 输入有值
-      results = this.allTagArr.filter((item) => {
-        return (
-          //返回 有数据的项
-          item.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0
-        );
-      });
-      cb(results);
     },
     handleBlur(){
       // this.actInpVal = ''
@@ -1500,6 +1506,7 @@ export default {
     },
     showJumpDialog(item){
       this.getOfficialReleaseList()
+      this.officialTitleValue = ''
       this.handleItem = item
       this.dialogJumpVisible = true
     },
@@ -1525,8 +1532,11 @@ export default {
       this.jumpTypeForm.officialNewsId = row.officialNewsId
     },
     officialTitleValueChange(e){
-      this.queryOfficial.searchName = e
-      this.getOfficialReleaseList()
+      clearTimeout(this.timeout)
+      this.timeout = setTimeout(() => {
+        this.queryOfficial.searchName = e
+        this.getOfficialReleaseList()
+      }, 1000)
     },
     clearOfficialTitleValue(){
       this.queryOfficial.searchName = ''

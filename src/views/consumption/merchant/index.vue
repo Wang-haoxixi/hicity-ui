@@ -145,7 +145,7 @@ export default {
       brandLoading: false,
       formRuleInit: {
         merchantName: [{required: true, message: '请输入商户名称', trigger: 'blur'}],
-        merchantSynopsis: [{required: true, message: '请输入商户介绍', trigger: 'blur'}],
+        merchantSynopsis: [{required: true, validator: this.merchantSynopsisValidator, message: '请输入商户介绍', trigger: 'blur'}],
         merchantLogo: [{required: true, message: '请添加商户Logo', trigger: 'blur'}],
         merchantUserName: [{required: true, message: '请输入联系人', trigger: 'blur'}],
         merchantUserPhone: [{required: true, message: '请输入联系电话', trigger: 'blur'}],
@@ -194,6 +194,13 @@ export default {
     }
   },
   methods: {
+    merchantSynopsisValidator (rules, value, callback) {
+      if (!value.trim()) {
+        callback(new Error())
+      } else {
+        callback()
+      }
+    },
     percentageTypeChange (value) {
       this.formData.percentageMoney = ''
       this.$nextTick(() => {
