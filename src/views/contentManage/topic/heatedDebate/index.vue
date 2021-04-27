@@ -122,9 +122,7 @@
           </div>
           <div
             class="preview-content"
-            v-html="
-              formData.content.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>')
-            "
+            v-html="getContent(formData.content)"
           ></div>
         </hc-preview>
       </template>
@@ -219,6 +217,9 @@ export default {
   created() {},
   methods: {
     dateFormat,
+    getContent (content) {
+      return content.replace(new RegExp(/\t/g), "&nbsp;&nbsp;&nbsp;&nbsp;").replace(new RegExp(/ /g), "&nbsp;").replace(/\r\n/g, '<br>').replace(/\n/g, '<br>')
+    },
     titleObjValidator (rules, value, callback) {
       if (this.titleObj.heatedDebateId || this.titleObj.heatedDebateId === 0) {
         callback()

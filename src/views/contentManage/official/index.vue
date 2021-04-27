@@ -137,7 +137,7 @@
           <div class="preview-time">发布时间：{{ dateFormat(new Date()) }}</div>
           <div
             class="preview-content"
-            v-html="quillContent.content || '内容'"
+            v-html="getContent(quillContent.content) || '内容'"
           ></div>
         </hc-preview>
       </template>
@@ -246,6 +246,9 @@ export default {
     },
   },
   methods: {
+    getContent (content) {
+      return content.replace(new RegExp(/\t/g), "&nbsp;&nbsp;&nbsp;&nbsp;").replace(new RegExp(/ /g), "&nbsp;").replace(/\r\n/g, '<br>').replace(/\n/g, '<br>')
+    },
     imageValidator (rule, value, callback) {
       if (this.titleImage && this.titleImage.length > 0) {
         callback()

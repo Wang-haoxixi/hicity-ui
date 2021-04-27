@@ -122,7 +122,7 @@ export default {
       this.publish = false
     },
     refresh (val) {
-      this.$refs.hcCrud.refresh({currentPage: 1}, {isOwn: val ? '1' : '0'})
+      this.$refs.hcCrud.refresh({currentPage: 1}, {isOwn: val ? '1' : undefined})
     },
     fetchListFun (params) {
       return new Promise((resolve, reject) => {
