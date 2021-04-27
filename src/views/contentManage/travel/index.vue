@@ -72,7 +72,7 @@
           <div class="preview-title">
             {{formData.travelName || '资讯标题'}}
           </div>
-          <div class="preview-content" v-html="formData.content.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>')"></div>
+          <div class="preview-content" v-html="getContent(formData.content)"></div>
         </hc-preview>
       </template>
     </hc-table-form>
@@ -142,6 +142,9 @@ export default {
   },
   methods: {
     dateFormat,
+    getContent (content) {
+      return content.replace(new RegExp(/\t/g), "&nbsp;&nbsp;&nbsp;&nbsp;").replace(new RegExp(/ /g), "&nbsp;").replace(/\r\n/g, '<br>').replace(/\n/g, '<br>')
+    },
     fetchListFun (params) {
       return new Promise((resolve, reject) => {
         getTravelList({
