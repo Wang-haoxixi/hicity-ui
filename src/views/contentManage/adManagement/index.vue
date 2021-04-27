@@ -285,7 +285,7 @@
         <el-form-item
           v-if="editForm.type && editForm.type!='false'"
           label="跳转对象 :"
-          prop="adslotName"
+          prop="relationId"
           :label-width="formLabelWidth"
           class="jump-item"
         >
