@@ -1489,6 +1489,7 @@ export default {
       if(item.optionsList&&item.optionsList.length>=10){
         return this.$message.warning('子项最多可以添加10条')
       }
+      console.log('item',item)
       item.optionsList.push({
         label:'',
         type:'',

@@ -29,7 +29,7 @@
             >票务管理</el-button
           >
           <span style="margin-left: 30px; color: #919397"
-            >发布时间：2020-12-29 10:39</span
+            >发布时间：{{props.row.updateTime}}</span
           >
         </template>
         <template v-slot:poster="scope">
@@ -143,6 +143,9 @@ export default {
     tableOption() {
       return tableOption(this.userType == 1 || this.userType == 2);
     },
+  },
+  activated(){
+    this.$refs.hcCrud.refresh(); // 刷新表格数据
   },
   methods: {
     fetchListFun(params) {

@@ -929,6 +929,7 @@ export default {
     },
     // 监听广告类型变化
     typeChange(val) {
+      console.log(111,this.cityId)
       this.form.relationId = ''
       this.editForm.relationId = ''
       this.jumpName = ''

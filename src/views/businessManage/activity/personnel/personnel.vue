@@ -366,7 +366,11 @@ export default {
         checkedCount > 0 && checkedCount < this.checkedSignInCode.length;
     },
     handleSaveInfo(){
-      saveInfo(...this.applyInfoForm).then(res=>{
+      console.log(121,this.applyInfoForm)
+      if(this.applyInfo.seatNumber.length>15){
+        return this.$message.error('座位号字数不能超过15个字符')
+      }
+      saveInfo(this.applyInfo).then(res=>{
         console.log('res',res)
         if(res.data.code != 0){
           return this.$message.error("保存失败");
