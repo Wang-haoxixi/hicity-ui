@@ -323,7 +323,7 @@
                       label="单次购票数量："
                       label-width="100"
                       prop="limitTicket"
-                      style="margin: 20px 0"
+                      style="margin: 20px 25px 20px 0"
                     >
                       <el-input-number
                         v-model="item.limitTicket"
@@ -348,6 +348,7 @@
                       v-if="item.ticketingType === '2'"
                       label="允许退票："
                       label-width="100"
+                      style="vertical-align: inherit;"
                     >
                       <el-switch
                         v-model="item.allowedRefund"

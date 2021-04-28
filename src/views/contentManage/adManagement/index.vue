@@ -1100,7 +1100,6 @@ export default {
     this.getAdPosition();
     this.getDictByTypeFn();
     this.form.cityId = this.userInfo.manageCityId;
-    // this.CITYID = this.userInfo.manageCityId;
   },
 };
 </script>
