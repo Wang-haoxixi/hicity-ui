@@ -1469,11 +1469,15 @@ export default {
       if(rst){
         return this.$message.warning('选项已存在')
       }
-      let num = item.optionsList.length
+      let num = 0
+      // let num = item.optionsList.length
+      if(item.optionsList && item.optionsList.length>0){
+        num = item.optionsList[item.optionsList.length - 1].value
+      }
       let opt = {
         label: item.inputValue,
         select: false,
-        value: num + 1
+        value: Number(num) + 1
       }
       item.optionsList.push(opt)
       item.inputValue = ''
