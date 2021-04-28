@@ -616,6 +616,7 @@ export default {
   },
   data() {
     return {
+      CITYID: '',
       tableOption: tableOption,
       imageUrl: "",
       baseUrl: "/api/admin/sys_file/oss/upload", //oss上传文件
@@ -755,7 +756,7 @@ export default {
       this.imageUrl = "";
       this.form.imageUrl = "";
       this.form.seq = "1";
-      this.form.cityId = "";
+      // this.form.cityId = "";
       this.jumpName = ''
     },
     // 重置编辑表单
@@ -802,29 +803,29 @@ export default {
     handleSizeChange2(val){
       this.size1 = val
       if (this.editForm.type === "activity") {
-        this.getActivitiePageFn(this.editForm.cityId); //活动
+        this.getActivitiePageFn(this.form.cityId); //活动
       } else if (this.editForm.type === "travel") {
-        this.getTravelPageFn(this.editForm.cityId); //城市打卡
+        this.getTravelPageFn(this.form.cityId); //城市打卡
       } else if (this.editForm.type === "heated_debate") {
-        this.getHeated_debatePageFn(this.editForm.cityId); //城市热议
+        this.getHeated_debatePageFn(this.form.cityId); //城市热议
       } else if (this.editForm.type === "news") {
-        this.getNewsPageFn(this.editForm.cityId); //城市新闻
+        this.getNewsPageFn(this.form.cityId); //城市新闻
       } else if (this.editForm.type === "official_column") {
-        this.getOfficial_columnPageFn(this.editForm.cityId); //官方发布
+        this.getOfficial_columnPageFn(this.form.cityId); //官方发布
       }
     },
     handleCurrentChange2(val){
       this.current1 = val
       if (this.editForm.type === "activity") {
-        this.getActivitiePageFn(this.editForm.cityId); //活动
+        this.getActivitiePageFn(this.form.cityId); //活动
       } else if (this.editForm.type === "travel") {
-        this.getTravelPageFn(this.editForm.cityId); //城市打卡
+        this.getTravelPageFn(this.form.cityId); //城市打卡
       } else if (this.editForm.type === "heated_debate") {
-        this.getHeated_debatePageFn(this.editForm.cityId); //城市热议
+        this.getHeated_debatePageFn(this.form.cityId); //城市热议
       } else if (this.editForm.type === "news") {
-        this.getNewsPageFn(this.editForm.cityId); //城市新闻
+        this.getNewsPageFn(this.form.cityId); //城市新闻
       } else if (this.editForm.type === "official_column") {
-        this.getOfficial_columnPageFn(this.editForm.cityId); //官方发布
+        this.getOfficial_columnPageFn(this.form.cityId); //官方发布
       }
     },
     // 获取广告位分页
@@ -925,11 +926,10 @@ export default {
     },
     handleAdd() {
       this.dialogFormVisible = true;
-      this.form.cityId = this.userInfo.manageCityId;
     },
     // 监听广告类型变化
     typeChange(val) {
-      console.log(111,this.cityId)
+      // console.log('跳转类型变更...',this.form.cityId)
       this.form.relationId = ''
       this.editForm.relationId = ''
       this.jumpName = ''
@@ -967,15 +967,15 @@ export default {
       this.editJumpDialogVisible = true;
       this.jumpLoading = true
       if (this.editForm.type === "activity") {
-        this.getActivitiePageFn(this.editForm.cityId); //活动
+        this.getActivitiePageFn(this.form.cityId); //活动
       } else if (this.editForm.type === "travel") {
-        this.getTravelPageFn(this.editForm.cityId); //城市打卡
+        this.getTravelPageFn(this.form.cityId); //城市打卡
       } else if (this.editForm.type === "heated_debate") {
-        this.getHeated_debatePageFn(this.editForm.cityId); //城市热议
+        this.getHeated_debatePageFn(this.form.cityId); //城市热议
       } else if (this.editForm.type === "news") {
-        this.getNewsPageFn(this.editForm.cityId); //城市新闻
+        this.getNewsPageFn(this.form.cityId); //城市新闻
       } else if (this.editForm.type === "official_column") {
-        this.getOfficial_columnPageFn(this.editForm.cityId); //官方发布
+        this.getOfficial_columnPageFn(this.form.cityId); //官方发布
       }
     },
     handleSelectJumpName(row) {
@@ -1099,6 +1099,8 @@ export default {
   created() {
     this.getAdPosition();
     this.getDictByTypeFn();
+    this.form.cityId = this.userInfo.manageCityId;
+    // this.CITYID = this.userInfo.manageCityId;
   },
 };
 </script>

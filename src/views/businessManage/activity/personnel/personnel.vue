@@ -6,7 +6,16 @@
         <el-button @click="backClick">返回</el-button>
       </div>
       <div>
-        <el-button v-if="tableData.length > 0" type="primary" @click="exportData" size="mini">导出</el-button>
+        <el-button
+          v-if="tableData.length > 0"
+          type="primary"
+          @click="exportData"
+          size="mini"
+          >导出</el-button
+        >
+        <el-input placeholder="请输入内容" size="small " style="width:250px;margin-left:10px">
+          <el-button slot="append" icon="el-icon-search" @click="handleSearch"></el-button>
+        </el-input>
         <el-table :data="tableData" style="width: 100%">
           <el-table-column prop="name" label="名称" width="180">
           </el-table-column>
@@ -24,8 +33,14 @@
           </el-table-column>
           <el-table-column label="票名">
             <template slot-scope="scope">
-              <el-button v-if="scope.row.info != 'null'" type="text" size="mini" @click="handleCheckTicketInfo(scope.row.info)">{{scope.row.ticketingName}}</el-button>
-              <span v-else>{{scope.row.ticketingName}}</span>
+              <el-button
+                v-if="scope.row.info != 'null'"
+                type="text"
+                size="mini"
+                @click="handleCheckTicketInfo(scope.row.info)"
+                >{{ scope.row.ticketingName }}</el-button
+              >
+              <span v-else>{{ scope.row.ticketingName }}</span>
             </template>
           </el-table-column>
           <el-table-column prop="orderNum" label="购票数量"></el-table-column>
@@ -67,7 +82,7 @@
           width="50%"
         >
           <el-input
-            maxlength='300'
+            maxlength="300"
             show-word-limit
             type="textarea"
             :rows="4"
@@ -91,7 +106,7 @@
           width="50%"
         >
           <div>
-              <!-- :plain='item.actived' -->
+            <!-- :plain='item.actived' -->
             <el-button
               size="mini"
               type="primary"
@@ -104,7 +119,7 @@
             >
             <el-form>
               <el-form-item
-                :required='formItem.must'
+                :required="formItem.must"
                 v-for="(formItem, indexF) in applyInfo.formItems || []"
                 :key="indexF"
                 :label="formItem.label"
@@ -148,9 +163,13 @@
                 <el-input v-model="applyInfo.seatNumber"></el-input>
               </el-form-item>
             </el-form>
-            <div slot="footer" style="text-align:right">
-              <el-button @click="dialogApplyInfoVisible = false">取 消</el-button>
-              <el-button type="primary" @click="handleSaveInfo">保 存</el-button>
+            <div slot="footer" style="text-align: right">
+              <el-button @click="dialogApplyInfoVisible = false"
+                >取 消</el-button
+              >
+              <el-button type="primary" @click="handleSaveInfo"
+                >保 存</el-button
+              >
             </div>
           </div>
         </el-dialog>
@@ -194,10 +213,22 @@
           width="50%"
         >
           <div>参加项目</div>
-          <el-checkbox v-for="(item,index) in infoList" :key="index" size="medium" v-model="item.select" disabled style="display:block;margin-top:10px">{{item.label}}</el-checkbox>
+          <el-checkbox
+            v-for="(item, index) in infoList"
+            :key="index"
+            size="medium"
+            v-model="item.select"
+            disabled
+            style="display: block; margin-top: 10px"
+            >{{ item.label }}</el-checkbox
+          >
           <span slot="footer" class="dialog-footer">
-            <el-button @click="dialogUserSelectVisible = false">取 消</el-button>
-            <el-button type="primary" @click="dialogUserSelectVisible = false">确 定</el-button>
+            <el-button @click="dialogUserSelectVisible = false"
+              >取 消</el-button
+            >
+            <el-button type="primary" @click="dialogUserSelectVisible = false"
+              >确 定</el-button
+            >
           </span>
         </el-dialog>
 
@@ -243,7 +274,7 @@ export default {
       dialogAnnotationVisible: false,
       dialogApplyInfoVisible: false,
       dialogSignInVisible: false,
-      dialogUserSelectVisible:false,
+      dialogUserSelectVisible: false,
       total: 0,
       applyInfoForm: [],
       annotation: "",
@@ -252,7 +283,7 @@ export default {
       isIndeterminate: true,
       checkedSignInCode: [], //已选择
       signInCodeData: [], //核销数组
-      infoList:[]
+      infoList: [],
     };
   },
   created() {
@@ -273,11 +304,15 @@ export default {
     },
   },
   methods: {
-    exportData () {
-      dataExport(this.$route.query.id)
+    exportData() {
+      dataExport(this.$route.query.id);
     },
     backClick() {
       this.$router.go(-1);
+    },
+    // 搜索
+    handleSearch(){
+      console.log('search...')
     },
     // 批注
     handleAnnotation(row) {
@@ -285,10 +320,10 @@ export default {
       this.dialogAnnotationVisible = true;
       this.annotation = row.soRemarks;
     },
-    handleCheckTicketInfo(info){
-      console.log('票名',JSON.parse(info))
-      this.infoList = JSON.parse(info)
-      this.dialogUserSelectVisible = true
+    handleCheckTicketInfo(info) {
+      console.log("票名", JSON.parse(info));
+      this.infoList = JSON.parse(info);
+      this.dialogUserSelectVisible = true;
     },
     handleSaveAnnotation() {
       addAnnotation({
@@ -302,7 +337,7 @@ export default {
     handleCheck(enroleId) {
       this.dialogApplyInfoVisible = true;
       formInquire({ enroleId: enroleId }).then((res) => {
-        console.log(111,res)
+        console.log(111, res);
         this.applyInfoForm = res.data.data.data;
         if (this.applyInfoForm && this.applyInfoForm.length > 0) {
           this.applyInfo = this.applyInfoForm[0];
@@ -333,7 +368,7 @@ export default {
         if (res.data.code != 0) {
           return this.$message.error("获取列表失败");
         }
-        console.log('列表',res)
+        console.log("列表", res);
         this.tableData = res.data.data.data.records;
         this.total = res.data.data.data.total;
       });
@@ -349,8 +384,7 @@ export default {
     changeName(item, index) {
       // item.actived = false
       this.applyInfo = item;
-      console.log('applyInfo',this.applyInfo)
-      
+      console.log("applyInfo", this.applyInfo);
     },
     handleCheckAllChange(val) {
       let writeOffStatusCode = this.signInCodeData.filter((item) => {
@@ -365,20 +399,20 @@ export default {
       this.isIndeterminate =
         checkedCount > 0 && checkedCount < this.checkedSignInCode.length;
     },
-    handleSaveInfo(){
-      console.log(121,this.applyInfoForm)
-      if(this.applyInfo.seatNumber.length>15){
-        return this.$message.error('座位号字数不能超过15个字符')
+    handleSaveInfo() {
+      console.log(121, this.applyInfoForm);
+      if (this.applyInfo.seatNumber.length > 15) {
+        return this.$message.error("座位号字数不能超过15个字符");
       }
-      saveInfo(this.applyInfo).then(res=>{
-        console.log('res',res)
-        if(res.data.code != 0){
+      saveInfo(this.applyInfo).then((res) => {
+        console.log("res", res);
+        if (res.data.code != 0) {
           return this.$message.error("保存失败");
         }
         this.$message.success("保存成功");
-        this.dialogApplyInfoVisible = false
-      })
-    }
+        this.dialogApplyInfoVisible = false;
+      });
+    },
   },
 };
 </script>
@@ -399,5 +433,4 @@ export default {
 .tagInfo {
   margin-bottom: 15px;
 }
-
 </style>
