@@ -63,7 +63,7 @@
             </hc-remote-select>
           </el-form-item>
           <el-form-item
-            v-if="(userType == 1 || userType == 2) && (!titleObj.heatedDebateId || titleObj.heatedDebateId === 0)"
+            v-if="(userType == 1 || userType == 2) && ((!titleObj.heatedDebateId || titleObj.heatedDebateId === 0) || formData.state == '0')"
             label="发布城市："
             prop="cityList"
           >
