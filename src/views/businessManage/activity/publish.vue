@@ -798,10 +798,10 @@ export default {
         ],
         name: [{ required: true, message: "请输入活动标题", trigger: "blur" }],
         startTime: [
-          { required: true, message: "请选择开始日期", trigger: "change" },
+          { required: true, validator: this.beginDataValidator, trigger: "change" },
         ],
         endTime: [
-          { required: true, message: "请选择结束日期", trigger: "change" },
+          { required: true, validator: this.endDataValidator, trigger: "change" },
         ],
         type: [
           { required: true, message: "请选择活动类型", trigger: "change" },
@@ -860,7 +860,6 @@ export default {
           { required: true, message: "请输入购票数量", trigger: "blur" },
         ],
       },
-
       // 选择今天之后的日期
       pickerOptionsBeginDate: {
         disabledDate(time) {
@@ -870,9 +869,7 @@ export default {
       // 选择大于开始时间的日期
       pickerOptionsEndDate: {
         disabledDate: (time) => {
-          return (
-            time.getTime() < new Date(this.baseFormData.startTime).getTime()
-          );
+          return time.getTime() < Date.now() - 8.64e7 || time.getTime() < new Date(this.baseFormData.startTime).getTime();
         },
       },
       // 基本信息数据
@@ -987,6 +984,30 @@ export default {
     ...mapGetters(["userType", "userInfo"]),
   },
   methods: {
+    beginDataValidator (rules, value, callback) {
+      if (!value) {
+        callback(new Error('请选择开始时间'))
+        return
+      }
+      // let formData = this.dialogEditFormVisible ? this.editForm : this.form
+      if (value && this.baseFormData.endTime && value >= this.baseFormData.endTime) {
+        callback(new Error('开始时间须早于结束时间'))
+      } else {
+        callback()
+      }
+    },
+    endDataValidator (rules, value, callback) {
+      if (!value) {
+        callback(new Error('请选择结束时间'))
+        return
+      }
+      // let formData = this.dialogEditFormVisible ? this.editForm : this.form
+      if (value && this.baseFormData.startTime && value <= this.baseFormData.startTime) {
+        callback(new Error('结束时间须晚于开始时间'))
+      } else {
+        callback()
+      }
+    },
     onBeforeUpload(file) {
       return new Promise((resolve, reject) => {
         getFileMimeType(file).then(res => {
