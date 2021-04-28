@@ -13,7 +13,7 @@
       </el-form-item>
       <el-form-item label="跳转对象：">
         <div>{{link.name}}</div>
-        <hc-crud :option="officialOption" :fetchListFun="fetchListFun">
+        <hc-crud :option="officialOption" :fetchListFun="fetchListFun" ref="hcCrud" :auto-load="false">
           <template v-slot:menu="scope">
             <el-button type="text" @click="selectLink(scope.row)">选择</el-button>
           </template>
@@ -71,6 +71,10 @@ export default {
         type: 'officialRelease',
       }
       this.dialogVisible = true
+      this.$nextTick(() => {
+        this.$refs.hcCrud.resetSearch()
+        this.$refs.hcCrud.toSearch()
+      })
     },
     fetchListFun (params) {
       return new Promise((resolve, reject) => {

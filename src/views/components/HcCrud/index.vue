@@ -154,6 +154,10 @@ export default {
       type: Array,
       default: () => [],
     },
+    autoLoad: {
+      type: Boolean,
+      default: true
+    }
   },
   data() {
     return {
@@ -222,7 +226,9 @@ export default {
     },
   },
   mounted() {
-    this.getList();
+    if (this.autoLoad) {
+      this.getList();
+    }
   },
   methods: {
     getDic ({dicData, dicName}) {
