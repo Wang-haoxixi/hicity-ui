@@ -1523,15 +1523,16 @@ export default {
       item.optionsList.splice(indexO,1)
     },
     showJumpDialog(item){
-      this.getOfficialReleaseList()
       this.officialTitleValue = ''
+      this.getOfficialReleaseList()
       this.handleItem = item
       this.dialogJumpVisible = true
     },
     editJump(item){
+      this.officialTitleValue = ''
       this.handleItem = item
-      this.dialogJumpVisible = true
       this.getOfficialReleaseList()
+      this.dialogJumpVisible = true
       this.jumpTypeForm.type = item.type
       this.jumpTypeForm.officialNewsName = item.offcialName
       this.jumpTypeForm.officialNewsId = item.value

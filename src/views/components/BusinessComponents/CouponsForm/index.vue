@@ -17,14 +17,14 @@
       </el-select>
     </el-form-item>
     <el-form-item label="抵扣价：" prop="deductionPrice">
-      <hc-input v-model="formData.deductionPrice" :decimal="2" :min="0.01" :max="99.99" maxlength="5" style="width: 200px;" :disabled="formData.status == '3' || formData.status == '2'">
+      <hc-input v-model="formData.deductionPrice" :decimal="2" :min="0.01" :max="9999.99" maxlength="7" style="width: 200px;" :disabled="formData.status == '3' || formData.status == '2'">
         <div slot="append">元</div>
       </hc-input>
       <div>抵扣价指商户核销该券时抵扣的价格，该价格用于计算展示用户到店支付金额</div>
     </el-form-item>
     <el-form-item label="满足条件：" prop="conditionPrice">
       满
-      <hc-input v-model="formData.conditionPrice" :decimal="2" :min="0.01" :max="999.99" maxlength="6" style="width: 200px;" :disabled="formData.status == '3' || formData.status == '2'">
+      <hc-input v-model="formData.conditionPrice" :decimal="2" :min="0.01" :max="9999.99" maxlength="7" style="width: 200px;" :disabled="formData.status == '3' || formData.status == '2'">
         <div slot="append">元</div>
       </hc-input>
       可用
