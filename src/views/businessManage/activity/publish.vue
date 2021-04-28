@@ -450,7 +450,7 @@
                       <div>选项列表</div>
                       <div class="list" v-for="(itemO,indexO) in itemP.optionsList" :key="indexO">
                         <div style="display:flex;align-items: center;">
-                          <el-input v-model="itemO.label" show-word-limit maxlength="50" placeholder="请输入选项名称" style="width:400px"></el-input>
+                          <el-input v-model.trim="itemO.label" show-word-limit maxlength="50" placeholder="请输入选项名称" style="width:400px"></el-input>
                           <el-button v-if="!itemO.value" type="primary" round plain @click="showJumpDialog(itemO)" style="margin-left:10px;">选择跳转对象</el-button>
                           <div style="flex:1;text-overflow: ellipsis;white-space:nowrap;overflow:hidden;margin-top: 10px;margin-left:10px">{{itemO.offcialName}}</div>
                           <i v-if="itemO.value" class="el-icon-edit-outline" style="margin-top:10px;" title="修改跳转对象" @click="editJump(itemO)"></i>
@@ -858,9 +858,6 @@ export default {
         limitTicket: [
           { required: true, message: "请输入购票数量", trigger: "blur" },
         ],
-        // remarks: [
-        //   { required: true, message: "请输入票种备注", trigger: "blur" },
-        // ],
       },
 
       // 选择今天之后的日期
@@ -992,7 +989,6 @@ export default {
     onBeforeUpload(file) {
       return new Promise((resolve, reject) => {
         getFileMimeType(file).then(res => {
-          console.log('海报校验',res)
           if (res) {
             const isLt1M = file.size / 1024 / 1024 < 50;
             if (!isLt1M) {
@@ -1394,12 +1390,10 @@ export default {
     },
     // 活动附件上传成功的钩子
     handleAccessorySuccess(res, file) {
-      console.log(res)
       this.baseFormData.fileList.push({
         original: file.name,
         attachFile: file.response.data.data.url,
       });
-      // this.$refs.baseFormDataRef.validateField("fileList");
     },
     handleExceed(files, fileList) {
       this.$message.warning(`活动附件最多上传3份`);
@@ -1416,12 +1410,10 @@ export default {
           this.baseFormData.fileList.splice(i, 1);
         }
       });
-      // this.$refs.baseFormDataRef.validateField("fileList");
     },
     onChange(res) {},
     toFormCollect(){
       this.showFormCollect = true
-      // this.defaultList = this.systemopt
     },
     handleSwitch(item) {
       let i = this.defaultList.findIndex(m=> item.label == m.label && item.type == m.type)
@@ -1470,7 +1462,6 @@ export default {
         return this.$message.warning('选项已存在')
       }
       let num = 0
-      // let num = item.optionsList.length
       if(item.optionsList && item.optionsList.length>0){
         num = item.optionsList[item.optionsList.length - 1].value
       }
@@ -1489,11 +1480,33 @@ export default {
       }
       item.conferenceFormDTOList.push(JSON.parse(JSON.stringify(itemBtn)))
     },
+    isRepeat(arr) {// 判断数组元素是否重复
+      var hash = {};
+      for(var i in arr) {
+        if(hash[arr[i]]) {
+          return true;
+        }
+        // 不存在该元素，则赋值为true，可以赋任意值，相应的修改if判断条件即可
+        hash[arr[i]] = true;
+      }
+      return false;
+    },
     handleAddOption(item){
       if(item.optionsList&&item.optionsList.length>=10){
         return this.$message.warning('子项最多可以添加10条')
       }
-      console.log('item',item)
+      let nullFlag = item.optionsList.some(optItem=>{//判空
+        return optItem.label===''
+      })
+      let labelArr = item.optionsList.map(optItem=>{
+        return optItem.label 
+      })
+      if(nullFlag){
+        return this.$message.warning('子项内容不能为空')
+      }
+      if(this.isRepeat(labelArr)){
+        return this.$message.warning('子项内容应保持唯一性')
+      }
       item.optionsList.push({
         label:'',
         type:'',
@@ -1503,7 +1516,6 @@ export default {
       })
     },
     handleDeleteItem(item,index){//父项删除
-      // item.conferenceFormDTOList.splice(index, 1);
       item.conferenceFormDTOList = []
     },
     handleDeteleItemO(item,indexO){//子项删除
@@ -1581,7 +1593,6 @@ export default {
           item.payMethodList.push(item.payOfflinePay);
         }
       });
-      // delete this.baseFormData.ticketingManagements
       this.baseFormData.submitType = 1;
       this.baseFormData.id = this.$route.query.id;
       this.customList.forEach(item=>{
