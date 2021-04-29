@@ -5,12 +5,12 @@ export const tableOption = (edit = false, admin = false) => {
     menu: true,
     columns: [
       {
-        label: '城市',
+        label: '区县',
         prop: 'cityName',
         span: 24,
         search: true,
         maxlength: 50,
-        searchPlaceholder: '请输入城市名称'
+        searchPlaceholder: '请输入区县名称'
       }, 
       {
         label: '状态',

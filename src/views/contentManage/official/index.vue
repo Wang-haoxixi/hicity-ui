@@ -85,7 +85,7 @@
 
           <!-- 标题图 -->
           <el-form-item label="标题图" prop="titleImage">
-            <hc-image-upload v-model="titleImage" :limit="9"></hc-image-upload>
+            <hc-image-upload v-model="titleImage" :limit="1"></hc-image-upload>
             <!-- <el-upload
               :action="uploadPicUrl"
               list-type="picture-card"

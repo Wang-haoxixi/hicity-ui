@@ -104,7 +104,7 @@ export default {
   props: {
     value: {
       type: [Array, String, Number],
-      required: true
+      // required: true
     },
     cityId: {
       type: Number,

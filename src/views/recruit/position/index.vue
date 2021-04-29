@@ -5,6 +5,22 @@
       :title="title"
       @go-back="viewDetail = false">
       <hc-crud ref="hcCrud" :fetchListFun="fetchListFun" :option="tableOption">
+        <template v-slot:searchItems="scope">
+          <el-form-item style="margin: 10px 0 0 10px;" label="职位名称：">
+            <el-input v-model="scope.searchForm.name" placeholder="请输入职位名称"></el-input>
+          </el-form-item>
+          <el-form-item style="margin: 10px 0 0 10px;" label="工作城市：">
+            <hc-city-select v-model="scope.searchForm.cityId" :city-id="userInfo.manageCityId" single></hc-city-select>
+          </el-form-item>
+          <el-form-item style="margin: 10px 0 0 10px;" label="职位状态：">
+            <el-select v-model="scope.searchForm.statusFlag" clearable>
+              <el-option label="招聘中" value="valid">招聘中</el-option>
+              <el-option label="已关闭" value="close">已关闭</el-option>
+              <el-option label="已下架" value="off_shelf">已下架</el-option>
+              <el-option label="待审核" value="wait_audit">待审核</el-option>
+            </el-select>
+          </el-form-item>
+        </template>
         <template v-slot:menu="scope">
           <el-button type="text" size="mini" @click="toView(scope.row)">详情</el-button>
           <template v-if="scope.row.status == '3' && scope.row.auditStatus == '1'">
@@ -14,20 +30,23 @@
           <el-button v-if="scope.row.status == '1'" type="text" size="mini" @click="offShelf(scope.row)">下架</el-button>
         </template>
       </hc-crud>
-      <position-detail slot="form" :position-detail="positionDetail"></position-detail>
+      <position-detail slot="form" :position-detail="positionDetail" @refresh="refresh"></position-detail>
     </hc-table-form>
   </basic-container>
 </template>
 
 <script>
 import { getPositionList, getPositionDetail, offShelf, audit } from "@/api/recruit/position"
+import HcCitySelect from "@/views/components/HcCity/HcCitySelect/index"
 import PositionDetail from "./PositionDetail"
+import { mapGetters } from "vuex"
 export default {
-  components: { PositionDetail },
+  components: { PositionDetail, HcCitySelect },
   data () {
     return {
       viewDetail: false,
       tableOption: {
+        search: true,
         labelWidth: '100px',
         columns: [
           {
@@ -38,7 +57,6 @@ export default {
           {
             label: '职位名称',
             prop: 'name',
-            search: true,
             maxlength: 50,
           },
           {
@@ -85,6 +103,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(['userInfo']),
     title () {
       if (this.viewDetail) {
         return '职位详情'
@@ -171,6 +190,10 @@ export default {
         })
       }).catch(() => {
       });
+    },
+    refresh () {
+      this.viewDetail = false
+      this.$refs.hcCrud.refresh()
     }
   }
 }

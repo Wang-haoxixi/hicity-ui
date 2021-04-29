@@ -6,7 +6,7 @@
           <el-button type="small" @click="showTagType">标签分类</el-button>
         </template>
         <template v-slot:positionLableTypeIdForm="scope">
-          <hc-remote-select v-model="scope.formData.positionLableTypeId" :remote-fun="getAllTagType" :show-word="scope.formData.positionLableType" @change="scope.formData.positionLableType = $event"></hc-remote-select>
+          <hc-remote-select v-model="scope.formData.positionLableTypeId" :remote-fun="getAllTagType" :show-word="scope.formData.positionLableType" @change="scope.formData.positionLableType = $event" placeholder="请输入关键字"></hc-remote-select>
         </template>
       </hc-crud>
     </hc-table-form>
@@ -55,7 +55,7 @@ export default {
             label: '标签分类',
             prop: 'positionLableTypeId',
             formSlot: true,
-            rules: [{required: true, message: '请输入标签分类'}],
+            rules: [{required: true, message: '请输入关键字并选择分类'}],
             maxlength: 50,
             formatter: function (row) {
               return row.positionLableType
