@@ -105,7 +105,8 @@
           :visible.sync="dialogApplyInfoVisible"
           width="50%"
         >
-          <div>
+          <!-- :before-close="handleCloseDialogApplyInfo" -->
+          <div v-if="applyInfoForm.length>0">
             <!-- :plain='item.actived' -->
             <el-button
               size="mini"
@@ -172,6 +173,8 @@
               >
             </div>
           </div>
+          <div v-else style="text-align: center;color: #909399;">暂无报名信息</div>
+
         </el-dialog>
 
         <el-dialog
@@ -335,6 +338,9 @@ export default {
       this.dialogAnnotationVisible = false;
     },
     handleCheck(enroleId) {
+      this.applyInfoForm = [];
+      this.applyInfo = {}
+      console.log('enroleId',enroleId)
       this.dialogApplyInfoVisible = true;
       formInquire({ enroleId: enroleId }).then((res) => {
         console.log(111, res);
@@ -385,6 +391,10 @@ export default {
       // item.actived = false
       this.applyInfo = item;
       console.log("applyInfo", this.applyInfo);
+    },
+    handleCloseDialogApplyInfo(){
+      this.applyInfoForm = [];
+      this.applyInfo = {}
     },
     handleCheckAllChange(val) {
       let writeOffStatusCode = this.signInCodeData.filter((item) => {
