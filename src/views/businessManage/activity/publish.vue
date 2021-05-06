@@ -1524,10 +1524,10 @@ export default {
         return optItem.label 
       })
       if(nullFlag){
-        return this.$message.warning('子项内容不能为空')
+        return this.$message.warning('选项名称不能为空')
       }
       if(this.isRepeat(labelArr)){
-        return this.$message.warning('子项内容应保持唯一性')
+        return this.$message.warning('选项内容应保持唯一性')
       }
       item.optionsList.push({
         label:'',
@@ -1699,6 +1699,7 @@ export default {
         }
       })
       this.baseFormData.conferenceFormList = [...this.defaultList,...this.customList]
+
       this.$refs.baseFormDataRef.validate((valid1) => {
         this.$refs.setTicketDataRef.forEach((item) => {
           item.validate((valid2) => {
@@ -1800,6 +1801,7 @@ export default {
         }
       })
       this.baseFormData.conferenceFormList = [...this.defaultList,...this.customList]
+      console.log(3423,this.baseFormData)
       this.$refs.baseFormDataRef.validate((valid1) => {
         // 状态不为草稿
         if (this.statusFlag != "0") {

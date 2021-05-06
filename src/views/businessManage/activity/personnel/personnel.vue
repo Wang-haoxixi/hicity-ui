@@ -11,9 +11,14 @@
           type="primary"
           @click="exportData"
           size="mini"
+          style="margin-right: 10px"
           >导出</el-button
         >
-        <el-input placeholder="请输入内容" size="small " style="width:250px;margin-left:10px">
+        <el-input clearable placeholder="请输入关键字" size="small" v-model="searchContent" class="input-with-select">
+          <el-select v-model="selectType" slot="prepend" @change="handleChangeType" placeholder="请选择" style="width: 90px">
+            <el-option label="用户名" value="1"></el-option>
+            <el-option label="手机号" value="2"></el-option>
+          </el-select>
           <el-button slot="append" icon="el-icon-search" @click="handleSearch"></el-button>
         </el-input>
         <el-table :data="tableData" style="width: 100%">
@@ -268,8 +273,8 @@ export default {
       tableData: [],
       query: {
         activityId: null,
-        name: "",
-        orderStatus: "",
+        userName: "",
+        phone: "",
         current: 1,
         size: 20,
       },
@@ -287,6 +292,9 @@ export default {
       checkedSignInCode: [], //已选择
       signInCodeData: [], //核销数组
       infoList: [],
+
+      selectType: '',//搜索类型
+      searchContent: ''//搜索内容
     };
   },
   created() {
@@ -313,9 +321,23 @@ export default {
     backClick() {
       this.$router.go(-1);
     },
+    handleChangeType(){
+      this.searchContent = ''
+    },
     // 搜索
     handleSearch(){
-      console.log('search...')
+      if(this.selectType == ''){
+        return this.$message.error('请选择搜索类型')
+      }
+      if(this.selectType == '1'){
+        this.query.userName = this.searchContent
+        this.query.phone = ''
+        this.getPeopleManagementList()
+      }else if(this.selectType == '2'){
+        this.query.phone = this.searchContent
+        this.query.userName = ''
+        this.getPeopleManagementList()
+      }
     },
     // 批注
     handleAnnotation(row) {
@@ -324,7 +346,6 @@ export default {
       this.annotation = row.soRemarks;
     },
     handleCheckTicketInfo(info) {
-      console.log("票名", JSON.parse(info));
       this.infoList = JSON.parse(info);
       this.dialogUserSelectVisible = true;
     },
@@ -340,10 +361,8 @@ export default {
     handleCheck(enroleId) {
       this.applyInfoForm = [];
       this.applyInfo = {}
-      console.log('enroleId',enroleId)
       this.dialogApplyInfoVisible = true;
       formInquire({ enroleId: enroleId }).then((res) => {
-        console.log(111, res);
         this.applyInfoForm = res.data.data.data;
         if (this.applyInfoForm && this.applyInfoForm.length > 0) {
           this.applyInfo = this.applyInfoForm[0];
@@ -374,7 +393,6 @@ export default {
         if (res.data.code != 0) {
           return this.$message.error("获取列表失败");
         }
-        console.log("列表", res);
         this.tableData = res.data.data.data.records;
         this.total = res.data.data.data.total;
       });
@@ -390,7 +408,6 @@ export default {
     changeName(item, index) {
       // item.actived = false
       this.applyInfo = item;
-      console.log("applyInfo", this.applyInfo);
     },
     handleCloseDialogApplyInfo(){
       this.applyInfoForm = [];
@@ -410,12 +427,10 @@ export default {
         checkedCount > 0 && checkedCount < this.checkedSignInCode.length;
     },
     handleSaveInfo() {
-      console.log(121, this.applyInfoForm);
       if (this.applyInfo.seatNumber.length > 15) {
         return this.$message.error("座位号字数不能超过15个字符");
       }
       saveInfo(this.applyInfo).then((res) => {
-        console.log("res", res);
         if (res.data.code != 0) {
           return this.$message.error("保存失败");
         }
@@ -442,5 +457,9 @@ export default {
 }
 .tagInfo {
   margin-bottom: 15px;
+}
+
+.input-with-select{
+  width: 400px;
 }
 </style>
