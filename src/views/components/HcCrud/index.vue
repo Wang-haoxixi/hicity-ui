@@ -284,11 +284,16 @@ export default {
           this.tableLoading = true;
           this.fetchListFun(params)
             .then(({ records, page }) => {
-              this.tableData = records;
-              this.page = {
-                ...this.page,
-                ...page,
-              };
+              if (records.length == 0 && page.total > 0 && this.page.currentPage > 1) {
+                this.page.currentPage -= 1
+                this.getList()
+              } else {
+                this.tableData = records;
+                this.page = {
+                  ...this.page,
+                  ...page,
+                };
+              }
             })
             .finally(() => {
               resolve()
