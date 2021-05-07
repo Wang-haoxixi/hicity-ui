@@ -99,7 +99,7 @@
         </el-form-item>
       </el-form>
       <div slot="footer">
-        <el-button @click="linkCancel">取 消</el-button>
+        <el-button @click="videoCancel">取 消</el-button>
         <el-button type="primary" @click="videoSave">确 定</el-button>
       </div>
     </el-dialog>
@@ -336,7 +336,10 @@ export default {
       }
     })
     if (this.value.structuredContent) {
-      this.quill.setContents(JSON.parse(this.value.structuredContent || '[]'))
+      const converter = new QuillDeltaToHtmlConverter(JSON.parse(this.value.structuredContent || '[]'), {inlineStyles: true})
+      const html = converter.convert()
+      this.quill.root.innerHTML = html
+      // this.quill.setContents(JSON.parse(this.value.structuredContent || '[]'))
     } else if (this.value.content) {
       this.quill.root.innerHTML = this.value.content
     }
@@ -473,6 +476,10 @@ export default {
         .delete(selection.length)
         .insert({video: this.videoUrl})
       this.quill.updateContents(delta)
+      this.dialogVisibleVideo = false
+    },
+    videoCancel () {
+      this.videoUrl = ''
       this.dialogVisibleVideo = false
     },
     linkCancel () {
