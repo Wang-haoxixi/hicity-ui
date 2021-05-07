@@ -3,6 +3,7 @@
     title="推荐管理"
     :visible.sync="dialogVisible"
     width="width"
+    append-to-body
     :before-close="dialogBeforeClose">
     <el-table :data="recommendList">
       <el-table-column label="券名称" prop="name"></el-table-column>

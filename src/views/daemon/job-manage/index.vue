@@ -116,6 +116,7 @@
         :option="tableLogOption"
         :table-loading="tableLogLoading"
         @on-load="getJobLogList"
+        append-to-body
         @refresh-change="getJobLogList">
         <template slot-scope="scope" slot="jobLogStatus">
           <div v-if="scope.row.jobLogStatus == 0">

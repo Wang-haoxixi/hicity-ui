@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :visible.sync="dialogShow" :title="`${methodName}`" width="500px" @close="_close()">
+  <el-dialog :visible.sync="dialogShow" :title="`${methodName}`" width="500px" @close="_close()" append-to-body>
     <el-form class="el-form-detail" :model="form" ref="form" label-width="120px">
       <el-form-item v-if="form.type!=='0'" label="上级分类" prop="parentId">
         <el-select v-model="form.parentId" filterable :disabled="isChild" placeholder="请选择上级分类">

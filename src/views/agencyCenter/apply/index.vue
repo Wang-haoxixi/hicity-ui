@@ -19,7 +19,7 @@
     </hc-table-form>
 
     <!-- 合伙人详情 -->
-    <el-dialog title="合伙人详情" :visible.sync="dialogFormVisible" width="50%">
+    <el-dialog title="合伙人详情" :visible.sync="dialogFormVisible" width="50%" append-to-body>
       <div class="item">用户账号：{{ partner.id }}</div>
       <div class="item">姓名：{{ partner.name }}</div>
       <div class="item">联系方式：{{ partner.mobile }}</div>

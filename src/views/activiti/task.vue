@@ -32,7 +32,8 @@
     </basic-container>
     <el-dialog
       :visible.sync="showTask"
-      title="任务办理">
+      title="任务办理"
+      append-to-body>
       <avue-form ref="form" v-model="obj" :option="formOption">
         <template slot-scope="scope" slot="menuForm">
           <el-button
@@ -47,12 +48,14 @@
     </el-dialog>
     <el-dialog
       :visible.sync="showComment"
-      title="批注列表">
+      title="批注列表"
+      append-to-body>
       <avue-crud :data="taskTableData" :option="taskOption"/>
     </el-dialog>
     <el-dialog
       :visible.sync="showPicDialog"
-      title="流程图">
+      title="流程图"
+      append-to-body>
       <img v-if="showPicDialog" :src="actPicUrl" width="100%">
     </el-dialog>
   </div>

@@ -81,6 +81,7 @@
       title="关联品牌"
       :visible.sync="brandViewDialogVisible"
       :before-close="dialogBeforeClose"
+      append-to-body
       width="70%"
     >
       <template>

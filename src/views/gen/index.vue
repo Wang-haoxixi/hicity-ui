@@ -53,6 +53,7 @@
         :visible.sync="box"
         title="生成配置"
         width="50%"
+        append-to-body
         lock-scroll>
         <div class="pull-auto">
           <avue-form
@@ -66,6 +67,7 @@
         :visible.sync="boxBatch"
         title="批量生成"
         width="50%"
+        append-to-body
         lock-scroll>
         <div class="pull-auto">
           <avue-form

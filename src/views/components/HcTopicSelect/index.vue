@@ -4,6 +4,7 @@
     <el-dialog
       title="话题分类选择"
       :visible.sync="classifyChooseDialogVisible"
+      append-to-body
       width="90%">
       <div>
         <div class="classify-box">
@@ -35,6 +36,7 @@
     <el-dialog
       title="话题选择"
       :visible.sync="topicChooseDialogVisible"
+      append-to-body
       width="70%"
     >
       <template>

@@ -4,6 +4,7 @@
     <el-dialog
       title="选择城市"
       :visible.sync="cityChooseDialogVisible"
+      append-to-body
       width="70%">
       <hc-city-box ref="HcCityBox" v-if="cityChooseDialogVisible" :all-city-list="allCityList" :init-city-list="initCityList"></hc-city-box>
       <div slot="footer">

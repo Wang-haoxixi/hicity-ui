@@ -3,6 +3,7 @@
     :title="title"
     :visible.sync="dialogVisible"
     width="70%"
+    append-to-body
     :before-close="dialogBeforeClose">
     <el-form ref="form" :model="formData" :rules="formRules">
       <el-form-item v-for="item in formList" :key="item.prop" :prop="item.prop" :label="item.label+'：'" :label-width="option.labelWidth || item.labelWidth">

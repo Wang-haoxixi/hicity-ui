@@ -3,6 +3,7 @@
     title="地址选择"
     :visible.sync="dialogVisible"
     width="600px"
+    append-to-body
     :before-close="dialogBeforeClose">
     <div>
       <el-form-item label="请输入：" label-width="70px">

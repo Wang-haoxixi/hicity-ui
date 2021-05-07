@@ -34,6 +34,7 @@
       title="广告新增"
       :visible.sync="dialogFormVisible"
       @close="dialogFormVisibleClose"
+      append-to-body
     >
       <el-form :model="form" ref="ruleAddForm" :rules="ruleForm">
         <!-- 城市 -->
@@ -191,6 +192,7 @@
       title="广告编辑"
       :visible.sync="dialogEditFormVisible"
       @close="dialogEditFormVisibleClose"
+      append-to-body
     >
       <el-form :model="editForm" ref="ruleEditForm" :rules="ruleForm">
         <!-- 城市 -->
@@ -471,6 +473,7 @@
         :data="jumpObjArr"
         style="width: 100%"
         v-loading='jumpLoading'
+        append-to-body
       >
         <el-table-column prop="id" label="id" width="80"> </el-table-column>
         <el-table-column prop="name" label="跳转名称"> </el-table-column>

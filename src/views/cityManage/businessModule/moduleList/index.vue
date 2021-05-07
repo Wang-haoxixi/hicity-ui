@@ -44,6 +44,7 @@
     <el-dialog
       title="模块配置"
       :visible.sync="dialogVisible"
+      append-to-body
       width="">
       <div class="mod-detail">
         <div class="mod-icon">

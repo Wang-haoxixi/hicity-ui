@@ -106,6 +106,7 @@
     <el-dialog
       title="关联标签"
       :visible.sync="tagViewDialogVisible"
+      append-to-body
       width="70%"
     >
       <template>

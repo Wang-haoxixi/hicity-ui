@@ -337,10 +337,10 @@ export default {
       }
     })
     if (this.value.structuredContent) {
-      const converter = new QuillDeltaToHtmlConverter(JSON.parse(this.value.structuredContent || '[]'), {inlineStyles: true, multiLineParagraph: false})
-      const html = converter.convert()
-      this.quill.root.innerHTML = html
-      // this.quill.setContents(JSON.parse(this.value.structuredContent || '[]'))
+      // const converter = new QuillDeltaToHtmlConverter(JSON.parse(this.value.structuredContent || '[]'), {inlineStyles: true, multiLineParagraph: false})
+      // const html = converter.convert()
+      // this.quill.root.innerHTML = html
+      this.quill.setContents(JSON.parse(this.value.structuredContent || '[]'))
     } else if (this.value.content) {
       this.quill.root.innerHTML = this.value.content
     }

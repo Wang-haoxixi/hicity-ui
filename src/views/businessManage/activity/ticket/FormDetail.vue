@@ -3,6 +3,7 @@
     :title="title"
     :visible.sync="dialogVisible"
     width="1000px"
+    append-to-body
     :before-close="dialogBeforeClose">
     <div class="form-detail-container">
       <el-form ref="form" :model="formData" label-width="auto" :rules="formRules">

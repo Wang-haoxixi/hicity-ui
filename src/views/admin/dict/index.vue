@@ -59,6 +59,7 @@
       :table-loading="tableLoading"
       title="字典项管理"
       width="90%"
+      append-to-body
       @close="dialogFormVisible=false">
       <avue-crud
         ref="crudItem"

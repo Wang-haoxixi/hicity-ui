@@ -14,6 +14,7 @@
     <el-dialog
       title="模板选择"
       :visible.sync="dialogVisible"
+      append-to-body
       width="70%"
       :before-close="dialogBeforeClose">
       <div class="module-list-outter">

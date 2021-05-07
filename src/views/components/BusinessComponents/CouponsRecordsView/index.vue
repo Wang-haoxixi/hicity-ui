@@ -2,6 +2,7 @@
   <el-dialog
     :visible.sync="dialogVisible"
     width="70%"
+    append-to-body
     :before-close="dialogBeforeClose">
     <el-tabs v-model="type">
       <el-tab-pane label="订单信息" name="order">

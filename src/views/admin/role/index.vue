@@ -46,6 +46,7 @@
     <el-dialog
       :visible.sync="dialogPermissionVisible"
       :close-on-click-modal="false"
+      append-to-body
       title="分配权限">
       <div class="dialog-main-tree">
       <el-tree

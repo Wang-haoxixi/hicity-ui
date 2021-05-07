@@ -86,6 +86,7 @@
     <el-dialog
       title="活动签到码"
       :visible.sync="showCodeDialogVisible"
+      append-to-body
       width="30%"
     >
       <div class="code-img">

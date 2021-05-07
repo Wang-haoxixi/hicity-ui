@@ -32,7 +32,7 @@
         </template>
       </avue-crud>
     </basic-container>
-    <el-dialog :visible.sync="dialogFormVisible" title="接入">
+    <el-dialog :visible.sync="dialogFormVisible" title="接入" append-to-body>
       <el-row :gutter="20">
         <el-col :span="6">服务器地址(URL)</el-col>
         <el-col id="target" :span="12">{{ wxurl }}</el-col>

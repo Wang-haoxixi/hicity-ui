@@ -84,6 +84,7 @@
         <el-dialog
           title="添加批注"
           :visible.sync="dialogAnnotationVisible"
+          append-to-body
           width="50%"
         >
           <el-input
@@ -108,6 +109,7 @@
         <el-dialog
           title="查看信息"
           :visible.sync="dialogApplyInfoVisible"
+          append-to-body
           width="50%"
         >
           <!-- :before-close="handleCloseDialogApplyInfo" -->
@@ -185,6 +187,7 @@
         <el-dialog
           title="核销签到"
           :visible.sync="dialogSignInVisible"
+          append-to-body
           width="50%"
         >
           <el-checkbox
@@ -218,6 +221,7 @@
         <el-dialog
           title="用户选择"
           :visible.sync="dialogUserSelectVisible"
+          append-to-body
           width="50%"
         >
           <div>参加项目</div>

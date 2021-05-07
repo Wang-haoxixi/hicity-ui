@@ -14,6 +14,7 @@
       title="标签分类"
       :visible.sync="dialogVisible"
       width="500px"
+      append-to-body
       :before-close="dialogBeforeClose">
       <div>
         <el-button icon="el-icon-plus" size="small" @click="addTagType"></el-button>

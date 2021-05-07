@@ -543,6 +543,7 @@
         class="dialogPostersVisible"
         title="海报图库"
         :visible.sync="dialogPostersVisible"
+        append-to-body
         width="940px"
       >
         <div class="posterBox">
@@ -561,6 +562,7 @@
         :visible.sync="dialogJumpVisible"
         width="70%"
         class="jump"
+        append-to-body
         @close='closeDialogJumpVisible'
       >
         <el-form ref="jumpTypeFormRef" :model="jumpTypeForm" label-width="100px">

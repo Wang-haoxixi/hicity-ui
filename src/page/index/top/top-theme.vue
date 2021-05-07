@@ -3,7 +3,8 @@
     <el-dialog
       :visible.sync="box"
       title="选择"
-      width="50%">
+      width="50%"
+      append-to-body>
       <el-radio-group
         v-model="text"
         class="list">

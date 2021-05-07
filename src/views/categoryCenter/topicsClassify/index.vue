@@ -75,6 +75,7 @@
         <el-dialog
           title="新增关联"
           :visible.sync="topicDialogVisible"
+          append-to-body
           width="70%">
           <el-form :model="formData" labelWidth="100px">
             <el-form-item label="选择话题：">
@@ -93,6 +94,7 @@
     <el-dialog
       title="关联话题"
       :visible.sync="topicViewDialogVisible"
+      append-to-body
       width="70%"
     >
       <template>

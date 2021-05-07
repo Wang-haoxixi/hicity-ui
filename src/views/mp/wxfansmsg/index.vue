@@ -30,6 +30,7 @@
           :page="pageRes"
           :data="tableResData"
           :option="tableResOption"
+          append-to-body
           @row-save="handleResSave"
           @row-del="rowResDel"/>
       </el-dialog>
