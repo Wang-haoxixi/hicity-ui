@@ -6,20 +6,23 @@
       @go-back="viewDetail = false">
       <hc-crud ref="hcCrud" :fetchListFun="fetchListFun" :option="tableOption">
         <template v-slot:searchItems="scope">
-          <el-form-item style="margin: 10px 0 0 10px;" label="职位名称：">
-            <el-input v-model="scope.searchForm.name" placeholder="请输入职位名称"></el-input>
-          </el-form-item>
-          <el-form-item style="margin: 10px 0 0 10px;" label="工作城市：">
+          <div class="search-item">
+            <div style="white-space: nowrap;">职位名称：</div>
+            <el-input v-model="scope.searchForm.name" placeholder="请输入职位名称" clearable></el-input>
+          </div>
+          <div class="search-item">
+            <div style="white-space: nowrap;">工作城市：</div>
             <hc-city-select v-model="scope.searchForm.cityId" :city-id="userInfo.manageCityId" single></hc-city-select>
-          </el-form-item>
-          <el-form-item style="margin: 10px 0 0 10px;" label="职位状态：">
+          </div>
+          <div class="search-item">
+            <div style="white-space: nowrap;">职位状态：</div>
             <el-select v-model="scope.searchForm.statusFlag" clearable>
               <el-option label="招聘中" value="valid">招聘中</el-option>
               <el-option label="已关闭" value="close">已关闭</el-option>
               <el-option label="已下架" value="off_shelf">已下架</el-option>
               <el-option label="待审核" value="wait_audit">待审核</el-option>
             </el-select>
-          </el-form-item>
+          </div>
         </template>
         <template v-slot:menu="scope">
           <el-button type="text" size="mini" @click="toView(scope.row)">详情</el-button>
@@ -200,4 +203,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.search-item {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  margin: 10px 20px 0 0;
+}
 </style>

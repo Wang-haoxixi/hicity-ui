@@ -2,25 +2,56 @@
   <div class="hc-crud-container">
     <!-- 搜索 -->
     <slot name="search">
-      <el-form
+      <div
+        v-if="optionC.search || searchList && searchList.length > 0"
+        class="search-box">
+        <div
+          v-for="(item, index) in searchList"
+          :key="index"
+          class="search-item">
+          <div style="white-space: nowrap;">{{item.label + ':'}}</div>
+          <hc-form-item
+            style="margin-left: 10px;"
+            v-model="searchFormShow[item.prop]"
+            :option="item"
+          ></hc-form-item>
+        </div>
+        <slot name="searchItems" :search-form="searchFormShow"></slot>
+        <div class="search-item">
+          <el-button
+            type="primary"
+            icon="el-icon-search"
+            @click="toSearch"
+            >搜 索</el-button
+          >
+          <el-button
+            icon="el-icon-refresh"
+            @click="resetSearch"
+            >重 置</el-button
+          >
+        </div>
+      </div>
+
+      <!-- <el-form
         v-if="optionC.search || searchList && searchList.length > 0"
         class="search-box"
-        label-width="auto"
         style="width: 100%"
+        label-width="auto"
         @submit.native.prevent="toSearch"
       >
+        <el-form-item
+          v-for="(item, index) in searchList"
+          :key="index"
+          class="search-item"
+          :label="item.label + ':'"
+          label-width="auto"
+        >
+          <hc-form-item
+            v-model="searchFormShow[item.prop]"
+            :option="item"
+          ></hc-form-item>
+        </el-form-item>
         <slot name="searchItems" :search-form="searchFormShow">
-          <el-form-item
-            v-for="(item, index) in searchList"
-            :key="index"
-            class="search-item"
-            :label="item.label + ':'"
-          >
-            <hc-form-item
-              v-model="searchFormShow[item.prop]"
-              :option="item"
-            ></hc-form-item>
-          </el-form-item>
         </slot>
         <el-form-item>
           <el-button
@@ -37,7 +68,7 @@
             >重 置</el-button
           >
         </el-form-item>
-      </el-form>
+      </el-form> -->
     </slot>
     <!-- 新建 -->
     <div v-if="optionC.header" class="hc-crud-header">
@@ -391,12 +422,17 @@ export default {
 
 .search-box {
   display: flex;
+  width: 100%;
+  margin: -10px -20px 0 0;
   justify-content: flex-start;
   align-items: flex-start;
   flex-wrap: wrap;
-  margin: -10px 0 0 -10px;
+  padding-bottom: 20px;
   .search-item {
-    margin: 10px 0 0 10px;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    margin: 10px 20px 0 0;
   }
 }
 
