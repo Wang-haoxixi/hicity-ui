@@ -348,7 +348,7 @@
                       v-if="item.ticketingType === '2'"
                       label="允许退票："
                       label-width="100"
-                      style="vertical-align: inherit;"
+                      style="display: block;margin-left:10px;margin-bottom:10px"
                     >
                       <el-switch
                         v-model="item.allowedRefund"
