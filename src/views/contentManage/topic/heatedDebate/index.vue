@@ -218,7 +218,7 @@ export default {
   methods: {
     dateFormat,
     getContent (content) {
-      return content.replace(new RegExp(/\t/g), "&nbsp;&nbsp;&nbsp;&nbsp;").replace(new RegExp(/ /g), "&nbsp;").replace(/\r\n/g, '<br>').replace(/\n/g, '<br>')
+      return content.replace(new RegExp(/\t/g), "&nbsp;&nbsp;&nbsp;&nbsp;").replace(/\r\n/g, '<br>').replace(/\n/g, '<br>')
     },
     titleObjValidator (rules, value, callback) {
       if (this.titleObj.heatedDebateId || this.titleObj.heatedDebateId === 0) {

@@ -99,7 +99,7 @@
         </el-form-item>
       </el-form>
       <div slot="footer">
-        <el-button @click="linkCancel">取 消</el-button>
+        <el-button @click="videoCancel">取 消</el-button>
         <el-button type="primary" @click="videoSave">确 定</el-button>
       </div>
     </el-dialog>
@@ -165,7 +165,8 @@ class image extends BlockEmbed {
     // `
     const node = super.create();
     node.setAttribute('contenteditable', 'false');
-    node.setAttribute('width', '100%');
+    // node.style.width = '500px'
+    node.setAttribute('width', '400px');
     // node.innerHTML = this.transformValue(value)
     return node;
   }
@@ -336,7 +337,10 @@ export default {
       }
     })
     if (this.value.structuredContent) {
-      this.quill.setContents(JSON.parse(this.value.structuredContent || '[]'))
+      const converter = new QuillDeltaToHtmlConverter(JSON.parse(this.value.structuredContent || '[]'), {inlineStyles: true, multiLineParagraph: false})
+      const html = converter.convert()
+      this.quill.root.innerHTML = html
+      // this.quill.setContents(JSON.parse(this.value.structuredContent || '[]'))
     } else if (this.value.content) {
       this.quill.root.innerHTML = this.value.content
     }
@@ -347,7 +351,7 @@ export default {
           deltas.insert(op.insert, op.attributes)
         }
       })
-      const converter = new QuillDeltaToHtmlConverter(deltas.ops, {inlineStyles: true})
+      const converter = new QuillDeltaToHtmlConverter(deltas.ops, {inlineStyles: true, multiLineParagraph: false})
       const html = converter.convert()
       this.$emit('input', {content: html, structuredContent: JSON.stringify(deltas.ops)})
     });
@@ -475,6 +479,10 @@ export default {
       this.quill.updateContents(delta)
       this.dialogVisibleVideo = false
     },
+    videoCancel () {
+      this.videoUrl = ''
+      this.dialogVisibleVideo = false
+    },
     linkCancel () {
       this.link = {
         label: '',
@@ -533,17 +541,15 @@ export default {
   }
 }
 
-.quill-image {
+/deep/.quill-image {
   display: block;
-  margin: 20px 0;
   margin: 0 auto;
   font-size: 0;
   width: 400px;
 }
 
-.quill-image-box {
+/deep/.quill-image-box {
   display: block;
-  margin: 20px 0;
   text-align: center;
   font-size: 0;
   width: 100%;

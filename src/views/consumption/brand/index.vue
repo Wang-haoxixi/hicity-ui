@@ -40,7 +40,7 @@
             <hc-image-upload single :limit="1" v-model="formData.brandLogo"></hc-image-upload>
           </el-form-item>
           <el-form-item label="品牌介绍：" prop="brandSynopsis">
-            <el-input type="textarea" v-model="formData.brandSynopsis" :autosize="{minRows: 5, maxRows: 10}" maxlength="250"></el-input>
+            <el-input type="textarea" v-model="formData.brandSynopsis" :autosize="{minRows: 5, maxRows: 10}" maxlength="250" show-word-limit></el-input>
           </el-form-item>
           <el-form-item>
             <el-button v-if="publishType != 'view'" type="primary" :loading="formLoading" @click="handleCreate">保 存</el-button>

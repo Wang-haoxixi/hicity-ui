@@ -11,7 +11,7 @@
       <hc-image-upload single :limit="1" v-model="formData.merchantLogo" disabled></hc-image-upload>
     </el-form-item>
     <el-form-item label="店铺介绍：" prop="merchantSynopsis">
-      <el-input type="textarea" v-model="formData.merchantSynopsis" :autosize="{minRows: 5, maxRows: 10}" maxlength="1000"></el-input>
+      <el-input type="textarea" v-model="formData.merchantSynopsis" :autosize="{minRows: 5, maxRows: 10}" maxlength="1000" show-word-limit></el-input>
     </el-form-item>
     <el-form-item label="联系人：" prop="merchantUserName">
       <el-input v-model="formData.merchantUserName" maxlength="50"></el-input>
