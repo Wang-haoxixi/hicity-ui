@@ -247,7 +247,7 @@ export default {
   },
   methods: {
     getContent (content) {
-      return content.replace(new RegExp(/\t/g), "&nbsp;&nbsp;&nbsp;&nbsp;").replace(new RegExp(/ /g), "&nbsp;").replace(/\r\n/g, '<br>').replace(/\n/g, '<br>')
+      return content.replace(new RegExp(/\t/g), "&nbsp;&nbsp;&nbsp;&nbsp;").replace(/\r\n/g, '<br>').replace(/\n/g, '<br>')
     },
     imageValidator (rule, value, callback) {
       if (this.titleImage && this.titleImage.length > 0) {
