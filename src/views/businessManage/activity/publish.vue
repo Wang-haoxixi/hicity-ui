@@ -512,7 +512,7 @@
           <div v-for="(item,index) in customList" :key="index">
             <div class="item" >
               <el-checkbox v-model="item.must">必填</el-checkbox>
-              <el-input :placeholder="item.typename" show-word-limit maxlength="250"  v-model.trim="item.label"></el-input>
+              <el-input :placeholder="placeholderName(item.type)" show-word-limit maxlength="50"  v-model.trim="item.label"></el-input>
               <i class="el-icon-remove" title="删除" @click="handleDelete(index)"></i>
             </div>
             <div class="option-list" v-if="item.optionsList == [] || item.optionsList">
@@ -735,15 +735,15 @@ export default {
       
       customList:[],
       customForm:[
-        {
-          "typename": '单行文本',
-          "label": "",
-          "value": "",
-          "type": "input",
-          "must": false,
-          "fixedItem": false,
-          "placeholder": "",
-        },
+        // { // 删除自定单行文本框
+        //   "typename": '单行文本',
+        //   "label": "",
+        //   "value": "",
+        //   "type": "input",
+        //   "must": false,
+        //   "fixedItem": false,
+        //   "placeholder": "单行文本",
+        // },
         {
           "typename": '单选按钮框',
           "label": "",
@@ -751,7 +751,7 @@ export default {
           "type": "radio",
           "must": false,
           "fixedItem": false,
-          "placeholder": "",
+          "placeholder": "单选按钮框",
           "optionsList": [],
           "isInput":false,
           "inputValue": ""
@@ -763,7 +763,7 @@ export default {
           "type": "checkbox",
           "must": false,
           "fixedItem": false,
-          "placeholder": "",
+          "placeholder": "多选按钮框",
           "optionsList": [],
           "isInput":false,
           "inputValue": ""
@@ -775,7 +775,7 @@ export default {
           "type": "textarea",
           "must": false,
           "fixedItem": false,
-          "placeholder": "",
+          "placeholder": "多行文本",
         }
       ],
       checkedList: false,
@@ -984,8 +984,22 @@ export default {
   },
   computed: {
     ...mapGetters(["userType", "userInfo"]),
+    
   },
   methods: {
+    placeholderName(type){ // 提示语placeholder
+      if(type){
+        if(type=='input'){
+          return '单行文本'
+        }else if(type=='radio'){
+          return '单选按钮框'
+        }else if(type=='checkbox'){
+          return '多选按钮框'
+        }else if(type=='textarea'){
+          return '多行文本'
+        }
+      }
+    },
     beginDataValidator (rules, value, callback) {
       if (!value) {
         callback(new Error('请选择开始时间'))
@@ -1622,9 +1636,9 @@ export default {
       this.baseFormData.id = this.$route.query.id;
       this.customList.forEach(item=>{
         if(item.type == 'input' || item.type == 'textarea'){
-          item.placeholder = "请输入" + item.label
+          item.placeholder = "请输入"
         }else if(item.type == 'radio' || item.type == 'checkbox'){
-          item.placeholder = "请选择" + item.label
+          item.placeholder = "请选择"
         }
       })
       this.baseFormData.conferenceFormList = [...this.defaultList,...this.customList]
@@ -1695,9 +1709,11 @@ export default {
       this.baseFormData.submitType = 1;
       this.customList.forEach(item=>{
         if(item.type == 'input' || item.type == 'textarea'){
-          item.placeholder = "请输入" + item.label
+          item.placeholder = "请输入"
+          // item.placeholder = item.typename
         }else if(item.type == 'radio' || item.type == 'checkbox'){
-          item.placeholder = "请选择" + item.label
+          item.placeholder = "请选择"
+          // item.placeholder = item.typename
         }
       })
       this.baseFormData.conferenceFormList = [...this.defaultList,...this.customList]
@@ -1748,9 +1764,9 @@ export default {
       this.baseFormData.submitType = 0;
       this.customList.forEach(item=>{
         if(item.type == 'input' || item.type == 'textarea'){
-          item.placeholder = "请输入" + item.label
+          item.placeholder = "请输入"
         }else if(item.type == 'radio' || item.type == 'checkbox'){
-          item.placeholder = "请选择" + item.label
+          item.placeholder = "请选择"
         }
       })
       this.baseFormData.conferenceFormList = [...this.defaultList,...this.customList]
@@ -1797,13 +1813,12 @@ export default {
       this.baseFormData.id = this.$route.query.id;
       this.customList.forEach(item=>{
         if(item.type == 'input' || item.type == 'textarea'){
-          item.placeholder = "请输入" + item.label
+          item.placeholder = "请输入"
         }else if(item.type == 'radio' || item.type == 'checkbox'){
-          item.placeholder = "请选择" + item.label
+          item.placeholder = "请选择"
         }
       })
       this.baseFormData.conferenceFormList = [...this.defaultList,...this.customList]
-      console.log(3423,this.baseFormData)
       this.$refs.baseFormDataRef.validate((valid1) => {
         // 状态不为草稿
         if (this.statusFlag != "0") {
