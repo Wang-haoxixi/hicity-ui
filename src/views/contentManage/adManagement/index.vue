@@ -348,6 +348,9 @@
     </el-dialog>
     <!-- 新增选择跳转对象 -->
     <el-dialog title="跳转对象" :visible.sync="jumpDialogVisible" width="50%" @closed='closeDialogAddJumpVisible'>
+      <el-input clearable v-model="searchName" placeholder="请输入关键字" class="input-with-select" style="width:300px">
+        <el-button slot="append" icon="el-icon-search" @click="searchAddItem"></el-button>
+      </el-input>
       <el-table
         v-if="form.type === 'activity'"
         :data="jumpObjArr"
@@ -467,7 +470,10 @@
       </span>
     </el-dialog>
     <!-- 编辑选择跳转对象 -->
-    <el-dialog title="跳转对象" :visible.sync="editJumpDialogVisible" width="50%">
+    <el-dialog title="跳转对象" :visible.sync="editJumpDialogVisible" width="50%" @close='closeDialogEditJumpVisible'>
+      <el-input clearable v-model="searchName" placeholder="请输入关键字" class="input-with-select" style="width:300px">
+        <el-button slot="append" icon="el-icon-search" @click="searchEditItem"></el-button>
+      </el-input>
       <el-table
         v-if="editForm.type === 'activity'"
         :data="jumpObjArr"
@@ -619,6 +625,8 @@ export default {
   },
   data() {
     return {
+      searchName: "",//搜索名称
+
       CITYID: '',
       tableOption: tableOption,
       imageUrl: "",
@@ -711,6 +719,44 @@ export default {
     };
   },
   methods: {
+    // 新增-搜索
+    searchAddItem(){
+      if (this.form.type === "activity") {
+        if(this.current1>1) this.current1 = 1
+        this.getActivitiePageFn(this.form.cityId,this.searchName); //活动
+      } else if (this.form.type === "travel") {
+        if(this.current1>1) this.current1 = 1
+        this.getTravelPageFn(this.form.cityId,this.searchName); //城市打卡
+      } else if (this.form.type === "heated_debate") {
+        if(this.current1>1) this.current1 = 1
+        this.getHeated_debatePageFn(this.form.cityId,this.searchName); //城市热议
+      } else if (this.form.type === "news") {
+        if(this.current1>1) this.current1 = 1
+        this.getNewsPageFn(this.form.cityId,this.searchName); //城市新闻
+      } else if (this.form.type === "official_column") {
+        if(this.current1>1) this.current1 = 1
+        this.getOfficial_columnPageFn(this.form.cityId,this.searchName); //官方发布
+      }
+    },
+    // 编辑-搜索
+    searchEditItem(){
+      if (this.editForm.type === "activity") {
+        if(this.current1>1) this.current1 = 1
+        this.getActivitiePageFn(this.editForm.cityId,this.searchName); //活动
+      } else if (this.editForm.type === "travel") {
+        if(this.current1>1) this.current1 = 1
+        this.getTravelPageFn(this.editForm.cityId,this.searchName); //城市打卡
+      } else if (this.editForm.type === "heated_debate") {
+        if(this.current1>1) this.current1 = 1
+        this.getHeated_debatePageFn(this.editForm.cityId,this.searchName); //城市热议
+      } else if (this.editForm.type === "news") {
+        if(this.current1>1) this.current1 = 1
+        this.getNewsPageFn(this.editForm.cityId,this.searchName); //城市新闻
+      } else if (this.editForm.type === "official_column") {
+        if(this.current1>1) this.current1 = 1
+        this.getOfficial_columnPageFn(this.editForm.cityId,this.searchName); //官方发布
+      }
+    },
     beginDataValidator (rules, value, callback) {
       if (!value) {
         callback(new Error('请选择开始时间'))
@@ -774,67 +820,73 @@ export default {
       this.size1 = 10
       this.current1 = 1
       this.total1 = 0
+      this.searchName = ''
+    },
+    closeDialogEditJumpVisible(){
+      this.size1 = 10
+      this.current1 = 1
+      this.total1 = 0
+      this.searchName = ''
     },
     handleSizeChange1(val){
       this.size1 = val
       if (this.form.type === "activity") {
-        this.getActivitiePageFn(this.form.cityId); //活动
+        this.getActivitiePageFn(this.form.cityId,this.searchName); //活动
       } else if (this.form.type === "travel") {
-        this.getTravelPageFn(this.form.cityId); //城市打卡
+        this.getTravelPageFn(this.form.cityId,this.searchName); //城市打卡
       } else if (this.form.type === "heated_debate") {
-        this.getHeated_debatePageFn(this.form.cityId); //城市热议
+        this.getHeated_debatePageFn(this.form.cityId,this.searchName); //城市热议
       } else if (this.form.type === "news") {
-        this.getNewsPageFn(this.form.cityId); //城市新闻
+        this.getNewsPageFn(this.form.cityId,this.searchName); //城市新闻
       } else if (this.form.type === "official_column") {
-        this.getOfficial_columnPageFn(this.form.cityId); //官方发布
+        this.getOfficial_columnPageFn(this.form.cityId,this.searchName); //官方发布
       }
     },
     handleCurrentChange1(val){
       this.current1 = val
       if (this.form.type === "activity") {
-        this.getActivitiePageFn(this.form.cityId); //活动
+        this.getActivitiePageFn(this.form.cityId,this.searchName); //活动
       } else if (this.form.type === "travel") {
-        this.getTravelPageFn(this.form.cityId); //城市打卡
+        this.getTravelPageFn(this.form.cityId,this.searchName); //城市打卡
       } else if (this.form.type === "heated_debate") {
-        this.getHeated_debatePageFn(this.form.cityId); //城市热议
+        this.getHeated_debatePageFn(this.form.cityId,this.searchName); //城市热议
       } else if (this.form.type === "news") {
-        this.getNewsPageFn(this.form.cityId); //城市新闻
+        this.getNewsPageFn(this.form.cityId,this.searchName); //城市新闻
       } else if (this.form.type === "official_column") {
-        this.getOfficial_columnPageFn(this.form.cityId); //官方发布
+        this.getOfficial_columnPageFn(this.form.cityId,this.searchName); //官方发布
       }
     },
     handleSizeChange2(val){
       this.size1 = val
       if (this.editForm.type === "activity") {
-        this.getActivitiePageFn(this.form.cityId); //活动
+        this.getActivitiePageFn(this.form.cityId,this.searchName); //活动
       } else if (this.editForm.type === "travel") {
-        this.getTravelPageFn(this.form.cityId); //城市打卡
+        this.getTravelPageFn(this.form.cityId,this.searchName); //城市打卡
       } else if (this.editForm.type === "heated_debate") {
-        this.getHeated_debatePageFn(this.form.cityId); //城市热议
+        this.getHeated_debatePageFn(this.form.cityId,this.searchName); //城市热议
       } else if (this.editForm.type === "news") {
-        this.getNewsPageFn(this.form.cityId); //城市新闻
+        this.getNewsPageFn(this.form.cityId,this.searchName); //城市新闻
       } else if (this.editForm.type === "official_column") {
-        this.getOfficial_columnPageFn(this.form.cityId); //官方发布
+        this.getOfficial_columnPageFn(this.form.cityId,this.searchName); //官方发布
       }
     },
     handleCurrentChange2(val){
       this.current1 = val
       if (this.editForm.type === "activity") {
-        this.getActivitiePageFn(this.form.cityId); //活动
+        this.getActivitiePageFn(this.form.cityId,this.searchName); //活动
       } else if (this.editForm.type === "travel") {
-        this.getTravelPageFn(this.form.cityId); //城市打卡
+        this.getTravelPageFn(this.form.cityId,this.searchName); //城市打卡
       } else if (this.editForm.type === "heated_debate") {
-        this.getHeated_debatePageFn(this.form.cityId); //城市热议
+        this.getHeated_debatePageFn(this.form.cityId,this.searchName); //城市热议
       } else if (this.editForm.type === "news") {
-        this.getNewsPageFn(this.form.cityId); //城市新闻
+        this.getNewsPageFn(this.form.cityId,this.searchName); //城市新闻
       } else if (this.editForm.type === "official_column") {
-        this.getOfficial_columnPageFn(this.form.cityId); //官方发布
+        this.getOfficial_columnPageFn(this.form.cityId,this.searchName); //官方发布
       }
     },
     // 获取广告位分页
     getAdPosition() {
       adPosition().then((res) => {
-        console.log('adslotName',res)
         // this.adslotGroup = res.data.data.data.records.filter((item) => {
         //   return item.authority == true;
         // });
@@ -859,42 +911,46 @@ export default {
         this.adType = res.data.data.data.dictItemList;
       });
     },
-    // 获取活动数据
-    getActivitiePageFn(cityId) {
+    // 活动
+    getActivitiePageFn(cityId,name) {
       activitiePage({cityId: cityId,current: this.current1,
-         size: this.size1}).then((res) => {
+         size: this.size1,name: name}).then((res) => {
         this.jumpObjArr = res.data.data.data.records;
         this.total1 = res.data.data.data.total
         this.jumpLoading = false
       });
     },
-    getTravelPageFn(cityId) {
+    // 城市打卡
+    getTravelPageFn(cityId,name) {
       travelPage({ cityId: cityId,current: this.current1,
-         size: this.size1,queryType: 0 }).then((res) => {
+         size: this.size1,travelName: name }).then((res) => {
         this.jumpObjArr = res.data.data.data.records;
         this.total1 = res.data.data.data.total
         this.jumpLoading = false
       });
     },
-    getHeated_debatePageFn(cityId) {
+    // 城市热议
+    getHeated_debatePageFn(cityId,name) {
       heated_debatePage({ cityId: cityId,current: this.current1,
-         size: this.size1 }).then((res) => {
+         size: this.size1,title: name }).then((res) => {
         this.jumpObjArr = res.data.data.data.records;
         this.total1 = res.data.data.data.total
         this.jumpLoading = false
       });
     },
-    getNewsPageFn(cityId) {
+    // 城市新闻
+    getNewsPageFn(cityId,name) {
       newsPage({ cityId: cityId,current: this.current1,
-         size: this.size1 }).then((res) => {
+         size: this.size1,searchName : name }).then((res) => {
         this.jumpObjArr = res.data.data.data.records;
         this.total1 = res.data.data.data.total
         this.jumpLoading = false
       });
     },
-    getOfficial_columnPageFn(cityId) {
+    // 官方发布
+    getOfficial_columnPageFn(cityId,name) {
       official_columnPage({ cityId: cityId,current: this.current1,
-         size: this.size1 }).then((res) => {
+         size: this.size1,searchName : name }).then((res) => {
         this.jumpObjArr = res.data.data.data.records;
         this.total1 = res.data.data.data.total
         this.jumpLoading = false
@@ -932,7 +988,6 @@ export default {
     },
     // 监听广告类型变化
     typeChange(val) {
-      // console.log('跳转类型变更...',this.form.cityId)
       this.form.relationId = ''
       this.editForm.relationId = ''
       this.jumpName = ''
