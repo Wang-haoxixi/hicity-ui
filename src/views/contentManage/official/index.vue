@@ -47,6 +47,20 @@
             ></el-input>
           </el-form-item>
 
+          <el-form-item label="文章来源：" prop="dataType">
+            <el-radio v-model="addform.dataType" label="1">转载</el-radio>
+            <el-radio v-model="addform.dataType" label="2">原创</el-radio>
+          </el-form-item>
+          <el-form-item label="平台来源：" prop="newsSource" v-if="addform.dataType == '1'">
+            <el-input v-model.trim="addform.newsSource" maxlength="200"></el-input>
+          </el-form-item>
+          <el-form-item label="作者：" prop="author" v-if="addform.dataType=='1'">
+            <el-input v-model.trim="addform.author" maxlength="50" ></el-input>
+          </el-form-item>
+          <el-form-item label="作者：" v-if="addform.dataType=='2'">
+            <el-input :value="userInfo.realName" maxlength="50" disabled></el-input>
+          </el-form-item>
+          
           <el-row>
             <el-col :span="12">
               <!-- 栏目 -->
@@ -198,6 +212,7 @@ export default {
       },
       // 官方发布 - 新增
       addform: {
+        dataType: "",//文章来源默认为转载
         cityIdList: [],
         closeAllowed: "0", //启停
       },
@@ -219,6 +234,15 @@ export default {
       rules: {
         officialNewsName: [
           { required: true, message: "请输入名称", trigger: "blur" },
+        ],
+        dataType: [
+          { required: true, message: "请选择文章来源", trigger: "change" },
+        ],
+        newsSource: [
+          { required: true, message: "请输入平台来源", trigger: "blur" },
+        ],
+        author: [
+          { required: true, message: "请输入作者", trigger: "blur" },
         ],
         officialColumnId: [
           { required: true, message: "请选择栏目", trigger: "change" },
@@ -405,6 +429,7 @@ export default {
       this.addform = {
         cityIdList: [this.userInfo.manageCityId],
         closeAllowed: "0", //启停
+        dataType: '1'
       };
       this.isShow = false;
       this.publishType = "add";
@@ -451,6 +476,10 @@ export default {
     },
     // 保存草稿
     handleDraft() {
+      if(this.addform.dataType=='2'){
+        this.addform.author = this.userInfo.realName
+      }
+
       this.formLoading = true
       this.urlList.forEach((item) => {
         item.imageSizeType = this.addform.imageSizeType;
@@ -530,6 +559,10 @@ export default {
         });
       }
       addform.urlList = titleImage;
+
+      if(this.addform.dataType=='2'){
+        this.addform.author = this.userInfo.realName
+      }
       
       // 新增
       if (this.publishType == "add") {
@@ -632,13 +665,13 @@ export default {
         }
       }
     },
+
   },
   created() {
     // this.getOfficialReleaseList();
     this.getCityColumn();
     this.init();
-    // console.log("isAdmin", this.isAdmin);
-    // console.log("source", this.addform.source);
+    console.log('userInfo...',this.userInfo.realName)
   },
 };
 </script>

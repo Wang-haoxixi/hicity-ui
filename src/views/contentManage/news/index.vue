@@ -48,6 +48,21 @@
           <el-form-item label="名称：" prop="title">
             <el-input v-model.trim="formData.title" maxlength="200"></el-input>
           </el-form-item>
+
+          <el-form-item label="文章来源：" prop="dataType">
+            <el-radio v-model="formData.dataType" label="1">转载</el-radio>
+            <el-radio v-model="formData.dataType" label="2">原创</el-radio>
+          </el-form-item>
+          <el-form-item label="平台来源：" prop="newsSource" v-if="formData.dataType == '1'">
+            <el-input v-model.trim="formData.newsSource" maxlength="200"></el-input>
+          </el-form-item>
+          <el-form-item label="作者：" prop="author" v-if="formData.dataType=='1'">
+            <el-input v-model.trim="formData.author" maxlength="50" ></el-input>
+          </el-form-item>
+          <el-form-item label="作者：" v-if="formData.dataType=='2'">
+            <el-input :value="userInfo.realName" maxlength="50" disabled></el-input>
+          </el-form-item>
+
           <el-form-item label="标签：" prop="lableIdList">
             <el-select
               style="width: 100%"
@@ -176,6 +191,15 @@ export default {
       titleImage: [],
       formRule: {
         title: [{required: true, message: '请输入名称', trigger: 'blur'}],
+        dataType: [
+          { required: true, message: "请选择文章来源", trigger: "change" },
+        ],
+        newsSource: [
+          { required: true, message: "请输入平台来源", trigger: "blur" },
+        ],
+        author: [
+          { required: true, message: "请输入作者", trigger: "blur" },
+        ],
         lableIdList: [{required: true, message: '请选择标签', trigger: 'blur'}],
         titleImage: [{validator: this.imageValidator, required: true, trigger: 'blur'}],
         imageSizeType: [{required: true, message: '请选择图片展示比例'}],
@@ -284,7 +308,8 @@ export default {
         this.formData = {
           cityIdList: [this.userInfo.manageCityId],
           closeAllowed: "0",
-          lableIdList: []
+          lableIdList: [],
+          dataType: '1'
         }
         if (!this.quillContent || (this.quillContent.content || this.quillContent.structuredContent)) {
           this.quillContent = {
@@ -298,6 +323,7 @@ export default {
       })
     },
     handleCreate() {
+      // console.log('formData...',this.formData)
       this.formLoading = true
       this.$refs.form.validate(valid => {
         if (valid) {
@@ -308,6 +334,9 @@ export default {
       })
     },
     save (state) {
+      if(this.formData.dataType=='2'){
+        this.formData.author = this.userInfo.realName
+      }
       let formData = this.formData;
       formData.content = this.quillContent.content;
       formData.structuredContent = this.quillContent.structuredContent;
@@ -321,6 +350,7 @@ export default {
       formData.urlList = titleImage;
       if (this.publishType == "add") {
         addNews({ ...formData, state }).then(({ data }) => {
+          console.log('res...',data)
           this.publish = false;
           this.$notify({
             title: "成功",
@@ -367,6 +397,9 @@ export default {
       });
     },
     handleDraft() {
+      if(this.formData.dataType=='2'){
+        this.formData.author = this.userInfo.realName
+      }
       this.formLoading = true
       this.$refs.form.validate(valid => {
         if (valid) {

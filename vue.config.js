@@ -2,7 +2,7 @@
 const url = "http://183.131.134.242:10167"; // 测试站
 // const url = "http://192.168.0.109:9999"; // 郑旭
 // const url = 'http://192.168.0.116:9999'// 张云生
-//  const url = "http://192.168.0.182:9999"; // 司泉鑫
+//  const url = "http://192.168.0.181:9999"; // 司泉鑫
 module.exports = {
   lintOnSave: true,
   productionSourceMap: false,
