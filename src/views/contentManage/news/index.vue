@@ -189,8 +189,10 @@ export default {
   data() {
     return {
       formData: {
+        dataType: "",//文章来源默认为转载
         cityIdList: [],
-        lableIdList: []
+        lableIdList: [],
+        author: '',
       },
       tagList: [],
       allCity: [],
@@ -327,7 +329,8 @@ export default {
           cityIdList: [this.userInfo.manageCityId],
           closeAllowed: "0",
           lableIdList: [],
-          dataType: '1'
+          dataType: '1',
+          author: '',
         }
         if (!this.quillContent || (this.quillContent.content || this.quillContent.structuredContent)) {
           this.quillContent = {
@@ -352,9 +355,6 @@ export default {
       })
     },
     save (state) {
-      if(this.formData.dataType=='2'){
-        this.formData.author = this.userInfo.realName
-      }
       let formData = this.formData;
       formData.content = this.quillContent.content;
       formData.structuredContent = this.quillContent.structuredContent;
@@ -415,9 +415,6 @@ export default {
       });
     },
     handleDraft() {
-      if(this.formData.dataType=='2'){
-        this.formData.author = this.userInfo.realName
-      }
       this.formLoading = true
       this.$refs.form.validate(valid => {
         if (valid) {
@@ -468,6 +465,7 @@ export default {
       console.log(this.$refs.hcCrud.multipleSelection)
     },
     dataTypeChange (type) {
+      this.formData.newsSource = ''
       if (type == '1') {
         this.formData.author = ''
       } else if (type == '2') {

@@ -230,7 +230,8 @@ export default {
       addform: {
         dataType: "",//文章来源默认为转载
         cityIdList: [],
-        closeAllowed: "0", //启停
+        closeAllowed: "0", //启停,
+        author: '',
       },
       // 预览的图片数组
       fileList: [],
@@ -445,7 +446,8 @@ export default {
       this.addform = {
         cityIdList: [this.userInfo.manageCityId],
         closeAllowed: "0", //启停
-        dataType: '1'
+        dataType: '1',
+        author: '',
       };
       this.isShow = false;
       this.publishType = "add";
@@ -492,10 +494,6 @@ export default {
     },
     // 保存草稿
     handleDraft() {
-      if(this.addform.dataType=='2'){
-        this.addform.author = this.userInfo.realName
-      }
-
       this.formLoading = true
       this.urlList.forEach((item) => {
         item.imageSizeType = this.addform.imageSizeType;
@@ -575,11 +573,6 @@ export default {
         });
       }
       addform.urlList = titleImage;
-
-      if(this.addform.dataType=='2'){
-        this.addform.author = this.userInfo.realName
-      }
-      
       // 新增
       if (this.publishType == "add") {
         this.$refs.addformRef.validate((valid) => {
@@ -664,6 +657,7 @@ export default {
       console.log(this.$refs.hcCrud.multipleSelection)
     },
     dataTypeChange (type) {
+      this.addform.newsSource = ''
       if (type == '1') {
         this.addform.author = ''
       } else if (type == '2') {
