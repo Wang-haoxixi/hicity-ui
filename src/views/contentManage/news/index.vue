@@ -5,6 +5,21 @@
       :formVisible="publish"
       @go-back="goBack">
       <hc-crud ref="hcCrud" :option="tableOption" :fetchListFun="fetchListFun" @toUpdate="toUpdate" @toDelete="toDelete">
+        <!-- <template v-slot:searchItems="scope">
+          <div class="search-item">
+            <div style="white-space: nowrap;">状态：</div>
+            <el-select v-model="scope.searchForm.state">
+              <el-option label="所有" :value="undefined">所有</el-option>
+              <el-option label="草稿" value='0'>正常</el-option>
+              <el-option label="已生效" value='1'>已生效</el-option>
+              <el-option label="已失效" value='2'>已失效</el-option>
+            </el-select>
+          </div>
+          <div class="search-item">
+            <div style="white-space: nowrap;">城市/地区：</div>
+            <hc-city-select v-model="scope.searchForm.cityId" :city-id="userInfo.manageCityId" single></hc-city-select>
+          </div>
+        </template> -->
         <template v-slot:title="scope">
           <hc-text-line :text="scope.row.title" :lines="3" :line-height="20"></hc-text-line>
         </template>
@@ -15,6 +30,10 @@
             icon="el-icon-plus"
             @click="toCreate"
             >新建</el-button>
+          <!-- <el-button
+            @click="toPublish"
+            size="mini"
+            >快捷发布</el-button> -->
         </template>
         <template slot="tagList" slot-scope="scope">
           <el-button type="text" size="mini" @click="tagView(scope.row)"
@@ -50,17 +69,16 @@
           </el-form-item>
 
           <el-form-item label="文章来源：" prop="dataType">
-            <el-radio v-model="formData.dataType" label="1">转载</el-radio>
-            <el-radio v-model="formData.dataType" label="2">原创</el-radio>
+            <el-radio-group v-model="formData.dataType" @change="dataTypeChange">
+              <el-radio label="1">转载</el-radio>
+              <el-radio label="2">原创</el-radio>
+            </el-radio-group>
           </el-form-item>
           <el-form-item label="平台来源：" prop="newsSource" v-if="formData.dataType == '1'">
             <el-input v-model.trim="formData.newsSource" maxlength="200"></el-input>
           </el-form-item>
-          <el-form-item label="作者：" prop="author" v-if="formData.dataType=='1'">
-            <el-input v-model.trim="formData.author" maxlength="50" ></el-input>
-          </el-form-item>
-          <el-form-item label="作者：" v-if="formData.dataType=='2'">
-            <el-input :value="userInfo.realName" maxlength="50" disabled></el-input>
+          <el-form-item label="作者：" prop="author">
+            <el-input v-model.trim="formData.author" maxlength="50" :disabled="formData.dataType=='2'"></el-input>
           </el-form-item>
 
           <el-form-item label="标签：" prop="lableIdList">
@@ -197,9 +215,9 @@ export default {
         newsSource: [
           { required: true, message: "请输入平台来源", trigger: "blur" },
         ],
-        author: [
-          { required: true, message: "请输入作者", trigger: "blur" },
-        ],
+        // author: [
+        //   { required: true, message: "请输入作者", trigger: "blur" },
+        // ],
         lableIdList: [{required: true, message: '请选择标签', trigger: 'blur'}],
         titleImage: [{validator: this.imageValidator, required: true, trigger: 'blur'}],
         imageSizeType: [{required: true, message: '请选择图片展示比例'}],
@@ -445,6 +463,16 @@ export default {
     tagView(row) {
       this.newsTagList = row.lableList;
       this.tagViewDialogVisible = true;
+    },
+    toPublish () {
+      console.log(this.$refs.hcCrud.multipleSelection)
+    },
+    dataTypeChange (type) {
+      if (type == '1') {
+        this.formData.author = ''
+      } else if (type == '2') {
+        this.formData.author = this.userInfo.realName
+      }
     },
   },
 };
