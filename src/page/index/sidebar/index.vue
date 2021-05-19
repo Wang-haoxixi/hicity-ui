@@ -17,6 +17,8 @@
           :props="website.menu.props"
           :collapse="keyCollapse"
           first/>
+          <el-menu-item index="100"  @click="link"><i class="icon-yonghuguanli"/><span slot="title">我的组织</span>
+</el-menu-item>
       </el-menu>
     </el-scrollbar>
   </div>
@@ -45,7 +47,11 @@ export default {
     }
   },
   mounted() {},
-  methods: {}
+  methods: {
+    link(){
+      window.open("http://183.131.134.242:10021/")
+    },
+  }
 }
 </script>
 <style lang="scss" scoped>
