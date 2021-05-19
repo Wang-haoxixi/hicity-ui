@@ -38,6 +38,8 @@
               <el-input
                 v-model.trim="baseFormData.name"
                 placeholder="不小于5个字，不超过40个字"
+                maxlength='40'
+                show-word-limit
               ></el-input>
             </el-col>
           </el-row>
@@ -159,6 +161,8 @@
                   style="width: 600px; margin: 0 10px"
                   v-model.trim="baseFormData.field"
                   placeholder="请输入活动地址"
+                  maxlength='75'
+                  show-word-limit
                 ></el-input>
               </el-form-item>
             </div>
@@ -299,6 +303,8 @@
                         style="width: 300px"
                         v-model="item.ticketingName"
                         placeholder="如早餐票、普通票、VIP票"
+                        maxlength='20'
+                        show-word-limit
                       ></el-input>
                     </el-form-item>
                   <!-- </el-col>
