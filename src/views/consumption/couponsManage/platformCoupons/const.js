@@ -12,6 +12,27 @@ export const tableOption = () => {
       maxlength: 50,
     },
     {
+      label: '优惠券类型',
+      prop: 'type',
+      width: 100,
+      type: 'select',
+      search: true,
+      dicData: [
+        {
+          label: '全部',
+          value: undefined
+        },
+        {
+          label: '商户券',
+          value: '0'
+        },
+        {
+          label: '平台券',
+          value: '1'
+        }
+      ]
+    },
+    {
       label: '发布城市',
       prop: 'cityName',
     },

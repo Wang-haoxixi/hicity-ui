@@ -164,3 +164,10 @@ export function getAllCityTree () {
     url: '/admin/city/tree_no_province',
   })
 }
+
+export function getCityAdmin (params) {
+  return request({
+    url: '/admin/city/city_admin',
+    params
+  })
+}

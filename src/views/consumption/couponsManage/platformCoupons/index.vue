@@ -8,9 +8,7 @@
         <el-tab-pane label="全部" name="all"></el-tab-pane>
         <el-tab-pane label="上架中" name="1"></el-tab-pane>
         <el-tab-pane label="待上架" name="0"></el-tab-pane>
-        <el-tab-pane label="已售罄" name="2"></el-tab-pane>
         <el-tab-pane label="已下架" name="3"></el-tab-pane>
-        <el-tab-pane label="仓库中" name="4"></el-tab-pane>
       </el-tabs>
       <hc-crud ref="hcCrud" :fetchListFun="fetchListFun" :option="tableOption">
         <template slot="menuLeft">
@@ -27,27 +25,14 @@
         </template>
         <template slot="menu" slot-scope="scope">
           <el-button type="text" size="mini" @click="toView(scope.row)">查看</el-button>
-          <template v-if="scope.row.status == 0 && scope.row.releaseCity == userInfo.manageCityId">
+          <template v-if="scope.row.type == 1">
             <el-button type="text" size="mini" @click="toUpdate(scope.row)">编辑</el-button>
-            <el-button type="text" size="mini" @click="toDelete(scope.row)">删除</el-button>
-          </template>
-          <template v-if="scope.row.status == 1">
-            <el-button type="text" size="mini" @click="toShelfOff(scope.row)">下架</el-button>
-          </template>
-          <template v-if="scope.row.status == 2 && scope.row.releaseCity == userInfo.manageCityId">
-            <el-button type="text" size="mini" @click="toUpdate(scope.row)">编辑</el-button>
-          </template>
-          <template v-if="scope.row.status == 3 && scope.row.releaseCity == userInfo.manageCityId">
-            <el-button type="text" size="mini" @click="toUpdate(scope.row)">编辑</el-button>
-          </template>
-          <template v-if="scope.row.status == 4 && scope.row.releaseCity == userInfo.manageCityId">
-            <el-button type="text" size="mini" @click="toUpdate(scope.row)">编辑</el-button>
-            <el-button type="text" size="mini" @click="toDelete(scope.row)">删除</el-button>
+            <el-button v-if="scope.row.status == 1" type="text" size="mini" @click="toShelfOff(scope.row)">下架</el-button>
           </template>
         </template>
       </hc-crud>
       <template slot="form">
-        <coupons-form v-if="formType == 'add' || formType == 'edit'" ref="form" is-platform @save="handleSave"></coupons-form>
+        <coupons-form v-if="formType == 'add' || formType == 'edit'" ref="form" is-platform @save="handleSave" :is-edit="formType == 'edit'"></coupons-form>
         <coupons-detail v-if="formType == 'view'" :detail="couponsDetail"></coupons-detail>
       </template>
     </hc-table-form>
@@ -127,7 +112,7 @@ export default {
       return new Promise((resolve, reject) => {
         this.getCouponsPage({
           ...params,
-          type: '1',
+          // type: '1',
         }).then(({ data }) => {
           resolve({
             records: data.data.data.records,
@@ -174,33 +159,33 @@ export default {
     toUpdate({ id }) {
       getCouponsDetail(id).then(({ data }) => {
         let formData = data.data.data
-        let initForm = {
-          id: formData.id,
-          availableEndTime: formData.availableEndTime,
-          availableStartTime: formData.availableStartTime,
-          conditionPrice: formData.conditionPrice,
-          deductionPrice: formData.deductionPrice,
-          downTime: formData.downTime,
-          instructions: formData.instructions,
-          isPermanent: formData.isPermanent,
-          isDepository: formData.isDepository,
-          limitNum: formData.limitNum,
-          isCopyLogo: false,
-          logo: formData.logo,
-          name: formData.name,
-          supply: formData.supply,
-          surplus: formData.surplus,
-          upTime: formData.upTime,
-          updateTime: formData.updateTime,
-          scopeOfUseCity: formData.scopeOfUseCity || '',
-          status: formData.status,
-          category: formData.category,
-          receivedNum: formData.receivedNum,
-        }
+        // let initForm = {
+        //   id: formData.id,
+        //   availableEndTime: formData.availableEndTime,
+        //   availableStartTime: formData.availableStartTime,
+        //   conditionPrice: formData.conditionPrice,
+        //   deductionPrice: formData.deductionPrice,
+        //   downTime: formData.downTime,
+        //   instructions: formData.instructions,
+        //   isPermanent: formData.isPermanent,
+        //   isDepository: formData.isDepository,
+        //   limitNum: formData.limitNum,
+        //   isCopyLogo: false,
+        //   logo: formData.logo,
+        //   name: formData.name,
+        //   supply: formData.supply,
+        //   surplus: formData.surplus,
+        //   upTime: formData.upTime,
+        //   updateTime: formData.updateTime,
+        //   scopeOfUseCity: formData.scopeOfUseCity || '',
+        //   status: formData.status,
+        //   category: formData.category,
+        //   receivedNum: formData.receivedNum,
+        // }
         this.formShow = true;
         this.formType = "edit";
         this.$nextTick(() => {
-          this.$refs.form.open(initForm)
+          this.$refs.form.open(formData)
         })
       });
     },
