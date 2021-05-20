@@ -353,9 +353,6 @@ export default {
       })
     },
     toDeleteBrand (row) {
-      console.log(row)
-      console.log(this.formData.relations)
-      // return
       this.$confirm("是否确认删除该品牌?", "警告", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
