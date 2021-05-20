@@ -90,6 +90,7 @@
         :table-loading="tableLoading"
         @handle-event="handleEvent"
         @handle-auto-event="handleAutoEvent"
+        @selection-change="selectionChange"
       >
         <template
           v-for="(item, index) in slotList"
@@ -201,6 +202,7 @@ export default {
         currentPage: 1,
         pageSize: 10,
       },
+      multipleSelection: []
     };
   },
   computed: {
@@ -357,6 +359,9 @@ export default {
         this.deleteFun && this.deleteFun(row, this.refresh);
       }
     },
+    selectionChange (selection) {
+      this.multipleSelection = selection
+    },
     toCreate() {
       this.$refs.form.open();
     },
@@ -393,11 +398,13 @@ export default {
       });
     },
     toSearch() {
+      this.tableData = []
       this.searchForm = {
         ...this.searchForm,
         ...this.searchFormShow
       }
       this.page.currentPage = 1
+      this.page.total = 0
       this.getList();
     },
     resetSearch() {
