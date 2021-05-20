@@ -65,11 +65,15 @@ const user = {
       return new Promise((resolve, reject) => {
         loginByUsername(user.username, user.password, user.code, user.randomStr).then(response => {
           const data = response.data
-          commit('SET_ACCESS_TOKEN', data.access_token)
-          commit('SET_REFRESH_TOKEN', data.refresh_token)
-          commit('SET_EXPIRES_IN', data.expires_in)
-          commit('CLEAR_LOCK')
-          resolve()
+          if (data.access_token && data.refresh_token && data.expires_in) {
+            commit('SET_ACCESS_TOKEN', data.access_token)
+            commit('SET_REFRESH_TOKEN', data.refresh_token)
+            commit('SET_EXPIRES_IN', data.expires_in)
+            commit('CLEAR_LOCK')
+            resolve()
+          } else {
+            reject(new Error(data.msg))
+          }
         }).catch(error => {
           reject(error)
         })
