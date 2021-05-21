@@ -413,6 +413,14 @@ export default {
         searchFormShow[key] = undefined
       }
     },
+    resetSearchItems (items) {
+      let searchFormShow = this.searchFormShow
+      for (var key in searchFormShow) {
+        if (items.includes(key)) {
+          searchFormShow[key] = undefined
+        }
+      }
+    }
   },
 };
 </script>

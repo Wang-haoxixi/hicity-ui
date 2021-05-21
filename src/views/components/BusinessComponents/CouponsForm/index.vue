@@ -50,8 +50,8 @@
       <el-radio-group v-model="formData.deductionType" :disabled="isEdit">
         <el-radio label="3">满减现金券</el-radio>
         <el-radio label="2">立减现金券</el-radio>
-        <el-radio label="4">满减折扣券</el-radio>
-        <el-radio label="5">立减折扣券</el-radio>
+        <!-- <el-radio label="4">满减折扣券</el-radio>
+        <el-radio label="5">立减折扣券</el-radio> -->
       </el-radio-group>
     </el-form-item>
     <el-form-item v-if="formData.deductionType == 3 || formData.deductionType == 4" label="满减条件金额：" prop="conditionPrice">

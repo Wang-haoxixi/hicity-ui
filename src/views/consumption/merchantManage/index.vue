@@ -43,9 +43,9 @@
                 >注销</el-button>
               <el-button type="text" size="mini" @click="toShopManage(scope.row)"
               >店铺管理</el-button>
-              <el-button type="text" size="mini" @click="toDelete(scope.row)"
+              <el-button type="text" size="mini" @click="toViewOrder(scope.row)"
                 >收款明细</el-button>
-              <el-button type="text" size="mini" @click="toDelete(scope.row)"
+              <el-button type="text" size="mini" @click="toViewAccount(scope.row)"
                 >账户明细</el-button>
             </template>
           </template>
@@ -59,6 +59,42 @@
             <el-button type="text" size="mini" @click="toUnbundling(scope.row)" >解绑</el-button>
           </template>
         </hc-crud>
+
+        <hc-crud v-else-if="publishType == 'order'" ref="orderCrud" :option="orderTableOption" :fetchListFun="orderFetchListFun" :auto-load="false">
+          <template v-slot:searchItems="scope">
+            <div class="search-item">
+              <div style="white-space: nowrap;">订单号：</div>
+              <el-input v-model="scope.searchForm.orderNum" placeholder="请输入订单号" maxlength="50" clearable></el-input>
+            </div>
+            <div class="search-item">
+              <div style="white-space: nowrap;">收款店铺：</div>
+              <el-select v-model="scope.searchForm.storeId" clearable @change="storeChange">
+                <el-option label="全部" :value="undefined">全部</el-option>
+                <el-option v-for="(item, index) in storeList" :key="index" :label="item.storeName" :value="item.storeId">{{item.storeName}}</el-option>
+              </el-select>
+            </div>
+            <div class="search-item">
+              <div style="white-space: nowrap;">收银员：</div>
+              <el-select v-model="scope.searchForm.storeManagerId" clearable>
+                <el-option label="全部" v-if="cashierList && cashierList.length > 0" :value="undefined">全部</el-option>
+                <el-option v-for="(item, index) in cashierList" :key="index" :label="item.name" :value="item.storeManagerId">{{item.name}}</el-option>
+              </el-select>
+            </div>
+            <div class="search-item">
+            <div style="white-space: nowrap;">收款状态：</div>
+              <el-select v-model="scope.searchForm.orderStatus" clearable>
+                <el-option label="全部" :value="undefined">全部</el-option>
+                <el-option v-for="(item, index) in dicList['STORE_ORDER_STATUS']" :key="index" :value="item.value" :label="item.label">{{item.label}}</el-option>
+              </el-select>
+            </div>
+          </template>
+          <template slot="menu" slot-scope="scope">
+            <el-button type="text" size="mini" @click="toViewOrderDetail(scope.row)" >查看</el-button>
+          </template>
+        </hc-crud>
+
+        <hc-crud v-else-if="publishType == 'account'" ref="accountCrud" :option="accountTableOption" :fetchListFun="accountFetchListFun" :auto-load="false">
+        </hc-crud>        
 
         <el-form
           v-else
@@ -82,7 +118,7 @@
           </el-form-item>
           <el-form-item label="民族：" prop="nation">
             <el-select style="width: 250px;" v-model="formData.nation" placeholder="请选择民族">
-              <el-option v-for="item in dicList['PERSION_NATION']" :key="item.value" :value="item.value" :label="item.label">{{item.label}}</el-option>
+              <el-option v-for="item in dicList['PERSON_NATION']" :key="item.value" :value="item.value" :label="item.label">{{item.label}}</el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="出生日期：" prop="birth">
@@ -117,7 +153,6 @@
             <hc-image-upload single :limit="1" v-model="formData.idCardReverse" :disabled="publishType == 'view'"></hc-image-upload>
           </el-form-item>
           <el-form-item label="地区城市：" prop="cityId">
-            {{formData.cityId}}
             <hc-city-select v-model="formData.cityId" :city-id="userInfo.manageCityId" single @change="$refs.form.validateField('cityId')"></hc-city-select>
           </el-form-item>
           <el-form-item label="联系人姓名：" prop="contactsName">
@@ -150,13 +185,23 @@
           </div>
         </el-dialog>
 
+        <el-dialog
+          title="店铺详情"
+          :visible.sync="orderVisible"
+          width="70%">
+          <order-detail :detail="orderDetail"></order-detail>
+          <div slot="footer">
+            <el-button @click="orderVisible = false">返 回</el-button>
+          </div>
+        </el-dialog>
+
       </template>
     </hc-table-form>
   </basic-container>
 </template>
 
 <script>
-import { tableOption, shopTableOption } from "./const";
+import { tableOption, shopTableOption, orderTableOption, accountTableOption } from "./const";
 import { mapGetters } from "vuex";
 import {
   getManageList,
@@ -166,7 +211,11 @@ import {
   getManagerStorePage,
   getStoreDetail,
   unbundlingStore,
-  cancelManager
+  cancelManager,
+  getMerchantOrderPage,
+  getMerchantOrderDetail,
+  getMerchantStoreList,
+  getMerchantAccountPage
 } from "@/api/mms/store";
 import HcImageUpload from "@/views/components/HcImageUpload/index";
 import HcTableForm from "@/views/components/HcTableForm/index"
@@ -177,9 +226,10 @@ import HcCitySelect from "@/views/components/HcCity/HcCitySelect/index"
 import HcInput from "@/views/components/HcForm/HcInput/index"
 import MerchantQrCode from "@/views/components/BusinessComponents/MerchantQrCode/index"
 import StoreDetail from '@/views/consumption/shopManage/detail'
+import OrderDetail from './orderDetail'
 
 export default {
-  components: { HcImageUpload, HcTableForm, HcEmptyData, HcMapSelect, HcRemoteSelect, HcCitySelect, HcInput, MerchantQrCode, StoreDetail },
+  components: { HcImageUpload, HcTableForm, HcEmptyData, HcMapSelect, HcRemoteSelect, HcCitySelect, HcInput, MerchantQrCode, StoreDetail, OrderDetail },
   data() {
     return {
       formData: {
@@ -202,11 +252,17 @@ export default {
         percentageType: [{required: true, message: '请选择抽成类型', trigger: 'blur'}],
       },
       idCardTime: [],
-      shopTableOption,
       formLoading: false,
-      handleId: null,
       storeVisible: false,
-      storeDetail: {}
+      orderVisible: false,
+      storeDetail: {},
+      handleId: null,
+      orderDetail: {},
+      storeList: [],
+      cashierList: [],
+      shopTableOption,
+      orderTableOption,
+      accountTableOption,
     };
   },
   computed: {
@@ -224,6 +280,10 @@ export default {
           return '商户信息-编辑'
         } else if (this.publishType == 'shop') {
           return '店铺管理'
+        } else if (this.publishType == 'order') {
+          return '收款明细'
+        } else if (this.publishType == 'account') {
+          return '账户明细'
         } else {
           return '商户信息'
         }
@@ -264,6 +324,42 @@ export default {
         getManagerStorePage({
           ...params,
           storeManagerId: this.handleId
+        })
+        .then(({ data }) => {
+          resolve({
+            records: data.data.data.records,
+            page: {
+              total: data.data.data.total
+            }
+          })
+        }, error => {
+          reject(error)
+        })
+      })
+    },
+    orderFetchListFun (params) {
+      return new Promise((resolve, reject) => {
+        getMerchantOrderPage({
+          storeManagerId: this.handleId,
+          ...params,
+        })
+        .then(({ data }) => {
+          resolve({
+            records: data.data.data.records,
+            page: {
+              total: data.data.data.total
+            }
+          })
+        }, error => {
+          reject(error)
+        })
+      })
+    },
+    accountFetchListFun (params) {
+      return new Promise((resolve, reject) => {
+        getMerchantAccountPage({
+          userId: this.handleId,
+          ...params,
         })
         .then(({ data }) => {
           resolve({
@@ -423,7 +519,50 @@ export default {
       }).then(() => {
       }).catch(function() {
       })
-    }
+    },
+    toViewOrder ({storeManagerId}) {
+      this.handleId = storeManagerId
+      this.publish = true
+      this.publishType = "order"
+      this.$nextTick(() => {
+        this.$refs.orderCrud.resetSearch()
+        this.$refs.orderCrud.toSearch()
+      })
+      getMerchantStoreList({storeManagerId}).then(({ data }) => {
+        this.storeList = data.data.data
+        this.cashierList = []
+        this.$refs.orderCrud.resetSearchItems(['storeId', 'storeManagerId'])
+      })
+    },
+    toViewOrderDetail ({storeOrderId}) {
+      getMerchantOrderDetail({ storeOrderId }).then(({ data }) => {
+        this.orderDetail = data.data.data;
+        this.orderVisible = true
+      });
+    },
+    storeChange (storeId) {
+      if (storeId) {
+        for (let i = 0; i < this.storeList.length; i++) {
+          if (storeId == this.storeList[i].storeId) {
+            this.cashierList = this.storeList[i].vos
+            this.$refs.orderCrud.resetSearchItems(['storeManagerId'])
+            return
+          }
+        }
+      } else {
+        this.cashierList = []
+        this.$refs.orderCrud.resetSearchItems(['storeManagerId'])
+      }
+    },
+    toViewAccount ({storeManagerId}) {
+      this.handleId = storeManagerId
+      this.publish = true
+      this.publishType = "account"
+      this.$nextTick(() => {
+        this.$refs.accountCrud.resetSearch()
+        this.$refs.accountCrud.toSearch()
+      })
+    },
   },
 };
 </script>

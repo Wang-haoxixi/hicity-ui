@@ -522,7 +522,7 @@ export default {
       }
     },
     toView ({ storeId }) {
-      getStoreDetail({ storeId }).then(({ data }) => {storeShare
+      getStoreDetail({ storeId }).then(({ data }) => { 
         this.storeDetail = data.data.data;
         this.publish = true;
         this.publishType = "view";

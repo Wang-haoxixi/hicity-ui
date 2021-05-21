@@ -99,3 +99,99 @@ export const shopTableOption = {
     },
   ]
 }
+
+
+export const orderTableOption = {
+  menuWidth: 80,
+  index: true,
+  menu: true,
+  search: true,
+  columns: [
+    {
+      label: '订单号',
+      prop: 'orderNum',
+    },
+    {
+      label: '订单创建时间',
+      prop: 'createTime',
+      width: 160,
+    },
+    {
+      label: '收款店铺',
+      prop: 'storeName'
+    },
+    {
+      label: '收银员',
+      prop: 'cashierName'
+    },
+    {
+      label: '收款金额',
+      prop: 'paymentAmount'
+    },
+    {
+      label: '收款状态',
+      prop: 'orderStatus',
+      type: 'select',
+      dicName: 'STORE_ORDER_STATUS',
+      width: 100,
+    },
+  ]
+}
+
+export const accountTableOption = {
+  menuWidth: 80,
+  index: true,
+  menu: ['view'],
+  search: true,
+  labelWidth: '150px',
+  columns: [
+    {
+      label: '交易账户',
+      prop: 'payeePhone',
+    },
+    {
+      label: '交易日期',
+      prop: 'transactionDate',
+      type: 'date',
+      valueFormat: 'yyyy-MM-dd',
+      search: true,
+      hidden: true,
+      formHidden: true,
+    },
+    {
+      label: '交易日期',
+      prop: 'createTime',
+      width: 160,
+    },
+    {
+      label: '交易类型',
+      prop: 'transactionType',
+      type: 'select',
+      dicData: [
+        {
+          label: '收入',
+          value: 1
+        },
+        {
+          label: '提现',
+          value: 2
+        }
+      ],
+      search: true,
+    },
+    {
+      label: '交易金额',
+      prop: 'amount'
+    },
+    {
+      label: '账户余额',
+      prop: 'balance',
+      formHidden: true
+    },
+    {
+      label: '收款订单号',
+      prop: 'serialNo',
+      hidden: true
+    },
+  ]
+}

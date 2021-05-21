@@ -5,50 +5,34 @@
     :model="detail"
     label-width="150px">
     <h3 class="form-title">基本信息</h3>
+    <el-form-item label="券ID：">
+      {{detail.id}}
+    </el-form-item>
     <el-form-item label="券名称：">
       {{detail.name}}
+    </el-form-item>
+    <el-form-item label="券类型：" prop="category">
+      {{getTypey(detail)}}
     </el-form-item>
     <el-form-item label="券门类：" prop="category">
       {{getCategory(detail.category)}}
     </el-form-item>
-    <el-form-item v-if="detail.type == '0'" label="所属商户：">
-      <el-button type="text" @click="toViewMerchant(detail.merchantId)">{{detail.merchantName}}</el-button>
-    </el-form-item>
-    <el-form-item label="抵扣价：">
-      ￥{{detail.deductionPrice}}
-    </el-form-item>
-    <el-form-item label="满足条件：">
-      满{{detail.conditionPrice}}元可用
-    </el-form-item><el-form-item label="是否放入仓库：">
-      {{detail.isDepository == "1" ? "是" : '否'}}
-    </el-form-item>
-    <el-form-item v-if="detail.isDepository == '0'" label="可用时间：">
-      {{detail.availableStartTime}} 至 {{detail.isPermanent == '1' ? '永久有效' : detail.availableEndTime}}
-    </el-form-item>
-    <el-form-item label="logo：">
-      <el-image style="height: 150px;width: 150px;" :src="detail.logo"></el-image>
-    </el-form-item>
-    <el-form-item label="购买须知：">
+    <el-form-item label="使用说明：">
       {{detail.instructions}}
     </el-form-item>
-
-    <template v-if="detail.isDepository == '0'">
-      <h3 class="form-title">上下架时间</h3>
-      <el-form-item label="上架时间：">
-        {{detail.upTime}}
-      </el-form-item>
-      <el-form-item label="下架时间：">
-        {{detail.isPermanent == '1' ? '长期有效' : detail.downTime}}
-      </el-form-item>
-    </template>
-
-    <h3 class="form-title">领取限制</h3>
-    <el-form-item v-if="detail.type == '1'" label="发布城市：">
-      <hc-city-select :value="detail.scopeOfUseCity.split(',').map(item => parseInt(item))" viewOnly :city-id="$store.getters.userInfo.manageCityId"></hc-city-select>
+    <el-form-item label="优惠券种类：">
+      {{getClass(detail)}}
     </el-form-item>
-    <el-form-item label="用户可领个数：">
-      活动期间每个用户可参与 {{detail.limitNum}} 个
+    <el-form-item label="优惠内容：">
+      {{getDeduction(detail)}}
     </el-form-item>
+    <el-form-item label="上架时间：">
+      {{detail.upTime}}
+    </el-form-item>
+    <el-form-item label="下架时间：">
+      {{detail.isPermanent == '1' ? '长期有效' : detail.downTime}}
+    </el-form-item>
+
   </el-form>
 </template>
 
@@ -80,6 +64,50 @@ export default {
         return '电影演出'
       } else {
         return ''
+      }
+    },
+    getTypey (detail) {
+      if (detail.deductionType == '1') {
+        return '店铺折扣券'
+      } else if (detail.type == '0') {
+        return '商户券'
+      } else if (detail.type == '1') {
+        return '平台券'
+      } else {
+        return ''
+      }
+    },
+    getClass (detail) {
+      let name = ''
+      if (detail.receiveType == '1') {
+        name += '新人'
+      } else if (detail.receiveType == '2') {
+        name += '首单'
+      }
+      if (detail.deductionType == '1') {
+        name += '店铺折扣券'
+      } else if (detail.deductionType == '2') {
+        name += '立减现金券'
+      } else if (detail.deductionType == '3') {
+        name += '满减现金券'
+      } else if (detail.deductionType == '4') {
+        name += '满减折扣券'
+      } else if (detail.deductionType == '4') {
+        name += '立减折扣券'
+      }
+      return name
+    },
+    getDeduction (detail) {
+      if (detail.deductionType == '1') {
+        return `${detail.discountRatio}折`
+      } else if (detail.deductionType == '2') {
+        return `减`
+      } else if (detail.deductionType == '3') {
+        return `满${detail.conditionPrice}减${detail.deductionPrice}`
+      } else if (detail.deductionType == '4') {
+        return `满${detail.conditionPrice}打${detail.discountRatio}折`
+      } else if (detail.deductionType == '4') {
+        return `${detail.discountRatio}折`
       }
     }
   }
