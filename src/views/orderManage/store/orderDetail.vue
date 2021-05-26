@@ -3,7 +3,7 @@
     ref="form"
     class="dialog-main-tree"
     :model="detail"
-    label-width="180px">
+    label-width="200px">
     <h3 class="form-title">基础信息</h3>
     <el-form-item label="订单号：">
       {{detail.orderNum}}
@@ -93,20 +93,22 @@
       {{detail.paymentAmount}}
     </el-form-item>
     <el-form-item label="平台抽成总额：">
-      {{detail.name}}
+      {{detail.shareTotal}}
     </el-form-item>
     <el-form-item label="商户实收金额：">
-      {{detail.name}}
+      {{detail.receivedAmount}}
     </el-form-item>
 
-
-
-
+    <h3 class="form-title">平台分成信息</h3>
+    <el-form-item v-for="(item, index) in shareList" :key="index" :label="item.shareAccount + '分成金额：'">
+      {{item.shareAmount}}
+    </el-form-item>
 
   </el-form>
 </template>
 
 <script>
+import { getDicValue } from "@/util/dic"
 import HcCitySelect from "@/views/components/HcCity/HcCitySelect/index"
 
 export default {
@@ -119,22 +121,21 @@ export default {
       }
     }
   },
+  computed: {
+    shareList () {
+      if (this.detail && this.detail.shareJson) {
+        return JSON.parse(this.detail.shareJson) || []
+      } else {
+        return []
+      }
+    }
+  },
   methods: {
     toViewMerchant (merchantId) {
       this.$emit('merchant-view', merchantId)
     },
     getCategory (category) {
-      if (category === 0) {
-        return '餐饮外卖'
-      } else if (category === 1) {
-        return '商超购物'
-      } else if (category === 2) {
-        return '出行玩乐'
-      } else if (category === 3) {
-        return '电影演出'
-      } else {
-        return ''
-      }
+      return getDicValue('COUPONS_CATEGORY', category)
     },
     getTypey (detail) {
       if (detail.deductionType == '1') {
