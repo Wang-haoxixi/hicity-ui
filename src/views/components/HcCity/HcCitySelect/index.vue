@@ -1,7 +1,10 @@
 <template>
   <div>
-    <el-input :disabled="disabled" :value="cityName" readonly @focus="toSelect"></el-input>
-    <hc-city-box ref="hcCityBox" :title="title" :single="single" @save="save"></hc-city-box>
+    <template v-if="viewOnly && single">{{cityName}}</template>
+    <template v-else>
+      <el-input :disabled="disabled" :value="cityName" readonly @focus="toSelect"></el-input>
+      <hc-city-box ref="hcCityBox" :title="title" :single="single" @save="save"></hc-city-box>
+    </template>
   </div>
 </template>
 
@@ -168,6 +171,7 @@ export default {
       this.citySelected = !this.single ? getCityShow(city) : getLastCity(city)
       let cityList = getCityList(city)
       this.$emit('input', !this.single ? cityList : (cityList && (cityList.length > 0 ? cityList[0] : '')))
+      this.$emit('change', !this.single ? cityList : (cityList && (cityList.length > 0 ? cityList[0] : '')))
     },
   }
 }

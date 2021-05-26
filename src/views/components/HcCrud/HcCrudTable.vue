@@ -1,5 +1,10 @@
 <template>
-  <el-table :data="tableData" stripe border style="width: 100%" header-row-class-name="hc-crud-table-header" :header-cell-style="{backgroundColor: '#FAFAFA', color: '#333333'}" v-loading="tableLoading" :default-expand-all="option.defaultExpand">
+  <el-table :data="tableData" stripe border style="width: 100%" header-row-class-name="hc-crud-table-header" :header-cell-style="{backgroundColor: '#FAFAFA', color: '#333333'}" v-loading="tableLoading" :default-expand-all="option.defaultExpand" v-on="$listeners">
+    <el-table-column
+      v-if="option.selection"
+      type="selection"
+      width="55">
+    </el-table-column>
     <el-table-column v-if="option.expand" type="expand" width="50px">
       <template v-slot="scope">
         <slot name="expand" :row="scope.row"></slot>
@@ -14,8 +19,8 @@
       <template v-if="item.slot || item.type == 'select' || item.formatter" v-slot="scope">
         <slot v-if="item.slot" :name="item.prop" :row="scope.row">
         </slot>
-        <div v-else-if="item.type == 'select'">{{getDicValue(item, scope.row[item.prop])}}</div>
-        <div v-else>{{getFormatter(item.formatter, scope.row)}}</div>
+        <div v-else-if="item.formatter">{{getFormatter(item.formatter, scope.row)}}</div>
+        <div v-else>{{getDicValue(item, scope.row[item.prop])}}</div>
       </template>
     </el-table-column>
     <el-table-column v-if="option.menu" label="操作" :width="option.menuWidth || ''">

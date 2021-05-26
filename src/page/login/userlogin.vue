@@ -149,6 +149,9 @@ export default {
             this.$store.dispatch('InitDictMap').then(() => {
               this.$router.push({ path: this.tagWel.value })
             })
+          }, error => {
+            this.$message.error(error.message)
+            this.refreshCode()
           }).catch(() => {
             this.refreshCode()
           })

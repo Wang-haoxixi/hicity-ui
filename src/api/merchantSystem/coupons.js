@@ -51,10 +51,13 @@ export function couponsOn (id) {
   })
 }
 
-export function couponsDown (id) {
+export function couponsDown (couponsId) {
   return request({
-    url: `/mms/coupons/put/down?id=${id}`,
+    url: `/mms/coupons/put/down`,
     method: 'POST',
+    data: {
+      couponsId
+    }
   })
 }
 
@@ -125,6 +128,29 @@ export function getWriteoffDetail (params) {
 export function recommendBatch (data) {
   return request({
     url: '/mms/coupons/city/top/batch/deal',
+    method: 'post',
+    data
+  })
+}
+
+export function getRecommendPage (params) {
+  return request({
+    url: '/mms/coupons/platform/all/page',
+    params
+  })
+}
+
+export function setPriority (data) {
+  return request({
+    url: '/mms/coupons/recommend/sort',
+    method: 'post',
+    data
+  })
+}
+
+export function setRecommend (data) {
+  return request({
+    url: '/mms/coupons/choice/recommend',
     method: 'post',
     data
   })
