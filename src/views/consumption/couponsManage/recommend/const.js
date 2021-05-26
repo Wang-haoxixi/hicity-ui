@@ -2,7 +2,7 @@ export const tableOption = () => {
   let columns = [
     {
       label: 'ID',
-      prop: 'id',
+      prop: 'couponsId',
       width: 80,
     },
     {
@@ -45,15 +45,13 @@ export const tableOption = () => {
           value: '2'
         }
       ],
-      // formatter: function (row) {
-      //   if (row.status === 0) {
-      //     return '商户券'
-      //   } else if (row.status === 1) {
-      //     return '平台券'
-      //   } else if (row.status === 2) {
-      //     return '店铺券'
-      //   }
-      // }
+      formatter: function (row) {
+        if (row.type == '0') {
+          return row.deductionType == '1' ? '店铺券' : '商户券'
+        } else {
+          return '平台券'
+        }
+      }
     },
     {
       label: '优惠券种类',
@@ -93,6 +91,27 @@ export const tableOption = () => {
       label: '发券店铺',
       prop: 'storeName',
       width: 100,
+    },
+    {
+      label: '精选推荐位',
+      prop: 'isChoice',
+      width: 100,
+      search: true,
+      type: 'select',
+      dicData: [
+        {
+          label: '全部',
+          value: undefined,
+        },
+        {
+          label: '是',
+          value: '1'
+        },
+        {
+          label: '否',
+          value: '0'
+        }
+      ]
     }
   ]
 

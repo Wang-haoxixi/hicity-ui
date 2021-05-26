@@ -140,9 +140,17 @@ export function getRecommendPage (params) {
   })
 }
 
-export function setRecommend (data) {
+export function setPriority (data) {
   return request({
     url: '/mms/coupons/recommend/sort',
+    method: 'post',
+    data
+  })
+}
+
+export function setRecommend (data) {
+  return request({
+    url: '/mms/coupons/choice/recommend',
     method: 'post',
     data
   })
