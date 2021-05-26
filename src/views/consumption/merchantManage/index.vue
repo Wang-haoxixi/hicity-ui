@@ -176,7 +176,7 @@
         </el-form>
 
         <el-dialog
-          title="店铺详情"
+          title="订单详情"
           :visible.sync="storeVisible"
           width="70%">
           <store-detail :detail="storeDetail"></store-detail>
@@ -238,18 +238,13 @@ export default {
       publish: false,
       publishType: "",
       formRule: {
-        merchantName: [{required: true, message: '请输入商户名称', trigger: 'blur'}],
-        merchantSynopsis: [{required: true, validator: this.merchantSynopsisValidator, message: '请输入商户介绍', trigger: 'blur'}],
-        merchantLogo: [{required: true, message: '请添加商户Logo', trigger: 'blur'}],
-        merchantUserName: [{required: true, message: '请输入联系人', trigger: 'blur'}],
-        merchantUserPhone: [{required: true, message: '请输入联系电话', trigger: 'blur'}],
-        cityId: [{required: true, message: '请选择所在城市', trigger: 'blur'}],
-        address: [{required: true, message: '请输入详细地址', trigger: 'blur'}],
-        brandId: [{required: true, message: '请选择关联品牌', trigger: 'blur'}],
+        phone: [{required: true, message: '请输入商户账户', trigger: 'blur'}],
+        name: [{required: true, message: '请输入商户名称', trigger: 'blur'}],
+        cityId: [{required: true, message: '请选择所在城市', trigger: 'change'}],
+        contactsName: [{required: true, message: '请输入联系人姓名', trigger: 'blur'}],
+        contactsPhone: [{required: true, message: '请输入联系人电话', trigger: 'blur'}],
+        contactsAddress: [{required: true, message: '请输入联系人地址', trigger: 'blur'}],
         merchantStatus: [{required: true, message: '请选择店铺状态', trigger: 'blur'}],
-        discount: [{required: true, message: '请输入会员折扣', trigger: 'blur'}],
-        locationAddr: [{validator: this.locationAddrValidator, required: true, message: '请选择定位地址', trigger: 'change'}],
-        percentageType: [{required: true, message: '请选择抽成类型', trigger: 'blur'}],
       },
       idCardTime: [],
       formLoading: false,
