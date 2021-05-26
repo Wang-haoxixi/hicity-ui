@@ -19,8 +19,8 @@
       <template v-if="item.slot || item.type == 'select' || item.formatter" v-slot="scope">
         <slot v-if="item.slot" :name="item.prop" :row="scope.row">
         </slot>
-        <div v-else-if="item.type == 'select'">{{getDicValue(item, scope.row[item.prop])}}</div>
-        <div v-else>{{getFormatter(item.formatter, scope.row)}}</div>
+        <div v-else-if="item.formatter">{{getFormatter(item.formatter, scope.row)}}</div>
+        <div v-else>{{getDicValue(item, scope.row[item.prop])}}</div>
       </template>
     </el-table-column>
     <el-table-column v-if="option.menu" label="操作" :width="option.menuWidth || ''">
