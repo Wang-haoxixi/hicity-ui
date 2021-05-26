@@ -4,12 +4,6 @@
       :title="title"
       :formVisible="formShow"
       @go-back="formShow = false">
-      <el-tabs v-model="couponStatus">
-        <el-tab-pane label="全部" name="all"></el-tab-pane>
-        <el-tab-pane label="上架中" name="1"></el-tab-pane>
-        <el-tab-pane label="待上架" name="0"></el-tab-pane>
-        <el-tab-pane label="已下架" name="3"></el-tab-pane>
-      </el-tabs>
       <hc-crud ref="hcCrud" :fetchListFun="fetchListFun" :option="tableOption">
         <template slot="menuLeft">
           <el-button
@@ -54,7 +48,6 @@ export default {
   components: { HcImageUpload, HcTableForm, HcInput, CouponsDetail, CouponsForm, HcCityBox },
   data() {
     return {
-      couponStatus: 'all',
       formShow: false,
       formType: "",
       couponsDetail: {}
@@ -86,25 +79,6 @@ export default {
           return ''
         }
       }
-    }
-  },
-  watch: {
-    couponStatus (val) {
-      let status = val != 'all' ? val : undefined
-      let params = {
-        status
-      }
-      if (status == '0') {
-        params.isDepository = '0'
-      } else if (status == '4') {
-        params = {
-          status: undefined,
-          isDepository: '1'
-        }
-      } else {
-        params.isDepository = undefined
-      }
-      this.$refs.hcCrud.refresh({}, params)
     }
   },
   methods: {
@@ -148,16 +122,16 @@ export default {
         })
       }
     },
-    toView ({id}) {
-      getCouponsDetail(id).then(({ data }) => {
+    toView ({couponsId}) {
+      getCouponsDetail(couponsId).then(({ data }) => {
         let couponsDetail = data.data.data
         this.couponsDetail = couponsDetail
         this.formType = 'view'
         this.formShow = true
       });
     },
-    toUpdate({ id }) {
-      getCouponsDetail(id).then(({ data }) => {
+    toUpdate({ couponsId }) {
+      getCouponsDetail(couponsId).then(({ data }) => {
         let formData = data.data.data
         // let initForm = {
         //   id: formData.id,
@@ -189,13 +163,13 @@ export default {
         })
       });
     },
-    toDelete({ id }) {
+    toDelete({ couponsId }) {
       this.$confirm("是否确认删除该优惠券?", "警告", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
       }).then(() => {
-        deleteCouponsBatch([id]).then(({ data }) => {
+        deleteCouponsBatch([couponsId]).then(({ data }) => {
           this.formShow = false;
           this.$notify({
             title: "成功",
@@ -207,13 +181,13 @@ export default {
         });
       }).catch(function () {});
     },
-    toShelfOff ({ id }) {
+    toShelfOff ({ couponsId }) {
       this.$confirm("是否确认下架该优惠券?", "警告", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
       }).then(() => {
-        couponsDown(id).then(({ data }) => {
+        couponsDown(couponsId).then(({ data }) => {
           this.$notify({
             title: "成功",
             message: "下架成功",

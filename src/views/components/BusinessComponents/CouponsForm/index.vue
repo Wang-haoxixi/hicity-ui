@@ -9,10 +9,7 @@
     </el-form-item>
     <el-form-item label="券门类：" prop="category">
       <el-select v-model="formData.category" :disabled="isEdit">
-        <el-option label="餐饮外卖" :value="0">餐饮外卖</el-option>
-        <el-option label="商超购物" :value="1">商超购物</el-option>
-        <el-option label="出行玩乐" :value="2">出行玩乐</el-option>
-        <el-option label="电影演出" :value="3">电影演出</el-option>
+        <el-option v-for="item in dicList['COUPONS_CATEGORY']" :key="item.value" :label="item.label" :value="item.value">{{item.label}}</el-option>
       </el-select>
     </el-form-item>
     <el-form-item label="优惠券类型：">
