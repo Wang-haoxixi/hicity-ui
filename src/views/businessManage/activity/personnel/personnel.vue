@@ -3,259 +3,175 @@
     <basic-container>
       <div class="title">
         <div>人员管理</div>
-        <el-button @click="backClick">返回</el-button>
+        <el-button @click="$router.back(-1)">返回</el-button>
       </div>
-      <div>
-        <el-button
-          v-if="tableData.length > 0"
-          type="primary"
-          @click="exportData"
-          size="mini"
-          style="margin-right: 10px"
-          >导出</el-button
-        >
-        <el-input clearable placeholder="请输入关键字" size="small" v-model="searchContent" class="input-with-select">
-          <el-select v-model="selectType" slot="prepend" @change="handleChangeType" placeholder="请选择" style="width: 90px">
-            <el-option label="用户名" value="1"></el-option>
-            <el-option label="手机号" value="2"></el-option>
-          </el-select>
-          <el-button slot="append" icon="el-icon-search" @click="handleSearch"></el-button>
-        </el-input>
-        <el-table :data="tableData" style="width: 100%">
-          <el-table-column prop="name" label="名称" width="180">
-          </el-table-column>
-          <el-table-column label="报名信息" width="100">
-            <template slot-scope="scope">
-              <el-button
-                type="text"
-                size="mini"
-                @click="handleCheck(scope.row.enroleId)"
-                >查看</el-button
-              >
-            </template>
-          </el-table-column>
-          <el-table-column prop="createTime" label="报名时间" width="160">
-          </el-table-column>
-          <el-table-column label="票名">
-            <template slot-scope="scope">
-              <el-button
-                v-if="scope.row.info != 'null'"
-                type="text"
-                size="mini"
-                @click="handleCheckTicketInfo(scope.row.info)"
-                >{{ scope.row.ticketingName }}</el-button
-              >
-              <span v-else>{{ scope.row.ticketingName }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column prop="orderNum" label="购票数量"></el-table-column>
-          <el-table-column prop="orderStatusName" label="订单状态">
-          </el-table-column>
-          <el-table-column prop="applyStatusName" label="报名状态">
-          </el-table-column>
-          <el-table-column prop="cancelNum" label="核销状态"></el-table-column>
-          <el-table-column prop="auditStatus" label="审核状态">
-            <template slot-scope="scope">
-              {{ scope.row.auditStatus | auditStatusFilters }}
-            </template>
-          </el-table-column>
-          <el-table-column label="批注" width="80">
-            <template slot-scope="scope">
-              <el-button
-                type="text"
-                size="mini"
-                @click="handleAnnotation(scope.row)"
-                >{{ !scope.row.soRemarks ? "添加" : "查看" }}</el-button
-              >
-            </template>
-          </el-table-column>
-          <el-table-column label="操作" fixed="right" width="100">
-            <template slot-scope="scope">
-              <el-button
-                type="text"
-                size="mini"
-                @click="handleSignIn(scope.row)"
-                >核销签到</el-button
-              >
-            </template>
-          </el-table-column>
-        </el-table>
-
-        <el-dialog
-          title="添加批注"
-          :visible.sync="dialogAnnotationVisible"
-          append-to-body
-          width="50%"
-        >
-          <el-input
-            maxlength="300"
-            show-word-limit
-            type="textarea"
-            :rows="4"
-            placeholder="您可以输入对这个报名者的备注，方便您的管理与服务"
-            v-model="annotation"
-          >
-          </el-input>
-          <span slot="footer" class="dialog-footer">
-            <el-button @click="dialogAnnotationVisible = false"
-              >取 消</el-button
+      <div class="search-box">
+        <el-form :inline="true" :model="query" class="demo-form-inline">
+          <el-form-item>
+            <el-input
+              placeholder="请输入关键字"
+              v-model="searchName"
+              class="input-with-select"
             >
-            <el-button type="primary" @click="handleSaveAnnotation"
-              >保 存</el-button
-            >
-          </span>
-        </el-dialog>
-
-        <el-dialog
-          title="查看信息"
-          :visible.sync="dialogApplyInfoVisible"
-          append-to-body
-          width="50%"
-        >
-          <!-- :before-close="handleCloseDialogApplyInfo" -->
-          <div v-if="applyInfoForm.length>0">
-            <!-- :plain='item.actived' -->
+              <el-select
+                slot="prepend"
+                placeholder="请选择"
+                v-model="selectType"
+                @change="changeType"
+              >
+                <el-option label="全部" value="all"></el-option>
+                <el-option label="用户名" value="user"></el-option>
+                <el-option label="手机号" value="cell"></el-option>
+                <el-option label="单位" value="unit"></el-option>
+              </el-select>
+            </el-input>
+          </el-form-item>
+          <el-form-item label="订单状态:">
+            <el-select v-model="query.orderStatus">
+              <el-option label="全部" value=""></el-option>
+              <el-option label="待支付" value="0"></el-option>
+              <el-option label="支付成功" value="1"></el-option>
+              <el-option label="支付失败" value="2"></el-option>
+              <el-option label="取消支付" value="3"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="票种类型:">
+            <el-select v-model="query.ticketingType">
+              <el-option label="全部" value=""></el-option>
+              <el-option label="付费票" value="0"></el-option>
+              <el-option label="免费票" value="1"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="核销状态:">
+            <el-select v-model="query.cancelStatus">
+              <el-option label="全部" value=""></el-option>
+              <el-option label="未核销" value="0"></el-option>
+              <el-option label="已核销" value="1"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="人员类型:">
+            <el-select v-model="query.isVip">
+              <el-option label="全部" value=""></el-option>
+              <el-option label="vip" value="0"></el-option>
+              <el-option label="普通" value="1"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="审核状态:">
+            <el-select v-model="query.auditStatus">
+              <el-option label="全部" value=""></el-option>
+              <el-option label="无需审核" value="0"></el-option>
+              <el-option label="待审核" value="1"></el-option>
+              <el-option label="审核通过" value="2"></el-option>
+              <el-option label="审核未通过" value="3"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="handlecheck">查询</el-button>
+          </el-form-item>
+        </el-form>
+      </div>
+      <el-table
+        border
+        style="width: 100%"
+        v-loading="loading"
+        :data="tableData"
+        :span-method="mergeCell"
+        :header-cell-style="{ background: '#FAFAFA' }"
+      >
+        <el-table-column prop="userName" label="名称"> </el-table-column>
+        <el-table-column label="报名信息" width="500px">
+          <template slot-scope="scope">
+            <span class="info-item">{{
+              scope.row.userName ? scope.row.userName : "no data"
+            }}</span>
+            <span class="info-item">{{
+              scope.row.phone ? scope.row.phone : "no data"
+            }}</span>
+            <span class="info-item">{{
+              scope.row.company ? scope.row.company : "no data"
+            }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="购票信息" width="120">
+          <template slot-scope="scope">
             <el-button
-              size="mini"
-              type="primary"
-              class="tagInfo"
-              @click="changeName(item, index)"
-              v-for="(item, index) in applyInfoForm"
+              type="text"
+              @click="handleCheckTicketInfo(scope.row.info)"
+              >{{ scope.row.ticketingType | ticketingTypeFilter }}</el-button
+            >
+          </template>
+        </el-table-column>
+        <el-table-column label="是否为vip" width="100">
+          <template slot-scope="scope">
+            <el-switch
+              @change="changeVip(scope.row)"
+              v-model="scope.row.isVip"
+              active-color="#13ce66"
+              inactive-color="#ff4949"
+            >
+            </el-switch>
+          </template>
+        </el-table-column>
+        <el-table-column label="座位号" width="200">
+          <template slot-scope="scope">
+            <el-button
               plain
-              :key="index"
-              >{{ item.formItems[0].value }}</el-button
+              @click="handleToSet(scope.row)"
+              v-if="scope.row.isShowBtn"
+              >{{ scope.row.seatNumber
+              }}<i class="el-icon-edit el-icon--right"></i
+            ></el-button>
+            <el-input
+              ref="saveInputRef"
+              v-model="scope.row.seatNumber"
+              placeholder="设置座位号"
+              @blur="blurInput(scope.row)"
+              v-else
+            ></el-input>
+          </template>
+        </el-table-column>
+        <el-table-column prop="createTime" label="报名时间"> </el-table-column>
+        <el-table-column prop="orderStatus" label="订单状态" width="120">
+          <template slot-scope="scope">
+            {{ scope.row.orderStatus | orderStatusFilter }}
+          </template>
+        </el-table-column>
+        <el-table-column label="核销状态" width="80">
+          <template slot-scope="scope">
+            {{ scope.row.cancelStatus | cancelStatusFilter }}
+          </template>
+        </el-table-column>
+        <el-table-column label="审核状态" width="120">
+          <template slot-scope="scope">
+            {{ scope.row.auditStatus | auditStatusFilter }}
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="100">
+          <template slot-scope="scope">
+            <el-button size="mini" type="text" @click="handleEdit(scope.row)"
+              >编辑</el-button
             >
-            <el-form>
-              <el-form-item
-                :required="formItem.must"
-                v-for="(formItem, indexF) in applyInfo.formItems || []"
-                :key="indexF"
-                :label="formItem.label"
-              >
-                <el-input
-                  :value="formItem.value"
-                  disabled
-                  autocomplete="off"
-                  v-if="formItem.type == 'input'"
-                ></el-input>
-                <el-input
-                  v-if="formItem.type == 'textarea'"
-                  disabled
-                  type="textarea"
-                  :rows="2"
-                  :value="formItem.value"
-                >
-                </el-input>
-                <el-radio
-                  v-else-if="formItem.type == 'radio'"
-                  v-for="(radioItem, indexR) in formItem.optionsList"
-                  disabled
-                  :key="indexR"
-                  :label="true"
-                  v-model="radioItem.select"
-                  >{{ radioItem.label }}</el-radio
-                >
-                <el-checkbox
-                  disabled
-                  v-else-if="formItem.type == 'checkbox'"
-                  v-for="(checkboxItem, indexC) in formItem.optionsList"
-                  v-model="checkboxItem.select"
-                  :key="indexC"
-                  :label="checkboxItem.label"
-                ></el-checkbox>
-              </el-form-item>
-              <el-form-item label="标记为VIP：">
-                <el-switch v-model="applyInfo.isVip"></el-switch>
-              </el-form-item>
-              <el-form-item label="座位号">
-                <el-input v-model="applyInfo.seatNumber"></el-input>
-              </el-form-item>
-            </el-form>
-            <div slot="footer" style="text-align: right">
-              <el-button @click="dialogApplyInfoVisible = false"
-                >取 消</el-button
-              >
-              <el-button type="primary" @click="handleSaveInfo"
-                >保 存</el-button
-              >
-            </div>
-          </div>
-          <div v-else style="text-align: center;color: #909399;">暂无报名信息</div>
-
-        </el-dialog>
-
-        <el-dialog
-          title="核销签到"
-          :visible.sync="dialogSignInVisible"
-          append-to-body
-          width="50%"
-        >
-          <el-checkbox
-            :indeterminate="isIndeterminate"
-            v-model="checkAll"
-            @change="handleCheckAllChange"
-            >全选</el-checkbox
-          >
-
-          <el-checkbox-group
-            v-model="checkedSignInCode"
-            @change="handleCheckedCitiesChange"
-          >
-            <el-checkbox
-              v-for="(item, i) in signInCodeData"
-              :label="item"
-              :key="i"
-              :disabled="item.writeOffStatus == 0 ? false : true"
-              >{{ item.orderNo }}</el-checkbox
+            <el-button size="mini" type="text" @click="handleAudit(scope.row)"
+              >审核</el-button
             >
-          </el-checkbox-group>
-
-          <span slot="footer" class="dialog-footer">
-            <el-button @click="dialogSignInVisible = false">取 消</el-button>
-            <el-button type="primary" @click="handleSaveSignIn"
-              >保 存</el-button
-            >
-          </span>
-        </el-dialog>
-
-        <el-dialog
-          title="用户选择"
-          :visible.sync="dialogUserSelectVisible"
-          append-to-body
-          width="50%"
-        >
-          <div>参加项目</div>
-          <el-checkbox
-            v-for="(item, index) in infoList"
-            :key="index"
-            size="medium"
-            v-model="item.select"
-            disabled
-            style="display: block; margin-top: 10px"
-            >{{ item.label }}</el-checkbox
-          >
-          <span slot="footer" class="dialog-footer">
-            <el-button @click="dialogUserSelectVisible = false"
-              >取 消</el-button
-            >
-            <el-button type="primary" @click="dialogUserSelectVisible = false"
-              >确 定</el-button
-            >
-          </span>
-        </el-dialog>
-
-        <el-pagination
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          :current-page="query.current"
-          :page-sizes="[10, 20, 30, 40, 50, 100]"
-          :page-size="query.size"
-          :total="total"
-          background
-          layout="total, sizes, prev, pager, next, jumper"
-          class="paging"
-        ></el-pagination>
-      </div>
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-pagination
+        class="pagination"
+        background
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="query.current"
+        :page-sizes="[10, 20, 30, 40, 50, 100]"
+        :page-size="query.size"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="total"
+      >
+      </el-pagination>
+      <TicketInfo ref="ticketInfoRef" />
+      <EditApplyInfo ref="editApplyInfoRef" />
+      <PersonnelAudit ref="personnelAuditRef" />
     </basic-container>
   </div>
 </template>
@@ -263,184 +179,220 @@
 <script>
 import {
   peopleManagement,
-  formInquire,
-  addAnnotation,
-  // remarkInfo,
-  signInCode,
-  checkCode,
-  dataExport,
-  saveInfo,
-} from "@/api/activity/personnel";
+  set_vip_or_seat,
+  checkFormInfo,
+} from "@/api/activity/personnel.js";
+import TicketInfo from "./components/TicketInfo";
+import EditApplyInfo from "./components/EditApplyInfo";
+import PersonnelAudit from "./components/PersonnelAudit";
 export default {
+  components: {
+    TicketInfo,
+    EditApplyInfo,
+    PersonnelAudit,
+  },
   data() {
     return {
-      tableData: [],
+      isShowBtn: true,
+      loading: false,
+      total: 0,
       query: {
-        activityId: null,
+        activityId: "",
+        current: 1,
+        size: 10,
         userName: "",
         phone: "",
-        current: 1,
-        size: 20,
+        orderStatus: "",
+        ticketingType: "",
+        cancelStatus: "",
+        isVip: "",
+        auditStatus: "",
       },
-      applyInfo: {}, //单条报名信息
-      dialogAnnotationVisible: false,
-      dialogApplyInfoVisible: false,
-      dialogSignInVisible: false,
-      dialogUserSelectVisible: false,
-      total: 0,
-      applyInfoForm: [],
-      annotation: "",
-      enroleId: "",
-      checkAll: false,
-      isIndeterminate: true,
-      checkedSignInCode: [], //已选择
-      signInCodeData: [], //核销数组
-      infoList: [],
-
-      selectType: '',//搜索类型
-      searchContent: ''//搜索内容
+      selectType: "all",
+      searchName: "",
+      tableData: [],
+      vipQuery: {
+        id: "",
+        code: "vip",
+        vip: "",
+        seatNumber: "",
+      },
+      seatQuery: {
+        id: "",
+        code: "seatNumber",
+        vip: "",
+        seatNumber: "",
+      },
     };
+  },
+  filters: {
+    orderStatusFilter(data) {
+      if (data == 0) {
+        return "待支付";
+      } else if (data == 1) {
+        return "支付成功";
+      } else if (data == 2) {
+        return "支付失败";
+      } else if (data == 3) {
+        return "待支付取消报名";
+      } else if (data == 4) {
+        return "取消报名退款成功";
+      } else if (data == 5) {
+        return "取消报名待退款";
+      } else if (data == 6) {
+        return "取消报名退款失败";
+      } else {
+        return "暂无";
+      }
+    },
+    cancelStatusFilter(data) {
+      if (data == 0) {
+        return "0/1";
+      } else if (data == 1) {
+        return "1/1";
+      } else {
+        return "暂无";
+      }
+    },
+    auditStatusFilter(data) {
+      if (data == 0) {
+        return "不需要审核";
+      } else if (data == 1) {
+        return "待审核";
+      } else if (data == 2) {
+        return "审核通过";
+      } else if (data == 3) {
+        return "审核未通过";
+      } else {
+        return "暂无";
+      }
+    },
+    ticketingTypeFilter(data) {
+      if (data == 1) {
+        return "免费票";
+      } else if (data == 2) {
+        return "付费票";
+      }
+    },
   },
   created() {
     this.query.activityId = this.$route.query.id;
-    this.getPeopleManagementList();
-  },
-  filters: {
-    auditStatusFilters(val) {
-      if (val == 0) {
-        return "不需要审核";
-      } else if (val == 1) {
-        return "待审核";
-      } else if (val == 2) {
-        return "审核通过";
-      } else if (val == 3) {
-        return "审核未通过";
-      }
-    },
+    // this.searchForm.activityId = this.$route.query.id;
+    this.getpeopleManagementPage();
   },
   methods: {
-    exportData() {
-      dataExport(this.$route.query.id);
+    changeType(data) {
+      console.log("data", data);
+      this.searchName = "";
     },
-    backClick() {
-      this.$router.go(-1);
-    },
-    handleChangeType(){
-      this.searchContent = ''
-    },
-    // 搜索
-    handleSearch(){
-      if(this.selectType == ''){
-        return this.$message.error('请选择搜索类型')
+    handlecheck() {
+      if (this.selectType == "all") {
+        this.query.userName = "";
+        this.query.phone = "";
+      } else if (this.selectType == "user") {
+        this.query.userName = this.searchName;
+        this.query.phone = "";
+      } else if (this.selectType == "cell") {
+        this.query.userName = "";
+        this.query.phone = this.searchName;
+      } else if (this.selectType == "unit") {
       }
-      if(this.selectType == '1'){
-        this.query.userName = this.searchContent
-        this.query.phone = ''
-        this.getPeopleManagementList()
-      }else if(this.selectType == '2'){
-        this.query.phone = this.searchContent
-        this.query.userName = ''
-        this.getPeopleManagementList()
-      }
+      console.log(this.query);
+      this.getpeopleManagementPage();
     },
-    // 批注
-    handleAnnotation(row) {
-      this.enroleId = row.enroleId;
-      this.dialogAnnotationVisible = true;
-      this.annotation = row.soRemarks;
-    },
-    handleCheckTicketInfo(info) {
-      this.infoList = JSON.parse(info);
-      this.dialogUserSelectVisible = true;
-    },
-    handleSaveAnnotation() {
-      addAnnotation({
-        id: this.enroleId,
-        soRemarks: this.annotation,
-      }).then((res) => {
-        this.getPeopleManagementList();
-      });
-      this.dialogAnnotationVisible = false;
-    },
-    handleCheck(enroleId) {
-      this.applyInfoForm = [];
-      this.applyInfo = {}
-      this.dialogApplyInfoVisible = true;
-      formInquire({ enroleId: enroleId }).then((res) => {
-        this.applyInfoForm = res.data.data.data;
-        if (this.applyInfoForm && this.applyInfoForm.length > 0) {
-          this.applyInfo = this.applyInfoForm[0];
+    mergeCell({ row, column, rowIndex, columnIndex }) {
+      if (!columnIndex) {
+        if (row.rows) {
+          return {
+            colspan: 1,
+            rowspan: row.rows,
+          };
+        } else {
+          return {
+            rowspan: 0,
+            colspan: 0,
+          };
         }
-      });
+      }
     },
-    handleSaveSignIn() {
-      let codeArr = this.checkedSignInCode.map((item) => {
-        return item.orderNo;
-      });
-      checkCode({
-        orderNos: codeArr,
-      }).then((res) => {
-        this.getPeopleManagementList();
-      });
-      this.dialogSignInVisible = false;
+    // 处理获取的列表数据
+    handleData(data) {
+      console.log(data);
+      let newList = [];
+      for (let i = 0; i < data.length; i++) {
+        for (let j = 0; j < data[i].list.length; j++) {
+          newList.push({
+            userName: data[i].userName,
+            ...data[i].list[j],
+            rows: j == 0 ? data[i].list.length : 0,
+            isVip: data[i].list[j].isVip == 0 ? false : true,
+            isShowBtn: true,
+          });
+        }
+      }
+      console.log("newList", newList);
+      this.tableData = newList;
     },
-    // 核销签到
-    handleSignIn(row) {
-      this.dialogSignInVisible = true;
-      this.enroleId = row.enroleId;
-      signInCode({ enroleId: this.enroleId }).then((res) => {
-        this.signInCodeData = res.data.data.data;
-      });
-    },
-    getPeopleManagementList() {
+    // 获取人员数据
+    getpeopleManagementPage() {
+      this.loading = true;
       peopleManagement(this.query).then((res) => {
-        if (res.data.code != 0) {
-          return this.$message.error("获取列表失败");
-        }
-        this.tableData = res.data.data.data.records;
         this.total = res.data.data.data.total;
+        this.handleData(res.data.data.data.records);
+        this.loading = false;
       });
     },
     handleSizeChange(val) {
-      this.query.size = val;
-      this.getPeopleManagementList();
+      console.log("每页显示条数", val);
     },
     handleCurrentChange(val) {
+      console.log("当前页", val);
       this.query.current = val;
-      this.getPeopleManagementList();
+      this.getpeopleManagementPage();
     },
-    changeName(item, index) {
-      // item.actived = false
-      this.applyInfo = item;
-    },
-    handleCloseDialogApplyInfo(){
-      this.applyInfoForm = [];
-      this.applyInfo = {}
-    },
-    handleCheckAllChange(val) {
-      let writeOffStatusCode = this.signInCodeData.filter((item) => {
-        return item.writeOffStatus == "0";
+    handleEdit(row) {
+      console.log("修改", row.enroleId);
+      checkFormInfo({ id: row.enroleId }).then((res) => {
+      // checkFormInfo({ id: 295 }).then((res) => {
+        console.log("formInfo...", res);
+        let data = res.data.data.data
+        this.$refs.editApplyInfoRef.openApplyInfoDialog(data);
       });
-      this.checkedSignInCode = val ? writeOffStatusCode : [];
-      this.isIndeterminate = false;
     },
-    handleCheckedCitiesChange(value) {
-      let checkedCount = value.length;
-      this.checkAll = checkedCount === this.checkedSignInCode.length;
-      this.isIndeterminate =
-        checkedCount > 0 && checkedCount < this.checkedSignInCode.length;
+    handleAudit(row) {
+      console.log("审核", row);
+      this.$refs.personnelAuditRef.openAuditDialog();
     },
-    handleSaveInfo() {
-      if (this.applyInfo.seatNumber.length > 15) {
-        return this.$message.error("座位号字数不能超过15个字符");
-      }
-      saveInfo(this.applyInfo).then((res) => {
-        if (res.data.code != 0) {
-          return this.$message.error("保存失败");
-        }
-        this.$message.success("保存成功");
-        this.dialogApplyInfoVisible = false;
+    changeVip(row) {
+      console.log("vips", row);
+      this.vipQuery.id = row.enroleId;
+      this.vipQuery.vip = row.isVip ? 1 : 0;
+      this.vipQuery.seatNumber = row.seatNumber;
+      console.log("vipQuery", this.vipQuery);
+      set_vip_or_seat(this.vipQuery).then((res) => {
+        console.log("setVip...", res);
       });
+    },
+    handleToSet(row) {
+      console.log("toSet...", row);
+      row.isShowBtn = !row.isShowBtn;
+      this.$nextTick(() => {
+        this.$refs.saveInputRef.focus();
+      });
+    },
+    blurInput(row) {
+      console.log("blur...");
+      row.isShowBtn = !row.isShowBtn;
+      this.seatQuery.id = row.enroleId;
+      this.seatQuery.vip = row.isVip ? 1 : 0;
+      this.seatQuery.seatNumber = row.seatNumber;
+      console.log("seatQuery", this.seatQuery);
+      set_vip_or_seat(this.seatQuery).then((res) => {
+        console.log("setSeat...", res);
+      });
+    },
+    handleCheckTicketInfo(info) {
+      this.$refs.ticketInfoRef.openTicketInfoDialog(JSON.parse(info));
     },
   },
 };
@@ -455,15 +407,22 @@ export default {
   justify-content: space-between;
   align-items: center;
 }
-.paging {
-  margin-top: 20px;
+.search-box {
+  .el-form-item {
+    margin-right: 20px;
+  }
+  .input-with-select {
+    width: 400px;
+    .el-select--medium {
+      width: 100px;
+    }
+  }
+}
+.pagination {
   text-align: right;
+  padding-top: 20px;
 }
-.tagInfo {
-  margin-bottom: 15px;
-}
-
-.input-with-select{
-  width: 400px;
+.info-item {
+  margin-right: 10px;
 }
 </style>
