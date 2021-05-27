@@ -7,6 +7,12 @@
       </div>
       <div class="search-box">
         <el-form :inline="true" :model="query" class="demo-form-inline">
+          <el-button
+            type="primary"
+            style="margin-right: 10px"
+            @click="handleExportData"
+            >导出</el-button
+          >
           <el-form-item>
             <el-input
               placeholder="请输入关键字"
@@ -94,11 +100,9 @@
         </el-table-column>
         <el-table-column label="购票信息" width="120">
           <template slot-scope="scope">
-            <el-button
-              type="text"
-              @click="handleCheckTicketInfo(scope.row.info)"
-              >{{ scope.row.ticketingType | ticketingTypeFilter }}</el-button
-            >
+            <el-button type="text" @click="handleCheckTicketInfo(scope.row)">{{
+              scope.row.ticketingType | ticketingTypeFilter
+            }}</el-button>
           </template>
         </el-table-column>
         <el-table-column label="是否为vip" width="100">
@@ -181,6 +185,7 @@ import {
   peopleManagement,
   set_vip_or_seat,
   checkFormInfo,
+  dataExport,
 } from "@/api/activity/personnel.js";
 import TicketInfo from "./components/TicketInfo";
 import EditApplyInfo from "./components/EditApplyInfo";
@@ -251,7 +256,7 @@ export default {
       } else if (data == 1) {
         return "1/1";
       } else {
-        return "暂无";
+        return "0/0";
       }
     },
     auditStatusFilter(data) {
@@ -281,6 +286,10 @@ export default {
     this.getpeopleManagementPage();
   },
   methods: {
+    handleExportData() {
+      console.log("exportData...");
+      dataExport(this.$route.query.id);
+    },
     changeType(data) {
       console.log("data", data);
       this.searchName = "";
@@ -353,15 +362,13 @@ export default {
     handleEdit(row) {
       console.log("修改", row.enroleId);
       checkFormInfo({ id: row.enroleId }).then((res) => {
-      // checkFormInfo({ id: 295 }).then((res) => {
-        console.log("formInfo...", res);
-        let data = res.data.data.data
+        let data = res.data.data.data;
         this.$refs.editApplyInfoRef.openApplyInfoDialog(data);
       });
     },
     handleAudit(row) {
       console.log("审核", row);
-      this.$refs.personnelAuditRef.openAuditDialog();
+      this.$refs.personnelAuditRef.openAuditDialog(2);
     },
     changeVip(row) {
       console.log("vips", row);
@@ -389,10 +396,20 @@ export default {
       console.log("seatQuery", this.seatQuery);
       set_vip_or_seat(this.seatQuery).then((res) => {
         console.log("setSeat...", res);
+        if (res.data.data.businessCode === 1000) {
+          this.$notify({
+            title: "座位号",
+            message: "座位号设置成功",
+            type: "success",
+          });
+        }
       });
     },
-    handleCheckTicketInfo(info) {
-      this.$refs.ticketInfoRef.openTicketInfoDialog(JSON.parse(info));
+    handleCheckTicketInfo(row) {
+      checkFormInfo({ id: row.enroleId }).then((res) => {
+        let data = res.data.data.data;
+        this.$refs.ticketInfoRef.openTicketInfoDialog(data);
+      });
     },
   },
 };

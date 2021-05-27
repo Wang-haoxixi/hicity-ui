@@ -9,7 +9,7 @@
         <el-form label-width="50px">
           <el-form-item
             label-width="100"
-            v-for="(item, index) in conferenceFormList"
+            v-for="(item, index) in data.conferenceFormList"
             :label="item.label"
             :key="index"
             :required="item.must"
@@ -25,18 +25,7 @@
               v-model="item.value"
             >
             </el-input>
-            <!-- <el-radio-group
-              v-else-if="item.type == 'radio'"
-              v-model="radioVal"
-            >
-              <el-radio
-                v-for="(itemR, indexR) in item.optionsList"
-                :key="indexR"
-                :label="itemR.label"
-              ></el-radio>
-            </el-radio-group> -->
             <template v-else-if="item.type == 'radio'">
-              <!-- {{ item.optionsList }} -->
               <el-radio
                 v-for="(itemR, indexR) in item.optionsList"
                 :key="indexR"
@@ -62,7 +51,6 @@
           </el-form-item>
         </el-form>
       </div>
-
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisibleApplyInfo = false">取 消</el-button>
         <el-button type="primary" @click="handleSave">保 存</el-button>
@@ -76,22 +64,17 @@ export default {
   data() {
     return {
       dialogVisibleApplyInfo: false,
-      ticketingFormList: [], //票务表单
-      conferenceFormList: [], //报名表单
-
-      checkboxList: [],
-      radioVal: "",
+      data: {},
     };
   },
   methods: {
     openApplyInfoDialog(data) {
       this.dialogVisibleApplyInfo = true;
-      this.ticketingFormList = data.ticketingFormList;
-      this.conferenceFormList = data.conferenceFormList;
-      console.log("data...", this.ticketingFormList, this.conferenceFormList);
+      this.data = data;
+      console.log("data...", this.data);
     },
     handleSave() {
-      console.log("conferenceFormList...", this.conferenceFormList);
+      console.log("save_data...", this.data);
     },
     getRadioValue(options) {
       for (let i = 0; i < options.length; i++) {
@@ -133,8 +116,17 @@ export default {
 
 <style lang="scss" scoped>
 .applyInfo-box {
-//   .el-form-item__label {
-//     display: contents;
-//   }
+  ::v-deep .el-form-item__label {
+    display: contents;
+  }
+  .el-checkbox {
+    display: block;
+    padding-left: 50px;
+  }
+  .el-radio {
+    display: block;
+    line-height: 40px;
+    padding-left: 50px;
+  }
 }
 </style>

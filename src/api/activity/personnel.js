@@ -66,15 +66,15 @@ import request from "@/router/axios";
 //   });
 // }
 
-// export function dataExport (id) {
-//   return request({
-//     url: `/dms/conference_enrole_form/download?conferenceId=${id}`,
-//     responseType: "arraybuffer"
-//   }).then(res => {
-//     let disposition = res.headers['content-disposition']
-//     downloadExe(res, decodeURI(disposition.substring(disposition.indexOf('fileName=') + 9)))
-//   })
-// }
+export function dataExport (id) {
+  return request({
+    url: `/dms/conference_enrole_form/download?conferenceId=${id}`,
+    responseType: "arraybuffer"
+  }).then(res => {
+    let disposition = res.headers['content-disposition']
+    downloadExe(res, decodeURI(disposition.substring(disposition.indexOf('fileName=') + 9)))
+  })
+}
 
 
 function downloadExe(response, name) {
