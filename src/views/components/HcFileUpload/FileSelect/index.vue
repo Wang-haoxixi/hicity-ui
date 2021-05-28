@@ -12,6 +12,10 @@ export default {
     accept: {
       type: String,
       default: ''
+    },
+    multiple: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -23,7 +27,9 @@ export default {
   mounted () {
     let input = document.createElement('input')
     input.type = 'file'
-    input.multiple = 'multiple'
+    if (this.multiple) {
+      input.multiple = 'multiple'
+    }
     input.accept = this.accept
     input.onchange = () => {
       this.$emit('file-change', input.files)
