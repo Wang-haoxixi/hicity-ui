@@ -27,7 +27,7 @@
           </template>
         </template>
       </hc-crud>
-  
+
       <template slot="form">
         <el-form
           v-if="publishType != 'view'"
@@ -66,16 +66,15 @@
             <hc-city-select v-model="formData.cityId" :city-id="userInfo.manageCityId" single></hc-city-select>
           </el-form-item>
           <el-form-item label="店铺Logo：" prop="storeLogo">
-            <hc-image-upload single :limit="1" v-model="formData.storeLogo" :disabled="publishType == 'view'" @change="logoChange"></hc-image-upload>
+            <!-- <hc-image-upload single :limit="1" v-model="formData.storeLogo" :disabled="publishType == 'view'" @change="logoChange"></hc-image-upload> -->
+            <hc-image-cropper v-model="formData.storeLogo" :disabled="publishType == 'view'" single :limit="1" @change="logoChange" bottom-tip="请上传尺寸为144*144，大小不超过2M的图片"></hc-image-cropper>
           </el-form-item>
           <el-form-item label="营业时间：" prop="openingHours">
             <el-input v-model.trim="formData.openingHours" maxlength="20"></el-input>
           </el-form-item>
-          <el-form-item label="店铺介绍：" prop="storeSynopsis">
+          <el-form-item label="店铺简介：" prop="storeSynopsis">
             <el-input type="textarea" v-model="formData.storeSynopsis" :autosize="{minRows: 5, maxRows: 10}" maxlength="1000" show-word-limit></el-input>
-          </el-form-item>
-          <el-form-item label="店铺图片：" prop="storeSynopsisPicturesUrl">
-            <hc-image-upload :limit="6" v-model="formData.storeSynopsisPicturesUrl" :disabled="publishType == 'view'" @change="logoChange"></hc-image-upload>
+            <hc-image-upload style="margin-top: 12px;" :limit="6" v-model="formData.storeSynopsisPicturesUrl" :disabled="publishType == 'view'" @change="logoChange"></hc-image-upload>
           </el-form-item>
           <el-form-item label="导航定位：" prop="locationAddr">
             <hc-map-select v-model="locationAddr" @city-change="cityChange" @change="locationAddrChange"></hc-map-select>
@@ -113,7 +112,7 @@
           <el-form-item label="营业执照：" prop="businessLicenseUrl">
             <hc-image-upload single :limit="1" v-model="formData.businessLicenseUrl" :disabled="publishType == 'view'" @change="logoChange"></hc-image-upload>
           </el-form-item>
-          
+
           <el-form-item label="店铺状态：" prop="storeStatus">
             <el-radio-group v-model="formData.storeStatus">
               <el-radio v-for="item in dicList['STORE_STATE']" :key="item.value" :label="parseInt(item.value)">{{item.label}}</el-radio>
@@ -174,7 +173,7 @@
           </el-form-item>
         </el-form>
         <store-detail v-else :detail="storeDetail"></store-detail>
-        
+
       </template>
     </hc-table-form>
 
@@ -217,8 +216,9 @@ import HcCitySelect from "@/views/components/HcCity/HcCitySelect/index"
 import HcInput from "@/views/components/HcForm/HcInput/index"
 import StoreDetail from './detail'
 import ShareAccount from './shareAccount'
+import HcImageCropper from "@/views/components/HcImageUpload/cropper"
 export default {
-  components: { HcImageUpload, HcTableForm, HcEmptyData, HcMapSelect, HcRemoteSelect, HcCitySelect, HcInput, StoreDetail, ShareAccount },
+  components: { HcImageUpload, HcImageCropper, HcTableForm, HcEmptyData, HcMapSelect, HcRemoteSelect, HcCitySelect, HcInput, StoreDetail, ShareAccount },
   data() {
     return {
       storeDetail: {},
@@ -487,7 +487,7 @@ export default {
       })
     },
     save () {
-      let formData = { 
+      let formData = {
         ...this.formData,
         lng: this.locationAddr.longitude,
         lat: this.locationAddr.latitude,
@@ -522,7 +522,7 @@ export default {
       }
     },
     toView ({ storeId }) {
-      getStoreDetail({ storeId }).then(({ data }) => { 
+      getStoreDetail({ storeId }).then(({ data }) => {
         this.storeDetail = data.data.data;
         this.publish = true;
         this.publishType = "view";
