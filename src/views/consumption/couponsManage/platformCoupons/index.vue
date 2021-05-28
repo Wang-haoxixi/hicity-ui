@@ -37,7 +37,7 @@
 <script>
 import { tableOption } from "./const";
 import { mapGetters } from "vuex";
-import { getPlatformCouponsPage, getCityCouponsPage, createCoupons, getCouponsDetail, updateCoupons, deleteCouponsBatch, couponsDown } from "@/api/merchantSystem/coupons"
+import { getPlatformCouponsPage, getCityCouponsPage, createPlatformCoupons, getEditCouponsDetail, getCouponsDetail, updatePlatformCoupons, deleteCouponsBatch, couponsDown } from "@/api/merchantSystem/coupons"
 import HcImageUpload from "@/views/components/HcImageUpload/index";
 import HcTableForm from "@/views/components/HcTableForm/index";
 import HcInput from "@/views/components/HcForm/HcInput/index"
@@ -109,13 +109,13 @@ export default {
     handleSave(formData) {
       formData.type = '1'
       if (this.formType == 'add') {
-        createCoupons(formData).then(({ data }) => {
+        createPlatformCoupons(formData).then(({ data }) => {
           this.formShow = false
           this.$message.success('新增成功')
           this.$refs.hcCrud.refresh()
         })
       } else if (this.formType == 'edit') {
-        updateCoupons(formData).then(({ data }) => {
+        updatePlatformCoupons(formData).then(({ data }) => {
           this.formShow = false
           this.$message.success('修改成功')
           this.$refs.hcCrud.refresh()
@@ -131,7 +131,7 @@ export default {
       });
     },
     toUpdate({ couponsId }) {
-      getCouponsDetail(couponsId).then(({ data }) => {
+      getEditCouponsDetail(couponsId).then(({ data }) => {
         let formData = data.data.data
         // let initForm = {
         //   id: formData.id,
