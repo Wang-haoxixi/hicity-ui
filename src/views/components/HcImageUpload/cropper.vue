@@ -2,7 +2,7 @@
   <div class="hc-upload-image-container">
     <div v-if="topTip" class="upload-tip">{{topTip}}</div>
     <div v-for="(file, index) in fileList" :key="index" class="image-box upload">
-      <div class="image-box-content">
+      <div class="image-box-content" :style="getStyle()">
         <img v-if="file.type == 'formal'" class="image-box-content-image" fit="fill" :src="file.url"/>
         <el-progress v-if="file.type == 'temp'" type="circle" :percentage="0"></el-progress>
         <div v-if="!disabled" class="image-box-cotent-shadow" @click.stop="">
@@ -15,7 +15,6 @@
       v-show="!single || fileList.length == 0"
       ref="fileUpload"
       key="fileUpload"
-      :multiple="multipleChoice"
       @file-add="fileAddTemp"
       @file-change="fileChangeTemp"
       @upload-success="fileChangeFormal"
@@ -28,7 +27,7 @@
         <div v-if="disabled"></div>
         <div v-else class="image-box">
           <slot>
-            <div class="image-box-content">
+            <div class="image-box-content" :style="getStyle()">
               <i class="el-icon-plus"></i>
             </div>
           </slot>
@@ -36,17 +35,30 @@
       </template>
     </file-upload>
     <div v-if="bottomTip" class="upload-tip">{{bottomTip}}</div>
+    <cropper-dialog ref="cropperDialog" :size="size" :height="heightLimit" :width="widthLimit"></cropper-dialog>
   </div>
 </template>
 
 <script>
 import { v4 as uuidv4 } from 'uuid'
 import FileUpload from '@/views/components/HcFileUpload/FileUpload/index'
+import CropperDialog from './cropperDialog.vue'
 import { getFileMimeType } from "@/util/file"
-
 export default {
-  components: { FileUpload },
+  components: { FileUpload, CropperDialog },
   props: {
+    size: {
+      type: Number,
+      default: 2
+    },
+    heightLimit: {
+      type: Number,
+      default: 144
+    },
+    widthLimit: {
+      type: Number,
+      default: 144
+    },
     disabled: {
       type: Boolean,
       default: false
@@ -75,10 +87,6 @@ export default {
       type: String,
       default: ''
     },
-    multipleChoice: {
-      type: Boolean,
-      default: false
-    }
   },
   data () {
     return {
@@ -116,62 +124,45 @@ export default {
   },
   methods: {
     onBeforeUpload(files, isChange) {
-      let fileList = []
-      for (let i = 0; i < files.length; i++) {
-        fileList.push(files[i])
-      }
       return new Promise((resolve, reject) => {
-        let promiseList = []
-        for (let i = 0; i < fileList.length; i++) {
-          let file = fileList[i]
-          let promise = new Promise((resolve, reject) => {
-            getFileMimeType(file).then(res => {
-              if (res) {
-                const isLt1M = file.size / 1024 / 1024 < 50;
-                if (!isLt1M) {
-                  resolve({
-                    type: 'error',
-                    index: i,
-                    message: '上传文件大小不能超过 50MB!'
-                  })
+        let file = files[0]
+        getFileMimeType(file).then(res => {
+          if (res) {
+            let reader = new FileReader()
+            reader.readAsDataURL(file)
+            console.log(file)
+            reader.onload = (fileR) => {
+              let img = new Image()
+              img.src = fileR.target.result
+              img.onload = () => {
+                if (img.height == this.heightLimit && img.width == this.widthLimit) {
+                  resolve([file])
                 } else {
-                  resolve({
-                    type: 'success',
-                    index: i
+                  this.$confirm('所选图片尺寸不符合，是否进行裁剪?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                  }).then(() => {
+                    this.$refs.cropperDialog.toCropper(fileR.target.result).then((data) => {
+                      let fileC = new window.File([data], file.name, { type: file.type })
+                      if (fileC.size / 1024 / 1024 < this.size) {
+                        this.$refs.cropperDialog
+                        resolve([fileC])
+                      } else {
+                        this.$message.warning(`文件大小超过${this.size}MB，请重新裁剪或更换图片！`)
+                      }
+                    })
                   })
                 }
-              } else {
-                resolve({
-                  type: 'error',
-                  index: i,
-                  message: '暂不支持该文件类型！'
-                })
               }
-            })
-          })
-          promiseList.push(promise)
-        }
-        Promise.all(promiseList).then((results) => {
-          let errorList = []
-          let errorObjects = []
-          for (let i = 0; i < results.length; i++) {
-            if (results[i].type == 'error') {
-              errorObjects.push(results[i])
-              errorList.push(results[i].index)
             }
-          }
-          errorList.sort()
-          for (let i = errorList.length - 1; i >= 0; i--) {
-            fileList.splice(i, 1)
-          }
-          if (!isChange && fileList.length + this.fileList.length > this.limit) {
-            this.$message.warning(`本次选择${fileList.length}张有效图片，共计选择${fileList.length + this.fileList.length}张，已超出限制的${this.limit}张`)
-            resolve([])
           } else {
-            resolve(fileList)
+            this.$message.warning('暂不支持该文件类型！')
+            reject()
           }
         })
       })
+
     },
     fileAddTemp (file) {
       this.fileList.push({
@@ -275,6 +266,12 @@ export default {
         this.$emit('change', '')
       }
     },
+    getStyle () {
+      return {
+        height: this.heightLimit + 'px',
+        width: this.widthLimit + 'px'
+      }
+    }
   }
 }
 </script>
@@ -284,7 +281,6 @@ export default {
   display: inline-block;
   .image-box {
     display: inline-block;
-    width: 148px;
     vertical-align: top;
     &.upload {
       padding: 0 10px 10px 0;
@@ -334,10 +330,16 @@ export default {
         }
       }
       .image-box-content-image {
-        height: 146px;
-        width: 146px;
+        height: 100%;
+        width: 100%;
       }
     }
   }
+}
+.upload-tip {
+  margin-top: 8px;
+  line-height: 22px;
+  font-size: 14px;
+  color: #666666;
 }
 </style>
