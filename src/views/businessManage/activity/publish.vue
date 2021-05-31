@@ -785,6 +785,7 @@
           <el-button type="primary" @click="handleSaveSelect">确 定</el-button>
         </span>
       </el-dialog>
+      <DiscussionGroup ref="discussionGroupRef" />
     </basic-container>
   </div>
 </template>
@@ -793,6 +794,7 @@ import store from "@/store";
 import { dateFormat } from "@/util/date.js";
 import HcQuill from "@/views/components/HcQuill";
 import HcCitySelect from "@/views/components/HcCity/HcCitySelect/index";
+import DiscussionGroup  from "./components/DiscussionGroup "
 import { mapGetters } from "vuex";
 import { getFileMimeType, annexFileTypes } from "@/util/file";
 import {
@@ -808,7 +810,7 @@ import {
 } from "@/api/activity/publish";
 import { Loading } from "element-ui";
 export default {
-  components: { HcQuill, HcCitySelect },
+  components: { HcQuill, HcCitySelect,DiscussionGroup },
   data() {
     return {
       annexFileTypes,
@@ -1976,6 +1978,7 @@ export default {
             .finally(() => {
               this.formLoading = false;
             });
+          // this.$refs.discussionGroupRef.openDiscussionGroupDialog()
         } else {
           this.$message.error("活动信息填写不完整");
           this.validRst = [];
