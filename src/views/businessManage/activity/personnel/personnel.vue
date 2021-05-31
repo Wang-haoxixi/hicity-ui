@@ -155,7 +155,11 @@
             <el-button size="mini" type="text" @click="handleEdit(scope.row)"
               >编辑</el-button
             >
-            <el-button size="mini" type="text" @click="handleAudit(scope.row)"
+            <el-button
+              size="mini"
+              type="text"
+              v-if="scope.row.auditStatus != 0"
+              @click="handleAudit(scope.row)"
               >审核</el-button
             >
           </template>
@@ -175,7 +179,7 @@
       </el-pagination>
       <TicketInfo ref="ticketInfoRef" />
       <EditApplyInfo ref="editApplyInfoRef" />
-      <PersonnelAudit ref="personnelAuditRef" />
+      <PersonnelAudit ref="personnelAuditRef" @refresh='getList'/>
     </basic-container>
   </div>
 </template>
@@ -286,6 +290,9 @@ export default {
     this.getpeopleManagementPage();
   },
   methods: {
+    getList(){
+      this.getpeopleManagementPage()
+    },
     handleExportData() {
       console.log("exportData...");
       dataExport(this.$route.query.id);
@@ -368,7 +375,8 @@ export default {
     },
     handleAudit(row) {
       console.log("审核", row);
-      this.$refs.personnelAuditRef.openAuditDialog(2);
+      // this.$refs.personnelAuditRef.openAuditDialog(2,123);
+      this.$refs.personnelAuditRef.openAuditDialog(row.auditStatus,row.enroleId);
     },
     changeVip(row) {
       console.log("vips", row);

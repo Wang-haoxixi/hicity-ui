@@ -1950,39 +1950,39 @@ export default {
         ...this.customList,
       ];
 
-      console.log("baseFormData...", this.baseFormData);
+      // console.log("baseFormData...", this.baseFormData);
 
-      // this.$refs.baseFormDataRef.validate((valid1) => {
-      //   this.$refs.setTicketDataRef.forEach((item) => {
-      //     item.validate((valid2) => {
-      //       that.validRst.push(valid2);
-      //       return false;
-      //     });
-      //   });
-      //   if (!this.validRst.includes(false) && valid1) {
-      //     savePublish(this.baseFormData)
-      //       .then((res) => {
-      //         if (res.data.code !== 0) {
-      //           this.validRst = [];
-      //           return this.$message.error("发布活动失败");
-      //         }
-      //         this.$message.success("发布活动成功");
-      //         this.fileList = [];
-      //         this.baseFormData.fileList = [];
-      //         this.$router.go(-1);
-      //         this.validRst = [];
-      //         this.defaultList = [];
-      //       })
-      //       .finally(() => {
-      //         this.formLoading = false;
-      //       });
-      //   } else {
-      //     this.$message.error("活动信息填写不完整");
-      //     this.validRst = [];
-      //     this.defaultList = [];
-      //     this.formLoading = false;
-      //   }
-      // });
+      this.$refs.baseFormDataRef.validate((valid1) => {
+        this.$refs.setTicketDataRef.forEach((item) => {
+          item.validate((valid2) => {
+            that.validRst.push(valid2);
+            return false;
+          });
+        });
+        if (!this.validRst.includes(false) && valid1) {
+          savePublish(this.baseFormData)
+            .then((res) => {
+              if (res.data.code !== 0) {
+                this.validRst = [];
+                return this.$message.error("发布活动失败");
+              }
+              this.$message.success("发布活动成功");
+              this.fileList = [];
+              this.baseFormData.fileList = [];
+              this.$router.go(-1);
+              this.validRst = [];
+              this.defaultList = [];
+            })
+            .finally(() => {
+              this.formLoading = false;
+            });
+        } else {
+          this.$message.error("活动信息填写不完整");
+          this.validRst = [];
+          this.defaultList = [];
+          this.formLoading = false;
+        }
+      });
     },
     // 新增 - 保存草稿
     saveManuscript() {

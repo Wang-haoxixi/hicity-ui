@@ -29,8 +29,17 @@
             >票务管理</el-button
           >
           <span style="margin-left: 30px; color: #919397"
-            >发布时间：{{props.row.updateTime}}</span
+            >发布时间：{{ props.row.updateTime }}</span
           >
+          <span style="margin-left: 30px; color: #919397">
+            活动圈子：2021城市超级APP体检官方活动群
+            <el-tag size="mini" type="danger">官方</el-tag>
+          </span>
+          <span style="margin-left: 30px">
+            <el-button type="text" @click="handleRelevanceMore"
+              >关联更多圈子</el-button
+            >
+          </span>
         </template>
         <template v-slot:poster="scope">
           <el-image
@@ -117,6 +126,61 @@
         >
       </span>
     </el-dialog>
+
+    <!-- 关联更多圈子弹框 -->
+    <el-dialog
+      title="2021城市超级APP免费体检活动"
+      :visible.sync="dialogVisibleRelevanceMore"
+      width="40%"
+    >
+      <div class="relevance-more-box">
+        <div class="search">
+          <span>搜索圈子</span>
+          <el-autocomplete
+            prefix-icon="el-icon-search"
+            v-model="state2"
+            :fetch-suggestions="querySearch"
+            placeholder="请输入关键字"
+            :trigger-on-focus="false"
+            @select="handleSelect"
+          ></el-autocomplete>
+          <el-button type="primary" round @click="toRelevance">关 联</el-button>
+        </div>
+        <el-divider></el-divider>
+        <div class="circle-list">
+          <div>关联圈子</div>
+          <div>
+            <div class="circle-item">
+              <span>2025xxxxx活动圈</span>
+              <el-button
+                type="danger"
+                round
+                size="mini"
+                @click="deleteCircleItem"
+                >删除</el-button
+              >
+            </div>
+            <div class="circle-item">
+              <span>2025xxxxx活动圈</span>
+              <el-button type="danger" round size="mini">删除</el-button>
+            </div>
+            <div class="circle-item">
+              <span>2025xxxxx活动圈</span>
+              <el-button type="danger" round size="mini">删除</el-button>
+            </div>
+            <div class="circle-item">
+              <span>2025xxxxx活动圈</span>
+              <el-button type="danger" round size="mini">删除</el-button>
+            </div>
+            <div class="circle-item">
+              <span>2025xxxxx活动圈</span>
+              <el-button type="danger" round size="mini">删除</el-button>
+            </div>
+          </div>
+          <!-- <div style="text-align:center;padding-top:10px">暂无关联</div> -->
+        </div>
+      </div>
+    </el-dialog>
   </basic-container>
 </template>
 
@@ -136,7 +200,10 @@ export default {
     return {
       showCityDialogVisible: false, //控制展示城市
       showCodeDialogVisible: false, //展示签到码
+      dialogVisibleRelevanceMore: true,
       img: "", //签到码地址
+
+      state2: "",
     };
   },
   computed: {
@@ -145,10 +212,57 @@ export default {
       return tableOption(this.userType == 1 || this.userType == 2);
     },
   },
-  activated(){
+  activated() {
     this.$refs.hcCrud.refresh(); // 刷新表格数据
   },
   methods: {
+    querySearch(queryString, cb) {
+      console.log("queryString..", queryString);
+      // var restaurants = this.restaurants;
+      // var results = queryString
+      //   ? restaurants.filter(this.createFilter(queryString))
+      //   : restaurants;
+      // 调用 callback 返回建议列表的数据
+      // cb(results);
+    },
+    // createFilter(queryString) {
+    //   return (restaurant) => {
+    //     return (
+    //       restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) ===
+    //       0
+    //     );
+    //   };
+    // },
+    handleSelect(item) {
+      console.log(item);
+    },
+    deleteCircleItem() {
+      this.$confirm("此操作将取消关联该圈子, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          this.$message({
+            type: "success",
+            message: "删除成功!",
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除",
+          });
+        });
+    },
+    toRelevance() {
+      // relevance code...
+      console.log("relevance...");
+    },
+
+    handleRelevanceMore() {
+      console.log("关联更多圈子...");
+    },
     fetchListFun(params) {
       return new Promise((resolve, reject) => {
         activitiesList(params).then((res) => {
@@ -190,9 +304,7 @@ export default {
             this.$refs.hcCrud.refresh();
           });
         })
-        .catch(() => {
-          // this.$message("取消删除成功!");
-        });
+        .catch(() => {});
     },
     // 展示签到码
     handleShowCode(row) {
@@ -202,87 +314,11 @@ export default {
     },
     // 下载签到码
     downloadCode() {
-      var a = document.createElement('a')
-      console.log('a',a)
-      a.download = '签到码'
-      a.href = this.img
+      var a = document.createElement("a");
+      console.log("a", a);
+      a.download = "签到码";
+      a.href = this.img;
       a.click();
-
-      // let image = new Image();
-      // var imgsrc = ""; /*这里是要下载的图片地址*/ //需要注意的是图片让后端反给你base64格式的
-      // var name = ""; /*这里是下载图片的名称*/
-      // // 解决跨域 Canvas 污染问题
-      // image.setAttribute("crossOrigin", "anonymous");
-      // image.onload = function () {
-      //   let canvas = document.createElement("canvas");
-      //   canvas.width = image.width;
-      //   canvas.height = image.height;
-      //   let context = canvas.getContext("2d");
-      //   context.drawImage(image, 0, 0, image.width, image.height);
-      //   let url = canvas.toDataURL("image/png"); //得到图片的base64编码数据
-      //   let a = document.createElement("a"); // 生成一个a元素
-      //   let event = new MouseEvent("click"); // 创建一个单击事件
-      //   a.download = name || "photo"; // 设置图片名称
-      //   a.href = url; // 将生成的URL设置为a.href属性
-      //   a.dispatchEvent(event); // 触发a的单击事件
-      // };
-      // image.src = imgsrc;
-
-      // 一、通过XMLHttpRequest()请求图片链接，然后获取返回的Blob（downloadjs）
-      // let data = { url: this.img }; // 签到码链接
-      // let anchor = document.createElement("a");
-      // if (data.url && data.url.length < 2048) {
-      //   anchor.href = data.url;
-      //   if (anchor.href.indexOf(data.url) !== -1) {
-      //     var ajax = new XMLHttpRequest();
-      //     ajax.open("GET", data.url, true);
-      //     ajax.responseType = "blob";
-      //     ajax.onload = function (e) {
-      //       Download(e.target.response, "签到码", "image/jpeg");
-      //     };
-      //     setTimeout(function () {
-      //       ajax.send();
-      //     }, 0);
-      //     return ajax;
-      //   }
-      // }
-      // 一、通过XMLHttpRequest()请求图片链接，然后获取返回的Blob
-      // var x=new XMLHttpRequest();
-      // x.open("GET", this.img, true);
-      // x.responseType = 'blob';
-      // x.onload=function(e){
-      //   console.log('e',e)
-      //   var url = window.URL.createObjectURL(x.response)
-      //   var a = document.createElement('a');
-      //   a.href = url
-      //   a.download = '签到码'
-      //   a.click()
-      // }
-      // x.send();
-      // 二、将图片转成Base64或者Blob
-      // var img = new Image()
-      //   img.onload = function() {
-      //     var canvas = document.createElement('canvas')
-      //     canvas.width = img.width
-      //     canvas.height = img.height
-      //     var ctx = canvas.getContext('2d')
-      //     // 将img中的内容画到画布上
-      //     ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
-      //     // 将画布内容转换为Blob
-      //     canvas.toBlob((blob) => {
-      //       // blob转为同源url
-      //       var blobUrl = window.URL.createObjectURL(blob)
-      //       // 创建a链接
-      //       var a = document.createElement('a')
-      //       a.href = blobUrl
-      //       a.download = '签到码'
-      //       // 触发a链接点击事件，浏览器开始下载文件
-      //       a.click()
-      //     })
-      // }
-      // img.src = this.img
-      // // 必须设置，否则canvas中的内容无法转换为blob
-      // img.setAttribute('crossOrigin', 'Anonymous')
     },
     // 查看
     check(id) {
@@ -355,6 +391,24 @@ export default {
   .el-image {
     width: 250px;
     height: 250px;
+  }
+}
+.relevance-more-box {
+  .search {
+    display: flex;
+    align-items: center;
+    .el-autocomplete {
+      flex: 1;
+      margin: 0 15px;
+    }
+  }
+  .circle-list {
+    .circle-item {
+      padding: 5px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
   }
 }
 </style>

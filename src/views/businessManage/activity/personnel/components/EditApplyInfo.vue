@@ -6,13 +6,17 @@
       width="50%"
     >
       <div class="applyInfo-box">
-        <el-form label-width="50px">
+        <el-form
+          ref="customFormRef"
+          label-width="50px"
+          :rules="getRules(data.conferenceFormList)"
+        >
           <el-form-item
             label-width="100"
             v-for="(item, index) in data.conferenceFormList"
+            :prop="'formItem' + index"
             :label="item.label"
             :key="index"
-            :required="item.must"
           >
             <el-input
               v-if="item.type == 'input'"
@@ -64,17 +68,76 @@ export default {
   data() {
     return {
       dialogVisibleApplyInfo: false,
-      data: {},
+      data: {
+        conferenceFormList: [],
+      },
     };
   },
   methods: {
+    validateRequiredItem(index) {
+      let itemData = this.data.conferenceFormList[index];
+      if (itemData.type == "input" || itemData.type == "textarea") {
+        return (rules, value, callback) => {
+          if (itemData.value) {
+            callback();
+          } else {
+            callback(new Error(`请输入${itemData.label}`));
+          }
+        };
+      } else if (itemData.type == "checkbox" || itemData.type == "radio") {
+        let options = itemData.optionsList;
+        return (rules, value, callback) => {
+          for (let i = 0; i < options.length; i++) {
+            if (options[i].select) {
+              callback();
+              return;
+            }
+          }
+          callback(new Error(`请选择${itemData.label}`));
+        };
+      }
+    },
+    getRules(formList) {
+      console.log("formList111...", formList);
+      let rules = {};
+      for (let i = 0; i < formList.length; i++) {
+        let formItem = formList[i];
+        if (formItem.must) {
+          rules["formItem" + i] = [
+            {
+              required: true,
+              validator: this.validateRequiredItem(i),
+              trigger: "change",
+            },
+          ];
+        }
+      }
+      console.log("rules...", rules);
+      return rules;
+    },
     openApplyInfoDialog(data) {
       this.dialogVisibleApplyInfo = true;
+      //   data.conferenceFormList.forEach(ele => {
+      //     ele.formItem
+      //   });
       this.data = data;
       console.log("data...", this.data);
     },
     handleSave() {
-      console.log("save_data...", this.data);
+      console.log("开始校验...");
+      this.data.conferenceFormList.forEach((ele) => {
+        if ((ele.type === "input" || ele.type === "textarea") && !ele.value && ele.must) {
+          return this.$message.error("请填写必填项");
+        } else if ((ele.type === "checkbox" || ele.type === "radio") && ele.must ) {
+          let flag = ele.optionsList.every((item) => {
+            return item.select == false;
+          });
+          if (flag) {
+            return this.$message.error("请填写必填项");
+          }
+        }
+      });
+    //   console.log("save_data...", this.data);
     },
     getRadioValue(options) {
       for (let i = 0; i < options.length; i++) {
@@ -121,12 +184,10 @@ export default {
   }
   .el-checkbox {
     display: block;
-    padding-left: 50px;
   }
   .el-radio {
     display: block;
     line-height: 40px;
-    padding-left: 50px;
   }
 }
 </style>

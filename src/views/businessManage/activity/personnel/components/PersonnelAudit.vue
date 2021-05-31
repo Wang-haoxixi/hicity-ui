@@ -3,32 +3,43 @@
     <el-dialog title="人员审核" :visible.sync="dialogVisibleAudit" width="20%">
       <div class="audit-box">
         <div class="current">当前TA的状态为：</div>
-        <el-tag type="danger" class="tag" v-if="auditStatus == '1'"
+        <el-tag type="danger" class="tag" v-if="currentAuditStatus == '1'"
           >待审核</el-tag
         >
-        <el-tag type="danger" class="tag" v-else-if="auditStatus == '2'"
-          >未通过</el-tag
-        >
-        <el-tag type="danger" class="tag" v-else-if="auditStatus == '3'"
+        <el-tag type="danger" class="tag" v-else-if="currentAuditStatus == '2'"
           >通过</el-tag
         >
-        <div class="reason" v-if="auditStatus == '2'">理 由</div>
-        <div class="content" v-if="auditStatus == '2'">
-          <i class="el-icon-message-solid"></i
-          >亲爱的朋友，您好！很抱歉，您的报名信息不符合本次活动要求。
+        <el-tag type="danger" class="tag" v-else-if="currentAuditStatus == '3'"
+          >未通过</el-tag
+        >
+        <div class="reason" v-if="currentAuditStatus == '3'">理 由</div>
+        <div class="content" v-if="currentAuditStatus == '3'">
+          <i class="el-icon-message-solid"></i>{{ query.auditRemark }}
         </div>
       </div>
-      <span slot="footer" class="dialog-footer" v-if="auditStatus == '1'">
+      <span
+        slot="footer"
+        class="dialog-footer"
+        v-if="currentAuditStatus == '1'"
+      >
         <el-button @click="handleOpenRejectReasonDialog">拒 绝</el-button>
         <el-button type="primary" @click="handlePass">通 过</el-button>
       </span>
-      <span slot="footer" class="dialog-footer" v-else-if="auditStatus == '2'">
+      <span
+        slot="footer"
+        class="dialog-footer"
+        v-else-if="currentAuditStatus == '3'"
+      >
         <el-button @click="handlePass">重新通过</el-button>
         <el-button type="primary" @click="handleOpenRejectReasonDialog"
           >修改理由</el-button
         >
       </span>
-      <span slot="footer" class="dialog-footer" v-else-if="auditStatus == '3'">
+      <span
+        slot="footer"
+        class="dialog-footer"
+        v-else-if="currentAuditStatus == '2'"
+      >
         <el-button @click="handleOpenRejectReasonDialog">驳 回</el-button>
       </span>
     </el-dialog>
@@ -40,25 +51,32 @@
       <div class="reject-reason-box">
         <i class="el-icon-warning"></i>
         <div class="p">请选择拒绝告知理由</div>
-        <el-select v-model="value" @change="changeOpt" class="select-box">
+        <el-select
+          v-model="query.auditRemark"
+          @change="changeOpt"
+          class="select-box"
+        >
           <el-option
             v-for="item in options"
             :key="item.value"
             :label="item.label"
-            :value="item.value"
+            :value="item.label"
           >
           </el-option>
         </el-select>
         <el-input
+          v-if="
+            query.auditRemark == '其他——自定义输入驳回理由，限制指数为50个字'
+          "
           type="textarea"
           :rows="3"
           placeholder="请输入内容"
           maxlength="50"
+          v-model="content"
           show-word-limit
           class="inp-textarea"
-          v-model="content"
-          v-if="value == '3'"
         >
+          <!-- v-model="query.auditRemark" -->
         </el-input>
       </div>
       <span slot="footer" class="dialog-footer">
@@ -70,6 +88,7 @@
 
 <script>
 import { mapGetters } from "vuex";
+import { auditPort } from "@/api/activity/personnel.js";
 export default {
   computed: {
     ...mapGetters(["dicList"]),
@@ -78,12 +97,17 @@ export default {
     return {
       dialogVisibleAudit: false,
       dialogVisibleRejectReason: false,
-      value: "0",
       options: [],
+      content: "",
 
-      content: "", //拒绝理由
+      currentAuditStatus: "", //当前审核状态
 
-      auditStatus: "",
+      query: {
+        id: "",
+        auditStatus: "", //要改变的审核状态
+        auditRemark:
+          "亲爱的朋友，您好！很抱歉，您的报名信息不符合本次活动要求。", //拒绝理由
+      },
     };
   },
   created() {
@@ -91,12 +115,10 @@ export default {
     console.log(this.options);
   },
   methods: {
-    closeRejectReason() {
-      this.value = "0";
-      this.content = "";
-    },
-    openAuditDialog(auditStatus) {
-      this.auditStatus = auditStatus;
+    closeRejectReason() {},
+    openAuditDialog(auditStatus, id) {
+      this.query.id = id;
+      this.currentAuditStatus = auditStatus;
       this.dialogVisibleAudit = true;
     },
     handleReject() {
@@ -107,18 +129,33 @@ export default {
     },
     handlePass() {
       // pass code...
+      this.query.auditStatus = "2";
+      console.log("query...", this.query);
+      auditPort(this.query).then((res) => {
+        console.log("res...", res);
+        this.$emit("refresh");
+      });
+
       this.dialogVisibleAudit = false;
     },
     handleFinish() {
-      //完成
       // reject code...
-      this.dialogVisibleRejectReason = false;
-      this.dialogVisibleAudit = false;
+      this.query.auditStatus = "3";
+      if (
+        this.query.auditRemark == "其他——自定义输入驳回理由，限制指数为50个字"
+      ) {
+        this.query.auditRemark = this.content;
+      }
+      console.log("finish...", this.query);
+      auditPort(this.query).then((res) => {
+        console.log("fin...", res);
+        this.$emit("refresh");
+        this.dialogVisibleRejectReason = false;
+        this.dialogVisibleAudit = false;
+      });
     },
     changeOpt(val) {
       console.log(val);
-      if (val == 3) {
-      }
     },
   },
 };

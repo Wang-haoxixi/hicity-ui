@@ -140,3 +140,11 @@ export function checkFormInfo(data) {
     params: data
   });
 }
+// 报名审核接口
+export function auditPort(data) {
+  return request({
+    url: "/dms/conference_enrole_form/sign_up/review",
+    method: "post",
+    data: data
+  });
+}
