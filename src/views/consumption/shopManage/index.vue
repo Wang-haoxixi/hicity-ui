@@ -13,6 +13,13 @@
             @click="toCreate"
             >新建</el-button>
         </template>
+
+        <template v-slot:searchItems="scope">
+          <div class="search-item">
+            <div style="white-space: nowrap;">城市/地区：</div>
+            <hc-city-select v-model="scope.searchForm.cityId" :city-id="userInfo.manageCityId" single></hc-city-select>
+          </div>
+        </template>
         <template slot="menu" slot-scope="scope">
           <template>
             <el-button type="text" size="mini" @click="toView(scope.row)"
