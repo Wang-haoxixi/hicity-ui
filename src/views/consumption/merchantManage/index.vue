@@ -16,7 +16,7 @@
         <template v-slot:searchItems="scope">
           <div class="search-item">
             <div style="white-space: nowrap;">商户姓名：</div>
-            <el-input v-model="scope.searchForm.name" placeholder="请输入商户账户" maxlength="50" clearable></el-input>
+            <el-input v-model="scope.searchForm.name" placeholder="请输入商户账户" maxlength="11" clearable></el-input>
           </div>
           <div class="search-item">
             <div style="white-space: nowrap;">商户状态：</div>
@@ -106,7 +106,7 @@
           :rules="formRule"
         >
           <el-form-item label="商户账户：" prop="phone">
-            <el-input v-model.trim="formData.phone" maxlength="50"></el-input>
+            <el-input v-model.trim="formData.phone" maxlength="20"></el-input>
           </el-form-item>
           <el-form-item label="姓名：" prop="name">
             <el-input v-model.trim="formData.name" maxlength="11"></el-input>

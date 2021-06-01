@@ -7,11 +7,11 @@ export const tableOption = (admin = false) => {
       prop: 'phone',
       width: "120",
       search: true,
+      maxlength: 20,
     },
     {
       label: '姓名',
       prop: 'name',
-      maxlength: 50,
     },
     {
       label: '城市/地区',
@@ -61,7 +61,7 @@ export const tableOption = (admin = false) => {
     search: true,
     columns
   }
-  
+
   return option
 }
 
