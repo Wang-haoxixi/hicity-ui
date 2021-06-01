@@ -38,10 +38,10 @@
           :rules="formRule"
         >
           <el-form-item label="店铺名称：" prop="storeName">
-            <el-input v-model.trim="formData.storeName" maxlength="50"></el-input>
+            <el-input v-model.trim="formData.storeName" maxlength="25"></el-input>
           </el-form-item>
           <el-form-item label="店铺地址：" prop="address">
-            <el-input v-model.trim="formData.address" maxlength="100"></el-input>
+            <el-input v-model.trim="formData.address" maxlength="30"></el-input>
           </el-form-item>
           <el-form-item label="所属商户：" prop="storeManagerId">
             <hc-remote-select v-model="formData.storeManagerId" :remote-fun="getAllManager" :show-word="formData.storeManagerName" style="width: 300px" @option-change="managerChange">
@@ -57,7 +57,7 @@
             </el-select>
           </el-form-item>
           <el-form-item label="联系人：" prop="storeUserName">
-            <el-input v-model.trim="formData.storeUserName" maxlength="50"></el-input>
+            <el-input v-model.trim="formData.storeUserName" maxlength="11"></el-input>
           </el-form-item>
           <el-form-item label="联系电话：" prop="storeUserPhone">
             <el-input v-model.trim="formData.storeUserPhone" maxlength="20"></el-input>
@@ -70,11 +70,11 @@
             <hc-image-cropper v-model="formData.storeLogo" :disabled="publishType == 'view'" single :limit="1" @change="logoChange" bottom-tip="请上传尺寸为144*144，大小不超过2M的图片"></hc-image-cropper>
           </el-form-item>
           <el-form-item label="营业时间：" prop="openingHours">
-            <el-input v-model.trim="formData.openingHours" maxlength="20"></el-input>
+            <el-input v-model.trim="formData.openingHours" placeholder="示例：周一至周五 10:00~17:00" maxlength="20"></el-input>
           </el-form-item>
           <el-form-item label="店铺简介：" prop="storeSynopsis">
-            <el-input type="textarea" v-model="formData.storeSynopsis" :autosize="{minRows: 5, maxRows: 10}" maxlength="1000" show-word-limit></el-input>
-            <hc-image-upload style="margin-top: 12px;" :limit="6" v-model="formData.storeSynopsisPicturesUrl" :disabled="publishType == 'view'" @change="logoChange"></hc-image-upload>
+            <el-input type="textarea" placeholder="请输入店铺文字简介" v-model="formData.storeSynopsis" :autosize="{minRows: 5, maxRows: 10}" maxlength="500" show-word-limit></el-input>
+            <hc-image-upload top-tip="店铺图片：" style="margin-top: 12px;" :limit="6" v-model="formData.storeSynopsisPicturesUrl" :disabled="publishType == 'view'" @change="logoChange"></hc-image-upload>
           </el-form-item>
           <el-form-item label="导航定位：" prop="locationAddr">
             <hc-map-select v-model="locationAddr" @city-change="cityChange" @change="locationAddrChange"></hc-map-select>
@@ -84,10 +84,10 @@
             <el-input v-model.trim="formData.businessLicense" maxlength="50"></el-input>
           </el-form-item>
           <el-form-item label="公司名称：" prop="companyName">
-            <el-input v-model.trim="formData.companyName" maxlength="50"></el-input>
+            <el-input v-model.trim="formData.companyName" maxlength="30"></el-input>
           </el-form-item>
           <el-form-item label="经营地址：" prop="businessAddress">
-            <el-input v-model.trim="formData.businessAddress" maxlength="50"></el-input>
+            <el-input v-model.trim="formData.businessAddress" maxlength="30"></el-input>
           </el-form-item>
           <el-form-item label="成立日期：" prop="dateOfSetUp">
             <el-date-picker
@@ -98,19 +98,30 @@
             </el-date-picker>
           </el-form-item>
           <el-form-item label="企业类型：" prop="businessType">
-            <el-input v-model.trim="formData.businessType" maxlength="50"></el-input>
+            <el-input v-model.trim="formData.businessType" maxlength="30"></el-input>
           </el-form-item>
           <el-form-item label="营业期限：" prop="businessTerm">
-            <el-input v-model.trim="formData.businessTerm" maxlength="50"></el-input>
+            <el-radio-group v-model="businessTerm" @change="businessTermDate = ''">
+              <el-radio label="长期">长期</el-radio>
+              <el-radio label="期限">期限</el-radio>
+            </el-radio-group>
+            <br>
+            <el-date-picker
+              v-if="businessTerm == '期限'"
+              v-model="businessTermDate"
+              type="date"
+              value-format="yyyy-MM-dd"
+              placeholder="选择日期">
+            </el-date-picker>
           </el-form-item>
           <el-form-item label="登记机关：" prop="registrationAuthority">
-            <el-input v-model.trim="formData.registrationAuthority" maxlength="50"></el-input>
+            <el-input v-model.trim="formData.registrationAuthority" maxlength="30"></el-input>
           </el-form-item>
           <el-form-item label="经营范围：" prop="scopeOfManagement">
-            <el-input v-model.trim="formData.scopeOfManagement" maxlength="50"></el-input>
+            <el-input type="textarea" placeholder="请输入店铺文字简介" v-model.trim="formData.scopeOfManagement" maxlength="300" :autosize="{minRows: 5, maxRows: 10}" show-word-limit></el-input>
           </el-form-item>
           <el-form-item label="营业执照：" prop="businessLicenseUrl">
-            <hc-image-upload single :limit="1" v-model="formData.businessLicenseUrl" :disabled="publishType == 'view'" @change="logoChange"></hc-image-upload>
+            <hc-image-upload single :limit="1" v-model.trim="formData.businessLicenseUrl" :disabled="publishType == 'view'" @change="logoChange"></hc-image-upload>
           </el-form-item>
 
           <el-form-item label="店铺状态：" prop="storeStatus">
@@ -229,6 +240,8 @@ export default {
         cityId: '',
         percentageMoney: ''
       },
+      businessTerm: '',
+      businessTermDate: '',
       locationAddr: {},
       publish: false,
       publishType: "",
@@ -238,23 +251,22 @@ export default {
       brandLoading: false,
       formRuleInit: {
         storeName: [{required: true, message: '请输入店铺名称', trigger: 'blur'}],
-        companyName: [{required: true, message: '请输入公司名称', trigger: 'blur'}],
-        businessAddress: [{required: true, message: '请输入经营地址', trigger: 'blur'}],
-        dateOfSetUp: [{required: true, message: '请输入成立日期', trigger: 'blur'}],
-        scopeOfManagement: [{required: true, message: '请输入经营范围', trigger: 'blur'}],
-        businessType: [{required: true, message: '请输入企业类型', trigger: 'blur'}],
-        businessTerm: [{required: true, message: '请输入营业期限', trigger: 'blur'}],
-        registrationAuthority: [{required: true, message: '请输入登记机关', trigger: 'blur'}],
+        // companyName: [{required: true, message: '请输入公司名称', trigger: 'blur'}],
+        // businessAddress: [{required: true, message: '请输入经营地址', trigger: 'blur'}],
+        // dateOfSetUp: [{required: true, message: '请输入成立日期', trigger: 'blur'}],
+        // scopeOfManagement: [{required: true, message: '请输入经营范围', trigger: 'blur'}],
+        // businessType: [{required: true, message: '请输入企业类型', trigger: 'blur'}],
+        // businessTerm: [{required: true, message: '请输入营业期限', trigger: 'blur'}],
+        // registrationAuthority: [{required: true, message: '请输入登记机关', trigger: 'blur'}],
         address: [{required: true, message: '请输入详细地址', trigger: 'blur'}],
         storeManagerId: [{required: true, message: '请输入所属商户', trigger: 'blur'}],
         storeType: [{required: true, message: '请选择店铺类型', trigger: 'blur'}],
         storeUserName: [{required: true, message: '请输入联系人', trigger: 'blur'}],
         storeUserPhone: [{required: true, message: '请输入联系电话', trigger: 'blur'}],
         storeLogo: [{required: true, message: '请添加店铺Logo', trigger: 'blur'}],
-        storeSynopsis: [{required: true, validator: this.storeSynopsisValidator, message: '请输入店铺介绍', trigger: 'blur'}],
-        storeSynopsisPicturesUrl: [{required: true, message: '请添加店铺图片', trigger: 'blur'}],
+        storeSynopsis: [{required: true, validator: this.storeSynopsisValidator, trigger: 'blur'}],
         openingHours: [{required: true, message: '请输入营业时间', trigger: 'blur'}],
-        businessLicense: [{required: true, message: '请输入统一社会信用代码', trigger: 'blur'}],
+        businessLicense: [{required: true, validator: this.businessLicenseValidator, trigger: 'blur'}],
         businessLicenseUrl: [{required: true, message: '请输入营业执照', trigger: 'blur'}],
         locationAddr: [{validator: this.locationAddrValidator, required: true, message: '请选择导航定位', trigger: 'change'}],
         cityId: [{required: true, message: '请选择城市/地区', trigger: 'change'}],
@@ -342,8 +354,17 @@ export default {
       this.formData.storeManagerName = option.data.name
     },
     storeSynopsisValidator (rules, value, callback) {
-      if (!value.trim()) {
-        callback(new Error())
+      if (this.formData.storeSynopsis.trim() || (this.formData.storeSynopsisPicturesUrl && this.formData.storeSynopsisPicturesUrl.length > 0)) {
+        callback()
+      } else {
+        callback(new Error('请输入文字简介或上传图片介绍'))
+      }
+    },
+    businessLicenseValidator (rules, value, callback) {
+      if (!value) {
+        callback(new Error('请输入统一社会信用代码'))
+      } else if (value.length > 18 || value.length < 15) {
+        callback(new Error('统一社会信用代码为15~18位'))
       } else {
         callback()
       }
@@ -493,6 +514,13 @@ export default {
         lat: this.locationAddr.latitude,
         locationAddr: this.locationAddr.name
       }
+      if (this.businessTerm == '长期') {
+        formData.businessTerm = '长期'
+      } else if (this.businessTerm == '期限'){
+        formData.businessTerm = this.businessTermDate
+      } else {
+        formData.businessTerm = ''
+      }
       if (this.publishType == "add") {
         addStore(formData).then(({ data }) => {
           this.publish = false;
@@ -534,6 +562,16 @@ export default {
           storeShare: [],
           ...data.data.data
         };
+        if (this.formData.businessTerm == '长期') {
+          this.businessTerm = '长期'
+          this.businessTermDate = ''
+        } else if (this.formData.businessTerm && /\d{4}-\d{2}-\d{2}/.test(this.formData.businessTerm)) {
+          this.businessTerm = '期限'
+          this.businessTermDate = this.formData.businessTerm
+        } else {
+          this.businessTerm = ''
+          this.businessTermDate = ''
+        }
         this.locationAddr = {
           longitude: data.data.data.lng,
           latitude: data.data.data.lat,
