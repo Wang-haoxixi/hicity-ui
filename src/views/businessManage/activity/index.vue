@@ -36,7 +36,7 @@
             <el-tag size="mini" type="danger">官方</el-tag>
           </span>
           <span style="margin-left: 30px">
-            <el-button type="text" @click="handleRelevanceMore"
+            <el-button type="text" @click="handleRelevanceMore(props)"
               >关联更多圈子</el-button
             >
           </span>
@@ -132,52 +132,54 @@
       title="2021城市超级APP免费体检活动"
       :visible.sync="dialogVisibleRelevanceMore"
       width="40%"
+      @close="closeDialogMore"
     >
       <div class="relevance-more-box">
         <div class="search">
           <span>搜索圈子</span>
-          <el-autocomplete
-            prefix-icon="el-icon-search"
-            v-model="state2"
-            :fetch-suggestions="querySearch"
-            placeholder="请输入关键字"
-            :trigger-on-focus="false"
-            @select="handleSelect"
-          ></el-autocomplete>
+          <el-select
+            v-el-select-loadmore="loadmore"
+            v-model="relevanceQuery.circleId"
+            filterable
+            remote
+            reserve-keyword
+            placeholder="请输入关键词"
+            :remote-method="remoteMethod"
+            :loading="loading"
+          >
+            <el-option
+              v-for="item in searchOrgList"
+              :key="item.circleId"
+              :label="item.name"
+              :value="item.circleId"
+            >
+            </el-option>
+          </el-select>
+
           <el-button type="primary" round @click="toRelevance">关 联</el-button>
         </div>
         <el-divider></el-divider>
         <div class="circle-list">
-          <div>关联圈子</div>
-          <div>
-            <div class="circle-item">
-              <span>2025xxxxx活动圈</span>
+          <div class="tiitle-org">关联圈子</div>
+          <div v-if="orgedArr.length != 0">
+            <div
+              class="circle-item"
+              v-for="(item, index) in orgedArr"
+              :key="index"
+            >
+              <span>{{ item.circleName }}</span>
               <el-button
                 type="danger"
                 round
                 size="mini"
-                @click="deleteCircleItem"
+                @click="deleteCircleItem(item.id)"
                 >删除</el-button
               >
             </div>
-            <div class="circle-item">
-              <span>2025xxxxx活动圈</span>
-              <el-button type="danger" round size="mini">删除</el-button>
-            </div>
-            <div class="circle-item">
-              <span>2025xxxxx活动圈</span>
-              <el-button type="danger" round size="mini">删除</el-button>
-            </div>
-            <div class="circle-item">
-              <span>2025xxxxx活动圈</span>
-              <el-button type="danger" round size="mini">删除</el-button>
-            </div>
-            <div class="circle-item">
-              <span>2025xxxxx活动圈</span>
-              <el-button type="danger" round size="mini">删除</el-button>
-            </div>
           </div>
-          <!-- <div style="text-align:center;padding-top:10px">暂无关联</div> -->
+          <div style="text-align: center; padding-top: 10px" v-else>
+            暂无关联
+          </div>
         </div>
       </div>
     </el-dialog>
@@ -189,6 +191,10 @@ import {
   activitiesList,
   activityDelete,
   checkCity,
+  searchOrg,
+  relevanceSave,
+  orgedList,
+  deleteOrg,
 } from "@/api/activity/activity";
 import { tableOption } from "./const.js";
 import HcCityBox from "@/views/components/HcCity/HcCityBox/index";
@@ -200,10 +206,21 @@ export default {
     return {
       showCityDialogVisible: false, //控制展示城市
       showCodeDialogVisible: false, //展示签到码
-      dialogVisibleRelevanceMore: true,
+      dialogVisibleRelevanceMore: false,
       img: "", //签到码地址
-
-      state2: "",
+      relevanceQuery: {
+        activityId: "", //活动id
+        circleId: "", //圈子id
+      },
+      loading: false,
+      searchOrgQuery: {
+        //搜索圈子
+        searchKey: "",
+        size: 10,
+        current: 1,
+      },
+      searchOrgList: [], //圈子搜索结果
+      orgedArr: [],
     };
   },
   computed: {
@@ -215,37 +232,77 @@ export default {
   activated() {
     this.$refs.hcCrud.refresh(); // 刷新表格数据
   },
+  directives: {
+    "el-select-loadmore": {
+      inserted(el, binding) {
+        // 获取element-ui定义好的scroll盒子
+        const SELECTWRAP_DOM = el.querySelector(
+          ".el-select-dropdown .el-select-dropdown__wrap"
+        );
+        SELECTWRAP_DOM.addEventListener("scroll", function () {
+          /**
+           * scrollHeight 获取元素内容高度(只读)
+           * scrollTop 获取或者设置元素的偏移值,常用于计算滚动条的位置, 当一个元素的容器没有产生垂直方向的滚动条, 那它的scrollTop的值默认为0.
+           * clientHeight 读取元素的可见高度(只读)
+           * 如果元素滚动到底, 下面等式返回true, 没有则返回false:
+           * ele.scrollHeight - ele.scrollTop === ele.clientHeight;
+           */
+          const condition =
+            this.scrollHeight - this.scrollTop <= this.clientHeight + 1;
+          if (condition) {
+            binding.value();
+          }
+        });
+      },
+    },
+  },
   methods: {
-    querySearch(queryString, cb) {
-      console.log("queryString..", queryString);
-      // var restaurants = this.restaurants;
-      // var results = queryString
-      //   ? restaurants.filter(this.createFilter(queryString))
-      //   : restaurants;
-      // 调用 callback 返回建议列表的数据
-      // cb(results);
+    closeDialogMore() {
+      this.relevanceQuery.circleId = "";
+      this.searchOrgList = []
+      this.orgedArr = []
     },
-    // createFilter(queryString) {
-    //   return (restaurant) => {
-    //     return (
-    //       restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) ===
-    //       0
-    //     );
-    //   };
-    // },
-    handleSelect(item) {
-      console.log(item);
+    getOrgList(query) {
+      searchOrg(query).then((res) => {
+        this.searchOrgList = res.data.data.data.records;
+        this.loading = false;
+      });
     },
-    deleteCircleItem() {
+    remoteMethod(query) {
+      if(query!=''){
+        this.loading = true;
+        this.searchOrgQuery.searchKey = query;
+        this.searchOrgQuery.current = 1;
+        this.getOrgList(this.searchOrgQuery);
+      }else {
+        this.searchOrgList = []
+      }
+    },
+    loadmore() {
+      this.searchOrgQuery.current += 1;
+      searchOrg(this.searchOrgQuery).then((res) => {
+        this.searchOrgList = this.searchOrgList.concat(
+          res.data.data.data.records
+        );
+      });
+    },
+    deleteCircleItem(id) {
       this.$confirm("此操作将取消关联该圈子, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
       })
         .then(() => {
-          this.$message({
-            type: "success",
-            message: "删除成功!",
+          deleteOrg(id).then((res) => {
+            if (res.data.data.businessCode == 1000) {
+              this.$message({
+                type: "success",
+                message: "删除成功",
+              });
+              this.getOrgedList({
+                activityId: this.relevanceQuery.activityId,
+              });
+            }
           });
         })
         .catch(() => {
@@ -257,11 +314,25 @@ export default {
     },
     toRelevance() {
       // relevance code...
-      console.log("relevance...");
+      relevanceSave(this.relevanceQuery).then((res) => {
+        if (res.data.data.businessCode == 1000) {
+          this.getOrgedList({
+            activityId: this.relevanceQuery.activityId,
+          });
+        }
+      });
     },
-
-    handleRelevanceMore() {
-      console.log("关联更多圈子...");
+    //已关联圈子数据
+    getOrgedList(query) {
+      orgedList(query).then((res) => {
+        this.orgedArr = res.data.data.data;
+      });
+    },
+    handleRelevanceMore({ row }) {
+      this.dialogVisibleRelevanceMore = true;
+      this.relevanceQuery.activityId = row.id;
+      let query = { activityId: row.id };
+      this.getOrgedList(query);
     },
     fetchListFun(params) {
       return new Promise((resolve, reject) => {
@@ -310,12 +381,10 @@ export default {
     handleShowCode(row) {
       this.showCodeDialogVisible = true;
       this.img = row.weChatCode;
-      console.log("imgurl", this.img);
     },
     // 下载签到码
     downloadCode() {
       var a = document.createElement("a");
-      console.log("a", a);
       a.download = "签到码";
       a.href = this.img;
       a.click();
@@ -397,12 +466,15 @@ export default {
   .search {
     display: flex;
     align-items: center;
-    .el-autocomplete {
+    .el-select {
       flex: 1;
       margin: 0 15px;
     }
   }
   .circle-list {
+    .tiitle-org {
+      padding-bottom: 10px;
+    }
     .circle-item {
       padding: 5px 0;
       display: flex;

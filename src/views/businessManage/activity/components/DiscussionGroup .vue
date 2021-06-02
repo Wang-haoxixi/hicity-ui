@@ -42,7 +42,7 @@
 export default {
   data() {
     return {
-      dialogVisibleDiscussionGroup: false,
+      dialogVisibleDiscussionGroup: true,
       discussionData: {
         name: "",
         acc: "",

@@ -29,3 +29,38 @@ export function checkCity(data) {
     params: data
   });
 }
+
+// 搜索圈子
+export function searchOrg(data) {
+  return request({
+    url: "/admin/open/search_org",
+    method: "get",
+    params: data
+  });
+}
+
+// 活动圈子关联新增
+export function relevanceSave(data) {
+  return request({
+    url: "/dms/activity_circle/save",
+    method: "post",
+    data: data
+  });
+}
+
+// 根据活动id查询圈子关联
+export function orgedList(data) {
+  return request({
+    url: "/dms/activity_circle/select_by_id",
+    method: "get",
+    params: data
+  });
+}
+
+// 删除活动圈子关联
+export function deleteOrg(data) {
+  return request({
+    url: "/dms/activity_circle/delete/?id=" + data,
+    method: "post",
+  });
+}
