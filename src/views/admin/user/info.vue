@@ -28,6 +28,9 @@
               <el-form-item label="手机号" prop="phone">
                 <el-input v-model="ruleForm2.phone" placeholder="验证码登录使用"/>
               </el-form-item>
+              <el-form-item label="管理员名称" prop="realName">
+                <el-input v-model="ruleForm2.realName"/>
+              </el-form-item>
               <el-form-item label="头像">
                 <el-upload
                   :headers="headers"
@@ -138,6 +141,7 @@ export default {
       },
       ruleForm2: {
         username: '',
+        realName: '',
         password: '',
         newpassword1: '',
         newpassword2: '',
@@ -200,6 +204,7 @@ export default {
       this.ruleForm2.newpassword1 = undefined
       this.ruleForm2.newpassword2 = undefined
       this.ruleForm2.username = this.userInfo.username
+      this.ruleForm2.realName = this.userInfo.realName
       this.ruleForm2.phone = this.userInfo.phone
       this.ruleForm2.avatar = this.userInfo.avatar
       // handleImg(this.userInfo.avatar, 'avatar')

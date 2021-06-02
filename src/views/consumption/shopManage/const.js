@@ -9,7 +9,7 @@ export const tableOption = (admin = false) => {
       label: '店铺名称',
       prop: 'storeName',
       search: true,
-      maxlength: 50,
+      maxlength: 25,
     },
     {
       label: '店铺地址',
@@ -19,7 +19,8 @@ export const tableOption = (admin = false) => {
       label: '店铺类型',
       prop: 'storeType',
       type: 'select',
-      dicName: 'STORE_TYPE'
+      dicName: 'STORE_TYPE',
+      search: true,
     },
     {
       label: '城市/地区',
@@ -54,7 +55,7 @@ export const tableOption = (admin = false) => {
     menu: true,
     columns
   }
-  
+
   return option
 }
 

@@ -16,7 +16,7 @@
         <template v-slot:searchItems="scope">
           <div class="search-item">
             <div style="white-space: nowrap;">商户姓名：</div>
-            <el-input v-model="scope.searchForm.merchantName" placeholder="请输入商户账户" maxlength="50" clearable></el-input>
+            <el-input v-model="scope.searchForm.name" placeholder="请输入商户账户" maxlength="11" clearable></el-input>
           </div>
           <div class="search-item">
             <div style="white-space: nowrap;">商户状态：</div>
@@ -94,7 +94,7 @@
         </hc-crud>
 
         <hc-crud v-else-if="publishType == 'account'" ref="accountCrud" :option="accountTableOption" :fetchListFun="accountFetchListFun" :auto-load="false">
-        </hc-crud>        
+        </hc-crud>
 
         <el-form
           v-else
@@ -106,10 +106,10 @@
           :rules="formRule"
         >
           <el-form-item label="商户账户：" prop="phone">
-            <el-input v-model.trim="formData.phone" maxlength="50" :disabled="publishType == 'edit'"></el-input>
+            <el-input v-model.trim="formData.phone" maxlength="20"></el-input>
           </el-form-item>
           <el-form-item label="姓名：" prop="name">
-            <el-input v-model.trim="formData.name" maxlength="50"></el-input>
+            <el-input v-model.trim="formData.name" maxlength="11"></el-input>
           </el-form-item>
           <el-form-item label="性别：" prop="gender">
             <el-select style="width: 250px;" v-model="formData.gender" placeholder="请选择性别">
@@ -130,10 +130,10 @@
             </el-date-picker>
           </el-form-item>
           <el-form-item label="地址：" prop="address">
-            <el-input v-model.trim="formData.address" maxlength="50"></el-input>
+            <el-input v-model.trim="formData.address" maxlength="30"></el-input>
           </el-form-item>
           <el-form-item label="身份证号：" prop="idCard">
-            <el-input v-model.trim="formData.idCard" maxlength="50"></el-input>
+            <el-input v-model.trim="formData.idCard" maxlength="18"></el-input>
           </el-form-item>
           <el-form-item label="身份证有效期：" prop="idCardTime">
             <el-date-picker
@@ -156,13 +156,13 @@
             <hc-city-select v-model="formData.cityId" :city-id="userInfo.manageCityId" single @change="$refs.form.validateField('cityId')"></hc-city-select>
           </el-form-item>
           <el-form-item label="联系人姓名：" prop="contactsName">
-            <el-input v-model.trim="formData.contactsName" maxlength="50"></el-input>
+            <el-input v-model.trim="formData.contactsName" maxlength="11"></el-input>
           </el-form-item>
           <el-form-item label="联系人电话：" prop="contactsPhone">
-            <el-input v-model.trim="formData.contactsPhone" maxlength="20"></el-input>
+            <el-input v-model.trim="formData.contactsPhone" maxlength="13"></el-input>
           </el-form-item>
           <el-form-item label="联系人地址：" prop="contactsAddress">
-            <el-input v-model.trim="formData.contactsAddress" maxlength="50"></el-input>
+            <el-input v-model.trim="formData.contactsAddress" maxlength="30"></el-input>
           </el-form-item>
           <el-form-item label="商户状态：" prop="merchantStatus">
             <el-radio-group v-model="formData.merchantStatus">
@@ -227,6 +227,7 @@ import HcInput from "@/views/components/HcForm/HcInput/index"
 import MerchantQrCode from "@/views/components/BusinessComponents/MerchantQrCode/index"
 import StoreDetail from '@/views/consumption/shopManage/detail'
 import OrderDetail from './orderDetail'
+import { isMobile, isPhone } from '@/util/validate'
 
 export default {
   components: { HcImageUpload, HcTableForm, HcEmptyData, HcMapSelect, HcRemoteSelect, HcCitySelect, HcInput, MerchantQrCode, StoreDetail, OrderDetail },
@@ -238,11 +239,11 @@ export default {
       publish: false,
       publishType: "",
       formRule: {
-        phone: [{required: true, message: '请输入商户账户', trigger: 'blur'}],
+        phone: [{required: true, validator: this.phoneValidator, trigger: 'blur'}],
         name: [{required: true, message: '请输入商户名称', trigger: 'blur'}],
         cityId: [{required: true, message: '请选择所在城市', trigger: 'change'}],
         contactsName: [{required: true, message: '请输入联系人姓名', trigger: 'blur'}],
-        contactsPhone: [{required: true, message: '请输入联系人电话', trigger: 'blur'}],
+        contactsPhone: [{required: true, validator: this.contactsPhoneValidator, trigger: 'blur'}],
         contactsAddress: [{required: true, message: '请输入联系人地址', trigger: 'blur'}],
         merchantStatus: [{required: true, message: '请选择店铺状态', trigger: 'blur'}],
       },
@@ -286,6 +287,24 @@ export default {
     }
   },
   methods: {
+    phoneValidator (rules, value, callback) {
+      if (!value) {
+        callback(new Error('请输入商户账户'))
+      } else if (isMobile(value)) {
+        callback()
+      } else {
+        callback(new Error('请输入正确的手机号码格式'))
+      }
+    },
+    contactsPhoneValidator (rules, value, callback) {
+      if (!value) {
+        callback(new Error('请输入联系人电话'))
+      } else if (isMobile(value) || isPhone(value)) {
+        callback()
+      } else {
+        callback(new Error('请输入正确的电话号码格式'))
+      }
+    },
     idCardChange (idCardTime) {
       if (idCardTime && idCardTime.length == 2) {
         this.formData.idCardStartTime = idCardTime[0]
@@ -389,7 +408,7 @@ export default {
       })
     },
     save () {
-      let formData = { 
+      let formData = {
         ...this.formData,
         lng: this.locationAddr.longitude,
         lat: this.locationAddr.latitude,
