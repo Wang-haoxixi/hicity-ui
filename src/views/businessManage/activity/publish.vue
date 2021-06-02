@@ -1062,7 +1062,8 @@ export default {
         disabledDate: (time) => {
           return (
             time.getTime() < Date.now() - 8.64e7 ||
-            time.getTime() < new Date(this.baseFormData.startTime).getTime()
+            // time.getTime() < new Date(this.baseFormData.startTime).getTime()
+            time.getTime() < new Date(this.baseFormData.startTime).getTime() -8.64e7
           );
         },
       },
@@ -2126,18 +2127,18 @@ export default {
       this.showDelete = false;
     },
     // 获取当前时间
-    getCurrentTime() {
-      this.baseFormData.startTime = dateFormat(new Date());
-    },
-    getNextTime() {
-      this.baseFormData.endTime = dateFormat(
-        new Date(new Date().getTime() + 1000 * 3600 * 24)
-      );
-    },
+    // getCurrentTime() {
+    //   this.baseFormData.startTime = dateFormat(new Date());
+    // },
+    // getNextTime() {
+    //   this.baseFormData.endTime = dateFormat(
+    //     new Date(new Date().getTime() + 1000 * 3600 * 24)
+    //   );
+    // },
   },
   created() {
-    this.getCurrentTime();
-    this.getNextTime();
+    // this.getCurrentTime();
+    // this.getNextTime();
     this.getActivityClassify();
     this.getCityTree();
     this.getActivityType();

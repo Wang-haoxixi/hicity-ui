@@ -84,7 +84,7 @@
         :span-method="mergeCell"
         :header-cell-style="{ background: '#FAFAFA' }"
       >
-        <el-table-column prop="userName" label="名称"> </el-table-column>
+        <el-table-column prop="userName" label="名称" fixed> </el-table-column>
         <el-table-column label="报名信息" width="500px">
           <template slot-scope="scope">
             <span class="info-item">{{
@@ -150,7 +150,7 @@
             {{ scope.row.auditStatus | auditStatusFilter }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="100">
+        <el-table-column label="操作" width="100" fixed="right">
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="handleEdit(scope.row)"
               >编辑</el-button

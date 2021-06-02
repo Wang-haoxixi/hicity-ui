@@ -77,83 +77,95 @@ export default {
     validateRequiredItem(index) {
       let itemData = this.data.conferenceFormList[index];
       if (itemData.type == "input" || itemData.type == "textarea") {
-        // if (itemData.code == "user_name") {
-        //   //姓名
-        //   return (rules, value, callback) => {
-        //     if (itemData.value && itemData.value.length <= 10) {
-        //       callback();
-        //     } else if (itemData.value && itemData.value.length > 10) {
-        //       callback(new Error(`姓名不能超过10个字符`));
-        //     } else {
-        //       callback(new Error(`姓名不能为空`));
-        //     }
-        //   };
-        // } else if (itemData.code == "phone_number") {
-        //   //手机号
-        //   return (rules, value, callback) => {
-        //     const phone = /^1[3|4|5|7|8]\d{9}$/;
-        //     if (itemData.value && phone.test(itemData.value)) {
-        //       callback();
-        //     } else if (itemData.value && !phone.test(itemData.value)) {
-        //       callback(new Error(`请输入正确的手机格式`));
-        //     } else {
-        //       callback(new Error(`手机号不能为空`));
-        //     }
-        //   };
-        // } else if (itemData.code == "company") {
-        //   //单位
-        //   return (rules, value, callback) => {
-        //     if (itemData.value && itemData.value.length <= 15) {
-        //       callback();
-        //     } else if (itemData.value && itemData.value.length > 15) {
-        //       callback(new Error(`单位不能超过15个字符`));
-        //     } else {
-        //       callback(new Error(`单位不能为空`));
-        //     }
-        //   };
-        // } else if (itemData.code == "position") {
-        //   //职务
-        //   return (rules, value, callback) => {
-        //     if (itemData.value && itemData.value.length <= 10) {
-        //       callback();
-        //     } else if (itemData.value && itemData.value.length > 10) {
-        //       callback(new Error(`职务不能超过10个字符`));
-        //     } else {
-        //       callback(new Error(`职务不能为空`));
-        //     }
-        //   };
-        // } else if (itemData.code == "remark") {
-        //   //备注
-        //   return (rules, value, callback) => {
-        //     if (itemData.value && itemData.value.length <= 100) {
-        //       callback();
-        //     } else if (itemData.value && itemData.value.length > 100) {
-        //       callback(new Error(`备注不能超过100个字符`));
-        //     } else {
-        //       callback(new Error(`备注不能为空`));
-        //     }
-        //   };
-        // } else if (itemData.code == "email") {
-        //   //邮箱
-        //   return (rules, value, callback) => {
-        //     const email = /^[A-Za-z0-9._%-]+@([A-Za-z0-9-]+\.)+[A-Za-z]{2,4}$/;
-        //     if (itemData.value && email.test(itemData.value)) {
-        //       callback();
-        //     } else if (itemData.value && !email.test(itemData.value)) {
-        //       callback(new Error(`请输入正确的邮箱格式`));
-        //     } else {
-        //       callback(new Error(`邮箱不能为空`));
-        //     }
-        //   };
-        // }
+        if (itemData.code == "user_name") {
+          //姓名
+          return (rules, value, callback) => {
+            if (itemData.value && itemData.value.length <= 10) {
+              callback();
+            } else if (itemData.value && itemData.value.length > 10) {
+              callback(new Error(`姓名不能超过10个字符`));
+            } else {
+              callback(new Error(`姓名不能为空`));
+            }
+          };
+        } else if (itemData.code == "phone_number") {
+          //手机号
+          return (rules, value, callback) => {
+            const phone = /^1[3|4|5|7|8]\d{9}$/;
+            if (itemData.value && phone.test(itemData.value)) {
+              callback();
+            } else if (itemData.value && !phone.test(itemData.value)) {
+              callback(new Error(`请输入正确的手机格式`));
+            } else {
+              callback(new Error(`手机号不能为空`));
+            }
+          };
+        } else if (itemData.code == "company") {
+          //单位
+          return (rules, value, callback) => {
+            if (itemData.value && itemData.value.length <= 15) {
+              callback();
+            } else if (itemData.value && itemData.value.length > 15) {
+              callback(new Error(`单位不能超过15个字符`));
+            } else {
+              callback(new Error(`单位不能为空`));
+            }
+          };
+        } else if (itemData.code == "position") {
+          //职务
+          return (rules, value, callback) => {
+            if (itemData.value && itemData.value.length <= 10) {
+              callback();
+            } else if (itemData.value && itemData.value.length > 10) {
+              callback(new Error(`职务不能超过10个字符`));
+            } else {
+              callback(new Error(`职务不能为空`));
+            }
+          };
+        } else if (itemData.code == "remark") {
+          //备注
+          return (rules, value, callback) => {
+            if (itemData.value && itemData.value.length <= 100) {
+              callback();
+            } else if (itemData.value && itemData.value.length > 100) {
+              callback(new Error(`备注不能超过100个字符`));
+            } else {
+              callback(new Error(`备注不能为空`));
+            }
+          };
+        } else if (itemData.code == "email") {
+          //邮箱
+          return (rules, value, callback) => {
+            const email = /^[A-Za-z0-9._%-]+@([A-Za-z0-9-]+\.)+[A-Za-z]{2,4}$/;
+            if (itemData.value && email.test(itemData.value)) {
+              callback();
+            } else if (itemData.value && !email.test(itemData.value)) {
+              callback(new Error(`请输入正确的邮箱格式`));
+            } else {
+              callback(new Error(`邮箱不能为空`));
+            }
+          };
+        } else if (itemData.type == "textarea" && !itemData.code) {
+          console.log("nocodetextarea...");
+          // 自定义文本框
+          return (rules, value, callback) => {
+            if (itemData.value && itemData.value.length <= 100) {
+              callback();
+            } else if (itemData.value && itemData.value.length > 100) {
+              callback(new Error(`${itemData.label}不能超过100个字符`));
+            } else {
+              callback(new Error(`${itemData.label}不能为空`));
+            }
+          };
+        }
 
-        return (rules, value, callback) => {
-          if (itemData.value) {
-            callback();
-          } else {
-            callback(new Error(`请输入${itemData.label}`));
-          }
-        };
+        // return (rules, value, callback) => {
+        //   if (itemData.value) {
+        //     callback();
+        //   } else {
+        //     callback(new Error(`请输入${itemData.label}`));
+        //   }
+        // };
       } else if (itemData.type == "checkbox" || itemData.type == "radio") {
         let options = itemData.optionsList;
         return (rules, value, callback) => {
@@ -194,22 +206,22 @@ export default {
       // let list = this.data.conferenceFormList;
       // for (let i = 0; i < list.length; i++) {
       //   if (list[i].must) {
+      //     this.validateRequiredItem(i)
       //   }
       // }
-
-      this.data.conferenceFormList.forEach((ele) => {
-        if ((ele.type === "input" || ele.type === "textarea") && !ele.value && ele.must) {
-          return this.$message.error("请填写必填项");
-        } else if ((ele.type === "checkbox" || ele.type === "radio") && ele.must ) {
-          let flag = ele.optionsList.every((item) => {
-            return item.select == false;
-          });
-          if (flag) {
-            return this.$message.error("请填写必填项");
-          }
-        }
-      });
-      // console.log("save_data...", this.data);
+      // this.data.conferenceFormList.forEach((ele) => {
+      //   if ((ele.type === "input" || ele.type === "textarea") && !ele.value && ele.must) {
+      //     return this.$message.error("请填写必填项");
+      //   } else if ((ele.type === "checkbox" || ele.type === "radio") && ele.must ) {
+      //     let flag = ele.optionsList.every((item) => {
+      //       return item.select == false;
+      //     });
+      //     if (flag) {
+      //       return this.$message.error("请填写必填项");
+      //     }
+      //   }
+      // });
+      console.log("校验通过...");
     },
     getRadioValue(options) {
       for (let i = 0; i < options.length; i++) {

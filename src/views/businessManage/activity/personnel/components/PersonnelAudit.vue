@@ -46,16 +46,11 @@
     <el-dialog
       :visible.sync="dialogVisibleRejectReason"
       width="30%"
-      @close="closeRejectReason"
     >
       <div class="reject-reason-box">
         <i class="el-icon-warning"></i>
         <div class="p">请选择拒绝告知理由</div>
-        <el-select
-          v-model="query.auditRemark"
-          @change="changeOpt"
-          class="select-box"
-        >
+        <el-select v-model="query.auditRemark" class="select-box">
           <el-option
             v-for="item in options"
             :key="item.value"
@@ -99,9 +94,7 @@ export default {
       dialogVisibleRejectReason: false,
       options: [],
       content: "",
-
       currentAuditStatus: "", //当前审核状态
-
       query: {
         id: "",
         auditStatus: "", //要改变的审核状态
@@ -112,17 +105,12 @@ export default {
   },
   created() {
     this.options = this.dicList.REFUSE_TYPE;
-    console.log(this.options);
   },
   methods: {
-    closeRejectReason() {},
     openAuditDialog(auditStatus, id) {
       this.query.id = id;
       this.currentAuditStatus = auditStatus;
       this.dialogVisibleAudit = true;
-    },
-    handleReject() {
-      //拒绝
     },
     handleOpenRejectReasonDialog() {
       this.dialogVisibleRejectReason = true;
@@ -130,10 +118,15 @@ export default {
     handlePass() {
       // pass code...
       this.query.auditStatus = "2";
-      console.log("query...", this.query);
       auditPort(this.query).then((res) => {
-        console.log("res...", res);
         this.$emit("refresh");
+        if (res.data.data.businessCode == 1000) {
+          this.$notify({
+            title: "成功",
+            message: "审核通过",
+            type: "success",
+          });
+        }
       });
 
       this.dialogVisibleAudit = false;
@@ -146,16 +139,11 @@ export default {
       ) {
         this.query.auditRemark = this.content;
       }
-      console.log("finish...", this.query);
       auditPort(this.query).then((res) => {
-        console.log("fin...", res);
         this.$emit("refresh");
         this.dialogVisibleRejectReason = false;
         this.dialogVisibleAudit = false;
       });
-    },
-    changeOpt(val) {
-      console.log(val);
     },
   },
 };
@@ -165,7 +153,7 @@ export default {
 ::v-deep .el-dialog__header {
   text-align: center;
   .el-dialog__title {
-    font-size: 22px;
+    font-size: 18px;
     font-weight: bold;
   }
 }
@@ -173,7 +161,7 @@ export default {
 .reject-reason-box {
   text-align: center;
   .current {
-    font-size: 20px;
+    font-size: 16px;
     font-weight: 500;
   }
   .tag {

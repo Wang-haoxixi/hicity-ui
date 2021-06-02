@@ -177,7 +177,7 @@
               >
             </div>
           </div>
-          <div style="text-align: center; padding-top: 10px" v-else>
+          <div style="text-align: center; padding-top: 10px;color:#909399;" v-else>
             暂无关联
           </div>
         </div>
@@ -213,8 +213,8 @@ export default {
         circleId: "", //圈子id
       },
       loading: false,
+      //搜索圈子参数
       searchOrgQuery: {
-        //搜索圈子
         searchKey: "",
         size: 10,
         current: 1,
@@ -235,6 +235,9 @@ export default {
   directives: {
     "el-select-loadmore": {
       inserted(el, binding) {
+        /** el可以获取当前dom节点，并且进行编译，也可以操作事件 **/
+        /** binding指的是一个对象，一般不用 **/
+        /** vnode 是 Vue 编译生成的虚拟节点 **/
         // 获取element-ui定义好的scroll盒子
         const SELECTWRAP_DOM = el.querySelector(
           ".el-select-dropdown .el-select-dropdown__wrap"
@@ -259,8 +262,8 @@ export default {
   methods: {
     closeDialogMore() {
       this.relevanceQuery.circleId = "";
-      this.searchOrgList = []
-      this.orgedArr = []
+      this.searchOrgList = [];
+      this.orgedArr = [];
     },
     getOrgList(query) {
       searchOrg(query).then((res) => {
@@ -269,13 +272,13 @@ export default {
       });
     },
     remoteMethod(query) {
-      if(query!=''){
+      if (query != "") {
         this.loading = true;
         this.searchOrgQuery.searchKey = query;
         this.searchOrgQuery.current = 1;
         this.getOrgList(this.searchOrgQuery);
-      }else {
-        this.searchOrgList = []
+      } else {
+        this.searchOrgList = [];
       }
     },
     loadmore() {
@@ -414,7 +417,6 @@ export default {
           id: data.row.id,
         },
       });
-      // this.$router.push("/personnel");
     },
     // 票务管理
     ticketManagement({ row }) {
@@ -427,60 +429,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.title {
-  padding-bottom: 5px;
-  font-size: 18px;
-  font-weight: 400;
-}
-.add-inp-more {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  .inp-more {
-    display: flex;
-    .inp {
-      width: 272px;
-    }
-    .more {
-      padding: 0 12px;
-      margin-left: 8px;
-      height: 28px;
-    }
-  }
-}
-.paging {
-  margin-top: 20px;
-  text-align: right;
-}
-.managBtn {
-  font-size: 14px;
-}
-.code-img {
-  text-align: center;
-  .el-image {
-    width: 250px;
-    height: 250px;
-  }
-}
-.relevance-more-box {
-  .search {
-    display: flex;
-    align-items: center;
-    .el-select {
-      flex: 1;
-      margin: 0 15px;
-    }
-  }
-  .circle-list {
-    .tiitle-org {
-      padding-bottom: 10px;
-    }
-    .circle-item {
-      padding: 5px 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-  }
-}
+@import "./styles/index.scss";
 </style>

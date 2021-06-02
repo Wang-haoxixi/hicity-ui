@@ -14,18 +14,23 @@
             {{ formData.ticketingName }}
           </el-form-item>
 
-          <!-- <el-form-item label="参与项目" class="join-box"></el-form-item> -->
           <div class="join-box">参与项目</div>
-          <div>{{ formData.ticketingFormList[0].label }}</div>
-          <el-form-item>
-            <el-checkbox
-              disabled
-              v-for="(item, index) in formData.ticketingFormList[0].optionsList"
-              :key="index"
-              :label="item.label"
-              :checked="item.select"
-            ></el-checkbox>
-          </el-form-item>
+          <div>
+            <div>{{ formData.ticketingFormList[0].label }}</div>
+            <el-form-item>
+              <el-checkbox
+                disabled
+                v-for="(item, index) in formData.ticketingFormList[0]
+                  .optionsList"
+                :key="index"
+                :label="item.label"
+                :checked="item.select"
+              ></el-checkbox>
+            </el-form-item>
+          </div>
+          <!-- <div style="text-align: center; padding-top: 10px; color: #909399">
+            暂无数据
+          </div> -->
         </el-form>
       </div>
       <span slot="footer" class="dialog-footer">
@@ -57,15 +62,14 @@ export default {
           ? ticketingFormList
           : [{ optionsList: [], label: "" }],
       };
-      console.log("formData...", this.formData);
     },
   },
 };
 </script>
 
 <style lang="scss" scoped>
-.join-box{
-    font-size: 18px;
-    margin-bottom: 22px;
+.join-box {
+  font-size: 18px;
+  margin-bottom: 22px;
 }
 </style>
