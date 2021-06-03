@@ -82,7 +82,7 @@
             </div>
             <div class="search-item">
             <div style="white-space: nowrap;">收款状态：</div>
-              <el-select v-model="scope.searchForm.orderStatus" clearable>
+              <el-select v-model="scope.searchForm.storeOrderStatus" clearable>
                 <el-option label="全部" :value="undefined">全部</el-option>
                 <el-option v-for="(item, index) in dicList['STORE_ORDER_STATUS']" :key="index" :value="item.value" :label="item.label">{{item.label}}</el-option>
               </el-select>
@@ -117,7 +117,7 @@
             </el-select>
           </el-form-item>
           <el-form-item label="民族：" prop="nation">
-            <el-select style="width: 250px;" v-model="formData.nation" placeholder="请选择民族">
+            <el-select style="width: 250px;" v-model="formData.nation" clearable filterable placeholder="请选择民族">
               <el-option v-for="item in dicList['PERSON_NATION']" :key="item.value" :value="item.value" :label="item.label">{{item.label}}</el-option>
             </el-select>
           </el-form-item>
@@ -146,10 +146,10 @@
               end-placeholder="结束日期">
             </el-date-picker>
           </el-form-item>
-          <el-form-item label="身份证正面：" prop="idCardPositive">
+          <el-form-item v-show="publishType != 'view' || formData.idCardPositive" label="身份证正面：" prop="idCardPositive">
             <hc-image-upload single :limit="1" v-model="formData.idCardPositive" :disabled="publishType == 'view'"></hc-image-upload>
           </el-form-item>
-          <el-form-item label="身份证反面：" prop="idCardReverse">
+          <el-form-item v-show="publishType != 'view' || formData.idCardReverse" label="身份证反面：" prop="idCardReverse">
             <hc-image-upload single :limit="1" v-model="formData.idCardReverse" :disabled="publishType == 'view'"></hc-image-upload>
           </el-form-item>
           <el-form-item label="地区城市：" prop="cityId">
@@ -176,9 +176,10 @@
         </el-form>
 
         <el-dialog
-          title="订单详情"
+          title="店铺详情"
           :visible.sync="storeVisible"
           width="70%">
+          123321
           <store-detail :detail="storeDetail"></store-detail>
           <div slot="footer">
             <el-button @click="storeVisible = false">返 回</el-button>
@@ -186,7 +187,7 @@
         </el-dialog>
 
         <el-dialog
-          title="店铺详情"
+          title="订单详情"
           :visible.sync="orderVisible"
           width="70%">
           <order-detail :detail="orderDetail"></order-detail>
