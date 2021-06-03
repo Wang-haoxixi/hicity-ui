@@ -28,7 +28,7 @@
           <top-color />
         </div>
       </el-tooltip>
-      <el-tooltip
+      <!-- <el-tooltip
         v-if="showDebug"
         :content="logsFlag ? '没有错误日志' : `${logsLen}条错误日志`"
         effect="dark"
@@ -37,7 +37,7 @@
         <div class="top-bar__item">
           <top-logs />
         </div>
-      </el-tooltip>
+      </el-tooltip> -->
       <el-tooltip
         v-if="showLock"
         effect="dark"

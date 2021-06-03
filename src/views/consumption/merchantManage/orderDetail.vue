@@ -18,7 +18,7 @@
       {{detail.cashierName}}
     </el-form-item>
     <el-form-item label="收款金额：">
-      {{detail.paymentAmount}}
+      {{detail.paymentAmount}}元
     </el-form-item>
     <el-form-item label="收款商户名称：">
       {{detail.storeManagerName}}
@@ -27,24 +27,24 @@
       {{detail.storeManagerAccount}}
     </el-form-item>
     <el-form-item label="订单总额：">
-      {{detail.orderTotal}}
+      {{detail.orderTotal}}元
     </el-form-item>
-    <el-form-item label="优惠总额：">
-      {{detail.totalDiscount}}
+    <el-form-item v-if="detail.totalDiscount" label="优惠总额：">
+      {{detail.totalDiscount}}元
     </el-form-item>
-    <el-form-item label="店铺固定优惠抵扣：">
-      {{detail.storeFixedDiscount}}
+    <el-form-item v-if="detail.storeFixedDiscount" label="店铺固定优惠抵扣：">
+      {{detail.storeFixedDiscount}}折
     </el-form-item>
-    <el-form-item label="优惠券抵扣：">
-      {{detail.couponDeduction}}
+    <el-form-item v-if="detail.couponDeduction" label="优惠券抵扣：">
+      {{detail.couponDeduction}}元
     </el-form-item>
     <el-form-item label="收款状态：">
-      {{getDicValue('STORE_ORDER_STATUS',detail.orderStatus)}}
+      {{getDicValue('STORE_ORDER_STATUS', detail.storeOrderStatus)}}
     </el-form-item>
-    <el-form-item label="收款成功时间：">
+    <el-form-item v-if="detail.storeOrderStatus == '5'" label="收款成功时间：">
       {{detail.paymentTime}}
     </el-form-item>
-    <el-form-item label="收款取消时间：">
+    <el-form-item v-if="detail.storeOrderStatus == '3' || detail.storeOrderStatus == '4'" label="收款取消时间：">
       {{detail.cancelTime}}
     </el-form-item>
   </el-form>

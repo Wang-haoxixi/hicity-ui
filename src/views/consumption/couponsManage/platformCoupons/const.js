@@ -49,7 +49,7 @@ export const tableOption = () => {
     },
     {
       label: '发券人账户',
-      prop: 'cityName',
+      prop: 'userAccount',
     },
     {
       label: '优惠券状态',
@@ -100,6 +100,5 @@ export const tableOption = () => {
     header: true,
     columns
   }
-  
   return option
 }

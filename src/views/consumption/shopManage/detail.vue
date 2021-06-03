@@ -23,7 +23,8 @@
     </el-form-item>
 
     <el-form-item label="城市/地区：">
-      <hc-city-select v-model="detail.cityId" :city-id="userInfo.manageCityId" single view-only></hc-city-select>
+      <template v-if="detail.cityName">{{detail.cityName}}</template>
+      <hc-city-select v-else v-model="detail.cityId" :city-id="1" single view-only></hc-city-select>
     </el-form-item>
     <el-form-item label="店铺状态：">
       {{getDicValue('STORE_STATE', detail.storeStatus)}}
@@ -31,11 +32,11 @@
     <el-form-item label="营业时间：">
       {{detail.openingHours}}
     </el-form-item>
-    
+
     <el-form-item label="店铺口碑：">
       平均{{detail.storeGrade}}分，共{{detail.commentCount}}人评分
     </el-form-item>
-    
+
     <el-form-item label="会员折扣：">
       {{detail.discount}}折
     </el-form-item>
@@ -43,8 +44,8 @@
       {{detail.percentageMoney ? detail.percentageMoney + '%' : '不抽成'}}
     </el-form-item>
 
-    
-    
+
+
     <el-form-item label="联系人：">
       {{detail.storeUserName}}
     </el-form-item>
@@ -57,7 +58,7 @@
     <el-form-item label="店铺图片：">
       <hc-image-upload :limit="6" v-model="detail.storeSynopsisPicturesUrl" disabled></hc-image-upload>
     </el-form-item>
-    
+
     <el-form-item label="导航定位：">
       <hc-map-view style="width: 600px;height: 300px;" :address="{latitude: detail.lat, longitude: detail.lng}"></hc-map-view>
     </el-form-item>

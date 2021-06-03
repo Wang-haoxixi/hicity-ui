@@ -9,7 +9,7 @@
     </el-form-item>
     <el-form-item label="券门类：" prop="category">
       <el-select v-model="formData.category" :disabled="isEdit">
-        <el-option v-for="item in dicList['COUPONS_CATEGORY']" :key="item.value" :label="item.label" :value="item.value">{{item.label}}</el-option>
+        <el-option v-for="item in dicList['COUPONS_CATEGORY']" :key="item.value" :label="item.label" :value="item.value - 0">{{item.label}}</el-option>
       </el-select>
     </el-form-item>
     <el-form-item label="优惠券类型：">
@@ -121,15 +121,13 @@
         </template>
       </el-radio-group>
     </el-form-item>
-    
-    
     <el-form-item label="发券数量：" prop="supply">
       <el-input-number v-model="formData.supply" :min="1" :max="99999999"></el-input-number>
     </el-form-item>
 
 
 
-    <el-form-item label="上架时间：" prop="upTime">
+    <!-- <el-form-item label="上架时间：" prop="upTime">
       <el-radio-group v-model="upTimeType" @change="upTimeTypeChange">
         <div style="display: flex;align-items: center;height: 36px;">
           <el-radio label="1">立即上架售卖</el-radio>
@@ -154,7 +152,7 @@
         value-format="yyyy-MM-dd HH:mm:ss"
         placeholder="选择下架时间">
       </el-date-picker>
-    </el-form-item>
+    </el-form-item> -->
     <el-form-item>
       <el-button type="primary" @click="handleSave">保存</el-button>
     </el-form-item>
@@ -236,7 +234,7 @@ export default {
       this.formData = {
         scopeOfUseCity: '',
         isPermanent: '0',
-        isCopyLogo: false, 
+        isCopyLogo: false,
         upTime: '',
         downTime: '',
         availableStartTime: '',
@@ -380,10 +378,14 @@ export default {
     },
     handleSave() {
       this.$refs.form.validate(valid => {
+        this.formData.upTime = this.formData.availableStartTime
+        this.formData.downTime = this.formData.availableEndTime
         if (valid) {
           let formData = {
             ...this.formData,
           }
+          formData.upTime = formData.availableStartTime
+          formData.downTime = formData.availableEndTime
           if (this.isPlatform) {
             formData.scopeOfUseCity = this.cityIds.join(',')
           }

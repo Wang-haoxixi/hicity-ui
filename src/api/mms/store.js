@@ -129,7 +129,7 @@ export function getCashierPage (params) {
 
 export function unbundlingCashier (data) {
   return request({
-    url: '/mms/store_manage/mobile/update_sub_account',
+    url: '/mms/store_manage/un_ling_cashier',
     method: 'POST',
     data
   })

@@ -37,7 +37,7 @@
 <script>
 import { tableOption } from "./const";
 import { mapGetters } from "vuex";
-import { getPlatformCouponsPage, getCityCouponsPage, createPlatformCoupons, getEditCouponsDetail, getCouponsDetail, updatePlatformCoupons, deleteCouponsBatch, couponsDown } from "@/api/merchantSystem/coupons"
+import { getPlatformCouponsPage, createPlatformCoupons, getEditCouponsDetail, getCouponsDetail, updatePlatformCoupons, deleteCouponsBatch, couponsDown } from "@/api/merchantSystem/coupons"
 import HcImageUpload from "@/views/components/HcImageUpload/index";
 import HcTableForm from "@/views/components/HcTableForm/index";
 import HcInput from "@/views/components/HcForm/HcInput/index"
@@ -58,23 +58,16 @@ export default {
     tableOption() {
       return tableOption(this.userType == 1 || this.userType == 2);
     },
-    getCouponsPage () {
-      if (this.userType == 1) {
-        return getPlatformCouponsPage
-      } else if (this.userType == 2 || this.userType == 3) {
-        return getCityCouponsPage
-      }
-    },
     title () {
       if (!this.formShow) {
-        return '平台券'
+        return '优惠券管理'
       } else {
         if (this.formType == 'add') {
-          return '平台券-新增'
+          return '优惠券-新增'
         } else if (this.formType == 'edit') {
-          return '平台券-编辑'
+          return '优惠券-编辑'
         } else if (this.formType == 'view') {
-          return '平台券-详情'
+          return '优惠券-详情'
         } else {
           return ''
         }
@@ -84,9 +77,10 @@ export default {
   methods: {
     fetchListFun (params) {
       return new Promise((resolve, reject) => {
-        this.getCouponsPage({
+        getPlatformCouponsPage({
           ...params,
           // type: '1',
+          cityId: this.userInfo.manageCityId
         }).then(({ data }) => {
           resolve({
             records: data.data.data.records,

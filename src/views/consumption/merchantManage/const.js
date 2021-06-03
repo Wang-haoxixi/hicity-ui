@@ -126,11 +126,14 @@ export const orderTableOption = {
     },
     {
       label: '收款金额',
-      prop: 'paymentAmount'
+      prop: 'paymentAmount',
+      formatter: function (data) {
+        return data.paymentAmount + '元'
+      }
     },
     {
       label: '收款状态',
-      prop: 'orderStatus',
+      prop: 'storeOrderStatus',
       type: 'select',
       dicName: 'STORE_ORDER_STATUS',
       width: 100,

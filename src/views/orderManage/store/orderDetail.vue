@@ -64,10 +64,10 @@
 
     <h3 class="form-title">交易双方信息</h3>
     <el-form-item label="优惠总额：">
-      {{detail.totalDiscount}}
+      {{detail.totalDiscount}}元
     </el-form-item>
     <el-form-item label="店铺固定优惠抵扣：">
-      {{detail.storeFixedDiscount}}
+      {{detail.storeFixedDiscount}}折
     </el-form-item>
     <el-form-item label="平台/商家优惠券抵扣：">
       {{detail.couponDeduction}}
@@ -82,26 +82,26 @@
       {{detail.couponNumber}}
     </el-form-item>
     <el-form-item label="不可用优惠券商品金额：">
-      {{detail.unavailableAmount}}
+      {{detail.unavailableAmount}}元
     </el-form-item>
 
     <h3 class="form-title">订单金额</h3>
     <el-form-item label="订单总金额：">
-      {{detail.orderTotal}}
+      {{detail.orderTotal}}元
     </el-form-item>
     <el-form-item label="用户实际支付：">
-      {{detail.paymentAmount}}
+      {{detail.paymentAmount}}元
     </el-form-item>
     <el-form-item label="平台抽成总额：">
-      {{detail.shareTotal}}
+      {{detail.shareTotal}}元
     </el-form-item>
     <el-form-item label="商户实收金额：">
-      {{detail.receivedAmount}}
+      {{detail.receivedAmount}}元
     </el-form-item>
 
     <h3 class="form-title">平台分成信息</h3>
     <el-form-item v-for="(item, index) in shareList" :key="index" :label="item.shareAccount + '分成金额：'">
-      {{item.shareAmount}}
+      {{item.shareAmount}}元
     </el-form-item>
 
   </el-form>
