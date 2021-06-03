@@ -77,3 +77,12 @@ export function officialReleaseList(data) {
     params: data
   });
 }
+
+// 活动创建圈子
+export function createCircle(data) {
+  return request({
+    url: "/dms/activity_publish/save/circle",
+    method: "post",
+    data: data
+  });
+}

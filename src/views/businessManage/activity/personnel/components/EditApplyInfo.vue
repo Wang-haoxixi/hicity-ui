@@ -71,7 +71,7 @@ export default {
       dialogVisibleApplyInfo: false,
       data: {
         conferenceFormList: [],
-        id: ''
+        id: "",
       },
     };
   },
@@ -198,8 +198,8 @@ export default {
       }
       return rules;
     },
-    openApplyInfoDialog(data,id) {
-      this.id = id
+    openApplyInfoDialog(data, id) {
+      this.id = id;
       this.dialogVisibleApplyInfo = true;
       this.data = data;
     },
@@ -208,12 +208,21 @@ export default {
 
       let query = {
         id: this.id,
-        infoFormConfigList: this.data.conferenceFormList
-      }
-      console.log('query...',query)
-      updatePeopleInfo(query).then(res=>{
-        console.log('rst..',res)
-      })
+        infoFormConfigList: this.data.conferenceFormList,
+      };
+      console.log("query...", query);
+      updatePeopleInfo(query).then((res) => {
+        console.log("rst..", res);
+        if (res.data.data.businessCode == 1000) {
+          this.$notify({
+            title: "成功",
+            message: "编辑成功",
+            type: "success",
+          });
+        }
+        this.dialogVisibleApplyInfo = false;
+        this.$emit("refresh");
+      });
 
       // let list = this.data.conferenceFormList;
       // for (let i = 0; i < list.length; i++) {

@@ -135,7 +135,7 @@
             ></el-input>
           </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="报名时间"> </el-table-column>
+        <el-table-column prop="createTime" label="报名时间" width="180"> </el-table-column>
         <el-table-column prop="orderStatus" label="订单状态" width="120">
           <template slot-scope="scope">
             {{ scope.row.orderStatus | orderStatusFilter }}

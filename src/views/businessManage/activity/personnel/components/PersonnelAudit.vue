@@ -119,17 +119,17 @@ export default {
       // pass code...
       this.query.auditStatus = "2";
       auditPort(this.query).then((res) => {
-        this.$emit("refresh");
         if (res.data.data.businessCode == 1000) {
           this.$notify({
             title: "成功",
             message: "审核通过",
             type: "success",
           });
+          this.dialogVisibleAudit = false;
+          this.$emit("refresh");
         }
       });
 
-      this.dialogVisibleAudit = false;
     },
     handleFinish() {
       // reject code...
@@ -140,9 +140,9 @@ export default {
         this.query.auditRemark = this.content;
       }
       auditPort(this.query).then((res) => {
-        this.$emit("refresh");
         this.dialogVisibleRejectReason = false;
         this.dialogVisibleAudit = false;
+        this.$emit("refresh");
       });
     },
   },

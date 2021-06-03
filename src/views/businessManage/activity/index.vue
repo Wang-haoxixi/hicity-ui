@@ -31,7 +31,7 @@
           <span style="margin-left: 30px; color: #919397"
             >发布时间：{{ props.row.updateTime }}</span
           >
-          <!-- <span style="margin-left: 30px; color: #919397">
+          <span style="margin-left: 30px; color: #919397">
             活动圈子：2021城市超级APP体检官方活动群
             <el-tag size="mini" type="danger">官方</el-tag>
           </span>
@@ -39,7 +39,7 @@
             <el-button type="text" @click="handleRelevanceMore(props)"
               >关联更多圈子</el-button
             >
-          </span> -->
+          </span>
         </template>
         <template v-slot:poster="scope">
           <el-image

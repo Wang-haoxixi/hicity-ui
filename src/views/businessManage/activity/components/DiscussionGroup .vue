@@ -16,15 +16,21 @@
           :model="discussionData"
           :rules="discussionFormRules"
         >
-          <el-form-item label="圈子名称：" prop="name">
+          <el-form-item label="绑定城市：" prop="cityId">
+            <hc-city-select
+              v-model="discussionData.cityId"
+              :city-id="userInfo.manageCityId"
+            ></hc-city-select>
+          </el-form-item>
+          <el-form-item label="圈子名称：" prop="circleName">
             <el-input
               maxlength="15"
-              v-model="discussionData.name"
+              v-model="discussionData.circleName"
               show-word-limit
             ></el-input>
           </el-form-item>
-          <el-form-item label="群主账号：" prop="acc">
-            <el-input v-model.number="discussionData.acc"></el-input>
+          <el-form-item label="群主账号：" prop="phone">
+            <el-input v-model.number="discussionData.phone"></el-input>
           </el-form-item>
         </el-form>
       </div>
@@ -39,19 +45,35 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
+import HcCitySelect from "@/views/components/HcCity/HcCitySelect/index";
+import { createCircle } from "@/api/activity/publish";
 export default {
+  components: { HcCitySelect },
+  computed: {
+    ...mapGetters(["userType", "userInfo"]),
+  },
   data() {
     return {
       dialogVisibleDiscussionGroup: false,
       discussionData: {
-        name: "",
-        acc: "",
+        circleName: "",
+        phone: "",
+        cityId: [],
       },
       discussionFormRules: {
-        name: [{ required: true, message: "请输入圈子名称", trigger: "blur" }],
-        acc: [
+        cityId: [
+          { required: true, message: "请输入城市", trigger: "blur" },
+        ],
+        circleName: [{ required: true, message: "请输入圈子名称", trigger: "blur" }],
+        phone: [
           { required: true, message: "请输入群主账号", trigger: "blur" },
-          { required: true, type:'number', message: "请输入正确的群主账号", trigger: "blur" },
+          {
+            required: true,
+            type: "number",
+            message: "请输入正确的群主账号",
+            trigger: "blur",
+          },
         ],
       },
     };
@@ -62,9 +84,12 @@ export default {
     },
     confirmClick() {
       console.log("dialogVisibleDiscussionGroup...", this.discussionData);
-      this.$refs.discussionFormRef.validate((valid) => {
-        console.log(valid);
-      });
+      // createCircle().then(res=>{
+      //   console.log('create...',res)
+      // })
+      // this.$refs.discussionFormRef.validate((valid) => {
+      //   console.log(valid);
+      // });
     },
   },
 };
