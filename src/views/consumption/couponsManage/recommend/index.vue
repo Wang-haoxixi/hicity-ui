@@ -87,7 +87,7 @@ export default {
         cancelButtonText: '取消',
         inputType: 'number',
         inputValidator: (val) => {
-          return val.length < 9 && /^[1-9]+0*$/.test(val) && parseInt(val) < 100000000
+          return val.length < 3 && /^[1-9]+0*$/.test(val) && parseInt(val) < 100
         },
         inputErrorMessage: '请输入1~100的整数'
       }).then(({ value }) => {
