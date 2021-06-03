@@ -719,7 +719,7 @@ export default {
           storeId: this.handleId
         }).then(() => {
           this.$message.success('解绑成功')
-          this.$refs.cashierOption.refresh()
+          this.$refs.cashierCrud.refresh()
         })
       }).then(() => {
       }).catch(function() {

@@ -71,6 +71,6 @@ export const tableOption = () => {
     menu: true,
     columns
   }
-  
+
   return option
 }

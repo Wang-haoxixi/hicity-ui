@@ -24,6 +24,7 @@ import { mapGetters } from "vuex";
 import { getStoreOrderPage, getStoreOrderDetail, hide } from "@/api/mms/store"
 import { getCommentPage, hideComment } from "@/api/cms/common"
 import StoreOrderDetail from './detail'
+import { dateFormat } from '@/util/date'
 export default {
   components: { StoreOrderDetail },
   data() {
@@ -50,7 +51,7 @@ export default {
       let time = params.time
       if (time) {
         params.startTime = time[0]
-        params.endTime = time[1]
+        params.endTime = dateFormat(new Date(new Date(time[1]).getTime() + 24 * 60 * 60 * 1000))
         delete params.time
       }
       console.log(params)

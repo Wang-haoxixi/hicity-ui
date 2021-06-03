@@ -106,7 +106,7 @@
           :rules="formRule"
         >
           <el-form-item label="商户账户：" prop="phone">
-            <el-input v-model.trim="formData.phone" maxlength="20"></el-input>
+            <el-input v-model.trim="formData.phone" :disabled="publishType == 'edit'" maxlength="20"></el-input>
           </el-form-item>
           <el-form-item label="姓名：" prop="name">
             <el-input v-model.trim="formData.name" maxlength="11"></el-input>
