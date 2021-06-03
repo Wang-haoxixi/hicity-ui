@@ -6,7 +6,7 @@
       @go-back="goBack">
       <hc-crud ref="hcCrud" :fetchListFun="fetchListFun" :option="tableOption">
         <template slot="menu" slot-scope="scope">
-          <el-button type="text" size="mini" @click="toView(scope.row)">查看</el-button>
+          <!-- <el-button type="text" size="mini" @click="toView(scope.row)">查看</el-button> -->
           <el-button v-if="!scope.row.isHidden" type="text" size="mini" @click="toHide(scope.row)">隐藏</el-button>
         </template>
       </hc-crud>
@@ -14,7 +14,7 @@
         <store-order-detail :detail="orderDetail"></store-order-detail>
       </template>
     </hc-table-form>
-    
+
   </basic-container>
 </template>
 
