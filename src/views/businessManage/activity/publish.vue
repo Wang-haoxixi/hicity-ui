@@ -852,15 +852,15 @@ export default {
           isDisabled: true,
         },
         // -----
-        // {
-        //   label: "单位",
-        //   must: true,
-        //   type: "input",
-        //   placeholder: "请输入单位",
-        //   fixedItem: true,
-        //   code: "company",
-        //   isDisabled: true,
-        // },
+        {
+          label: "单位",
+          must: true,
+          type: "input",
+          placeholder: "请输入单位",
+          fixedItem: true,
+          code: "company",
+          isDisabled: true,
+        },
         // -----
       ],
       defaultOptions: [
@@ -890,14 +890,14 @@ export default {
           fixedItem: true,
           code: "email",
         },
-        {
-          label: "单位",
-          must: false,
-          type: "input",
-          placeholder: "请输入单位",
-          fixedItem: true,
-          code: "company",
-        },
+        // {
+        //   label: "单位",
+        //   must: false,
+        //   type: "input",
+        //   placeholder: "请输入单位",
+        //   fixedItem: true,
+        //   code: "company",
+        // },
         {
           label: "职务",
           must: false,

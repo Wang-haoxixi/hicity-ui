@@ -58,8 +58,8 @@
           <el-form-item label="人员类型:">
             <el-select v-model="query.isVip">
               <el-option label="全部" value=""></el-option>
-              <el-option label="vip" value="0"></el-option>
-              <el-option label="普通" value="1"></el-option>
+              <el-option label="vip" value="1"></el-option>
+              <el-option label="普通" value="0"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="审核状态:">
@@ -353,6 +353,7 @@ export default {
     getpeopleManagementPage() {
       this.loading = true;
       peopleManagement(this.query).then((res) => {
+        console.log('res...',res)
         this.total = res.data.data.data.total;
         this.handleData(res.data.data.data.records);
         this.loading = false;

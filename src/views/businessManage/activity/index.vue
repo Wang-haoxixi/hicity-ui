@@ -31,7 +31,7 @@
           <span style="margin-left: 30px; color: #919397"
             >发布时间：{{ props.row.updateTime }}</span
           >
-          <span style="margin-left: 30px; color: #919397">
+          <!-- <span style="margin-left: 30px; color: #919397">
             活动圈子：2021城市超级APP体检官方活动群
             <el-tag size="mini" type="danger">官方</el-tag>
           </span>
@@ -39,7 +39,7 @@
             <el-button type="text" @click="handleRelevanceMore(props)"
               >关联更多圈子</el-button
             >
-          </span>
+          </span> -->
         </template>
         <template v-slot:poster="scope">
           <el-image
@@ -116,6 +116,7 @@
             style="line-height: 250px; text-align: center"
           >
             加载中<span class="dot">...</span>
+            <i class="el-icon-loading"></i>
           </div>
         </el-image>
       </div>
@@ -177,7 +178,10 @@
               >
             </div>
           </div>
-          <div style="text-align: center; padding-top: 10px;color:#909399;" v-else>
+          <div
+            style="text-align: center; padding-top: 10px; color: #909399"
+            v-else
+          >
             暂无关联
           </div>
         </div>
@@ -221,6 +225,7 @@ export default {
       },
       searchOrgList: [], //圈子搜索结果
       orgedArr: [],
+      canmore: true, // 是否加载更多
     };
   },
   computed: {
@@ -274,6 +279,7 @@ export default {
     remoteMethod(query) {
       if (query != "") {
         this.loading = true;
+        this.canmore = true;
         this.searchOrgQuery.searchKey = query;
         this.searchOrgQuery.current = 1;
         this.getOrgList(this.searchOrgQuery);
@@ -282,11 +288,18 @@ export default {
       }
     },
     loadmore() {
-      this.searchOrgQuery.current += 1;
+      if (!this.canmore) {
+        return;
+      }
+      this.searchOrgQuery.current++;
       searchOrg(this.searchOrgQuery).then((res) => {
-        this.searchOrgList = this.searchOrgList.concat(
-          res.data.data.data.records
-        );
+        if (res.data.data.data.records.length > 0) {
+          this.searchOrgList = this.searchOrgList.concat(
+            res.data.data.data.records
+          );
+        } else {
+          this.canmore = false;
+        }
       });
     },
     deleteCircleItem(id) {
