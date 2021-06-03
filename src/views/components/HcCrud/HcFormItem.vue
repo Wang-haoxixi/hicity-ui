@@ -101,9 +101,6 @@ export default {
       if (this.option.dicData) {
         return this.option.dicData
       } else if (this.option.dicName) {
-        console.log(this.option.dicName)
-        console.log(this.dicList)
-        console.log(this.dicList[this.option.dicName])
         return this.dicList[this.option.dicName]
       } else {
         return ''
@@ -112,7 +109,6 @@ export default {
   },
   methods: {
     change (value) {
-      console.log(value)
       if (this.option.trim) {
         this.$emit('input', value.trim())
       } else {
