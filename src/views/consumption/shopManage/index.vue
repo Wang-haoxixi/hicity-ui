@@ -170,7 +170,7 @@
                   </el-button>
                 </template>
                 <template v-slot:sharePercentage="scope">
-                  <hc-input v-model="scope.row.sharePercentage" :decimal="0" maxlength="10" :max="100" :min="1">
+                  <hc-input v-model="scope.row.sharePercentage" :decimal="0" maxlength="10" :max="100" :min="0">
                     <div slot="append">%</div>
                   </hc-input>
                 </template>
@@ -182,10 +182,34 @@
               </avue-crud>
             </el-form-item>
 
-
-
-
           </template>
+
+          <el-form-item label="微信手续费分配规则：" prop="storeWxConfigs">
+            <avue-crud
+              :option="wxConfigOption"
+              :data="formData.storeWxConfigs">
+              <template slot="menuLeft">
+                <el-button
+                  class="filter-item"
+                  type="primary"
+                  size="mini"
+                  icon="el-icon-plus"
+                  @click="toAddWxConfig">添加
+                </el-button>
+              </template>
+              <template v-slot:wxPercentage="scope">
+                <hc-input v-model="scope.row.wxPercentage" :decimal="0" maxlength="10" :max="100" :min="0">
+                  <div slot="append">%</div>
+                </hc-input>
+              </template>
+              <template slot="menu" slot-scope="scope">
+                <template>
+                  <el-button type="text" size="mini" v-if="scope.row.wxHierarchy != '商户'" @click="toDeleteWxConfig(scope.row)" >删除</el-button>
+                </template>
+              </template>
+            </avue-crud>
+          </el-form-item>
+
           <el-form-item>
             <el-button v-if="publishType != 'view'" type="primary" :loading="formLoading" @click="handleCreate">保 存</el-button>
           </el-form-item>
@@ -196,6 +220,7 @@
     </hc-table-form>
 
     <share-account ref="shareAccount" @select="shareAdd"></share-account>
+    <wx-config-account ref="wxConfigAccount" @select="wxConfigAdd"></wx-config-account>
 
     <el-dialog
       title="收银员管理"
@@ -234,9 +259,11 @@ import HcCitySelect from "@/views/components/HcCity/HcCitySelect/index"
 import HcInput from "@/views/components/HcForm/HcInput/index"
 import StoreDetail from './detail'
 import ShareAccount from './shareAccount'
+import WxConfigAccount from './wxConfigAccount'
 import HcImageCropper from "@/views/components/HcImageUpload/cropper"
+import { isMobile, isPhone } from '@/util/validate'
 export default {
-  components: { HcImageUpload, HcImageCropper, HcTableForm, HcEmptyData, HcMapSelect, HcRemoteSelect, HcCitySelect, HcInput, StoreDetail, ShareAccount },
+  components: { HcImageUpload, HcImageCropper, HcTableForm, HcEmptyData, HcMapSelect, HcRemoteSelect, HcCitySelect, HcInput, StoreDetail, ShareAccount, WxConfigAccount },
   data() {
     return {
       storeDetail: {},
@@ -269,7 +296,7 @@ export default {
         storeManagerId: [{required: true, message: '请输入所属商户', trigger: 'blur'}],
         storeType: [{required: true, message: '请选择店铺类型', trigger: 'blur'}],
         storeUserName: [{required: true, message: '请输入联系人', trigger: 'blur'}],
-        storeUserPhone: [{required: true, message: '请输入联系电话', trigger: 'blur'}],
+        storeUserPhone: [{required: true, validator: this.storeUserPhoneValidator, trigger: 'blur'}],
         storeLogo: [{required: true, message: '请添加店铺Logo', trigger: 'blur'}],
         storeSynopsis: [{required: true, validator: this.storeSynopsisValidator, trigger: 'blur'}],
         openingHours: [{required: true, message: '请输入营业时间', trigger: 'blur'}],
@@ -280,7 +307,8 @@ export default {
         storeStatus: [{required: true, message: '请选择店铺状态', trigger: 'blur'}],
         discount: [{required: true, message: '请输入会员折扣', trigger: 'blur'}],
         percentageType: [{required: true, message: '请选择抽成类型', trigger: 'blur'}],
-        storeShare: [{validator: this.storeShareValidator, required: true, trigger: 'blur'}]
+        storeShare: [{validator: this.storeShareValidator, required: true, trigger: 'blur'}],
+        storeWxConfigs: [{validator: this.storeWxConfigsValidator, required: true, trigger: 'blur'}]
       },
       formLoading: false,
       handleId: null,
@@ -316,6 +344,41 @@ export default {
           {
             label: '分成比例',
             prop: 'sharePercentage',
+            slot: true,
+            width: 150
+          },
+        ]
+      },
+      wxConfigOption: {
+        border: true,
+        stripe: true,
+        menuAlign: 'center',
+        editBtn: false,
+        delBtn: false,
+        align: 'center',
+        addBtn: false,
+        refreshBtn: false,
+        columnBtn: false,
+        labelWidth: 160,
+        menuWidth: 80,
+        column: [
+          {
+            label: '承担对象',
+            prop: 'wxAccount',
+          },
+          {
+            label: '账户类型',
+            prop: 'wxHierarchy',
+            width: 100
+          },
+          {
+            label: '城市/地区',
+            prop: 'cityName',
+            width: 100
+          },
+          {
+            label: '承当比例',
+            prop: 'wxPercentage',
             slot: true,
             width: 150
           },
@@ -358,7 +421,36 @@ export default {
   },
   methods: {
     managerChange (option) {
+      console.log(option)
       this.formData.storeManagerName = option.data.name
+      if (this.formData.storeWxConfigs.length > 0 && this.formData.storeWxConfigs[0].wxHierarchy == '商户') {
+        this.formData.storeWxConfigs.splice(0, 1, {
+          wxUserId: option.data.storeManagerId,
+          wxAccount: option.data.wxAccount,
+          wxHierarchy: option.data.wxHierarchy,
+          cityId: option.data.cityId,
+          cityName: option.data.cityName,
+          wxPercentage: 100,
+        })
+      } else {
+        this.formData.storeWxConfigs.unshift({
+          wxUserId: option.data.storeManagerId,
+          wxAccount: option.data.wxAccount,
+          wxHierarchy: option.data.wxHierarchy,
+          cityId: option.data.cityId,
+          cityName: option.data.cityName,
+          wxPercentage: 100,
+        })
+      }
+    },
+    storeUserPhoneValidator (rules, value, callback) {
+      if (!value) {
+        callback(new Error('请输入联系人电话'))
+      } else if (isMobile(value) || isPhone(value)) {
+        callback()
+      } else {
+        callback(new Error('请输入正确的电话号码格式'))
+      }
     },
     storeSynopsisValidator (rules, value, callback) {
       if (this.formData.storeSynopsis.trim() || (this.formData.storeSynopsisPicturesUrl && this.formData.storeSynopsisPicturesUrl.length > 0)) {
@@ -399,7 +491,7 @@ export default {
     storeShareValidator (rule, value, callback) {
       let storeShare = this.formData.storeShare
       if (!storeShare || storeShare.length == 0) {
-        callback(new Error('请填写分成比例配置123'))
+        callback(new Error('请填写分成比例配置'))
       } else {
         let total = 0
         for (let i = 0; i < storeShare.length; i++) {
@@ -407,6 +499,22 @@ export default {
         }
         if (total != 100) {
           callback(new Error('分成比例数值之和须等于100'))
+        } else {
+          callback()
+        }
+      }
+    },
+    storeWxConfigsValidator (rule, value, callback) {
+      let wxConfigs = this.formData.storeWxConfigs
+      if (!wxConfigs || wxConfigs.length == 0) {
+        callback(new Error('请填写微信手续费分配规则'))
+      } else {
+        let total = 0
+        for (let i = 0; i < wxConfigs.length; i++) {
+          total += wxConfigs[i].wxPercentage
+        }
+        if (total != 100) {
+          callback(new Error('承担比例数值之和须等于100'))
         } else {
           callback()
         }
@@ -493,13 +601,16 @@ export default {
     toCreate() {
       this.publish = true;
       this.publishType = "add";
+      this.businessTerm = ""
+      this.businessTermDate = ""
       this.formData = {
         storeName: '',
         storeLogo: '',
         storeSynopsis: '',
         cityId: '',
         percentageMoney: '',
-        storeShare: []
+        storeShare: [],
+        storeWxConfigs: [],
       }
       this.locationAddr = {}
       this.barndList = []
@@ -567,6 +678,7 @@ export default {
       getStoreDetail({ storeId }).then(({ data }) => {
         this.formData = {
           storeShare: [],
+          storeWxConfigs: [],
           ...data.data.data
         };
         if (this.formData.businessTerm == '长期') {
@@ -603,7 +715,7 @@ export default {
         type: 'warning'
       }).then(() => {
         unbundlingCashier({
-          storeManagerId,
+          cashierId: storeManagerId,
           storeId: this.handleId
         }).then(() => {
           this.$message.success('解绑成功')
@@ -616,6 +728,9 @@ export default {
     toAddShare () {
       this.$refs.shareAccount.open(this.formData.storeShare)
     },
+    toAddWxConfig () {
+      this.$refs.wxConfigAccount.open(this.formData.storeWxConfigs)
+    },
     shareAdd (user) {
       this.formData.storeShare.push({
         shareUserId: user.userId,
@@ -626,6 +741,16 @@ export default {
         sharePercentage: 0,
       })
     },
+    wxConfigAdd (user) {
+      this.formData.storeWxConfigs.push({
+        wxUserId: user.userId,
+        wxAccount: user.userName,
+        wxHierarchy: user.wxHierarchy,
+        cityId: user.cityId,
+        cityName: user.cityName,
+        wxPercentage: 0,
+      })
+    },
     toDeleteShare (row) {
       this.$confirm("是否确认删除该分成账户?", "警告", {
         confirmButtonText: "确定",
@@ -634,6 +759,16 @@ export default {
       })
       .then(() => {
         this.formData.storeShare.splice(row.$index, 1)
+      }).catch(function () {});
+    },
+    toDeleteWxConfig (row) {
+      this.$confirm("是否确认删除该承担对象?", "警告", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+      .then(() => {
+        this.formData.storeWxConfigs.splice(row.$index, 1)
       }).catch(function () {});
     }
   },
