@@ -80,6 +80,7 @@
         border
         style="width: 100%"
         v-loading="loading"
+        :cell-style="{ background: '#fff' }"
         :data="tableData"
         :span-method="mergeCell"
         :header-cell-style="{ background: '#FAFAFA' }"
@@ -179,7 +180,7 @@
       </el-pagination>
       <TicketInfo ref="ticketInfoRef" />
       <EditApplyInfo ref="editApplyInfoRef" />
-      <PersonnelAudit ref="personnelAuditRef" @refresh='getList'/>
+      <PersonnelAudit ref="personnelAuditRef" @refresh="getList" />
     </basic-container>
   </div>
 </template>
@@ -290,8 +291,8 @@ export default {
     this.getpeopleManagementPage();
   },
   methods: {
-    getList(){
-      this.getpeopleManagementPage()
+    getList() {
+      this.getpeopleManagementPage();
     },
     handleExportData() {
       console.log("exportData...");
@@ -313,7 +314,7 @@ export default {
         this.query.phone = this.searchName;
       } else if (this.selectType == "unit") {
       }
-      console.log(this.query);
+      console.log("searQuery...", this.query);
       this.getpeopleManagementPage();
     },
     mergeCell({ row, column, rowIndex, columnIndex }) {
@@ -353,7 +354,7 @@ export default {
     getpeopleManagementPage() {
       this.loading = true;
       peopleManagement(this.query).then((res) => {
-        console.log('res...',res)
+        console.log("res...", res);
         this.total = res.data.data.data.total;
         this.handleData(res.data.data.data.records);
         this.loading = false;
@@ -377,7 +378,10 @@ export default {
     handleAudit(row) {
       console.log("审核", row);
       // this.$refs.personnelAuditRef.openAuditDialog(2,123);
-      this.$refs.personnelAuditRef.openAuditDialog(row.auditStatus,row.enroleId);
+      this.$refs.personnelAuditRef.openAuditDialog(
+        row.auditStatus,
+        row.enroleId
+      );
     },
     changeVip(row) {
       console.log("vips", row);

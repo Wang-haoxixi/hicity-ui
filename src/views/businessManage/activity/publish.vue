@@ -1373,11 +1373,16 @@ export default {
 
             this.baseFormData.conferenceFormList = data.conferenceFormList;
 
+            data.conferenceFormList.sort(function(a,b){
+              return a.id - b.id
+            })
+            console.log('conferenceFormList...',data.conferenceFormList)
+
             this.defaultList = data.conferenceFormList
               .filter((item) => {
                 return item.code || item.label == "备注";
               })
-              .slice(2);
+              .slice(3);
             this.customList = data.conferenceFormList.filter((item) => {
               return !item.code && item.label !== "备注";
             });
