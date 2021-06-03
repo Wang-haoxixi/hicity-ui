@@ -44,7 +44,7 @@
           <el-form-item label="票种类型:">
             <el-select v-model="query.ticketingType">
               <el-option label="全部" value=""></el-option>
-              <el-option label="付费票" value="0"></el-option>
+              <el-option label="付费票" value="2"></el-option>
               <el-option label="免费票" value="1"></el-option>
             </el-select>
           </el-form-item>
@@ -372,7 +372,7 @@ export default {
       console.log("修改", row.enroleId);
       checkFormInfo({ id: row.enroleId }).then((res) => {
         let data = res.data.data.data;
-        this.$refs.editApplyInfoRef.openApplyInfoDialog(data);
+        this.$refs.editApplyInfoRef.openApplyInfoDialog(data,row.enroleId);
       });
     },
     handleAudit(row) {

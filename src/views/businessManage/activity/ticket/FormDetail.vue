@@ -90,7 +90,8 @@ export default {
         ticketingName: '免费票',
         number: 1,
         limitTicket: 1,
-        needAudit: true,
+        // needAudit: true,
+        needAudit: false,
       },
       formRules: {
         ticketingType: [{required: true, message: '请选择票务种类', trigger: 'blur'}],

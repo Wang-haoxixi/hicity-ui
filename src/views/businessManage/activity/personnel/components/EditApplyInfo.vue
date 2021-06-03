@@ -64,12 +64,14 @@
 </template>
 
 <script>
+import { updatePeopleInfo } from "@/api/activity/personnel.js";
 export default {
   data() {
     return {
       dialogVisibleApplyInfo: false,
       data: {
         conferenceFormList: [],
+        id: ''
       },
     };
   },
@@ -196,13 +198,23 @@ export default {
       }
       return rules;
     },
-    openApplyInfoDialog(data) {
+    openApplyInfoDialog(data,id) {
+      this.id = id
       this.dialogVisibleApplyInfo = true;
       this.data = data;
-      console.log("data...", this.data);
     },
     handleSave() {
       console.log("开始校验...", this.data.conferenceFormList);
+
+      let query = {
+        id: this.id,
+        infoFormConfigList: this.data.conferenceFormList
+      }
+      console.log('query...',query)
+      updatePeopleInfo(query).then(res=>{
+        console.log('rst..',res)
+      })
+
       // let list = this.data.conferenceFormList;
       // for (let i = 0; i < list.length; i++) {
       //   if (list[i].must) {

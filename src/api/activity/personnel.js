@@ -148,3 +148,12 @@ export function auditPort(data) {
     data: data
   });
 }
+
+// 编辑人员信息
+export function updatePeopleInfo(data) {
+  return request({
+    url: "/dms/conference_enrole_form/operate/update_config",
+    method: "post",
+    data: data
+  });
+}
