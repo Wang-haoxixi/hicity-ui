@@ -46,7 +46,35 @@ function getCityTree (city, idList) {
     return {
       id: city.id,
       regionName: city.regionName
-    } 
+    }
+  }
+  return null
+}
+
+function getCityRange (city, cityRange) {
+  let cityData = {
+    id: city.id,
+    regionName: city.regionName,
+  }
+  let children = []
+  for (let i = 0; i < city.children.length; i++) {
+    let cityC = city.children[i]
+    let child = getCityRange(cityC, cityRange)
+    if (child) {
+      children.push(child)
+    }
+  }
+  if (children.length > 0) {
+    return {
+      ...cityData,
+      children,
+      selfDisabled: city.children.length != children.length
+    }
+  } else if (cityRange.includes(city.id)) {
+    return {
+      ...cityData,
+      children: city.children
+    }
   }
   return null
 }
@@ -72,8 +100,11 @@ export default {
     ...mapGetters(['allCityTree']),
   },
   methods: {
-    open (cityId = 1, initCityList = [], viewOnly = false) {
+    open (cityId = 1, initCityList = [], viewOnly = false, cityRange) {
       let usedCity = getUsedCity(this.allCityTree, cityId)
+      if (cityRange && cityRange.length > 0) {
+        usedCity = getCityRange(usedCity, cityRange)
+      }
       let cityTree = getCityTree(usedCity, initCityList)
       this.$refs.box.open(usedCity, cityTree, viewOnly)
     },

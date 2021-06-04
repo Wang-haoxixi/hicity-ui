@@ -1,5 +1,6 @@
 <template>
   <div class="hc-upload-image-container">
+    <div v-if="topTip" class="upload-tip">{{topTip}}</div>
     <div v-for="(file, index) in fileList" :key="index" class="image-box upload">
       <div class="image-box-content">
         <img v-if="file.type == 'formal'" class="image-box-content-image" fit="fill" :src="file.url"/>
@@ -10,10 +11,11 @@
         </div>
       </div>
     </div>
-    <file-upload 
+    <file-upload
       v-show="!single || fileList.length == 0"
       ref="fileUpload"
       key="fileUpload"
+      :multiple="multipleChoice"
       @file-add="fileAddTemp"
       @file-change="fileChangeTemp"
       @upload-success="fileChangeFormal"
@@ -33,6 +35,7 @@
         </div>
       </template>
     </file-upload>
+    <div v-if="bottomTip" class="upload-tip">{{bottomTip}}</div>
   </div>
 </template>
 
@@ -61,6 +64,18 @@ export default {
       default: 9
     },
     single: {
+      type: Boolean,
+      default: false
+    },
+    topTip: {
+      type: String,
+      default: ''
+    },
+    bottomTip: {
+      type: String,
+      default: ''
+    },
+    multipleChoice: {
       type: Boolean,
       default: false
     }

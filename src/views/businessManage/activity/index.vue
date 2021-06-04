@@ -29,7 +29,7 @@
             >票务管理</el-button
           >
           <span style="margin-left: 30px; color: #919397"
-            >发布时间：{{props.row.updateTime}}</span
+            >发布时间：{{ props.row.updateTime }}</span
           >
         </template>
         <template v-slot:poster="scope">
@@ -107,6 +107,7 @@
             style="line-height: 250px; text-align: center"
           >
             加载中<span class="dot">...</span>
+            <i class="el-icon-loading"></i>
           </div>
         </el-image>
       </div>
@@ -137,6 +138,7 @@ export default {
       showCityDialogVisible: false, //控制展示城市
       showCodeDialogVisible: false, //展示签到码
       img: "", //签到码地址
+      loading: false,
     };
   },
   computed: {
@@ -145,7 +147,7 @@ export default {
       return tableOption(this.userType == 1 || this.userType == 2);
     },
   },
-  activated(){
+  activated() {
     this.$refs.hcCrud.refresh(); // 刷新表格数据
   },
   methods: {
@@ -190,99 +192,19 @@ export default {
             this.$refs.hcCrud.refresh();
           });
         })
-        .catch(() => {
-          // this.$message("取消删除成功!");
-        });
+        .catch(() => {});
     },
     // 展示签到码
     handleShowCode(row) {
       this.showCodeDialogVisible = true;
       this.img = row.weChatCode;
-      console.log("imgurl", this.img);
     },
     // 下载签到码
     downloadCode() {
-      var a = document.createElement('a')
-      console.log('a',a)
-      a.download = '签到码'
-      a.href = this.img
+      var a = document.createElement("a");
+      a.download = "签到码";
+      a.href = this.img;
       a.click();
-
-      // let image = new Image();
-      // var imgsrc = ""; /*这里是要下载的图片地址*/ //需要注意的是图片让后端反给你base64格式的
-      // var name = ""; /*这里是下载图片的名称*/
-      // // 解决跨域 Canvas 污染问题
-      // image.setAttribute("crossOrigin", "anonymous");
-      // image.onload = function () {
-      //   let canvas = document.createElement("canvas");
-      //   canvas.width = image.width;
-      //   canvas.height = image.height;
-      //   let context = canvas.getContext("2d");
-      //   context.drawImage(image, 0, 0, image.width, image.height);
-      //   let url = canvas.toDataURL("image/png"); //得到图片的base64编码数据
-      //   let a = document.createElement("a"); // 生成一个a元素
-      //   let event = new MouseEvent("click"); // 创建一个单击事件
-      //   a.download = name || "photo"; // 设置图片名称
-      //   a.href = url; // 将生成的URL设置为a.href属性
-      //   a.dispatchEvent(event); // 触发a的单击事件
-      // };
-      // image.src = imgsrc;
-
-      // 一、通过XMLHttpRequest()请求图片链接，然后获取返回的Blob（downloadjs）
-      // let data = { url: this.img }; // 签到码链接
-      // let anchor = document.createElement("a");
-      // if (data.url && data.url.length < 2048) {
-      //   anchor.href = data.url;
-      //   if (anchor.href.indexOf(data.url) !== -1) {
-      //     var ajax = new XMLHttpRequest();
-      //     ajax.open("GET", data.url, true);
-      //     ajax.responseType = "blob";
-      //     ajax.onload = function (e) {
-      //       Download(e.target.response, "签到码", "image/jpeg");
-      //     };
-      //     setTimeout(function () {
-      //       ajax.send();
-      //     }, 0);
-      //     return ajax;
-      //   }
-      // }
-      // 一、通过XMLHttpRequest()请求图片链接，然后获取返回的Blob
-      // var x=new XMLHttpRequest();
-      // x.open("GET", this.img, true);
-      // x.responseType = 'blob';
-      // x.onload=function(e){
-      //   console.log('e',e)
-      //   var url = window.URL.createObjectURL(x.response)
-      //   var a = document.createElement('a');
-      //   a.href = url
-      //   a.download = '签到码'
-      //   a.click()
-      // }
-      // x.send();
-      // 二、将图片转成Base64或者Blob
-      // var img = new Image()
-      //   img.onload = function() {
-      //     var canvas = document.createElement('canvas')
-      //     canvas.width = img.width
-      //     canvas.height = img.height
-      //     var ctx = canvas.getContext('2d')
-      //     // 将img中的内容画到画布上
-      //     ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
-      //     // 将画布内容转换为Blob
-      //     canvas.toBlob((blob) => {
-      //       // blob转为同源url
-      //       var blobUrl = window.URL.createObjectURL(blob)
-      //       // 创建a链接
-      //       var a = document.createElement('a')
-      //       a.href = blobUrl
-      //       a.download = '签到码'
-      //       // 触发a链接点击事件，浏览器开始下载文件
-      //       a.click()
-      //     })
-      // }
-      // img.src = this.img
-      // // 必须设置，否则canvas中的内容无法转换为blob
-      // img.setAttribute('crossOrigin', 'Anonymous')
     },
     // 查看
     check(id) {
@@ -309,7 +231,6 @@ export default {
           id: data.row.id,
         },
       });
-      // this.$router.push("/personnel");
     },
     // 票务管理
     ticketManagement({ row }) {
@@ -322,39 +243,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.title {
-  padding-bottom: 5px;
-  font-size: 18px;
-  font-weight: 400;
-}
-.add-inp-more {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  .inp-more {
-    display: flex;
-    .inp {
-      width: 272px;
-    }
-    .more {
-      padding: 0 12px;
-      margin-left: 8px;
-      height: 28px;
-    }
-  }
-}
-.paging {
-  margin-top: 20px;
-  text-align: right;
-}
-.managBtn {
-  font-size: 14px;
-}
-.code-img {
-  text-align: center;
-  .el-image {
-    width: 250px;
-    height: 250px;
-  }
-}
+@import "./styles/index.scss";
 </style>

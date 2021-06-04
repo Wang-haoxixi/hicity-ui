@@ -33,11 +33,11 @@
               <el-input-number v-model="formData.limitTicket" :min="1" :max="10000" placeholder="" style="width: 80%;"></el-input-number>
             </el-form-item>
           </el-col>
-          <el-col v-if="formData.ticketingType == 2" :span="8">
-            <!-- <el-form-item v-if="formData.ticketingType == 1" label="票种审核：" prop="needAudit">
+          <el-col  :span="8">
+            <el-form-item v-if="formData.ticketingType == 1" label="票种审核：" prop="needAudit">
               <el-switch v-model="formData.needAudit" :active-value="true" :inactive-value="false"></el-switch>
-            </el-form-item> -->
-            <el-form-item label="允许退票：" prop="allowedRefund">
+            </el-form-item>
+            <el-form-item v-if="formData.ticketingType == 2" label="允许退票：" prop="allowedRefund">
               <el-switch v-model="formData.allowedRefund" :active-value="1" :inactive-value="0"></el-switch>
             </el-form-item>
           </el-col>
@@ -90,7 +90,8 @@ export default {
         ticketingName: '免费票',
         number: 1,
         limitTicket: 1,
-        needAudit: true,
+        // needAudit: true,
+        needAudit: false,
       },
       formRules: {
         ticketingType: [{required: true, message: '请选择票务种类', trigger: 'blur'}],

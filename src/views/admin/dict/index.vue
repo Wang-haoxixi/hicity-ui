@@ -139,8 +139,8 @@ export default {
       this.dialogFormVisible = true
       this.tableLoading = true
       fetchItemList(Object.assign({
-        current: this.page.currentPage,
-        size: this.page.pageSize
+        current: 1,
+        size: 100
       }, { dictId: dictId })).then(response => {
         this.tableDictItemData = response.data.data.data.records
         this.tableLoading = false

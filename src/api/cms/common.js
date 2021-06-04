@@ -7,3 +7,18 @@ export function createComment(data) {
     data
   })
 }
+
+export function getCommentPage(params) {
+  return request({
+    url: '/cms/common_comment/pc/page',
+    params
+  })
+}
+
+export function hideComment(data) {
+  return request({
+    url: '/cms/common_comment/hidden',
+    method: 'POST',
+    data
+  })
+}

@@ -1,0 +1,56 @@
+.title {
+    padding-bottom: 5px;
+    font-size: 18px;
+    font-weight: 400;
+  }
+  .add-inp-more {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .inp-more {
+      display: flex;
+      .inp {
+        width: 272px;
+      }
+      .more {
+        padding: 0 12px;
+        margin-left: 8px;
+        height: 28px;
+      }
+    }
+  }
+  .paging {
+    margin-top: 20px;
+    text-align: right;
+  }
+  .managBtn {
+    font-size: 14px;
+  }
+  .code-img {
+    text-align: center;
+    .el-image {
+      width: 250px;
+      height: 250px;
+    }
+  }
+  .relevance-more-box {
+    .search {
+      display: flex;
+      align-items: center;
+      .el-select {
+        flex: 1;
+        margin: 0 15px;
+      }
+    }
+    .circle-list {
+      .tiitle-org {
+        padding-bottom: 10px;
+      }
+      .circle-item {
+        padding: 5px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+    }
+  }

@@ -1,5 +1,5 @@
 <template>
-  <file-select :accept="accept" ref="fileSelect" @file-change="fileSelect">
+  <file-select ref="fileSelect" :accept="accept" :multiple="multiple" @file-change="fileSelect">
     <slot name="trigger"></slot>
   </file-select>
 </template>
@@ -23,6 +23,10 @@ export default {
       type: String,
       default: ''
     },
+    multiple: {
+      type: Boolean,
+      default: false
+    },
   },
   data () {
     return {
@@ -43,7 +47,7 @@ export default {
           for (let i = 0; i < files.length; i++) {
             this.uploadFile(files[i])
           }
-        } 
+        }
       } else {
         for (let i = 0; i < files.length; i++) {
           this.uploadFile(files[i])
@@ -129,7 +133,7 @@ export default {
           } else {
             this.$emit('change-error', uuid)
           }
-          
+
           // let beforeUploadValidator = this.beforeUpload(file)
           // if (beforeUploadValidator instanceof Promise) {
           //   beforeUploadValidator.then(() => {

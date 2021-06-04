@@ -22,6 +22,14 @@ export function createCoupons (data) {
   })
 }
 
+export function createPlatformCoupons (data) {
+  return request({
+    url: '/mms/coupons/platform/create',
+    method: 'POST',
+    data
+  })
+}
+
 export function getCouponsDetail (id) {
   return request({
     url: `/mms/coupons/select?id=${id}`,
@@ -39,6 +47,14 @@ export function deleteCouponsBatch (data) {
 export function updateCoupons (data) {
   return request({
     url: '/mms/coupons/update',
+    method: 'POST',
+    data
+  })
+}
+
+export function updatePlatformCoupons (data) {
+  return request({
+    url: '/mms/coupons/platform/update',
     method: 'POST',
     data
   })
@@ -129,3 +145,33 @@ export function recommendBatch (data) {
     data
   })
 }
+
+export function getRecommendPage (params) {
+  return request({
+    url: '/mms/coupons/platform/all/page',
+    params
+  })
+}
+
+export function setPriority (data) {
+  return request({
+    url: '/mms/coupons/recommend/sort',
+    method: 'post',
+    data
+  })
+}
+
+export function setRecommend (data) {
+  return request({
+    url: '/mms/coupons/choice/recommend',
+    method: 'post',
+    data
+  })
+}
+
+export function getEditCouponsDetail (id) {
+  return request({
+    url: '/mms/app/coupons/merchant/select?couponsId=' + id,
+  })
+}
+

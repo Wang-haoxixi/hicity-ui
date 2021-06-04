@@ -20,7 +20,6 @@ export function getDicValue (name = '', value = '') {
   if (dicData) {
     for (let i = 0; i < dicData.length; i++) {
       if (dicData[i].value == value) {
-        console.log(dicData[i])
         return dicData[i].label
       }
     }
