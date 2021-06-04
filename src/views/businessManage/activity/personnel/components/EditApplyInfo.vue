@@ -19,7 +19,12 @@
             :key="index"
           >
             <el-input
-              v-if="item.type == 'input'"
+              v-if="item.type == 'input' && item.code != 'phone_number'"
+              v-model="item.value"
+            ></el-input>
+            <el-input
+              disabled
+              v-else-if="item.code == 'phone_number'"
               v-model="item.value"
             ></el-input>
             <el-input
@@ -199,18 +204,23 @@ export default {
       return rules;
     },
     openApplyInfoDialog(data, id) {
-      this.id = id;
       this.dialogVisibleApplyInfo = true;
-      this.data = data;
+      console.log("data...", data);
+      this.id = id;
+      // this.data = data;
+      this.data = {
+        id: "",
+        conferenceFormList: [],
+        ...data,
+      };
     },
     handleSave() {
-      console.log("开始校验...", this.data.conferenceFormList);
-
+      // console.log("开始校验...", this.data.conferenceFormList);
       let query = {
         id: this.id,
         infoFormConfigList: this.data.conferenceFormList,
       };
-      console.log("query...", query);
+      // console.log("query...", query);
       updatePeopleInfo(query).then((res) => {
         console.log("rst..", res);
         if (res.data.data.businessCode == 1000) {
@@ -219,9 +229,9 @@ export default {
             message: "编辑成功",
             type: "success",
           });
+          this.dialogVisibleApplyInfo = false;
+          this.$emit("refresh");
         }
-        this.dialogVisibleApplyInfo = false;
-        this.$emit("refresh");
       });
 
       // let list = this.data.conferenceFormList;

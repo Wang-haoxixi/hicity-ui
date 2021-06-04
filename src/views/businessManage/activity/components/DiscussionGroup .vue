@@ -4,6 +4,7 @@
       title="提示"
       :visible.sync="dialogVisibleDiscussionGroup"
       width="30%"
+      @close="closeDialog"
     >
       <div class="discussionGroup-warp">
         <p class="p1">正在生成活动讨论组</p>
@@ -20,6 +21,7 @@
             <hc-city-select
               v-model="discussionData.cityId"
               :city-id="userInfo.manageCityId"
+              :single="true"
             ></hc-city-select>
           </el-form-item>
           <el-form-item label="圈子名称：" prop="circleName">
@@ -59,13 +61,14 @@ export default {
       discussionData: {
         circleName: "",
         phone: "",
-        cityId: [],
+        cityId: "",
+        id: "",
       },
       discussionFormRules: {
-        cityId: [
-          { required: true, message: "请输入城市", trigger: "blur" },
+        cityId: [{ required: true, message: "请输入城市", trigger: "blur" }],
+        circleName: [
+          { required: true, message: "请输入圈子名称", trigger: "blur" },
         ],
-        circleName: [{ required: true, message: "请输入圈子名称", trigger: "blur" }],
         phone: [
           { required: true, message: "请输入群主账号", trigger: "blur" },
           {
@@ -79,17 +82,29 @@ export default {
     };
   },
   methods: {
-    openDiscussionGroupDialog() {
-      this.dialogVisibleDiscussionGroup = false;
+    closeDialog() {
+      this.$message.success("发布活动成功");
+      this.$router.go(-1);
     },
+    openDiscussionGroupDialog(data) {
+      console.log("id...", data);
+      this.discussionData.id = data;
+      this.dialogVisibleDiscussionGroup = true;
+    },
+    //确定生成圈子
     confirmClick() {
       console.log("dialogVisibleDiscussionGroup...", this.discussionData);
-      // createCircle().then(res=>{
-      //   console.log('create...',res)
-      // })
-      // this.$refs.discussionFormRef.validate((valid) => {
-      //   console.log(valid);
-      // });
+      this.$refs.discussionFormRef.validate((valid) => {
+        if (valid) {
+          createCircle(this.discussionData).then((res) => {
+            // console.log("create...", res);
+            if (res.data.data.businessCode == 1000) {
+              this.$message.success("发布活动并生成讨论组成功");
+              this.$router.go(-1);
+            }
+          });
+        }
+      });
     },
   },
 };

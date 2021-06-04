@@ -179,7 +179,7 @@
       >
       </el-pagination>
       <TicketInfo ref="ticketInfoRef" />
-      <EditApplyInfo ref="editApplyInfoRef" />
+      <EditApplyInfo ref="editApplyInfoRef" @refresh="getList" />
       <PersonnelAudit ref="personnelAuditRef" @refresh="getList" />
     </basic-container>
   </div>

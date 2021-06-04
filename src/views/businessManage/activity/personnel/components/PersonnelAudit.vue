@@ -43,10 +43,7 @@
         <el-button @click="handleOpenRejectReasonDialog">驳 回</el-button>
       </span>
     </el-dialog>
-    <el-dialog
-      :visible.sync="dialogVisibleRejectReason"
-      width="30%"
-    >
+    <el-dialog :visible.sync="dialogVisibleRejectReason" width="30%">
       <div class="reject-reason-box">
         <i class="el-icon-warning"></i>
         <div class="p">请选择拒绝告知理由</div>
@@ -129,7 +126,6 @@ export default {
           this.$emit("refresh");
         }
       });
-
     },
     handleFinish() {
       // reject code...

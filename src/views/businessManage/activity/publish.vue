@@ -1959,6 +1959,7 @@ export default {
       ];
 
       // console.log("baseFormData...", this.baseFormData);
+      // this.$refs.discussionGroupRef.openDiscussionGroupDialog(243)//显示创建圈子弹窗
 
       this.$refs.baseFormDataRef.validate((valid1) => {
         this.$refs.setTicketDataRef.forEach((item) => {
@@ -1970,21 +1971,22 @@ export default {
         if (!this.validRst.includes(false) && valid1) {
           savePublish(this.baseFormData)
             .then((res) => {
+              console.log('success...',res)
               if (res.data.code !== 0) {
                 this.validRst = [];
                 return this.$message.error("发布活动失败");
               }
-              this.$message.success("发布活动成功");
+              this.$refs.discussionGroupRef.openDiscussionGroupDialog(res.data.data.data)//显示创建圈子弹窗
+              // this.$message.success("发布活动成功");
               this.fileList = [];
               this.baseFormData.fileList = [];
-              this.$router.go(-1);
+              // this.$router.go(-1);
               this.validRst = [];
               this.defaultList = [];
             })
             .finally(() => {
               this.formLoading = false;
             });
-          // this.$refs.discussionGroupRef.openDiscussionGroupDialog()
         } else {
           this.$message.error("活动信息填写不完整");
           this.validRst = [];
