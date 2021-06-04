@@ -179,7 +179,6 @@
           title="店铺详情"
           :visible.sync="storeVisible"
           width="70%">
-          123321
           <store-detail :detail="storeDetail"></store-detail>
           <div slot="footer">
             <el-button @click="storeVisible = false">返 回</el-button>
