@@ -446,7 +446,7 @@ export default {
     storeUserPhoneValidator (rules, value, callback) {
       if (!value) {
         callback(new Error('请输入联系人电话'))
-      } else if (isMobile(value) || isPhone(value)) {
+      } else if (isMobile(value)) {
         callback()
       } else {
         callback(new Error('请输入正确的电话号码格式'))

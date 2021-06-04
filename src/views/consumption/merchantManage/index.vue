@@ -106,7 +106,7 @@
           :rules="formRule"
         >
           <el-form-item label="商户账户：" prop="phone">
-            <el-input v-model.trim="formData.phone" :disabled="publishType == 'edit'" maxlength="20"></el-input>
+            <el-input v-model.trim="formData.phone" :disabled="publishType == 'edit'" maxlength="11"></el-input>
           </el-form-item>
           <el-form-item label="姓名：" prop="name">
             <el-input v-model.trim="formData.name" maxlength="11"></el-input>
@@ -159,7 +159,7 @@
             <el-input v-model.trim="formData.contactsName" maxlength="11"></el-input>
           </el-form-item>
           <el-form-item label="联系人电话：" prop="contactsPhone">
-            <el-input v-model.trim="formData.contactsPhone" maxlength="13"></el-input>
+            <el-input v-model.trim="formData.contactsPhone" maxlength="11"></el-input>
           </el-form-item>
           <el-form-item label="联系人地址：" prop="contactsAddress">
             <el-input v-model.trim="formData.contactsAddress" maxlength="30"></el-input>
@@ -246,6 +246,7 @@ export default {
         contactsPhone: [{required: true, validator: this.contactsPhoneValidator, trigger: 'blur'}],
         contactsAddress: [{required: true, message: '请输入联系人地址', trigger: 'blur'}],
         merchantStatus: [{required: true, message: '请选择店铺状态', trigger: 'blur'}],
+        idCard: [{required: true, validator: this.idCardValidator, trigger: 'blur'}],
       },
       idCardTime: [],
       formLoading: false,
@@ -299,10 +300,20 @@ export default {
     contactsPhoneValidator (rules, value, callback) {
       if (!value) {
         callback(new Error('请输入联系人电话'))
-      } else if (isMobile(value) || isPhone(value)) {
+      } else if (isMobile(value)) {
         callback()
       } else {
         callback(new Error('请输入正确的电话号码格式'))
+      }
+    },
+    idCardValidator (rules, value, callback) {
+      console.log(value)
+      if (!value) {
+        callback(new Error('请输入身份证号码'))
+      } else if (/^(\d{18,18}|\d{15,15}|(\d{17,17}[x|X]))$/.test(value)) {
+        callback()
+      } else {
+        callback(new Error('请输入正确的身份证号码'))
       }
     },
     idCardChange (idCardTime) {
