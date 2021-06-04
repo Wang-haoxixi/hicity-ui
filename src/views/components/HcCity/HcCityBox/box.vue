@@ -24,7 +24,7 @@
           <div class="city-select-list">
             <!-- <div v-for="city in cityArange" :key="city.id" class="city-select-list-item"  :class="{'checked': hasSelected(city.id)}" @click="selectCity(city)">
               <div class="item-name">{{city.regionName}}</div>
-              <div class="item-number">{{cityChildren(city.id)}}</div>  
+              <div class="item-number">{{cityChildren(city.id)}}</div>
             </div> -->
             <city-name v-for="city in cityArange" :key="city.id" :checked="!!hasSelected(city.id)"
               :name="city.regionName"
@@ -166,13 +166,15 @@ export default {
     init () {
       this.citySelected = deepClone(this.initCityTree)
       this.cityMapList = formatCitys(this.allCityTree.children)
-      this.cityMapList.push({
-        key: this.allCityTree.regionName,
-        cityList: [{
-          id: this.allCityTree.id,
-          regionName: this.allCityTree.regionName
-        }]
-      })
+      if (!this.allCityTree.selfDisabled) {
+        this.cityMapList.push({
+          key: this.allCityTree.regionName,
+          cityList: [{
+            id: this.allCityTree.id,
+            regionName: this.allCityTree.regionName
+          }]
+        })
+      }
       this.cityArangeSelect(this.cityMapList[0])
     },
     cityArangeSelect ({key, cityList}) {
