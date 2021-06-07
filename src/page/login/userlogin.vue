@@ -146,6 +146,7 @@ export default {
         if (valid) {
           this.$store.dispatch('LoginByUsername', this.loginForm).then(() => {
             this.$store.dispatch('InitAllCityTree')
+            this.$store.dispatch('InitCityTree')
             this.$store.dispatch('InitDictMap').then(() => {
               this.$router.push({ path: this.tagWel.value })
             })

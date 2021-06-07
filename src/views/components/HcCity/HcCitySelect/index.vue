@@ -3,7 +3,7 @@
     <template v-if="viewOnly && single">{{cityName}}</template>
     <template v-else>
       <el-input :disabled="disabled" :value="cityName" readonly @focus="toSelect"></el-input>
-      <hc-city-box ref="hcCityBox" :title="title" :single="single" @save="save"></hc-city-box>
+      <hc-city-box ref="hcCityBox" :title="title" :single="single" :province="province" @save="save"></hc-city-box>
     </template>
   </div>
 </template>
@@ -126,6 +126,10 @@ export default {
       default: false
     },
     disabled: {
+      type: Boolean,
+      default: false
+    },
+    province: {
       type: Boolean,
       default: false
     }

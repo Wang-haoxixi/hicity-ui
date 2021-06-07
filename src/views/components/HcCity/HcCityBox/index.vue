@@ -1,5 +1,5 @@
 <template>
-  <hc-city-box ref="box" :title="title" :single="single" @save="save"></hc-city-box>
+  <hc-city-box ref="box" :title="title" :single="single" :province="province" @save="save"></hc-city-box>
 </template>
 
 <script>
@@ -90,6 +90,10 @@ export default {
       type: String,
       default: '展示城市'
     },
+    province: {
+      type: Boolean,
+      default: false
+    }
   },
   data () {
     return {

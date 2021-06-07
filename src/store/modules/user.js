@@ -1,7 +1,7 @@
 import { getStore, setStore } from '@/util/store'
 import { isURL, validatenull } from '@/util/validate'
 import { getUserInfo, loginByMobile, loginBySocial, loginByUsername, logout, refreshToken, getDicList } from '@/api/login'
-import { getAllCityTree } from '@/api/admin/city'
+import { getAllCityTree, getCityTree } from '@/api/admin/city'
 import { deepClone, encryption } from '@/util/util'
 import webiste from '@/const/website'
 import { GetMenu } from '@/api/admin/menu'
@@ -52,6 +52,9 @@ const user = {
     }) || [],
     allCityTree: getStore({
       name: 'allCityTree'
+    }) || [],
+    cityTree: getStore({
+      name: 'cityTree'
     }) || []
   },
   actions: {
@@ -196,6 +199,15 @@ const user = {
         })
       })
     },
+    InitCityTree ({commit}) {
+      return new Promise(resolve => {
+        getCityTree().then((response) => {
+          let data = response.data.data.data
+          commit('SET_CITY_TREE', data)
+          resolve()
+        })
+      })
+    },
     InitAllCityTree ({commit}) {
       return new Promise(resolve => {
         getAllCityTree().then((response) => {
@@ -262,6 +274,14 @@ const user = {
       setStore({
         name: 'dicList',
         content: state.dicList,
+        type: 'session',
+      })
+    },
+    SET_CITY_TREE: (state, cityTree) => {
+      state.cityTree = cityTree
+      setStore({
+        name: 'cityTree',
+        content: cityTree,
         type: 'session',
       })
     },
