@@ -2,25 +2,28 @@
   <basic-container>
     <hc-table-form title="标签配置">
       <hc-crud ref="hcCrud" :option="tableOption" :fetchListFun="fetchListFun" :addFun="addFun" :updateFun="updateFun">
+        <template slot="menuLeft">
+          <el-button
+            @click="manageRecommend"
+            size="mini"
+            >推荐管理</el-button>
+        </template>
         <template v-slot:table="scope">
           <hc-table-data-box :empty="!scope.tableData || scope.tableData.length == 0" :loading="boxLoading">
-            <div class="tag-box">
-              <div v-for="tag in scope.tableData" :key="tag.tagId" class="tag-item">
-                <div class="tag-item-info">
-                  <div class="tag-item-name">{{tag.name}}</div>
-                  <div class="tag-item-sort" v-if="!isAdmin && tag.isOpening && tag.sort">No.{{tag.sort}}</div>
+            <div class="label-box">
+              <div v-for="label in scope.tableData" :key="label.id" class="label-item">
+                <div class="label-item-info">
+                  <div class="label-item-name">{{label.name}}</div>
                 </div>
-                <div class="tag-item-option">
-                  <div class="tag-item-option-left">
-                    <el-button v-if="userInfo.userType == 3 || userInfo.userType == 4" type="text" size="mini" @click="cityView(tag.tagId)">查看配置城市</el-button>
-                    <el-button v-else-if="tag.editable" type="text" size="mini" @click="handleStart(tag)">{{tag.isOpening ? '停用' : '启用'}}</el-button>
+                <div class="label-item-option">
+                  <div class="label-item-option-left">
+                    引用：{{label.numberOfUse}}
                   </div>
-                  <div class="tag-item-option-right">
-                    <el-button v-if="!isAdmin" type="text" size="mini" @click="handleSort(tag)">排序</el-button>
-                    <template v-if="tag.isCanEdit">
-                      <el-button type="text" size="mini" @click="handleUpdate(tag)">编辑</el-button>
-                      <el-button type="text" size="mini" @click="handleDel(tag.tagId)">删除</el-button>
-                    </template>
+                  <div class="label-item-option-right">
+                    <el-button v-if="label.isRecommend == 1" type="text" size="mini" @click="toCancelRecommend(label.id)">取消推荐</el-button>
+                    <el-button v-else type="text" size="mini" @click="toRecommend(label.id)">推荐</el-button>
+                    <el-button type="text" size="mini" @click="handleUpdate(label)">编辑</el-button>
+                    <el-button type="text" size="mini" @click="handleDel(label.id)">删除</el-button>
                   </div>
                 </div>
               </div>
@@ -30,24 +33,50 @@
       </hc-crud>
     </hc-table-form>
 
+    <el-dialog
+      title="推荐列表"
+      :visible.sync="dialogVisible"
+      width="width">
+      <label-recommend ref="recommend" @refresh="recommendRefresh"></label-recommend>
+      <div slot="footer">
+        <el-button @click="dialogVisible = false">返 回</el-button>
+      </div>
+    </el-dialog>
 
-    <hc-city-box ref="hcCityBox"></hc-city-box>
+    <hc-city-box ref="recommendSelect" @save="setRecommend"></hc-city-box>
 
   </basic-container>
 </template>
 
 <script>
-import { getTagList, setTagSort, tagEnable, addTag, updateTag, deleteTag, tagOpenList } from '@/api/tms/city'
+import { getLabelPage, saveLabel, deleteLabel, setLabelRecommend, cancelLabelRecommend } from "@/api/cms/news"
 import { mapGetters } from 'vuex'
 import HcCityBox from '@/views/components/HcCity/HcCityBox/index'
+import LabelRecommend from './recommend'
 import { tableOption } from './const.js'
+
+function getCityList (tree) {
+  let cityList = []
+  if (tree) {
+    if (tree.children) {
+      for (let i = 0; i < tree.children.length; i++) {
+        cityList = [...cityList, ...getCityList(tree.children[i])]
+      }
+    } else {
+      cityList.push(tree.id)
+    }
+  }
+  return cityList
+}
 export default {
-  components: { HcCityBox },
+  components: { HcCityBox, LabelRecommend },
   data () {
     return {
+      recommendId: null,
       tableOption,
       tagList: [],
       boxLoading: false,
+      dialogVisible: false,
     }
   },
   computed: {
@@ -60,7 +89,7 @@ export default {
     fetchListFun (params) {
       this.boxLoading = true
       return new Promise((resolve, reject) => {
-        getTagList(params).then(({data}) => {
+        getLabelPage(params).then(({data}) => {
           resolve({
             records: data.data.data.records,
             page: {
@@ -75,7 +104,7 @@ export default {
       })
     },
     addFun(formData, next, loading) {
-      addTag(formData).then(({data}) => {
+      saveLabel(formData).then(({data}) => {
         this.$notify({
           title: '成功',
           message: '创建成功',
@@ -91,7 +120,7 @@ export default {
       this.$refs.hcCrud.rowEdit(row)
     },
     updateFun(formData, next, loading) {
-      updateTag(formData).then(({data}) => {
+      saveLabel(formData).then(({data}) => {
         this.$notify({
           title: '成功',
           message: '修改成功',
@@ -103,18 +132,13 @@ export default {
         loading()
       })
     },
-    cityView (tagId) {
-      tagOpenList(tagId).then(({data}) => {
-        this.$refs.hcCityBox.open(this.userInfo.manageCityId, data.data.data || [], true)
-      })
-    },
-    handleDel (tagId) {
-      this.$confirm("是否删除该标签?", "提示", {
+    handleDel (id) {
+      this.$confirm("是否确认删除该标签?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
       }).then(() => {
-        deleteTag({tagId}).then(({data}) => {
+        deleteLabel(id).then(({data}) => {
           if (data.code === 0) {
             this.$message.success('删除成功')
             this.$refs.hcCrud.refresh()
@@ -122,61 +146,68 @@ export default {
         })
       })
     },
-    handleStart (row) {
-      let enable = row.isOpening ? 0 : 1
-      tagEnable({
-        tagId: row.tagId,
-        enable
+    toRecommend (id) {
+      this.recommendId = id
+      this.$refs.recommendSelect.open(this.userInfo.manageCityId, [], false)
+    },
+    setRecommend (city) {
+      let cityList = getCityList(city)
+      setLabelRecommend({
+        id: this.recommendId,
+        cityList
       }).then(({data}) => {
-        if (data.code === 0) {
-          this.$message.success('操作成功')
-          this.$refs.hcCrud.refresh()
-        }
-      })
-    }, 
-    handleSort (row, index) {
-      this.$prompt('0~99999999的整数', '请输入排序', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        inputType: 'number',
-        inputValidator: (val) => {
-          return val.length < 9 && /^[1-9]+0*$/.test(val) && parseInt(val) < 100000000
-        },
-        inputErrorMessage: '请输入0~99999999的整数'
-      }).then(({ value }) => {
-        if (value) {
-          setTagSort({
-            tagId: row.tagId,
-            sort: parseInt(value),
-          }).then(({data}) => {
-            if (data.code === 0) {
-              this.$message.success('操作成功')
-              this.$refs.hcCrud.refresh()
-            }
-          })
-        }
+        this.$notify({
+          title: "成功",
+          message: "操作成功",
+          type: "success",
+          duration: 2000,
+        });
+        this.$refs.hcCrud.refresh()
       })
     },
+    toCancelRecommend (id) {
+      this.$confirm("是否确认取消推荐该标签?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      }).then(() => {
+        cancelLabelRecommend(id).then(({data}) => {
+          if (data.code === 0) {
+            this.$message.success('操作成功')
+            this.$refs.hcCrud.refresh()
+          }
+        })
+      })
+    },
+    manageRecommend () {
+      this.dialogVisible = true
+      this.$nextTick(() => {
+        this.$refs.recommend.open()
+      })
+    },
+    recommendRefresh () {
+      this.$refs.hcCrud.refresh()
+    }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.tag-box {
+.label-box {
   display: grid;
   grid-template-columns: repeat(auto-fill, 250px);
   grid-template-rows: repeat(auto-fill, 90px);
   grid-gap: 24px;
-  .tag-item {
+  .label-item {
     border-radius: 2px;
     border: 1px solid #E9E9E9;
     padding: 16px 13px;
-    .tag-item-info {
+    .label-item-info {
       display: flex;
       justify-content: space-between;
       align-items: center;
       height: 22px;
-      .tag-item-name {
+      .label-item-name {
         height: 22px;
         line-height: 22px;
         flex: 1 1 10px;
@@ -184,14 +215,14 @@ export default {
         white-space: nowrap;
         text-overflow: ellipsis;
       }
-      .tag-item-sort {
+      .label-item-sort {
         flex: 50px 0 0;
         height: 22px;
         line-height: 22px;
         text-align: right;
       }
     }
-    .tag-item-option {
+    .label-item-option {
       margin-top: 16px;
       height: 20px;
       display: flex;
@@ -199,11 +230,11 @@ export default {
       align-items: center;
       .mune-item {
         font-size: 14px;
-        
+
       }
-      .tag-item-option-left {
+      .label-item-option-left {
       }
-      .tag-item-option-right {
+      .label-item-option-right {
 
       }
     }
