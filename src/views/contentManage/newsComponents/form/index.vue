@@ -13,15 +13,18 @@
 
       <el-form-item label="文章来源：" prop="dataType">
         <el-radio-group v-model="formData.dataType" @change="dataTypeChange">
-          <el-radio label="1">转载</el-radio>
-          <el-radio label="2">原创</el-radio>
+          <el-radio label="1">原创</el-radio>
+          <el-radio label="2">转载</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="平台来源：" prop="newsSource" v-if="formData.dataType == '1'">
+      <el-form-item label="平台来源：" prop="newsSource" v-if="formData.dataType == '2'">
         <el-input v-model.trim="formData.newsSource" maxlength="200"></el-input>
       </el-form-item>
       <el-form-item label="作者：" prop="author">
-        <el-input v-model.trim="formData.author" maxlength="50" :disabled="formData.dataType=='2'"></el-input>
+        <el-input v-model.trim="formData.author" maxlength="50" :disabled="formData.dataType=='1'"></el-input>
+      </el-form-item>
+      <el-form-item label="原文链接：" prop="originalLink">
+        <el-input v-model.trim="formData.originalLink" maxlength="200"></el-input>
       </el-form-item>
 
       <el-form-item label="栏目：" prop="officialColumnId">
@@ -58,7 +61,7 @@
       </el-form-item>
 
       <el-form-item v-if="formData.source ? (userType != 3 && userType == formData.source) : (userType == 1 || userType == 2)" label="发布城市：" prop="cityIdList">
-        <hc-city-select v-model="formData.cityIdList" :city-id="userInfo.manageCityId"></hc-city-select>
+        <hc-city-select v-model="formData.cityIdList" :city-id="userInfo.manageCityId" :province="userType == 1"></hc-city-select>
       </el-form-item>
       <el-form-item label="标题图：" prop="titleImage">
         <hc-image-upload v-model="titleImage" :limit="3"></hc-image-upload>
@@ -106,7 +109,7 @@ export default {
       titleImage: [],
       quillContent: {},
       formData: {
-        dataType: "",//文章来源默认为转载
+        dataType: "1",//文章来源默认为原创
         cityIdList: [],
         officialColumnId: [],
         author: '',
@@ -252,13 +255,6 @@ export default {
         }
       }
       formData.labelList = labels
-      console.log({
-        data: {
-          ...formData,
-          state
-        },
-        isEdit: this.isEdit
-      })
       this.$emit('save', {
         data: {
           ...formData,
@@ -274,9 +270,9 @@ export default {
     },
     dataTypeChange (type) {
       this.formData.newsSource = ''
-      if (type == '1') {
+      if (type == '2') {
         this.formData.author = ''
-      } else if (type == '2') {
+      } else if (type == '1') {
         this.formData.author = this.userInfo.realName
       }
     },

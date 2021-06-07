@@ -221,7 +221,7 @@ export default {
           closeAllowed: "0",
           officialColumnId: [],
           dataType: '1',
-          author: '',
+          author: this.userInfo.realName,
         })
       })
     },
