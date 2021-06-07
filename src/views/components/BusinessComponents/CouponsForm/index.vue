@@ -4,21 +4,79 @@
     :model="formData"
     label-width="150px"
     :rules="formRule">
+    <h3 class="form-title">基本信息</h3>
     <el-form-item label="券名称：" prop="name">
-      <el-input v-model.trim="formData.name" maxlength="15" :disabled="isEdit" placeholder="品牌+商品类型+金额+代金券+商铺名称，如食品 西朵曼生日蛋糕100元代金券 雁峰区希朵曼"></el-input>
+      <el-input v-model.trim="formData.name" maxlength="15" :disabled="formData.status == '3' || formData.status == '2'" placeholder="品牌+商品类型+金额+代金券+商铺名称，如食品 西朵曼生日蛋糕100元代金券 雁峰区希朵曼"></el-input>
     </el-form-item>
     <el-form-item label="券门类：" prop="category">
-      <el-select v-model="formData.category" :disabled="isEdit">
-        <el-option v-for="item in dicList['COUPONS_CATEGORY']" :key="item.value" :label="item.label" :value="item.value - 0">{{item.label}}</el-option>
+      <el-select v-model="formData.category" :disabled="formData.status == '3' || formData.status == '2'">
+        <el-option label="餐饮外卖" :value="0">餐饮外卖</el-option>
+        <el-option label="商超购物" :value="1">商超购物</el-option>
+        <el-option label="出行玩乐" :value="2">出行玩乐</el-option>
+        <el-option label="电影演出" :value="3">电影演出</el-option>
       </el-select>
     </el-form-item>
-    <el-form-item label="优惠券类型：">
-      <el-select value="1" disabled>
-        <el-option label="平台券" value="1">平台券</el-option>
-      </el-select>
+    <el-form-item label="抵扣价：" prop="deductionPrice">
+      <hc-input v-model="formData.deductionPrice" :decimal="2" :min="0.01" :max="9999.99" maxlength="7" style="width: 200px;" :disabled="formData.status == '3' || formData.status == '2'">
+        <div slot="append">元</div>
+      </hc-input>
+      <div>抵扣价指商户核销该券时抵扣的价格，该价格用于计算展示用户到店支付金额</div>
+    </el-form-item>
+    <el-form-item label="满足条件：" prop="conditionPrice">
+      满
+      <hc-input v-model="formData.conditionPrice" :decimal="2" :min="0.01" :max="9999.99" maxlength="7" style="width: 200px;" :disabled="formData.status == '3' || formData.status == '2'">
+        <div slot="append">元</div>
+      </hc-input>
+      可用
+      <div>例如：满100元可用</div>
+    </el-form-item>
+    <el-form-item label="供应量：" prop="supply">
+      <el-input-number v-model="formData.supply" :min="1" :max="99999999"></el-input-number>
+    </el-form-item>
+    <el-form-item v-if="formData.receivedNum != undefined && formData.receivedNum != null" label="已领数量：">
+      {{formData.receivedNum}}
+    </el-form-item>
+    <el-form-item label="是否放入仓库：" prop="isDepository">
+      <el-switch v-model="formData.isDepository" active-text="是" active-value="1" inactive-text="否" inactive-value="0" :disabled="formData.status == '3' || formData.status == '2'" @change="depositoryChange"></el-switch>
+    </el-form-item>
+    <el-form-item v-if="formData.isDepository != '1'" label="是否永久有效：" prop="isPermanent">
+      <el-switch v-model="formData.isPermanent" active-text="是" active-value="1" inactive-text="否" inactive-value="0" @change="permanetChange"></el-switch>
+    </el-form-item>
+    <el-form-item v-if="formData.isDepository != '1'" class="form-item-available" label="可用时间：" prop="availableTime" style="padding-bottom: 20px;">
+      <el-form-item class="form-item-available-start" labelWidth="0" prop="availableStartTime" style="display: inline-block">
+        <el-date-picker
+          v-model="formData.availableStartTime"
+          @change="$refs.form.validateField('availableTime')"
+          type="datetime"
+          :picker-options="pickerOptions"
+          value-format="yyyy-MM-dd HH:mm:ss"
+          placeholder="选择开始时间">
+        </el-date-picker>
+      </el-form-item>
+        至
+      <el-form-item v-if="formData.isPermanent == 0" prop="availableEndTime" style="display: inline-block">
+        <el-date-picker
+          v-model="formData.availableEndTime"
+          @change="$refs.form.validateField('availableTime')"
+          type="datetime"
+          :picker-options="pickerOptions"
+          value-format="yyyy-MM-dd HH:mm:ss"
+          placeholder="选择结束时间">
+        </el-date-picker>
+      </el-form-item>
+      <template v-else>
+        永久
+      </template>
+    </el-form-item>
+    <el-form-item label="logo设置：" prop="logo">
+      <el-checkbox v-if="!isPlatform" v-model="formData.isCopyLogo" label="复用商户logo" :disabled="formData.status == '3' || formData.status == '2'" border @change="$refs.form.validateField('logo')"></el-checkbox>
+      <template v-if="!formData.isCopyLogo">
+        <div>图片建议尺寸:120像素*120像素，大小不超过1M，支持JPG、PNG格式。如不上传，默认使用超能支付logo</div>
+        <hc-image-upload v-model="formData.logo" single :limit="1" @change="$refs.form.validateField('logo')" :disabled="formData.status == '3' || formData.status == '2'"></hc-image-upload>
+      </template>
     </el-form-item>
     <el-form-item label="使用说明：" prop="instructions">
-      <el-input type="textarea" v-model.trim="formData.instructions" :autosize="{minRows: 6, maxRows: 10}" maxlength="200" style="width: 400px;"
+      <el-input type="textarea" v-model.trim="formData.instructions" :disabled="formData.status == '3' || formData.status == '2'" :autosize="{minRows: 6, maxRows: 10}" maxlength="200" style="width: 400px;"
       placeholder="例如：
 美食满300元-100元（酒水、饮料、槟榔、香烟除外）；
 本券不兑现，不找零，不可与本店其他优惠活动同时享受；
@@ -26,145 +84,71 @@
 本券需要预约，请提前与商家进行预约；"
       ></el-input>
     </el-form-item>
-    <el-form-item label="领取门槛：" prop="receiveType">
-      <el-radio-group v-model="formData.receiveType" @change="upTimeTypeChange" :disabled="isEdit">
-        <div class="radio-line">
-          <el-radio label="3">普通券（不限制领取和使用）</el-radio>
-        </div>
-        <div class="radio-line">
-          <el-radio label="1">新人券（限新用户可领）</el-radio>
-        </div>
-        <div class="radio-line">
-          <el-radio label="2">首单券（所有用户可领，限平台（区域）首单消费可用）</el-radio>
-        </div>
-      </el-radio-group>
-    </el-form-item>
-    <el-form-item v-if="isPlatform" label="适用范围：" prop="cityIds">
-      <hc-city-select v-model="cityIds" :city-id="userInfo.manageCityId" :disabled="isEdit"></hc-city-select>
-    </el-form-item>
 
-    <el-form-item label="券种类：" prop="deductionType">
-      <el-radio-group v-model="formData.deductionType" :disabled="isEdit">
-        <el-radio label="3">满减现金券</el-radio>
-        <el-radio label="2">立减现金券</el-radio>
-        <!-- <el-radio label="4">满减折扣券</el-radio>
-        <el-radio label="5">立减折扣券</el-radio> -->
-      </el-radio-group>
-    </el-form-item>
-    <el-form-item v-if="formData.deductionType == 3 || formData.deductionType == 4" label="满减条件金额：" prop="conditionPrice">
-      <hc-input v-model="formData.conditionPrice" :decimal="1" :min="0.1" :max="9999.9" maxlength="6" style="width: 200px;" :disabled="isEdit">
-        <div slot="append">元</div>
-      </hc-input>
-    </el-form-item>
-    <el-form-item v-if="formData.deductionType == 2 || formData.deductionType == 3" label="优惠金额：" prop="deductionPrice">
-      <hc-input v-model="formData.deductionPrice" :decimal="1" :min="0.1" :max="9999.9" maxlength="6" style="width: 200px;" :disabled="isEdit">
-        <div slot="append">元</div>
-      </hc-input>
-    </el-form-item>
-    <el-form-item v-if="formData.deductionType == 4 || formData.deductionType == 5" label="优惠折扣：" prop="discountRatio">
-      <hc-input style="width: 200px;" v-model="formData.discountRatio" :decimal="1" maxlength="10" :max="9.99" :min="0.1" :disabled="isEdit">
-      <div slot="append">折</div>
-    </hc-input>
-    </el-form-item>
-
-    <el-form-item label="是否全品类可用：" prop="isAllCategory">
-      <el-radio-group v-model="formData.isAllCategory" :disabled="isEdit">
-        <div class="radio-line">
-          <el-radio :label="true">全部商品可用</el-radio>
-        </div>
-        <div class="radio-line">
-          <el-radio :label="false">限部分商品可用</el-radio>
-        </div>
-        <div v-if="formData.isAllCategory === false" style="margin-top: 10px">
-          <el-form-item label="使用特殊说明：" prop="specialRemarks" label-width="120px">
-            <el-input v-model="formData.specialRemarks" maxlength="100" :disabled="isEdit"></el-input>
-          </el-form-item>
-        </div>
-      </el-radio-group>
-    </el-form-item>
-
-
-    <el-form-item label="有效期：" prop="isReceiveInvalid">
-      <el-radio-group v-model="formData.isReceiveInvalid" @change="upTimeTypeChange" :disabled="isEdit">
-        <div class="radio-line">
-          <el-radio :label="false">普通券（一段时间内有效）</el-radio>
-        </div>
-        <div class="radio-line">
-          <el-radio :label="true">限时券（领取后固定时长失效）</el-radio>
-        </div>
-        <template>
-          <el-form-item prop="availableTime" style="padding-bottom: 20px;">
-            <div style="margin-top: 10px">
-              <el-form-item prop="availableStartTime" label-width="120px" label="有效开始时间：" style="margin-bottom: 20px;">
-                <el-date-picker
-                  v-model="formData.availableStartTime"
-                  type="datetime"
-                  value-format="yyyy-MM-dd HH:mm:ss"
-                  @change="availableTimeChange"
-                  placeholder="选择有效开始时间"
-                  :disabled="isEdit">
-                </el-date-picker>
-              </el-form-item>
-              <el-form-item prop="availableEndTime" label-width="120px" label="有效结束时间：" style="margin-bottom: 20px;">
-                <el-date-picker
-                  v-model="formData.availableEndTime"
-                  type="datetime"
-                  value-format="yyyy-MM-dd HH:mm:ss"
-                  @change="availableTimeChange"
-                  placeholder="选择有效结束时间"
-                  :disabled="isEdit">
-                </el-date-picker>
-              </el-form-item>
-              <el-form-item v-if="formData.isReceiveInvalid" label-width="110px" label="领取后有效期：">
-                <hc-input v-model="formData.receiveInvalidDay" :decimal="0" :min="1" :max="9999" maxlength="7" style="width: 200px;" :disabled="isEdit">
-                  <div slot="append">天</div>
-                </hc-input>
-              </el-form-item>
-            </div>
-          </el-form-item>
-        </template>
-      </el-radio-group>
-    </el-form-item>
-    <el-form-item label="发券数量：" prop="supply">
-      <el-input-number v-model="formData.supply" :min="1" :max="99999999"></el-input-number>
-    </el-form-item>
-
-    <el-form-item v-if="isEdit" label="已领数量：">
-      {{formData.receivedNum || 0}}
-    </el-form-item>
-
-
-
-    <!-- <el-form-item label="上架时间：" prop="upTime">
-      <el-radio-group v-model="upTimeType" @change="upTimeTypeChange">
-        <div style="display: flex;align-items: center;height: 36px;">
-          <el-radio label="1">立即上架售卖</el-radio>
-        </div>
-        <div style="display: flex;align-items: center;height: 36px;">
-          <el-radio label="2">自定义上架时间</el-radio>
-        </div>
-        <el-date-picker v-if="upTimeType == 2"
-          v-model="formData.upTime"
+    <template v-if="formData.isDepository != '1'">
+      <h3 class="form-title">上下架时间</h3>
+      <el-form-item label="上架时间：" prop="upTime">
+        <el-radio-group v-model="upTimeType" @change="upTimeTypeChange">
+          <div style="display: flex;align-items: center;height: 36px;">
+            <el-radio label="1">立即上架售卖</el-radio>
+          </div>
+          <div style="display: flex;align-items: center;height: 36px;">
+            <el-radio label="2">自定义上架时间</el-radio>
+          </div>
+          <el-date-picker v-if="upTimeType == 2"
+            v-model="formData.upTime"
+            type="datetime"
+            :picker-options="pickerOptions"
+            value-format="yyyy-MM-dd HH:mm:ss"
+            placeholder="选择上架时间">
+          </el-date-picker>
+        </el-radio-group>
+      </el-form-item>
+      <el-form-item label="下架时间：" prop="downTime">
+        <el-date-picker
+          v-if="formData.isPermanent == '0'"
+          v-model="formData.downTime"
           type="datetime"
           :picker-options="pickerOptions"
           value-format="yyyy-MM-dd HH:mm:ss"
-          placeholder="选择上架时间">
+          placeholder="选择下架时间">
         </el-date-picker>
-      </el-radio-group>
+        <template v-else>
+          长期有效
+        </template>
+        
+        <!-- <el-radio-group disabled :value="formData.isPermanent">
+          <div style="display: flex;align-items: center;height: 36px;">
+            <el-radio label="1">长期有效</el-radio>
+            <span>当券库存为0时，会放到『已售罄』的券列表里，可加库存或下架该券;下架后，该券放到『仓库中』的券列表里</span>
+          </div>
+          <div style="display: flex;align-items: center;height: 36px;">
+            <el-radio label="0">自定义下架时间</el-radio>
+            <span>期间券库存为0时，会放到『已售罄』的券列表里，可在下架时间前加库存继续开售或直接下架该券;下架后，该券放到『仓库中』的券列表里</span>
+          </div>
+          <el-date-picker
+            v-if="formData.isPermanent == '0'"
+            v-model="formData.downTime"
+            type="datetime"
+            value-format="yyyy-MM-dd HH:mm:ss"
+            placeholder="选择日期时间">
+          </el-date-picker>
+        </el-radio-group> -->
+      </el-form-item>
+    </template>
+
+    <h3 class="form-title">领取限制</h3>
+    <el-form-item v-if="isPlatform" label="适用范围：" prop="cityIds">
+      <hc-city-select v-model="cityIds" :city-id="userInfo.manageCityId" :view-only="formData.status == '3' || formData.status == '2'"></hc-city-select>
     </el-form-item>
-    <el-form-item label="下架时间：" prop="downTime">
-      <el-date-picker
-        v-model="formData.downTime"
-        type="datetime"
-        :picker-options="pickerOptions"
-        value-format="yyyy-MM-dd HH:mm:ss"
-        placeholder="选择下架时间">
-      </el-date-picker>
-    </el-form-item> -->
+    <el-form-item label="用户可领个数：" prop="limitNum">
+      活动期间每个用户可参与
+      <el-input-number v-model="formData.limitNum" :max="99999999" :min="1" :disabled="formData.status == '3' || formData.status == '2'"></el-input-number>
+      个
+    </el-form-item>
     <el-form-item>
       <el-button type="primary" @click="handleSave">保存</el-button>
     </el-form-item>
-
   </el-form>
 </template>
 
@@ -181,10 +165,6 @@ export default {
       type: Boolean,
       default: false
     },
-    isEdit: {
-      type: Boolean,
-      default: false
-    },
   },
   data() {
     return {
@@ -198,6 +178,7 @@ export default {
         }
       },
       formData: {
+        logo: '',
       },
       upTimeType: '',
       downTimeType: '',
@@ -206,27 +187,31 @@ export default {
         name: [{required: true, message: '请输入券名称', trigger: 'blur'}],
         deductionPrice: [{validator: this.deductionPriceValidator, required: true, trigger: 'blur'}],
         conditionPrice: [{validator: this.conditionPriceValidator, required: true, trigger: 'blur'}],
-        category: [{required: true, message: '请选择券门类', trigger: 'change'}],
-        supply: [
-          {required: true, message: '请输入发券数量', trigger: 'blur'},
-          {validator: this.supplyValidator, trigger: 'blur'}
-        ],
-        receiveType: [{required: true, message: '请选择领取门槛', trigger: 'change'}],
-        deductionType: [{required: true, message: '请选择券种类', trigger: 'change'}],
-        isAllCategory: [{required: true, message: '请选择是否全品类可用', trigger: 'change'}],
-        specialRemarks: [{required: true, message: '请输入特殊说明', trigger: 'blur'}],
-        isReceiveInvalid: [{required: true, message: '请选择有效期类型', trigger: 'change'}],
+        supply: [{validator: this.supplyValidator, required: true, message: '请输入供应量', trigger: 'blur'}],
         availableTime: [
-          {validator: this.availableTimeDiffValidator, trigger: 'blur'},
+          {validator: this.availableTimeDiffValidator, required: true, trigger: 'blur'},
         ],
         availableStartTime: [
           {required: true, message: '请输入可用开始时间', trigger: 'blur'},
+          {validator: this.startTimeValidator, trigger: 'blur', message: '可用开始时间不能早于上架时间'},
         ],
         availableEndTime: [
-          {required: true, message: '请输入可用结束时间', trigger: 'blur'},
+          {validator: this.availableEndTimeRequiredValidator, required: true, trigger: 'blur'},
+          {validator: this.endTimeValidator, trigger: 'blur', message: '可用结束时间不能早于下架时间'}
         ],
         instructions: [{required: true, message: '请输入使用说明', trigger: 'blur'}],
+        upTime: [
+          {validator: this.upTimeRequiredValidator, required: true, trigger: 'blur'},
+          {validator: this.updownTimeDiffValidator, trigger: 'blur', message: '上架时间须早于下架时间'},
+          {validator: this.startTimeValidator, trigger: 'blur', message: '上架时间须早于可用开始时间'},
+        ],
+        downTime: [
+          {validator: this.downTimeRequiredValidator, required: true, trigger: 'blur'},
+          {validator: this.updownTimeDiffValidator, trigger: 'blur', message: '下架时间须晚于上架时间'},
+          {validator: this.endTimeValidator, trigger: 'blur', message: '下架时间须早于可用结束时间'},
+        ],
         limitNum: {required: true, message: '请输入用户可领个数', trigger: 'blur'},
+        logo: {validator: this.logoValidator, required: true, trigger: 'blur'},
         cityIds: {required: true, validator: this.cityValidator, message: '请选择适用范围', trigger: 'change'},
       },
     };
@@ -237,9 +222,10 @@ export default {
   methods: {
     open (initForm = {}, formRule) {
       this.formData = {
+        logo: '',
         scopeOfUseCity: '',
         isPermanent: '0',
-        isCopyLogo: false,
+        isCopyLogo: false, 
         upTime: '',
         downTime: '',
         availableStartTime: '',
@@ -260,12 +246,21 @@ export default {
       this.cityIds = cityIds
       formRule && (this.formRule = formRule)
     },
+    permanetChange () {
+      this.formData.availableEndTime = ''
+      this.formData.downTime = ''
+      this.$refs.form.clearValidate('downTime')
+      this.$refs.form.validateField('availableTime')
+    },
+    depositoryChange () {
+      this.formData.upTime = ''
+      this.formData.downTime = ''
+      this.formData.availableStartTime = ''
+      this.formData.availableEndTime = ''
+    },
     upTimeTypeChange () {
       this.formData.upTime = ''
       this.$refs.form.clearValidate('upTime')
-    },
-    availableTimeChange () {
-      this.$refs.form.validateField('availableTime')
     },
     deductionPriceValidator (rules, value, callback) {
       let formData = this.formData
@@ -307,11 +302,79 @@ export default {
         callback()
       }
     },
+    availableTimeRequiredValidator (rules, value, callback) {
+      if (!this.formData.availableStartTime) {
+        callback(new Error('请输入可用开始时间'))
+      } else if (this.formData.isPermanent == '0' && !this.formData.availableEndTime) {
+        callback(new Error('请输入可用结束时间'))
+      } else {
+        callback()
+      }
+    },
+    availableEndTimeRequiredValidator (rules, value, callback) {
+      if (this.formData.isPermanent == '0' && !this.formData.availableEndTime) {
+        callback(new Error('请输入可用结束时间'))
+      } else {
+        callback()
+      }
+    },
     availableTimeDiffValidator (rules, value, callback) {
-      if (this.formData.availableStartTime && this.formData.availableEndTime && this.formData.availableStartTime >= this.formData.availableEndTime) {
+      if (this.formData.isPermanent == '0' && this.formData.availableStartTime && this.formData.availableEndTime && this.formData.availableStartTime >= this.formData.availableEndTime) {
         callback(new Error('可用开始时间须早于可用结束时间'))
       } else {
         callback()
+      }
+    },
+    startTimeValidator (rules, value, callback) {
+      if (this.upTimeType == 2 && this.formData.availableStartTime && this.formData.upTime && this.formData.upTime > this.formData.availableStartTime) {
+        callback(new Error(rules.message))
+      } else {
+        callback()
+      }
+    },
+    endTimeValidator (rules, value, callback) {
+      if (this.formData.isPermanent == '0' && this.formData.availableEndTime && this.formData.downTime && this.formData.downTime > this.formData.availableEndTime) {
+        callback(new Error(rules.message))
+      } else {
+        callback()
+      }
+    },
+    upTimeRequiredValidator (rules, value, callback) {
+      if (this.upTimeType == 2 && !this.formData.upTime) {
+        callback(new Error('请输入上架时间'))
+      } else {
+        callback()
+      }
+    },
+    downTimeRequiredValidator (rules, value, callback) {
+      if (this.formData.isPermanent == '0' && !this.formData.downTime) {
+        callback(new Error('请输入下架时间'))
+      } else {
+        callback()
+      }
+    },
+    updownTimeDiffValidator (rules, value, callback) {
+      if (this.upTimeType == 2 && this.formData.isPermanent == '0' && this.formData.upTime && this.formData.downTime && this.formData.upTime >= this.formData.downTime) {
+        callback(new Error(rules.message))
+      } else {
+        callback()
+      }
+    },
+    logoValidator (rules, value, callback) {
+      if (this.isPlatform) {
+        if (this.formData.logo) {
+          callback()
+        } else {
+          callback(new Error('请选择图片，或者选择复用商户logo'))
+        }
+      } else if (this.formData.isCopyLogo) {
+        callback()
+      } else {
+        if (this.formData.logo) {
+          callback()
+        } else {
+          callback(new Error('请选择图片，或者选择复用商户logo'))
+        }
       }
     },
     cityValidator (rules, value, callback) {
@@ -323,14 +386,10 @@ export default {
     },
     handleSave() {
       this.$refs.form.validate(valid => {
-        this.formData.upTime = this.formData.availableStartTime
-        this.formData.downTime = this.formData.availableEndTime
         if (valid) {
           let formData = {
             ...this.formData,
           }
-          formData.upTime = formData.availableStartTime
-          formData.downTime = formData.availableEndTime
           if (this.isPlatform) {
             formData.scopeOfUseCity = this.cityIds.join(',')
           }
@@ -355,11 +414,6 @@ export default {
       padding-bottom: 20px;
     }
   }
-}
-.radio-line {
-  display: flex;
-  align-items: center;
-  height: 36px;
 }
 </style>
 

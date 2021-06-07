@@ -38,7 +38,6 @@ export default {
         let beforeUploadValidator = this.beforeUpload(files)
         if (beforeUploadValidator instanceof Promise) {
           beforeUploadValidator.then((fileList) => {
-            console.log(123321, fileList)
             for (let i = 0; i < fileList.length; i++) {
               this.uploadFile(fileList[i])
             }
@@ -48,7 +47,7 @@ export default {
           for (let i = 0; i < files.length; i++) {
             this.uploadFile(files[i])
           }
-        } 
+        }
       } else {
         for (let i = 0; i < files.length; i++) {
           this.uploadFile(files[i])
@@ -134,7 +133,7 @@ export default {
           } else {
             this.$emit('change-error', uuid)
           }
-          
+
           // let beforeUploadValidator = this.beforeUpload(file)
           // if (beforeUploadValidator instanceof Promise) {
           //   beforeUploadValidator.then(() => {

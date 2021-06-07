@@ -97,7 +97,7 @@ function getCityTree (city, idList) {
     return {
       id: city.id,
       regionName: city.regionName
-    } 
+    }
   }
   return null
 }
