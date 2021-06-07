@@ -31,6 +31,15 @@
           <span style="margin-left: 30px; color: #919397"
             >发布时间：{{ props.row.updateTime }}</span
           >
+          <span style="margin-left: 30px; color: #919397">
+            活动圈子：2021城市超级APP体检官方活动群
+            <el-tag size="mini" type="danger">官方</el-tag>
+          </span>
+          <span style="margin-left: 30px">
+            <el-button type="text" @click="handleRelevanceMore(props)"
+              >关联更多圈子</el-button
+            >
+          </span>
         </template>
         <template v-slot:poster="scope">
           <el-image
@@ -118,6 +127,66 @@
         >
       </span>
     </el-dialog>
+
+    <!-- 关联更多圈子弹框 -->
+    <el-dialog
+      title="2021城市超级APP免费体检活动"
+      :visible.sync="dialogVisibleRelevanceMore"
+      width="40%"
+      @close="closeDialogMore"
+    >
+      <div class="relevance-more-box">
+        <div class="search">
+          <span>搜索圈子</span>
+          <el-select
+            v-el-select-loadmore="loadmore"
+            v-model="relevanceQuery.circleId"
+            filterable
+            remote
+            reserve-keyword
+            placeholder="请输入关键词"
+            :remote-method="remoteMethod"
+            :loading="loading"
+          >
+            <el-option
+              v-for="item in searchOrgList"
+              :key="item.circleId"
+              :label="item.name"
+              :value="item.circleId"
+            >
+            </el-option>
+          </el-select>
+
+          <el-button type="primary" round @click="toRelevance">关 联</el-button>
+        </div>
+        <el-divider></el-divider>
+        <div class="circle-list">
+          <div class="tiitle-org">关联圈子</div>
+          <div v-if="orgedArr.length != 0">
+            <div
+              class="circle-item"
+              v-for="(item, index) in orgedArr"
+              :key="index"
+            >
+              <span>{{ item.circleName }}</span>
+              <el-button
+                type="danger"
+                round
+                size="mini"
+                @click="deleteCircleItem(item.id)"
+                >删除</el-button
+              >
+            </div>
+          </div>
+          <div
+            style="text-align: center; padding-top: 10px; color: #909399"
+            v-else
+          >
+            暂无关联
+          </div>
+        </div>
+      </div>
+    </el-dialog>
   </basic-container>
 </template>
 
@@ -126,6 +195,10 @@ import {
   activitiesList,
   activityDelete,
   checkCity,
+  searchOrg,
+  relevanceSave,
+  orgedList,
+  deleteOrg,
 } from "@/api/activity/activity";
 import { tableOption } from "./const.js";
 import HcCityBox from "@/views/components/HcCity/HcCityBox/index";
@@ -137,8 +210,22 @@ export default {
     return {
       showCityDialogVisible: false, //控制展示城市
       showCodeDialogVisible: false, //展示签到码
+      dialogVisibleRelevanceMore: false,
       img: "", //签到码地址
+      relevanceQuery: {
+        activityId: "", //活动id
+        circleId: "", //圈子id
+      },
       loading: false,
+      //搜索圈子参数
+      searchOrgQuery: {
+        searchKey: "",
+        size: 10,
+        current: 1,
+      },
+      searchOrgList: [], //圈子搜索结果
+      orgedArr: [],
+      canmore: true, // 是否加载更多
     };
   },
   computed: {
@@ -150,7 +237,119 @@ export default {
   activated() {
     this.$refs.hcCrud.refresh(); // 刷新表格数据
   },
+  directives: {
+    "el-select-loadmore": {
+      inserted(el, binding) {
+        /** el可以获取当前dom节点，并且进行编译，也可以操作事件 **/
+        /** binding指的是一个对象，一般不用 **/
+        /** vnode 是 Vue 编译生成的虚拟节点 **/
+        // 获取element-ui定义好的scroll盒子
+        const SELECTWRAP_DOM = el.querySelector(
+          ".el-select-dropdown .el-select-dropdown__wrap"
+        );
+        SELECTWRAP_DOM.addEventListener("scroll", function () {
+          /**
+           * scrollHeight 获取元素内容高度(只读)
+           * scrollTop 获取或者设置元素的偏移值,常用于计算滚动条的位置, 当一个元素的容器没有产生垂直方向的滚动条, 那它的scrollTop的值默认为0.
+           * clientHeight 读取元素的可见高度(只读)
+           * 如果元素滚动到底, 下面等式返回true, 没有则返回false:
+           * ele.scrollHeight - ele.scrollTop === ele.clientHeight;
+           */
+          const condition =
+            this.scrollHeight - this.scrollTop <= this.clientHeight + 1;
+          if (condition) {
+            binding.value();
+          }
+        });
+      },
+    },
+  },
   methods: {
+    closeDialogMore() {
+      this.relevanceQuery.circleId = "";
+      this.searchOrgList = [];
+      this.orgedArr = [];
+    },
+    getOrgList(query) {
+      searchOrg(query).then((res) => {
+        this.searchOrgList = res.data.data.data.records;
+        this.loading = false;
+      });
+    },
+    remoteMethod(query) {
+      if (query != "") {
+        this.loading = true;
+        this.canmore = true;
+        this.searchOrgQuery.searchKey = query;
+        this.searchOrgQuery.current = 1;
+        this.getOrgList(this.searchOrgQuery);
+      } else {
+        this.searchOrgList = [];
+      }
+    },
+    loadmore() {
+      if (!this.canmore) {
+        return;
+      }
+      this.searchOrgQuery.current++;
+      searchOrg(this.searchOrgQuery).then((res) => {
+        if (res.data.data.data.records.length > 0) {
+          this.searchOrgList = this.searchOrgList.concat(
+            res.data.data.data.records
+          );
+        } else {
+          this.canmore = false;
+        }
+      });
+    },
+    deleteCircleItem(id) {
+      this.$confirm("此操作将取消关联该圈子, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          deleteOrg(id).then((res) => {
+            if (res.data.data.businessCode == 1000) {
+              this.$message({
+                type: "success",
+                message: "删除成功",
+              });
+              this.getOrgedList({
+                activityId: this.relevanceQuery.activityId,
+              });
+            }
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除",
+          });
+        });
+    },
+    toRelevance() {
+      // relevance code...
+      relevanceSave(this.relevanceQuery).then((res) => {
+        if (res.data.data.businessCode == 1000) {
+          this.getOrgedList({
+            activityId: this.relevanceQuery.activityId,
+          });
+        }
+      });
+    },
+    //已关联圈子数据
+    getOrgedList(query) {
+      orgedList(query).then((res) => {
+        this.orgedArr = res.data.data.data;
+      });
+    },
+    handleRelevanceMore({ row }) {
+      this.dialogVisibleRelevanceMore = true;
+      this.relevanceQuery.activityId = row.id;
+      let query = { activityId: row.id };
+      this.getOrgedList(query);
+    },
     fetchListFun(params) {
       return new Promise((resolve, reject) => {
         activitiesList(params).then((res) => {
