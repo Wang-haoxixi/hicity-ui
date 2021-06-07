@@ -18,14 +18,29 @@ export const tableOption = (admin = false) => {
       width: 120,
     },
     {
-      label: '发布者',
+      label: '创建者',
       prop: 'createByName',
-      width: 180
+      width: 120
+    },
+    {
+      label: '创建时间',
+      prop: 'createTime',
+      width: 160
+    },
+    {
+      label: '最新更新人',
+      prop: 'updateByName',
+      width: 120
+    },
+    {
+      label: '最新更新时间',
+      prop: 'updateTime',
+      width: 160
     },
     {
       label: '状态',
       prop: 'state',
-      width: 90,
+      width: 70,
       formatter: function (data) {
         if (data.state == 0) {
           return '草稿'
@@ -37,11 +52,6 @@ export const tableOption = (admin = false) => {
           return ''
         }
       }
-    },
-    {
-      label: '创建时间',
-      prop: 'createTime',
-      width: 160
     },
 
   ]
@@ -67,6 +77,7 @@ export const tableOption = (admin = false) => {
     ],
     menuWidth: 120,
     columns,
+    selection: true
   }
   return option
 }

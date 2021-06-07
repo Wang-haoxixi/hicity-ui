@@ -20,6 +20,26 @@
             @click="manageRecommend"
             size="mini"
             >推荐管理</el-button>
+          <el-dropdown style="margin-left: 8px">
+            <el-button type="default" size="mini">
+              批量操作<i class="el-icon-arrow-down el-icon--right"></i>
+            </el-button>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item>
+                <div class="cover" @click="publishBatch">批量发布</div>
+              </el-dropdown-item>
+              <el-dropdown-item>
+                <div class="cover" @click="deleteBatch">批量删除</div>
+              </el-dropdown-item>
+              <el-dropdown-item>
+                <div class="cover" @click="offShelfBatch">批量下架</div>
+              </el-dropdown-item>
+              <el-dropdown-item>
+                <div class="cover" v-if="newsType == '1'" @click="toRecommendBatch">批量推荐</div>
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
+
         </template>
         <template slot="cityList" slot-scope="scope">
           <el-button type="text" size="mini" @click="cityView(scope.row.officialNewsId)"
@@ -66,7 +86,7 @@
     </el-dialog>
 
     <!-- 推荐选择 -->
-    <hc-city-box ref="recommendSelect" @save="setRecommend"></hc-city-box>
+    <hc-city-box ref="recommendSelect" @save="setRecommend" :province="recommendType == 'batch'"></hc-city-box>
 
   </basic-container>
 </template>
@@ -83,7 +103,8 @@ import {
   newsOpenList,
   deleteNews,
   cancelRecommend,
-  setRecommend
+  setRecommend,
+  batchHandler
 } from "@/api/cms/news";
 import HcQuill from "@/views/components/HcQuill";
 import HcCityBox from "@/views/components/HcCity/HcCityBox/index";
@@ -129,6 +150,7 @@ export default {
       dialogVisible: false,
       preview: false,
       recommendId: null,
+      recommendType: ''
     };
   },
   computed: {
@@ -268,24 +290,36 @@ export default {
     },
     toRecommend ({ officialNewsId }) {
       this.recommendId = officialNewsId
+      this.recommendType = 'single'
       newsOpenList({ officialNewsId }).then(({ data }) => {
         this.$refs.recommendSelect.open(this.userInfo.manageCityId, [], false, data.data.data)
       });
     },
     setRecommend (city) {
       let cityList = getCityList(city)
-      setRecommend({
-        dataId: this.recommendId,
-        cityList
-      }).then(({data}) => {
-        this.$notify({
-          title: "成功",
-          message: "操作成功",
-          type: "success",
-          duration: 2000,
-        });
-        this.$refs.hcCrud.refresh()
-      })
+      if (this.recommendType == 'single') {
+        setRecommend({
+          dataId: this.recommendId,
+          cityList
+        }).then(({data}) => {
+          this.$notify({
+            title: "成功",
+            message: "操作成功",
+            type: "success",
+            duration: 2000,
+          });
+          this.$refs.hcCrud.refresh()
+        })
+      } else if (this.recommendType == 'batch') {
+        batchHandler({
+          cityList,
+          operation: 4,
+          dataIdList: this.recommendId
+        }).then(({ data }) => {
+          this.$message.success('操作成功')
+          this.$refs.hcCrud.refresh()
+        })
+      }
     },
     toCancelRecommend ({ recId }) {
       this.$confirm(`是否确认取消推荐该条${this.newsTitle}?`, "警告", {
@@ -319,7 +353,92 @@ export default {
     },
     recommendRefresh () {
       this.$refs.hcCrud.refresh()
-    }
+    },
+    publishBatch () {
+      let selection = this.$refs.hcCrud.multipleSelection
+      if (selection && selection.length > 0) {
+        let dataIdList = []
+        for (let i = 0; i < selection.length; i++) {
+          dataIdList.push(selection[i].officialNewsId)
+        }
+        batchHandler({
+          dataIdList,
+          operation: 1
+        }).then(({ data }) => {
+          this.$message.success('操作成功')
+          this.$refs.hcCrud.refresh()
+        })
+      } else {
+        this.$message.warning('请先勾选需要发布的资讯')
+      }
+    },
+    deleteBatch () {
+      let selection = this.$refs.hcCrud.multipleSelection
+      if (selection && selection.length > 0) {
+        this.$confirm(`是否确认删除所选资讯?`, "警告", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        }).then(() => {
+          let dataIdList = []
+          for (let i = 0; i < selection.length; i++) {
+            dataIdList.push(selection[i].officialNewsId)
+          }
+          batchHandler({
+            dataIdList,
+            operation: 2
+          }).then(({ data }) => {
+            this.$message.success('操作成功')
+            this.$refs.hcCrud.refresh()
+          })
+        }).catch(function () {});
+      } else {
+        this.$message.warning('请先勾选需要删除的资讯')
+      }
+    },
+    offShelfBatch () {
+      let selection = this.$refs.hcCrud.multipleSelection
+      if (selection && selection.length > 0) {
+        this.$confirm(`是否确认下架所选资讯?`, "警告", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        }).then(() => {
+          let dataIdList = []
+          for (let i = 0; i < selection.length; i++) {
+            dataIdList.push(selection[i].officialNewsId)
+          }
+          batchHandler({
+            dataIdList,
+            operation: 3
+          }).then(({ data }) => {
+            this.$message.success('操作成功')
+            this.$refs.hcCrud.refresh()
+          })
+        }).catch(function () {});
+      } else {
+        this.$message.warning('请先勾选需要下架的资讯')
+      }
+    },
+    toRecommendBatch () {
+      let selection = this.$refs.hcCrud.multipleSelection
+      if (selection && selection.length > 0) {
+        let dataIdList = []
+        for (let i = 0; i < selection.length; i++) {
+          if (selection[i].isRecommend == 1) {
+            this.$message.warning('勾选的资讯中存在已推荐数据，请重新勾选')
+            return
+          }
+          dataIdList.push(selection[i].officialNewsId)
+        }
+        this.recommendId = dataIdList
+        this.recommendType = 'batch'
+        this.$refs.recommendSelect.open(this.userInfo.manageCityId, [], false)
+
+      } else {
+        this.$message.warning('请先勾选需要推荐的资讯')
+      }
+    },
   },
 };
 </script>
@@ -356,6 +475,14 @@ export default {
   /deep/ .quill-image, .quill-image-box, img {
     width: 100% !important;
   }
+}
+
+.cover{
+  display: inline-block;
+  margin: 0 -17px 0 -17px;
+  text-align: center;
+  width: 84px;
+  height: 100%;
 }
 </style>
 

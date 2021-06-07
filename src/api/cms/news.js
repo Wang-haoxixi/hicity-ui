@@ -158,4 +158,13 @@ export function getLabelRecommendRange (params) {
   })
 }
 
+// 资讯批量操作
+export function batchHandler (data) {
+  return request({
+    url: `/cms/official_news/batch/operation`,
+    method: 'post',
+    data
+  })
+}
+
 
