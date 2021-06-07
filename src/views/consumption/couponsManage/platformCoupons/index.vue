@@ -4,14 +4,6 @@
       :title="title"
       :formVisible="formShow"
       @go-back="formShow = false">
-      <el-tabs v-model="couponStatus">
-        <el-tab-pane label="全部" name="all"></el-tab-pane>
-        <el-tab-pane label="上架中" name="1"></el-tab-pane>
-        <el-tab-pane label="待上架" name="0"></el-tab-pane>
-        <el-tab-pane label="已售罄" name="2"></el-tab-pane>
-        <el-tab-pane label="已下架" name="3"></el-tab-pane>
-        <el-tab-pane label="仓库中" name="4"></el-tab-pane>
-      </el-tabs>
       <hc-crud ref="hcCrud" :fetchListFun="fetchListFun" :option="tableOption">
         <template slot="menuLeft">
           <el-button
@@ -27,27 +19,14 @@
         </template>
         <template slot="menu" slot-scope="scope">
           <el-button type="text" size="mini" @click="toView(scope.row)">查看</el-button>
-          <template v-if="scope.row.status == 0 && scope.row.releaseCity == userInfo.manageCityId">
+          <template v-if="scope.row.type == 1">
             <el-button type="text" size="mini" @click="toUpdate(scope.row)">编辑</el-button>
-            <el-button type="text" size="mini" @click="toDelete(scope.row)">删除</el-button>
-          </template>
-          <template v-if="scope.row.status == 1">
-            <el-button type="text" size="mini" @click="toShelfOff(scope.row)">下架</el-button>
-          </template>
-          <template v-if="scope.row.status == 2 && scope.row.releaseCity == userInfo.manageCityId">
-            <el-button type="text" size="mini" @click="toUpdate(scope.row)">编辑</el-button>
-          </template>
-          <template v-if="scope.row.status == 3 && scope.row.releaseCity == userInfo.manageCityId">
-            <el-button type="text" size="mini" @click="toUpdate(scope.row)">编辑</el-button>
-          </template>
-          <template v-if="scope.row.status == 4 && scope.row.releaseCity == userInfo.manageCityId">
-            <el-button type="text" size="mini" @click="toUpdate(scope.row)">编辑</el-button>
-            <el-button type="text" size="mini" @click="toDelete(scope.row)">删除</el-button>
+            <el-button v-if="scope.row.status == 1" type="text" size="mini" @click="toShelfOff(scope.row)">下架</el-button>
           </template>
         </template>
       </hc-crud>
       <template slot="form">
-        <coupons-form v-if="formType == 'add' || formType == 'edit'" ref="form" is-platform @save="handleSave"></coupons-form>
+        <coupons-form v-if="formType == 'add' || formType == 'edit'" ref="form" is-platform @save="handleSave" :is-edit="formType == 'edit'"></coupons-form>
         <coupons-detail v-if="formType == 'view'" :detail="couponsDetail"></coupons-detail>
       </template>
     </hc-table-form>
@@ -58,7 +37,7 @@
 <script>
 import { tableOption } from "./const";
 import { mapGetters } from "vuex";
-import { getPlatformCouponsPage, getCityCouponsPage, createCoupons, getCouponsDetail, updateCoupons, deleteCouponsBatch, couponsDown } from "@/api/merchantSystem/coupons"
+import { getPlatformCouponsPage, createPlatformCoupons, getEditCouponsDetail, getCouponsDetail, updatePlatformCoupons, deleteCouponsBatch, couponsDown } from "@/api/merchantSystem/coupons"
 import HcImageUpload from "@/views/components/HcImageUpload/index";
 import HcTableForm from "@/views/components/HcTableForm/index";
 import HcInput from "@/views/components/HcForm/HcInput/index"
@@ -69,7 +48,6 @@ export default {
   components: { HcImageUpload, HcTableForm, HcInput, CouponsDetail, CouponsForm, HcCityBox },
   data() {
     return {
-      couponStatus: 'all',
       formShow: false,
       formType: "",
       couponsDetail: {}
@@ -80,54 +58,29 @@ export default {
     tableOption() {
       return tableOption(this.userType == 1 || this.userType == 2);
     },
-    getCouponsPage () {
-      if (this.userType == 1) {
-        return getPlatformCouponsPage
-      } else if (this.userType == 2 || this.userType == 3) {
-        return getCityCouponsPage
-      }
-    },
     title () {
       if (!this.formShow) {
-        return '平台券'
+        return '优惠券管理'
       } else {
         if (this.formType == 'add') {
-          return '平台券-新增'
+          return '优惠券-新增'
         } else if (this.formType == 'edit') {
-          return '平台券-编辑'
+          return '优惠券-编辑'
         } else if (this.formType == 'view') {
-          return '平台券-详情'
+          return '优惠券-详情'
         } else {
           return ''
         }
       }
     }
   },
-  watch: {
-    couponStatus (val) {
-      let status = val != 'all' ? val : undefined
-      let params = {
-        status
-      }
-      if (status == '0') {
-        params.isDepository = '0'
-      } else if (status == '4') {
-        params = {
-          status: undefined,
-          isDepository: '1'
-        }
-      } else {
-        params.isDepository = undefined
-      }
-      this.$refs.hcCrud.refresh({}, params)
-    }
-  },
   methods: {
     fetchListFun (params) {
       return new Promise((resolve, reject) => {
-        this.getCouponsPage({
+        getPlatformCouponsPage({
           ...params,
-          type: '1',
+          // type: '1',
+          cityId: this.userInfo.manageCityId
         }).then(({ data }) => {
           resolve({
             records: data.data.data.records,
@@ -150,67 +103,67 @@ export default {
     handleSave(formData) {
       formData.type = '1'
       if (this.formType == 'add') {
-        createCoupons(formData).then(({ data }) => {
+        createPlatformCoupons(formData).then(({ data }) => {
           this.formShow = false
           this.$message.success('新增成功')
           this.$refs.hcCrud.refresh()
         })
       } else if (this.formType == 'edit') {
-        updateCoupons(formData).then(({ data }) => {
+        updatePlatformCoupons(formData).then(({ data }) => {
           this.formShow = false
           this.$message.success('修改成功')
           this.$refs.hcCrud.refresh()
         })
       }
     },
-    toView ({id}) {
-      getCouponsDetail(id).then(({ data }) => {
+    toView ({couponsId}) {
+      getCouponsDetail(couponsId).then(({ data }) => {
         let couponsDetail = data.data.data
         this.couponsDetail = couponsDetail
         this.formType = 'view'
         this.formShow = true
       });
     },
-    toUpdate({ id }) {
-      getCouponsDetail(id).then(({ data }) => {
+    toUpdate({ couponsId }) {
+      getEditCouponsDetail(couponsId).then(({ data }) => {
         let formData = data.data.data
-        let initForm = {
-          id: formData.id,
-          availableEndTime: formData.availableEndTime,
-          availableStartTime: formData.availableStartTime,
-          conditionPrice: formData.conditionPrice,
-          deductionPrice: formData.deductionPrice,
-          downTime: formData.downTime,
-          instructions: formData.instructions,
-          isPermanent: formData.isPermanent,
-          isDepository: formData.isDepository,
-          limitNum: formData.limitNum,
-          isCopyLogo: false,
-          logo: formData.logo,
-          name: formData.name,
-          supply: formData.supply,
-          surplus: formData.surplus,
-          upTime: formData.upTime,
-          updateTime: formData.updateTime,
-          scopeOfUseCity: formData.scopeOfUseCity || '',
-          status: formData.status,
-          category: formData.category,
-          receivedNum: formData.receivedNum,
-        }
+        // let initForm = {
+        //   id: formData.id,
+        //   availableEndTime: formData.availableEndTime,
+        //   availableStartTime: formData.availableStartTime,
+        //   conditionPrice: formData.conditionPrice,
+        //   deductionPrice: formData.deductionPrice,
+        //   downTime: formData.downTime,
+        //   instructions: formData.instructions,
+        //   isPermanent: formData.isPermanent,
+        //   isDepository: formData.isDepository,
+        //   limitNum: formData.limitNum,
+        //   isCopyLogo: false,
+        //   logo: formData.logo,
+        //   name: formData.name,
+        //   supply: formData.supply,
+        //   surplus: formData.surplus,
+        //   upTime: formData.upTime,
+        //   updateTime: formData.updateTime,
+        //   scopeOfUseCity: formData.scopeOfUseCity || '',
+        //   status: formData.status,
+        //   category: formData.category,
+        //   receivedNum: formData.receivedNum,
+        // }
         this.formShow = true;
         this.formType = "edit";
         this.$nextTick(() => {
-          this.$refs.form.open(initForm)
+          this.$refs.form.open(formData)
         })
       });
     },
-    toDelete({ id }) {
+    toDelete({ couponsId }) {
       this.$confirm("是否确认删除该优惠券?", "警告", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
       }).then(() => {
-        deleteCouponsBatch([id]).then(({ data }) => {
+        deleteCouponsBatch([couponsId]).then(({ data }) => {
           this.formShow = false;
           this.$notify({
             title: "成功",
@@ -222,13 +175,13 @@ export default {
         });
       }).catch(function () {});
     },
-    toShelfOff ({ id }) {
+    toShelfOff ({ couponsId }) {
       this.$confirm("是否确认下架该优惠券?", "警告", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
       }).then(() => {
-        couponsDown(id).then(({ data }) => {
+        couponsDown(couponsId).then(({ data }) => {
           this.$notify({
             title: "成功",
             message: "下架成功",

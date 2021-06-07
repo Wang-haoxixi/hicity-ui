@@ -67,10 +67,13 @@ export function couponsOn (id) {
   })
 }
 
-export function couponsDown (id) {
+export function couponsDown (couponsId) {
   return request({
-    url: `/mms/coupons/put/down?id=${id}`,
+    url: `/mms/coupons/put/down`,
     method: 'POST',
+    data: {
+      couponsId
+    }
   })
 }
 
