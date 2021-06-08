@@ -134,7 +134,7 @@ export default {
         name += '满减现金券'
       } else if (detail.deductionType == '4') {
         name += '满减折扣券'
-      } else if (detail.deductionType == '4') {
+      } else if (detail.deductionType == '5') {
         name += '立减折扣券'
       }
       return name
