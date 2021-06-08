@@ -73,15 +73,19 @@ function getUsedCity (cityTree, cityId) {
 
 function getCityTree (city, idList) {
   let children = []
+  let hasAllChildren = true
   for (let i = 0; i < city.children.length; i++) {
     let cityC = city.children[i]
     let child = getCityTree(cityC, idList)
     if (child) {
       children.push(child)
+      if (child.children) {
+        hasAllChildren = false
+      }
     }
   }
   if (children.length > 0) {
-    if (children.length == city.children.length) {
+    if (hasAllChildren && children.length == city.children.length) {
       return {
         id: city.id,
         regionName: city.regionName
