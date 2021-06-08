@@ -54,7 +54,6 @@ export default {
         params.endTime = dateFormat(new Date(new Date(time[1]).getTime() + 24 * 60 * 60 * 1000))
         delete params.time
       }
-      console.log(params)
       return new Promise((resolve, reject) => {
         getCommentPage({
           type: 5,

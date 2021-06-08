@@ -421,7 +421,6 @@ export default {
   },
   methods: {
     managerChange (option) {
-      console.log(option)
       this.formData.storeManagerName = option.data.name
       if (this.formData.storeWxConfigs.length > 0 && this.formData.storeWxConfigs[0].wxHierarchy == '商户') {
         this.formData.storeWxConfigs.splice(0, 1, {
