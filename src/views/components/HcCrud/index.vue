@@ -10,11 +10,15 @@
           :key="index"
           class="search-item">
           <div style="white-space: nowrap;">{{item.label + ':'}}</div>
-          <hc-form-item
-            style="margin-left: 10px;"
-            v-model="searchFormShow[item.prop]"
-            :option="item"
-          ></hc-form-item>
+          <div style="margin-left: 10px;">
+            <slot :name="item.prop + 'SearchItem'" :search-form="searchFormShow" :prop="item.prop">
+              <hc-form-item
+                style="margin-left: 10px;"
+                v-model="searchFormShow[item.prop]"
+                :option="item"
+              ></hc-form-item>
+            </slot>
+          </div>
         </div>
         <slot name="searchItems" :search-form="searchFormShow"></slot>
         <div class="search-item">

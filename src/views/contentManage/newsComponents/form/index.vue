@@ -267,12 +267,10 @@ export default {
       })
     },
     handlePreview() {
-      this.preview = true
-      // this.$refs.quill.getData()
-      // console.log()
+      this.$emit('preview', this.formData)
     },
     dataTypeChange (type) {
-      this.formData.newsSource = ''
+      this.$set(this.formData, 'newsSrouce', '')
       if (type == '2') {
         this.formData.author = ''
       } else if (type == '1') {

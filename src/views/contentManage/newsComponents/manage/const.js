@@ -65,16 +65,7 @@ export const tableOption = (admin = false) => {
   }
 
   let option = {
-    menu: [
-      {
-        label: '编辑',
-        fun: 'toUpdate'
-      },
-      {
-        label: '删除',
-        fun: 'toDelete'
-      },
-    ],
+    menu: true,
     menuWidth: 120,
     columns,
     selection: true

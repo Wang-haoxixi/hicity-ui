@@ -4,9 +4,41 @@
       :title="title"
       :formVisible="publish"
       @go-back="goBack">
-      <hc-crud ref="hcCrud" :option="tableOption" :fetchListFun="fetchListFun" @toUpdate="toUpdate" @toDelete="toDelete">
+      <hc-crud ref="hcCrud" :option="tableOption" :fetchListFun="fetchListFun" :search-query="searchQuery">
         <template v-slot:officialNewsName="scope">
-          <hc-text-line :text="scope.row.officialNewsName" :lines="3" :line-height="20"></hc-text-line>
+          <hc-text-line :text="scope.row.officialNewsName" :lines="3" :line-height="20">
+            <template v-slot="textScope">
+              <strong class="preview-link" @click="toPreview(scope.row.officialNewsId)">{{textScope.text}}</strong>
+            </template>
+          </hc-text-line>
+        </template>
+
+        <template v-slot:cityIdSearchItem="scope">
+          <hc-city-select v-model="scope.searchForm[scope.prop]" :city-id="userInfo.manageCityId" single></hc-city-select>
+        </template>
+        <template v-slot:officialColumnIdSearchItem="scope">
+          <el-select
+            style="width: 100%"
+            v-model="scope.searchForm[scope.prop]"
+            placeholder="请选择栏目"
+            clearable
+          >
+            <el-option
+              v-for="tag in columnsList"
+              :key="tag.officialColumnId"
+              :label="tag.officialColumnName"
+              :value="tag.officialColumnId"
+            >
+            </el-option>
+          </el-select>
+        </template>
+        <template v-slot:updateBySearchItem="scope">
+          <hc-remote-select v-model="scope.searchForm[scope.prop]" :remote-fun="getAllUser" :show-word="updateByName" @option-change="updateByChange">
+            <template v-slot:option="scope">
+              <strong>{{scope.option.data.realName}} </strong>
+              <span> ({{scope.option.data.username}})</span>
+            </template>
+          </hc-remote-select>
         </template>
         <template slot="menuLeft">
           <el-button
@@ -47,7 +79,24 @@
           >
         </template>
         <template slot="menu" slot-scope="scope">
+          <!-- <el-button  type="text" size="mini" @click="toView(scope.row)"
+            >查看</el-button
+          > -->
           <template v-if="userType <= scope.row.source">
+            <el-button  type="text" size="mini" @click="toUpdate(scope.row)"
+              >编辑</el-button
+            >
+            <el-button v-if="scope.row.state === 0" type="text" size="mini" @click="toPublish(scope.row)"
+              >发布</el-button
+            >
+            <el-button v-if="scope.row.state === 1" type="text" size="mini" @click="toOffShelf(scope.row)"
+              >下架</el-button
+            >
+            <el-button type="text" size="mini" @click="toDelete(scope.row)"
+              >删除</el-button
+            >
+          </template>
+          <template v-if="newsType == '1'">
             <el-button v-if="scope.row.isRecommend" type="text" size="mini" @click="toCancelRecommend(scope.row)"
               >取消推荐</el-button
             >
@@ -58,18 +107,9 @@
         </template>
       </hc-crud>
       <template slot="form">
-        <news-form ref="newsForm" :form-data="formData" @save="save"></news-form>
+        <news-form ref="newsForm" :form-data="formData" @save="save" @preview="handlePreview"></news-form>
       </template>
     </hc-table-form>
-
-    <!-- 预览 -->
-    <hc-preview v-if="preview" @close="preview = false">
-      <div class="preview-title">
-        {{formData.officialNewsName || '资讯标题'}}
-      </div>
-      <div class="preview-time">发布时间：{{dateFormat(new Date())}}</div>
-      <div class="preview-content" v-html="getContent(quillContent.content) || '内容'"></div>
-    </hc-preview>
 
     <!-- 城市范围查看 -->
     <hc-city-box ref="hcCityBox"></hc-city-box>
@@ -88,6 +128,8 @@
     <!-- 推荐选择 -->
     <hc-city-box ref="recommendSelect" @save="setRecommend" :province="recommendType == 'batch'"></hc-city-box>
 
+    <news-preview ref="preview"></news-preview>
+
   </basic-container>
 </template>
 
@@ -104,16 +146,20 @@ import {
   deleteNews,
   cancelRecommend,
   setRecommend,
-  batchHandler
+  batchHandler,
+  singleHandler,
+  cityColumn
 } from "@/api/cms/news";
+import { getAllUser } from '@/api/admin/user'
 import HcQuill from "@/views/components/HcQuill";
 import HcCityBox from "@/views/components/HcCity/HcCityBox/index";
 import HcCitySelect from "@/views/components/HcCity/HcCitySelect/index";
 import HcTableForm from "@/views/components/HcTableForm/index"
-import HcPreview from "@/views/components/HcPreview/index"
 import HcTextLine from "@/views/components/HcTextLine/index";
 import NewsForm from "../form/index"
 import NewsRecommend from "../recommend/index"
+import HcRemoteSelect from "@/views/components/HcForm/HcRemoteSelect/index"
+import NewsPreview from "../preview/index"
 
 function getCityList (tree) {
   let cityList = []
@@ -130,7 +176,7 @@ function getCityList (tree) {
 }
 
 export default {
-  components: { HcQuill, HcCityBox, HcCitySelect, HcTableForm, HcPreview, HcTextLine, NewsForm, NewsRecommend },
+  components: { HcQuill, HcCityBox, HcCitySelect, HcTableForm, HcTextLine, NewsForm, NewsRecommend, HcRemoteSelect, NewsPreview },
   props: {
     newsType: {
       type: Number,
@@ -148,9 +194,58 @@ export default {
       publish: false,
       publishType: "",
       dialogVisible: false,
-      preview: false,
       recommendId: null,
-      recommendType: ''
+      recommendType: '',
+      searchQuery: [
+        {
+          type: 'text',
+          label: '名称',
+          prop: 'searchName',
+          maxlength: 10,
+        },
+        {
+          label: '状态',
+          prop: 'state',
+          type: 'select',
+          dicData: [
+            {
+              label: '已生效',
+              value: 1
+            },
+            {
+              label: '草稿',
+              value: 0
+            }
+          ]
+        },
+        {
+          label: '城市',
+          prop: 'cityId',
+        },
+        {
+          label: '原文时间',
+          prop: 'createTime',
+          type: 'daterange',
+          valueFormat: 'yyyy-MM-dd HH:mm:ss',
+        },
+        {
+          label: '更新时间',
+          prop: 'updateTime',
+          type: 'daterange',
+          valueFormat: 'yyyy-MM-dd HH:mm:ss',
+        },
+        {
+          label: '栏目',
+          prop: 'officialColumnId',
+        },
+        {
+          label: '更新人',
+          prop: 'updateBy'
+        }
+
+      ],
+      columnsList: [],
+      updateByName: '',
     };
   },
   computed: {
@@ -177,6 +272,11 @@ export default {
       }
     }
   },
+  created () {
+    cityColumn({ cityId: this.userInfo.manageCityId, type: this.newsType }).then(({ data }) => {
+      this.columnsList = data.data.data;
+    });
+  },
   methods: {
     goBack () {
       this.quillContent = {
@@ -190,10 +290,19 @@ export default {
       this.publish = false
     },
     dateFormat,
-    getContent (content) {
-      return content.replace(new RegExp(/\t/g), "&nbsp;&nbsp;&nbsp;&nbsp;").replace(/\r\n/g, '<br>').replace(/\n/g, '<br>')
-    },
     fetchListFun (params) {
+      let createTime = params.createTime
+      if (createTime) {
+        params.createStartTime = createTime[0]
+        params.createEndTime = dateFormat(new Date(new Date(createTime[1]).getTime() + 24 * 60 * 60 * 1000))
+        delete params.createTime
+      }
+      let updateTime = params.updateTime
+      if (updateTime) {
+        params.updateStartTime = updateTime[0]
+        params.updateEndTime = dateFormat(new Date(new Date(updateTime[1]).getTime() + 24 * 60 * 60 * 1000))
+        delete params.updateTime
+      }
       return new Promise((resolve, reject) => {
         getNewsList({
           ...params,
@@ -263,11 +372,17 @@ export default {
         })
       });
     },
-    handlePreview() {
-      this.preview = true
+    toPreview (officialNewsId) {
+      getNewsDetail({ officialNewsId }).then(({ data }) => {
+        let newsDetail = data.data.data
+        this.handlePreview(newsDetail)
+      });
+    },
+    handlePreview(news) {
+      this.$refs.preview.open(news)
     },
     toDelete({ officialNewsId }) {
-      this.$confirm(`是否确认删除该条${this.newsTitle}?`, "警告", {
+      this.$confirm(`是否确认删除该资讯?`, "警告", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
@@ -322,7 +437,7 @@ export default {
       }
     },
     toCancelRecommend ({ recId }) {
-      this.$confirm(`是否确认取消推荐该条${this.newsTitle}?`, "警告", {
+      this.$confirm(`是否确认取消推荐该资讯?`, "警告", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
@@ -439,6 +554,66 @@ export default {
         this.$message.warning('请先勾选需要推荐的资讯')
       }
     },
+    toView({ officialNewsId }) {
+      getNewsDetail({ officialNewsId }).then(({ data }) => {
+        this.publish = true;
+        this.publishType = 'edit'
+        this.$nextTick(() => {
+          this.$refs.newsForm.open(data.data.data, true)
+        })
+      });
+    },
+    toPublish ({ officialNewsId }) {
+      this.$confirm(`是否确认发布该资讯?`, "警告", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      }).then(() => {
+        singleHandler({
+          dataId: officialNewsId,
+          operation: 1
+        }).then(({ data }) => {
+          this.$message.success('操作成功')
+          this.$refs.hcCrud.refresh()
+        })
+      }).catch(function () {});
+    },
+    toOffShelf ({ officialNewsId }) {
+      this.$confirm(`是否确认下架该资讯?`, "警告", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      }).then(() => {
+        singleHandler({
+          dataId: officialNewsId,
+          operation: 3
+        }).then(({ data }) => {
+          this.$message.success('操作成功')
+          this.$refs.hcCrud.refresh()
+        })
+      }).catch(function () {});
+    },
+    getAllUser (name) {
+      return new Promise((resolve, reject) => {
+        getAllUser({name}).then(({data}) => {
+          let userListTemp = data.data.data
+          let userList = []
+          for (let i = 0; i < userListTemp.length; i++) {
+            userList.push({
+              label: userListTemp[i].realName,
+              value: userListTemp[i].userId,
+              data: userListTemp[i]
+            })
+          }
+          resolve(userList)
+        }, () => {
+          reject(new Error("数据获取失败！"))
+        })
+      })
+    },
+    updateByChange (option) {
+      this.updateByName = option.label
+    }
   },
 };
 </script>
@@ -458,24 +633,6 @@ export default {
   }
 }
 
-.preview-title {
-  line-height: 26px;
-  color: #333333;
-  font-size: 18px;
-}
-.preview-time {
-  margin-top: 10px;
-  height: 17px;
-  line-height: 17px;
-  color: #999999;
-  font-size: 12px;
-}
-.preview-content {
-  margin-top: 24px;
-  /deep/ .quill-image, .quill-image-box, img {
-    width: 100% !important;
-  }
-}
 
 .cover{
   display: inline-block;
@@ -483,6 +640,17 @@ export default {
   text-align: center;
   width: 84px;
   height: 100%;
+}
+.search-item {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  margin: 10px 20px 0 0;
+}
+
+.preview-link {
+  color: #1E90FF;
+  cursor: pointer;
 }
 </style>
 

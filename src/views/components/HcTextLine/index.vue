@@ -1,8 +1,12 @@
 <template>
   <div class="text-line-container" :class="{'ellipsis': ellipsis}" :style="containerStyle">
-    <div v-if="!ellipsis" class="item-text" ref="text">{{text}}</div>
+    <div v-if="!ellipsis" class="item-text" ref="text">
+      <slot :text="text">
+        <span>{{text}}</span>
+      </slot>
+    </div>
     <el-tooltip  class="item-text" v-else :content="text" placement="top" effect="light" :style="tipStyle">
-      <span>{{text}}</span>
+      <slot :text="text"><span>{{text}}</span></slot>
     </el-tooltip>
   </div>
 </template>

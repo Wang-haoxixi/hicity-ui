@@ -167,4 +167,13 @@ export function batchHandler (data) {
   })
 }
 
+// 资讯操作
+export function singleHandler (data) {
+  return request({
+    url: `/cms/official_news/operation`,
+    method: 'post',
+    data
+  })
+}
+
 
