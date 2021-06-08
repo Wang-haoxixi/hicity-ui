@@ -66,17 +66,17 @@
 
           <el-form-item label="文章来源：" prop="dataType">
             <el-radio-group v-model="addform.dataType" @change="dataTypeChange">
-              <el-radio label="1">转载</el-radio>
-              <el-radio label="2">原创</el-radio>
+              <el-radio label="1">原创</el-radio>
+              <el-radio label="2">转载</el-radio>
             </el-radio-group>
           </el-form-item>
-          <el-form-item label="平台来源：" prop="newsSource" v-if="addform.dataType == '1'">
+          <el-form-item label="平台来源：" prop="newsSource" v-if="addform.dataType == '2'">
             <el-input v-model.trim="addform.newsSource" maxlength="200"></el-input>
           </el-form-item>
           <el-form-item label="作者：" prop="author">
-            <el-input v-model.trim="addform.author" maxlength="50" :disabled="addform.dataType=='2'"></el-input>
+            <el-input v-model.trim="addform.author" maxlength="50" :disabled="addform.dataType=='1'"></el-input>
           </el-form-item>
-          
+
           <el-row>
             <el-col :span="12">
               <!-- 栏目 -->
@@ -400,6 +400,10 @@ export default {
             imageSizeType: this.addform.imageSizeType,
           });
         });
+
+        if (this.addform.dataType == '1' && !this.addform.author) {
+          this.addform.author = this.userInfo.realName
+        }
         this.addform.urlList = this.urlList;
         this.isShow = false;
       });
@@ -447,7 +451,7 @@ export default {
         cityIdList: [this.userInfo.manageCityId],
         closeAllowed: "0", //启停
         dataType: '1',
-        author: '',
+        author: this.userInfo.realName,
       };
       this.isShow = false;
       this.publishType = "add";
@@ -658,9 +662,9 @@ export default {
     },
     dataTypeChange (type) {
       this.addform.newsSource = ''
-      if (type == '1') {
+      if (type == '2') {
         this.addform.author = ''
-      } else if (type == '2') {
+      } else if (type == '1') {
         this.addform.author = this.userInfo.realName
       }
     },

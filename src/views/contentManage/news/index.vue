@@ -70,15 +70,15 @@
 
           <el-form-item label="文章来源：" prop="dataType">
             <el-radio-group v-model="formData.dataType" @change="dataTypeChange">
-              <el-radio label="1">转载</el-radio>
-              <el-radio label="2">原创</el-radio>
+              <el-radio label="1">原创</el-radio>
+              <el-radio label="2">转载</el-radio>
             </el-radio-group>
           </el-form-item>
-          <el-form-item label="平台来源：" prop="newsSource" v-if="formData.dataType == '1'">
+          <el-form-item label="平台来源：" prop="newsSource" v-if="formData.dataType == '2'">
             <el-input v-model.trim="formData.newsSource" maxlength="200"></el-input>
           </el-form-item>
           <el-form-item label="作者：" prop="author">
-            <el-input v-model.trim="formData.author" maxlength="50" :disabled="formData.dataType=='2'"></el-input>
+            <el-input v-model.trim="formData.author" maxlength="50" :disabled="formData.dataType=='1'"></el-input>
           </el-form-item>
 
           <el-form-item label="标签：" prop="lableIdList">
@@ -330,7 +330,7 @@ export default {
           closeAllowed: "0",
           lableIdList: [],
           dataType: '1',
-          author: '',
+          author: this.userInfo.realName,
         }
         if (!this.quillContent || (this.quillContent.content || this.quillContent.structuredContent)) {
           this.quillContent = {
@@ -409,6 +409,9 @@ export default {
             titleImage.push(urlList[i].newsUrl);
           }
         }
+        if (this.formData.dataType == '1' && !this.formData.author) {
+          this.formData.author = this.userInfo.realName
+        }
         this.titleImage = titleImage;
         this.publish = true;
         this.publishType = "edit";
@@ -466,9 +469,9 @@ export default {
     },
     dataTypeChange (type) {
       this.formData.newsSource = ''
-      if (type == '1') {
+      if (type == '2') {
         this.formData.author = ''
-      } else if (type == '2') {
+      } else if (type == '1') {
         this.formData.author = this.userInfo.realName
       }
     },
