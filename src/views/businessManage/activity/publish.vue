@@ -44,6 +44,14 @@
             </el-col>
           </el-row>
         </el-form-item>
+        <!-- 活动主办方 -->
+        <!-- <el-form-item required label="活动主办方：">
+          <el-row>
+            <el-col :span="20">
+              <el-input></el-input>
+            </el-col>
+          </el-row>
+        </el-form-item> -->
         <!-- 举办时间 -->
         <el-form-item label="举办时间：" required>
           <el-col :span="6">
@@ -1976,11 +1984,11 @@ export default {
                 this.validRst = [];
                 return this.$message.error("发布活动失败");
               }
-              // this.$refs.discussionGroupRef.openDiscussionGroupDialog(res.data.data.data)//显示创建圈子弹窗
+              this.$refs.discussionGroupRef.openDiscussionGroupDialog(res.data.data.data)//显示创建圈子弹窗
               // this.$message.success("发布活动成功");
               this.fileList = [];
               this.baseFormData.fileList = [];
-              this.$router.go(-1);
+              // this.$router.go(-1);
               this.validRst = [];
               this.defaultList = [];
             })

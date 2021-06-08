@@ -85,7 +85,11 @@
         :span-method="mergeCell"
         :header-cell-style="{ background: '#FAFAFA' }"
       >
-        <el-table-column prop="userName" label="名称" fixed> </el-table-column>
+        <el-table-column prop="userName" label="名称" fixed>
+          <template slot-scope="scope">
+            {{ !scope.row.rows ? scope.row.userName : scope.row.enroleName }}
+          </template>
+        </el-table-column>
         <el-table-column label="报名信息" width="500px">
           <template slot-scope="scope">
             <span class="info-item">{{
@@ -334,12 +338,10 @@ export default {
     },
     // 处理获取的列表数据
     handleData(data) {
-      console.log(data);
       let newList = [];
       for (let i = 0; i < data.length; i++) {
         for (let j = 0; j < data[i].list.length; j++) {
           newList.push({
-            userName: data[i].userName,
             ...data[i].list[j],
             rows: j == 0 ? data[i].list.length : 0,
             isVip: data[i].list[j].isVip == 0 ? false : true,
@@ -347,14 +349,12 @@ export default {
           });
         }
       }
-      console.log("newList", newList);
       this.tableData = newList;
     },
     // 获取人员数据
     getpeopleManagementPage() {
       this.loading = true;
       peopleManagement(this.query).then((res) => {
-        console.log("res...", res);
         this.total = res.data.data.data.total;
         this.handleData(res.data.data.data.records);
         this.loading = false;
@@ -401,14 +401,11 @@ export default {
       });
     },
     blurInput(row) {
-      console.log("blur...");
       row.isShowBtn = !row.isShowBtn;
       this.seatQuery.id = row.enroleId;
       this.seatQuery.vip = row.isVip ? 1 : 0;
       this.seatQuery.seatNumber = row.seatNumber;
-      console.log("seatQuery", this.seatQuery);
       set_vip_or_seat(this.seatQuery).then((res) => {
-        console.log("setSeat...", res);
         if (res.data.data.businessCode === 1000) {
           this.$notify({
             title: "座位号",
