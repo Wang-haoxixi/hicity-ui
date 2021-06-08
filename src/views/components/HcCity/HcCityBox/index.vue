@@ -22,15 +22,19 @@ function getUsedCity (cityTree, cityId) {
 
 function getCityTree (city, idList) {
   let children = []
+  let hasAllChildren = true
   for (let i = 0; i < city.children.length; i++) {
     let cityC = city.children[i]
     let child = getCityTree(cityC, idList)
     if (child) {
       children.push(child)
+      if (child.children) {
+        hasAllChildren = false
+      }
     }
   }
   if (children.length > 0) {
-    if (children.length == city.children.length) {
+    if (hasAllChildren && children.length == city.children.length) {
       return {
         id: city.id,
         regionName: city.regionName
@@ -56,19 +60,23 @@ function getCityRange (city, cityRange) {
     id: city.id,
     regionName: city.regionName,
   }
+  let selfDisabled = false
   let children = []
   for (let i = 0; i < city.children.length; i++) {
     let cityC = city.children[i]
     let child = getCityRange(cityC, cityRange)
     if (child) {
       children.push(child)
+      if (child.selfDisabled) {
+        selfDisabled = true
+      }
     }
   }
   if (children.length > 0) {
     return {
       ...cityData,
       children,
-      selfDisabled: city.children.length != children.length
+      selfDisabled: selfDisabled || city.children.length != children.length
     }
   } else if (cityRange.includes(city.id)) {
     return {
@@ -77,6 +85,26 @@ function getCityRange (city, cityRange) {
     }
   }
   return null
+}
+
+function getCityRangeAll (cityList, cityRange, includeParent = false) {
+  let allRange = []
+  if (includeParent) {
+    for (let i = 0; i < cityList.length; i++) {
+      if (cityRange.includes(cityList[i].id)) {
+        includeParent = false
+      }
+    }
+  }
+  for (let i = 0; i < cityList.length; i++) {
+    if (cityList[i].children && cityList[i].children.length > 0) {
+      let rangeC = getCityRangeAll(cityList[i].children, cityRange, cityRange.includes(cityList[i].id) || includeParent)
+      allRange = [...allRange, ...rangeC]
+    } else if (cityRange.includes(cityList[i].id) || includeParent) {
+      allRange = [...allRange, cityList[i].id]
+    }
+  }
+  return allRange
 }
 
 export default {
@@ -107,6 +135,7 @@ export default {
     open (cityId = 1, initCityList = [], viewOnly = false, cityRange) {
       let usedCity = getUsedCity(this.allCityTree, cityId)
       if (cityRange && cityRange.length > 0) {
+        cityRange = getCityRangeAll(this.allCityTree, cityRange)
         usedCity = getCityRange(usedCity, cityRange)
       }
       let cityTree = getCityTree(usedCity, initCityList)
