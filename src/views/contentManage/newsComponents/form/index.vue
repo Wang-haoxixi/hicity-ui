@@ -181,6 +181,9 @@ export default {
         for (let i = 0; i < formData.labelList.length; i++) {
           labelShow.push(formData.labelList[i].name)
         }
+        if (this.formData.dataType == '1' && !this.formData.autor) {
+          this.formData.author = this.userInfo.realName
+        }
         this.labelShow = formData.labelList
       } else {
         if (!this.quillContent || (this.quillContent.content || this.quillContent.structuredContent)) {
