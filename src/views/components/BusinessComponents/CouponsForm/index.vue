@@ -44,7 +44,7 @@
     </el-form-item>
 
     <el-form-item label="券种类：" prop="deductionType">
-      <el-radio-group v-model="formData.deductionType" :disabled="isEdit">
+      <el-radio-group v-model="formData.deductionType" :disabled="isEdit" @change="deductionTypeChange">
         <el-radio label="3">满减现金券</el-radio>
         <el-radio label="2">立减现金券</el-radio>
         <!-- <el-radio label="4">满减折扣券</el-radio>
@@ -266,6 +266,12 @@ export default {
     },
     availableTimeChange () {
       this.$refs.form.validateField('availableTime')
+    },
+    deductionTypeChange () {
+      this.formData.conditionPrice = ''
+      this.formData.deductionPrice = ''
+      this.$refs.form.clearValidate('conditionPrice')
+      this.$refs.form.clearValidate('deductionPrice')
     },
     deductionPriceValidator (rules, value, callback) {
       let formData = this.formData
