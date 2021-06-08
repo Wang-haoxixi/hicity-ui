@@ -661,7 +661,7 @@ export default {
       console.log(this.$refs.hcCrud.multipleSelection)
     },
     dataTypeChange (type) {
-      this.addform.newsSource = ''
+      this.$set(this.addform, 'newsSource', '')
       if (type == '2') {
         this.addform.author = ''
       } else if (type == '1') {
