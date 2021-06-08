@@ -65,7 +65,7 @@ export default {
         id: "",
       },
       discussionFormRules: {
-        cityId: [{ required: true, message: "请输入城市", trigger: "blur" }],
+        cityId: [{ required: true, message: "请绑定城市", trigger: "change" }],
         circleName: [
           { required: true, message: "请输入圈子名称", trigger: "blur" },
         ],

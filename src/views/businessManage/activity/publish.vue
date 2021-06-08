@@ -44,6 +44,14 @@
             </el-col>
           </el-row>
         </el-form-item>
+        <!-- 活动主办方 -->
+        <!-- <el-form-item required label="活动主办方：">
+          <el-row>
+            <el-col :span="20">
+              <el-input></el-input>
+            </el-col>
+          </el-row>
+        </el-form-item> -->
         <!-- 举办时间 -->
         <el-form-item label="举办时间：" required>
           <el-col :span="6">
