@@ -67,7 +67,7 @@
                 <div class="cover" @click="offShelfBatch">批量下架</div>
               </el-dropdown-item>
               <el-dropdown-item>
-                <div class="cover" v-if="newsType == '1'" @click="toRecommendBatch">批量推荐</div>
+                <div class="cover" v-if="newsType == '1' && (userType == 1 || userType == 2)" @click="toRecommendBatch">批量推荐</div>
               </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -96,7 +96,7 @@
               >删除</el-button
             >
           </template>
-          <template v-if="newsType == '1'">
+          <template v-if="newsType == '1' && (userType == 1 || userType == 2)">
             <el-button v-if="scope.row.isRecommend" type="text" size="mini" @click="toCancelRecommend(scope.row)"
               >取消推荐</el-button
             >
@@ -126,7 +126,7 @@
     </el-dialog>
 
     <!-- 推荐选择 -->
-    <hc-city-box ref="recommendSelect" @save="setRecommend" :province="recommendType == 'batch'"></hc-city-box>
+    <hc-city-box ref="recommendSelect" @save="setRecommend" :province="recommendType == 'batch' && userType == 1"></hc-city-box>
 
     <news-preview ref="preview"></news-preview>
 
@@ -431,7 +431,7 @@ export default {
           operation: 4,
           dataIdList: this.recommendId
         }).then(({ data }) => {
-          this.$message.success('操作成功')
+          this.$message.success(data.data.data || '操作成功')
           this.$refs.hcCrud.refresh()
         })
       }

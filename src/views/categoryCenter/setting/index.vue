@@ -43,7 +43,7 @@
       </div>
     </el-dialog>
 
-    <hc-city-box ref="recommendSelect" @save="setRecommend"></hc-city-box>
+    <hc-city-box ref="recommendSelect" :province="userType == 1" @save="setRecommend"></hc-city-box>
 
   </basic-container>
 </template>
@@ -80,7 +80,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['userInfo']),
+    ...mapGetters(['userInfo', 'userType']),
     isAdmin () {
       return this.userInfo.userType == 3 || this.userInfo.userType == 4
     },
