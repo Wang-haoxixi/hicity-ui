@@ -17,6 +17,9 @@
             </div>
           </div>
         </div>
+        <div v-if="province && !viewOnly" style="padding-bottom: 20px;">
+          <el-button size="small" @click="toChoiceProvince">选择省份</el-button>
+        </div>
         <div class="city-select">
           <div class="city-select-nav">
             <div v-for="city in cityMapList" :key="city.key" class="city-select-nav-item" :class="{'checked': selectKey == city.key}" @click="cityArangeSelect(city)">{{city.key}}</div>
@@ -39,6 +42,7 @@
       </div>
     </el-dialog>
     <hc-city-box v-if="handleNext" ref="box" :title="title" :single="single" @save="saveSelect"></hc-city-box>
+    <hc-province-select ref="province" @save="choiceProvince"></hc-province-select>
   </div>
 </template>
 
@@ -47,6 +51,7 @@ import pinyin from 'pinyin'
 import { deepClone } from '@/util/util'
 import HcCityBox from './box'
 import CityName from './CityName'
+import HcProvinceSelect from './ProvinceSelect'
 const cqRegexp  = /^重庆/
 
 function formatCitys (tempCityList) {
@@ -96,13 +101,17 @@ function formatCitys (tempCityList) {
 
 export default {
   name: 'HcCityBox',
-  components: { HcCityBox, CityName },
+  components: { HcCityBox, CityName, HcProvinceSelect },
   props: {
     title: {
       type: String,
       default: '展示城市'
     },
     single: {
+      type: Boolean,
+      default: false
+    },
+    province: {
       type: Boolean,
       default: false
     }
@@ -380,6 +389,16 @@ export default {
       this.$nextTick(() => {
         this.$refs.box.open (allCityTree, initCityTree, this.viewOnly)
       })
+    },
+    toChoiceProvince () {
+      this.$refs.province.open()
+    },
+    choiceProvince (data) {
+      this.citySelected = {
+        id: 1,
+        regionName: '全国',
+        children: data
+      }
     }
   }
 }

@@ -60,3 +60,11 @@ export function updateRole (data) {
     data
   })
 }
+
+export function getAllUser(params) {
+  return request({
+    url: '/admin/user/user_list/by_name',
+    method: 'get',
+    params
+  })
+}

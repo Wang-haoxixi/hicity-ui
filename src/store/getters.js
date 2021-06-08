@@ -35,6 +35,7 @@ const getters = {
       return 0
     }
   },
+  cityTree: state => state.user.cityTree,
   allCityTree: state => state.user.allCityTree,
 }
 export default getters
