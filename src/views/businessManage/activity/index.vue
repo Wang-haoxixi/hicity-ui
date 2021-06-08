@@ -173,6 +173,7 @@
                 type="danger"
                 round
                 size="mini"
+                :disabled="item.isOfficial=='1' ? true : false"
                 @click="deleteCircleItem(item.id)"
                 >删除</el-button
               >
