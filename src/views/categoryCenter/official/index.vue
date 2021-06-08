@@ -1,6 +1,6 @@
 <template>
   <basic-container>
-    <hc-table-form title="官方发布栏目">
+    <hc-table-form title="城市头条栏目">
       <hc-crud ref="hcCrud" :option="tableOption" :fetchListFun="fetchListFun" :addFun="addFun" :updateFun="updateFun">
         <template v-slot:table="scope">
            <hc-table-data-box :empty="!scope.tableData || scope.tableData.length == 0" :loading="boxLoading">
@@ -32,7 +32,7 @@
     </hc-table-form>
 
     <hc-city-box ref="hcCityBox"></hc-city-box>
-    
+
   </basic-container>
 </template>
 
@@ -67,17 +67,6 @@ export default {
             search: true,
             trim: true,
             rules: [{required: true,message: '请输入栏目名称', trigger: 'blur'}]
-          },
-          {
-            label: '是否允许城市停用',
-            prop: 'closeAllowed',
-            type: 'switch',
-            inactiveText: '不允许',
-            inactiveValue: '1',
-            activeText: '允许',
-            activeValue: '0',
-            value: '1',
-            rules: [{required: true,message: '请选择是否允许城市停用', trigger: 'blur'}]
           }
         ]
       }
@@ -181,7 +170,7 @@ export default {
           this.$refs.hcCrud.refresh()
         }
       })
-    }, 
+    },
   }
 }
 </script>
@@ -224,7 +213,7 @@ export default {
       align-items: center;
       .mune-item {
         font-size: 14px;
-        
+
       }
       .column-item-option-left {
       }
