@@ -23,6 +23,7 @@ import Avue from '@smallwei/avue'
 import '@smallwei/avue/lib/index.css'
 // 插件 json 展示
 import vueJsonTreeView from 'vue-json-tree-view'
+import './styles/iconfont.scss'
 
 Vue.use(router)
 
