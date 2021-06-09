@@ -11,15 +11,16 @@
       <el-popover
         placement="bottom-end"
         width="350"
-        trigger="click">
-        <el-button slot="reference" size="mini" class="senior-search-down" icon="hc-icon icon-gengduo1"></el-button>
+        v-model="seniorVisible"
+        trigger="manual">
+        <el-button slot="reference" size="mini" class="senior-search-down" icon="hc-icon icon-gengduo1" @click="seniorVisible = !seniorVisible"></el-button>
         <slot name="seniorSearch" :searchFun="toSeniorSearch">
           <div class="senior-search-list">
             <div v-for="(search, index) in seniorSearchs" :key="index" class="senior-search-item">
               <div class="senior-search-item-title">{{search.label}}：</div>
               <div class="senior-search-item-content">
                 <slot :name="search.prop + 'SeniorSearch'" :searchForm="searchFormSenior" :prop="search.prop">
-                  <hc-form-item v-model="searchFormSenior[search.prop]" :option="search"></hc-form-item>
+                  <hc-form-item v-model="searchFormSenior[search.prop]" style="width: 100%" :option="search"></hc-form-item>
                 </slot>
               </div>
             </div>
@@ -33,7 +34,7 @@
             >
             <el-button
               icon="el-icon-refresh"
-              @click="resetSearch"
+              @click="resetSearch()"
               >重 置</el-button
             >
           </div>
@@ -55,6 +56,7 @@ export default {
   },
   data () {
     return {
+      seniorVisible: false,
       searchFormBasic: {},
       searchFormSenior: {}
     }
@@ -63,7 +65,7 @@ export default {
     basicSearch () {
       if (this.searchs && this.searchs.length > 0) {
         for (let i = 0; i < this.searchs.length; i++) {
-          if (this.searchs[i].search && (this.searchs[i].search === true || this.searchs[i].search.basic)) {
+          if (this.searchs[i].search && (this.searchs[i].search === true || this.searchs[i].search === 'basic')) {
             return this.searchs[i]
           }
         }
@@ -73,7 +75,7 @@ export default {
       let searchs = []
       if (this.searchs && this.searchs.length > 0) {
         for (let i = 0; i < this.searchs.length; i++) {
-          if (this.searchs[i].search && (this.searchs[i].search === true || this.searchs[i].search.senior)) {
+          if (this.searchs[i].search && (this.searchs[i].search === true || this.searchs[i].search === 'senior')) {
             searchs.push(this.searchs[i])
           }
         }
@@ -86,6 +88,7 @@ export default {
       this.$emit('search', searchForm)
     },
     toSeniorSearch (searchFormSenior) {
+      this.seniorVisible = false
       this.$emit('search', searchFormSenior)
     },
     resetSearch (type = 'senior') {
