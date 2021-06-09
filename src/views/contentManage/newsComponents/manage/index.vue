@@ -107,7 +107,7 @@
         </template>
       </hc-crud>
       <template slot="form">
-        <news-form ref="newsForm" :form-data="formData" @save="save" @preview="handlePreview"></news-form>
+        <news-form ref="newsForm" :news-type="newsType" :form-data="formData" @save="save" @preview="handlePreview"></news-form>
       </template>
     </hc-table-form>
 

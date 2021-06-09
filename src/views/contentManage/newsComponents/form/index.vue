@@ -133,6 +133,12 @@ export default {
       labelShow: [],
     }
   },
+  props: {
+    newsType: {
+      type: Number,
+      default: 0
+    }
+  },
   computed: {
     ...mapGetters(["userInfo", "dicList", "userType"]),
   },
