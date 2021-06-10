@@ -424,7 +424,7 @@ export default {
       this.formData.storeManagerName = option.data.name
       if (this.formData.storeWxConfigs.length > 0 && this.formData.storeWxConfigs[0].wxHierarchy == '商户') {
         this.formData.storeWxConfigs.splice(0, 1, {
-          wxUserId: option.data.storeManagerId,
+          wxUserId: option.data.userId,
           wxAccount: option.data.wxAccount,
           wxHierarchy: option.data.wxHierarchy,
           cityId: option.data.cityId,
@@ -433,7 +433,7 @@ export default {
         })
       } else {
         this.formData.storeWxConfigs.unshift({
-          wxUserId: option.data.storeManagerId,
+          wxUserId: option.data.userId,
           wxAccount: option.data.wxAccount,
           wxHierarchy: option.data.wxHierarchy,
           cityId: option.data.cityId,
