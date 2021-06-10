@@ -33,7 +33,7 @@
           </el-select>
         </template>
         <template v-slot:updateBySearchItem="scope">
-          <hc-remote-select v-model="scope.searchForm[scope.prop]" :remote-fun="getAllUser" :show-word="updateByName" @option-change="updateByChange">
+          <hc-remote-select v-model="scope.searchForm[scope.prop]" :remote-fun="getAllUser" :show-word="updateByName" @option-change="updateByOptionChange" @change="updateByChange">
             <template v-slot:option="scope">
               <strong>{{scope.option.data.realName}} </strong>
               <span> ({{scope.option.data.username}})</span>
@@ -611,8 +611,14 @@ export default {
         })
       })
     },
-    updateByChange (option) {
+    updateByOptionChange (option) {
       this.updateByName = option.label
+    },
+    updateByChange (val) {
+      console.log(val)
+      if (!val) {
+        this.updateByName = ''
+      }
     }
   },
 };

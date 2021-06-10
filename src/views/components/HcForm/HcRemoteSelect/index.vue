@@ -84,6 +84,7 @@ export default {
           this.options = []
         })
       }
+      this.$emit('change', val)
     }
   },
   methods: {
@@ -105,7 +106,6 @@ export default {
     selectChange (value) {
       this.selectData = value
       this.$emit('input', value)
-      this.$emit('change', value)
       for (let i = 0; i < this.options.length; i++) {
         if (this.options[i][this.valueKey] === value) {
           this.$emit('label-change', this.options[i][this.labelKey])
