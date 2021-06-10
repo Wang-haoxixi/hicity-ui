@@ -273,7 +273,23 @@ export default {
       })
     },
     handlePreview() {
-      this.$emit('preview', this.formData)
+      let labelList = []
+      for (let i = 0; i < this.labelObj.length; i++) {
+        if (typeof this.labelObj[i].id == "string") {
+          labelList.push({name: this.labelObj[i].name})
+        } else {
+          labelList.push({
+            id: this.labelObj[i].id,
+            name: this.labelObj[i].name
+          })
+        }
+      }
+      this.$emit('preview', {
+        createByName: this.userInfo.realName,
+        ...this.formData,
+        officialNewsContent: this.quillContent.content,
+        labelList
+      })
     },
     dataTypeChange (type) {
       this.$set(this.formData, 'newsSrouce', '')
