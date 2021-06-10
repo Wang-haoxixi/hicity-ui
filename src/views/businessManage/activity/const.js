@@ -43,7 +43,7 @@ export const tableOption = (isAdmin) => {
     expand: true,
     defaultExpand: true,
     menu: true,
-    menuWidth: 180,
+    menuWidth: 220,
     columns
   }
 }

@@ -44,14 +44,14 @@
             </el-col>
           </el-row>
         </el-form-item>
-        <!-- 活动主办方 -->
-        <!-- <el-form-item required label="活动主办方：">
+        <!-- 主办方 -->
+        <el-form-item prop="sponsor" label="主办方：">
           <el-row>
             <el-col :span="20">
-              <el-input></el-input>
+              <el-input v-model.trim="baseFormData.sponsor" maxlength="20" show-word-limit></el-input>
             </el-col>
           </el-row>
-        </el-form-item> -->
+        </el-form-item>
         <!-- 举办时间 -->
         <el-form-item label="举办时间：" required>
           <el-col :span="6">
@@ -99,7 +99,7 @@
         <el-form-item prop="poster" label="活动海报：">
           <div class="posterInpBox">
             <!-- 点击上传按钮 -->
-            <el-upload
+            <!-- <el-upload
               class="upload-demo"
               :action="uploadPicUrl"
               :on-success="handlePosterSuccess"
@@ -109,9 +109,12 @@
               accept=".jpg,.jpeg,.png,.gif,.bmp,.JPG,.JPEG,.PNG,.GIF,.BMP"
             >
               <el-button icon="el-icon-upload">点击上传</el-button>
-            </el-upload>
+            </el-upload> -->
+            <hc-image-cropper :widthLimit='286' :heightLimit='186' v-model="baseFormData.poster" :disabled="publishType == 'view'" single :limit="1" @change="logoChange" bottom-tip="请上传尺寸为286*186，大小不超过2M的图片">
+              <el-button icon="el-icon-upload">点击上传</el-button>
+            </hc-image-cropper>
             <!-- 海报图库按钮 -->
-            <el-button icon="el-icon-picture" @click="showPosters"
+            <el-button icon="el-icon-picture" @click="showPosters" class="poster-btn"
               >海报图库</el-button
             >
             <div style="margin-left: 15px">
@@ -224,7 +227,6 @@
             v-model="actInpVal"
             :fetch-suggestions="querySearch"
             @select="handleTagValFn"
-            @blur="handleBlur"
           ></el-autocomplete>
         </el-form-item>
         <!-- 活动亮点 -->
@@ -564,7 +566,7 @@
         <div class="default-options">
           <div>
             <div class="auto-user">
-              <el-switch v-model="baseFormData.autoNickName"></el-switch>
+              <el-switch v-model="baseFormData.whetherToFill"></el-switch>
               <span>用户报名时自动带入用户昵称（可以关闭）</span>
             </div>
             <div class="item" v-for="(item, index) in systemopt" :key="index">
@@ -817,8 +819,10 @@ import {
   officialReleaseList,
 } from "@/api/activity/publish";
 import { Loading } from "element-ui";
+
+import HcImageCropper from "@/views/components/HcImageUpload/cropper"
 export default {
-  components: { HcQuill, HcCitySelect,DiscussionGroup },
+  components: { HcQuill, HcCitySelect,DiscussionGroup,HcImageCropper },
   data() {
     return {
       annexFileTypes,
@@ -859,7 +863,6 @@ export default {
           code: "phone_number",
           isDisabled: true,
         },
-        // -----
         {
           label: "单位",
           must: true,
@@ -869,7 +872,6 @@ export default {
           code: "company",
           isDisabled: true,
         },
-        // -----
       ],
       defaultOptions: [
         {
@@ -898,14 +900,6 @@ export default {
           fixedItem: true,
           code: "email",
         },
-        // {
-        //   label: "单位",
-        //   must: false,
-        //   type: "input",
-        //   placeholder: "请输入单位",
-        //   fixedItem: true,
-        //   code: "company",
-        // },
         {
           label: "职务",
           must: false,
@@ -926,15 +920,6 @@ export default {
 
       customList: [],
       customForm: [
-        // { // 删除自定单行文本框
-        //   "typename": '单行文本',
-        //   "label": "",
-        //   "value": "",
-        //   "type": "input",
-        //   "must": false,
-        //   "fixedItem": false,
-        //   "placeholder": "单行文本",
-        // },
         {
           typename: "单选按钮框",
           label: "",
@@ -990,6 +975,9 @@ export default {
           { required: true, message: "请输入城市", trigger: "blur" },
         ],
         name: [{ required: true, message: "请输入活动标题", trigger: "blur" }],
+
+        sponsor: [{ required: true, message: "请输入主办方", trigger: "blur" }],
+
         startTime: [
           {
             required: true,
@@ -1036,13 +1024,6 @@ export default {
         details: [
           { required: true, message: "请输入活动详情", trigger: "blur" },
         ],
-        // fileList: [
-        //   {
-        //     validator: this.validatorFileList,
-        //     required: true,
-        //     trigger: "change",
-        //   },
-        // ],
       },
       setTicketDataRules: {
         ticketingType: [
@@ -1077,11 +1058,14 @@ export default {
       },
       // 基本信息数据
       baseFormData: {
-        autoNickName: true, //自动带入昵称
+        whetherToFill: true, //自动带入昵称
 
         conferenceFormList: [],
         cityIdList: [], //所属城市
         name: "",
+
+        sponsor: "",//主办方
+
         startTime: "",
         endTime: "",
         type: "",
@@ -1183,12 +1167,17 @@ export default {
         offcialName: "",
       },
       timeout: null,
+
+      publishType: ''
     };
   },
   computed: {
     ...mapGetters(["userType", "userInfo"]),
   },
   methods: {
+    logoChange(){
+
+    },
     placeholderName(type) {
       // 提示语placeholder
       if (type) {
@@ -1308,14 +1297,6 @@ export default {
         callback(new Error("请选择活动标签"));
       }
     },
-    // validatorFileList(rule, value, callback) {
-    //   if (value.length != 0) {
-    //     callback();
-    //   } else {
-    //     callback(new Error("请上传活动附件"));
-    //   }
-    // },
-
     // 活动分类改变触发
     changeClassification(e) {
       this.baseFormData.classification = this.classification[0];
@@ -1363,6 +1344,10 @@ export default {
             this.statusFlag = data.statusFlag;
             this.baseFormData.cityIdList = data.cityIdList;
             this.baseFormData.name = data.name;
+
+            this.baseFormData.whetherToFill = data.whetherToFill
+
+            this.baseFormData.sponsor = data.sponsor;
             this.baseFormData.startTime = data.startTime;
             this.baseFormData.endTime = data.endTime;
             this.baseFormData.type = data.type;
@@ -1396,7 +1381,6 @@ export default {
             });
             this.customList.forEach((item) => {
               if (item.type == "checkbox" || item.type == "radio") {
-                // item.isInput = false
                 this.$set(item, "isInput", false);
                 this.$set(item, "inputValue", "");
               }
@@ -1554,7 +1538,6 @@ export default {
       this.baseFormData.poster = "";
       this.$refs.baseFormDataRef.validateField("poster");
     },
-
     // 新增票种
     addTic() {
       let setTicketData = {
@@ -1631,10 +1614,6 @@ export default {
         });
         cb(results);
       }
-    },
-    handleBlur() {
-      // this.actInpVal = ''
-      // this.haveInputVal = false
     },
     // 选择活动标签
     handleTagValFn() {
@@ -1955,10 +1934,8 @@ export default {
       this.customList.forEach((item) => {
         if (item.type == "input" || item.type == "textarea") {
           item.placeholder = "请输入";
-          // item.placeholder = item.typename
         } else if (item.type == "radio" || item.type == "checkbox") {
           item.placeholder = "请选择";
-          // item.placeholder = item.typename
         }
       });
       this.baseFormData.conferenceFormList = [
@@ -1966,9 +1943,7 @@ export default {
         ...this.customList,
       ];
 
-      // console.log("baseFormData...", this.baseFormData);
-      // this.$refs.discussionGroupRef.openDiscussionGroupDialog(243)//显示创建圈子弹窗
-
+      console.log("baseFormData...", this.baseFormData);
       this.$refs.baseFormDataRef.validate((valid1) => {
         this.$refs.setTicketDataRef.forEach((item) => {
           item.validate((valid2) => {
@@ -2141,19 +2116,8 @@ export default {
     mouseLeave() {
       this.showDelete = false;
     },
-    // 获取当前时间
-    // getCurrentTime() {
-    //   this.baseFormData.startTime = dateFormat(new Date());
-    // },
-    // getNextTime() {
-    //   this.baseFormData.endTime = dateFormat(
-    //     new Date(new Date().getTime() + 1000 * 3600 * 24)
-    //   );
-    // },
   },
   created() {
-    // this.getCurrentTime();
-    // this.getNextTime();
     this.getActivityClassify();
     this.getCityTree();
     this.getActivityType();
