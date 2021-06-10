@@ -25,7 +25,7 @@ export const calcDate = (date1, date2) => {
 /**
  * 日期格式化
  */
-export function dateFormat(date, format = 'yyyy-MM-dd HH:mm:ss') {
+export function dateFormat(date, format = 'yyyy-MM-dd hh:mm:ss') {
   if (date !== 'Invalid Date') {
     var o = {
       'M+': date.getMonth() + 1, // month
