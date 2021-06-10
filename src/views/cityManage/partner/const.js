@@ -8,10 +8,10 @@ export const tableOption = (edit = false, admin = false) => {
         label: '城市',
         prop: 'cityName',
         span: 24,
-        search: true,
+        search: 'basic',
         maxlength: 50,
         searchPlaceholder: '请输入城市名称'
-      }, 
+      },
       {
         label: '状态',
         prop: 'status',

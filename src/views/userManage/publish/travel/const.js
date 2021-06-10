@@ -3,7 +3,7 @@ export const tableOption = (admin = false) => {
     {
       label: '游记标题',
       prop: 'travelName',
-      search: true,
+      search: 'basic',
       maxlength: 50,
     },
     {
@@ -31,6 +31,6 @@ export const tableOption = (admin = false) => {
     menu: true,
     columns
   }
-  
+
   return option
 }

@@ -7,7 +7,7 @@ export const tableOption = (admin = false) => {
     {
       label: '品牌名称',
       prop: 'brandName',
-      search: true,
+      search: 'basic',
       maxlength: 50,
     },
     {
@@ -26,6 +26,6 @@ export const tableOption = (admin = false) => {
     menuWidth: 120,
     columns
   }
-  
+
   return option
 }

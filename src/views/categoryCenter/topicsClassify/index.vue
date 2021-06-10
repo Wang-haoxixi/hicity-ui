@@ -138,7 +138,7 @@ export default {
       tableOption: {
         border: true,
         index: true,
-        indexLabel: '序号', 
+        indexLabel: '序号',
         stripe: true,
         menuAlign: 'center',
         editBtn: false,
@@ -174,7 +174,8 @@ export default {
           type: 'text',
           maxlength: 10,
           label: '分类名称',
-          prop: 'classifyName'
+          prop: 'classifyName',
+          search: 'basic'
         }
       ],
     }
@@ -226,7 +227,7 @@ export default {
           this.boxLoading = false
         })
       })
-      
+
     },
     toCreate () {
       this.formData = {

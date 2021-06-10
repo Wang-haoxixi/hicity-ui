@@ -5,10 +5,24 @@
       :title="title"
       @go-back="viewDetail = false">
       <hc-crud ref="hcCrud" :fetchListFun="fetchListFun" :option="tableOption">
-        <template v-slot:searchItems="scope">
+        <template v-slot:nameSearchItem="scope">
+          <el-input v-model="scope.searchForm.name" placeholder="请输入职位名称" clearable></el-input>
+        </template>
+        <template v-slot:cityIdSearchItem="scope">
+          <hc-city-select v-model="scope.searchForm.cityId" :city-id="userInfo.manageCityId" single></hc-city-select>
+        </template>
+        <template v-slot:statusFlagSearchItem="scope">
+          <el-select v-model="scope.searchForm.statusFlag" style="width: 100%;" clearable>
+            <el-option label="招聘中" value="valid">招聘中</el-option>
+            <el-option label="已关闭" value="close">已关闭</el-option>
+            <el-option label="已下架" value="off_shelf">已下架</el-option>
+            <el-option label="待审核" value="wait_audit">待审核</el-option>
+          </el-select>
+        </template>
+        <!-- <template v-slot:searchItem="scope">
           <div class="search-item">
-            <div style="white-space: nowrap;">职位名称：</div>
             <el-input v-model="scope.searchForm.name" placeholder="请输入职位名称" clearable></el-input>
+            <div style="white-space: nowrap;">职位名称：</div>
           </div>
           <div class="search-item">
             <div style="white-space: nowrap;">工作城市：</div>
@@ -23,7 +37,7 @@
               <el-option label="待审核" value="wait_audit">待审核</el-option>
             </el-select>
           </div>
-        </template>
+        </template> -->
         <template v-slot:menu="scope">
           <el-button type="text" size="mini" @click="toView(scope.row)">详情</el-button>
           <template v-if="scope.row.status == '3' && scope.row.auditStatus == '1'">
@@ -61,6 +75,39 @@ export default {
             label: '职位名称',
             prop: 'name',
             maxlength: 50,
+            search: true,
+          },
+          {
+            label: '工作城市',
+            prop: 'cityId',
+            search: true,
+            hidden: true,
+          },
+          {
+            label: '职位状态',
+            prop: 'statusFlag',
+            width: 100,
+            type: 'select',
+            dicData: [
+              {
+                label: '招聘中',
+                value: 'valid'
+              },
+              {
+                label: '已关闭',
+                value: 'close'
+              },
+              {
+                label: '已下架',
+                value: 'off_shelf'
+              },
+              {
+                label: '待审核',
+                value: 'wait_audit'
+              }
+            ],
+            search: true,
+            hidden: true,
           },
           {
             label: '发布人',

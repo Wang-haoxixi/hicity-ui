@@ -17,13 +17,13 @@ export const tableOption = (edit = false) => {
         message: '请输入管理员名称',
         trigger: 'blur'
       }]
-    }, 
+    },
     {
       label: '用户名',
       prop: 'username',
       maxlength: 20,
       editDisabled: true,
-      search: true,
+      search: 'basic',
       span: 24,
       rules: [{
         required: true,

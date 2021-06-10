@@ -3,7 +3,7 @@ export const tableOption = () => {
     {
       label: '券名称',
       prop: 'name',
-      search: true,
+      search: 'basic',
       slot: true,
       maxlength: 50,
     },
@@ -38,6 +38,6 @@ export const tableOption = () => {
     menu: true,
     columns
   }
-  
+
   return option
 }

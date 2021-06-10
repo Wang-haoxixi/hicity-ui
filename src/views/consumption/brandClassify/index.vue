@@ -132,7 +132,8 @@ export default {
           type: 'text',
           maxlength: 10,
           label: '品牌分类',
-          prop: 'brandClassificationName'
+          prop: 'brandClassificationName',
+          search: 'basic'
         }
       ],
       tableOption: {

@@ -3,7 +3,7 @@ export const tableOption = () => {
     {
       label: '评论类型',
       prop: 'isSuper',
-      search: true,
+      search: 'senior',
       type: 'select',
       dicData: [
         {
@@ -27,7 +27,7 @@ export const tableOption = () => {
     {
       label: '评论日期',
       prop: 'time',
-      search: true,
+      search: 'senior',
       searchValue: [],
       type: 'daterange',
       width: 160,
@@ -51,7 +51,7 @@ export const tableOption = () => {
       label: '当前状态',
       prop: 'isHidden',
       width: 100,
-      search: true,
+      search: 'senior',
       type: 'select',
       dicData: [
         {

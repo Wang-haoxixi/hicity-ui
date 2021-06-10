@@ -4,7 +4,7 @@
       title="城市模块配置"
       :formVisible="setModule"
       @go-back="setModule = false">
-      <hc-crud ref="hcCrud" :option="{search: true}" :fetchListFun="fetchListFun">
+      <hc-crud ref="hcCrud" :option="{search: true}" :fetchListFun="fetchListFun" :search-query="searchQuery">
         <template v-slot:search>
           <el-form class="search-box" inline :model="tempSearch">
             <div class="serach-box-left">
@@ -59,14 +59,14 @@
           </hc-table-data-box>
         </template>
       </hc-crud>
-    
+
       <template slot="form">
         <module-list module-list :city-id="handleCityId"></module-list>
 
       </template>
     </hc-table-form>
   </basic-container>
-  
+
 </template>
 
 <script>
@@ -90,6 +90,36 @@ export default {
       setModule: false,
       handleCityId: '',
       boxLoading: false,
+      searchQuery: [
+        {
+          label: '城市名称',
+          prop: 'cityName',
+          type: 'text',
+        },
+        {
+          label: '开通状态',
+          prop: 'cityStatus',
+          type: 'select',
+          dicData: [
+            {
+              value: undefined,
+              label: '全部'
+            },
+            {
+              value: '1',
+              label: '已开通'
+            },
+            {
+              value: '2',
+              label: '已锁定'
+            },
+            {
+              value: '3',
+              label: '未开通'
+            }
+          ]
+        }
+      ]
     }
   },
   computed: {
@@ -124,6 +154,24 @@ export default {
   methods: {
     fetchListFun (params) {
       this.boxLoading = true
+      let cityStatus = params.cityStatus
+      switch (cityStatus) {
+        case '1':
+          params.state = '0'
+          params.isOpening = true
+          break
+        case '2':
+          params.state = '9'
+          params.isOpening = true
+          break
+        case '3':
+          params.state = undefined
+          params.isOpening = false
+          break
+        default:
+          params.state = undefined
+          params.isOpening = undefined
+      }
       return new Promise((resolve, reject) => {
         adminCityOpenList(params).then(({data}) => {
           if (data.code === 0) {
@@ -204,7 +252,7 @@ export default {
       align-items: center;
       .mune-item {
         font-size: 14px;
-        
+
       }
       .city-item-option-left {
       }

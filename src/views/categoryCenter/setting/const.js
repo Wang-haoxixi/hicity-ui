@@ -7,7 +7,7 @@ export const tableOption = {
       label: '标签名称',
       prop: 'name',
       maxlength: 20,
-      search: true,
+      search: 'basic',
       trim: true,
       rules: [{required: true, message: '请输入标签名称', trigger: 'blur'}]
     }

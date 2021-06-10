@@ -33,12 +33,12 @@ export const tableOption = {
       message: '请输入真实姓名',
       trigger: 'blur'
     }]
-  }, 
+  },
   {
     label: '用户名',
     prop: 'username',
     editDisabled: true,
-    search: true,
+    search: 'basic',
     maxlength: 50,
     span: 24,
     rules: [{

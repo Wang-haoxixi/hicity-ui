@@ -6,12 +6,13 @@ export const tableOption = (admin = false) => {
       label: '商户账户',
       prop: 'phone',
       width: "120",
-      search: true,
       maxlength: 20,
+      search: true
     },
     {
-      label: '姓名',
+      label: '商户姓名',
       prop: 'name',
+      search: true
     },
     {
       label: '城市/地区',
@@ -46,7 +47,14 @@ export const tableOption = (admin = false) => {
           label: '注销',
           value: '2'
         }
-      ]
+      ],
+      search: true
+    },
+    {
+      label: '城市/地区',
+      prop: 'cityId',
+      width: "100",
+      search: true
     },
     {
       label: '创建时间',
@@ -110,6 +118,7 @@ export const orderTableOption = {
     {
       label: '订单号',
       prop: 'orderNum',
+      search: 'basic',
     },
     {
       label: '订单创建时间',
@@ -157,7 +166,7 @@ export const accountTableOption = {
       prop: 'transactionDate',
       type: 'date',
       valueFormat: 'yyyy-MM-dd',
-      search: true,
+      search: 'senior',
       hidden: true,
       formHidden: true,
     },
@@ -180,7 +189,7 @@ export const accountTableOption = {
           value: 2
         }
       ],
-      search: true,
+      search: 'senior',
     },
     {
       label: '交易金额',

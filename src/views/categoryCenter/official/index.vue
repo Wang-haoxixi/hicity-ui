@@ -64,7 +64,7 @@ export default {
             label: '栏目名称',
             prop: 'officialColumnName',
             maxlength: 50,
-            search: true,
+            search: 'basic',
             trim: true,
             rules: [{required: true,message: '请输入栏目名称', trigger: 'blur'}]
           },
