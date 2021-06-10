@@ -31,7 +31,7 @@
 
     </hc-table-form>
 
-    <hc-city-box ref="hcCityBox"></hc-city-box>
+    <hc-city-box ref="hcCityBox" no-merge></hc-city-box>
 
   </basic-container>
 </template>
@@ -67,6 +67,28 @@ export default {
             search: true,
             trim: true,
             rules: [{required: true,message: '请输入栏目名称', trigger: 'blur'}]
+          },
+          {
+            label: '是否允许城市停用',
+            prop: 'closeAllowed',
+            type: 'switch',
+            inactiveText: '不允许',
+            inactiveValue: '1',
+            activeText: '允许',
+            activeValue: '0',
+            value: '1',
+            rules: [{required: true,message: '请选择是否允许城市停用', trigger: 'blur'}]
+          },
+          {
+            label: '显示和隐藏',
+            prop: 'showStatus',
+            type: 'switch',
+            inactiveText: '隐藏',
+            inactiveValue: 1,
+            activeText: '显示',
+            activeValue: 0,
+            value: 0,
+            rules: [{required: true,message: '请选择显示和隐藏', trigger: 'blur'}]
           }
         ]
       }
