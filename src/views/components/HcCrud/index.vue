@@ -1,79 +1,5 @@
 <template>
   <div class="hc-crud-container">
-    <!-- 搜索 -->
-    <slot name="search">
-      <div
-        v-if="optionC.search || searchList && searchList.length > 0"
-        class="search-box">
-        <div
-          v-for="(item, index) in searchList"
-          :key="index"
-          class="search-item">
-          <div style="white-space: nowrap;">{{item.label + ':'}}</div>
-          <div style="margin-left: 10px;">
-            <slot :name="item.prop + 'SearchItem'" :search-form="searchFormShow" :prop="item.prop">
-              <hc-form-item
-                style="margin-left: 10px;"
-                v-model="searchFormShow[item.prop]"
-                :option="item"
-              ></hc-form-item>
-            </slot>
-          </div>
-        </div>
-        <slot name="searchItems" :search-form="searchFormShow"></slot>
-        <div class="search-item">
-          <el-button
-            type="primary"
-            icon="el-icon-search"
-            @click="toSearch"
-            >搜 索</el-button
-          >
-          <el-button
-            icon="el-icon-refresh"
-            @click="resetSearch"
-            >重 置</el-button
-          >
-        </div>
-      </div>
-
-      <!-- <el-form
-        v-if="optionC.search || searchList && searchList.length > 0"
-        class="search-box"
-        style="width: 100%"
-        label-width="auto"
-        @submit.native.prevent="toSearch"
-      >
-        <el-form-item
-          v-for="(item, index) in searchList"
-          :key="index"
-          class="search-item"
-          :label="item.label + ':'"
-          label-width="auto"
-        >
-          <hc-form-item
-            v-model="searchFormShow[item.prop]"
-            :option="item"
-          ></hc-form-item>
-        </el-form-item>
-        <slot name="searchItems" :search-form="searchFormShow">
-        </slot>
-        <el-form-item>
-          <el-button
-            class="search-item"
-            type="primary"
-            icon="el-icon-search"
-            @click="toSearch"
-            >搜 索</el-button
-          >
-          <el-button
-            class="search-item"
-            icon="el-icon-refresh"
-            @click="resetSearch"
-            >重 置</el-button
-          >
-        </el-form-item>
-      </el-form> -->
-    </slot>
     <!-- 新建 -->
     <div v-if="optionC.header" class="hc-crud-header">
       <div class="menu-left">
@@ -83,6 +9,20 @@
       <div class="menu-right">
         <slot name="menuRight"></slot>
         <el-button v-if="optionC.refresh" icon="el-icon-refresh" circle :size="optionC.headerSize" @click="handleRefresh"></el-button>
+
+        <hc-search-form ref="hcSearchForm" :searchs="searchList" style="margin-left: 10px" @search="coverSearch">
+          <template v-slot:basicSearch="scope">
+            <slot name="basicSearch" :searchFun="scope.searchFun"></slot>
+          </template>
+
+          <template v-slot:seniorSearch="scope">
+            <slot :searchFun="scope.searchFun" :searchList="scope.searchList"></slot>
+          </template>
+          <template v-for="search in searchList" v-slot:[`${search.prop}SeniorSearch`]="scope">
+            <slot :name="search.prop + 'SeniorSearch'" :searchForm="scope.searchForm" :prop="scope.prop">
+            </slot>
+          </template>
+        </hc-search-form>
       </div>
     </div>
     <!-- 表格 -->
@@ -158,9 +98,10 @@ import HcFormItem from "./HcFormItem";
 import HcCrudTable from "./HcCrudTable";
 import HcCrudForm from "./HcCrudForm";
 import { getDic } from '@/util/dic.js'
+import HcSearchForm from "./HcSearchForm";
 export default {
   name: "HcCrud",
-  components: { HcFormItem, HcCrudTable, HcCrudForm },
+  components: { HcFormItem, HcCrudTable, HcCrudForm, HcSearchForm },
   props: {
     option: {
       type: Object,
@@ -200,7 +141,6 @@ export default {
       tableData: [],
       tableLoading: false,
       searchForm: {},
-      searchFormShow: {},
       formLoading: false,
       page: {
         currentPage: 1,
@@ -230,7 +170,6 @@ export default {
               type: 'text',
               ...columns[i]
             })
-            this.$set(this.searchFormShow, columns[i].prop, undefined)
           }
         }
         return list;
@@ -401,29 +340,20 @@ export default {
         this.formLoading = false
       });
     },
-    toSearch() {
+    resetSearch () {
+      this.hcSearchForm.resetSearch(arguments)
+    },
+    resetSearchItems () {
+      this.hcSearchForm.resetSearchItems(arguments)
+    },
+    coverSearch (searchForm) {
       this.tableData = []
       this.searchForm = {
-        ...this.searchForm,
-        ...this.searchFormShow
+        ...searchForm
       }
       this.page.currentPage = 1
       this.page.total = 0
       this.getList();
-    },
-    resetSearch() {
-      let searchFormShow = this.searchFormShow
-      for (var key in searchFormShow) {
-        searchFormShow[key] = undefined
-      }
-    },
-    resetSearchItems (items) {
-      let searchFormShow = this.searchFormShow
-      for (var key in searchFormShow) {
-        if (items.includes(key)) {
-          searchFormShow[key] = undefined
-        }
-      }
     }
   },
 };
@@ -436,6 +366,10 @@ export default {
     justify-content: space-between;
     align-items: center;
     padding-bottom: 10px;
+    .menu-right {
+      display: flex;
+      align-items: center;
+    }
   }
 }
 
