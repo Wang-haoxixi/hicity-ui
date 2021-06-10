@@ -34,6 +34,41 @@ function getCityTree (city, idList) {
     }
   }
   if (children.length > 0) {
+    if (idList.includes(city.id) && hasAllChildren && children.length == city.children.length) {
+      return {
+        id: city.id,
+        regionName: city.regionName
+      }
+    } else {
+      return {
+        id: city.id,
+        regionName: city.regionName,
+        children
+      }
+    }
+  } else if (idList.includes(city.id)) {
+    return {
+      id: city.id,
+      regionName: city.regionName
+    }
+  }
+  return null
+}
+
+function getCityTreeMerge (city, idList) {
+  let children = []
+  let hasAllChildren = true
+  for (let i = 0; i < city.children.length; i++) {
+    let cityC = city.children[i]
+    let child = getCityTreeMerge(cityC, idList)
+    if (child) {
+      children.push(child)
+      if (child.children) {
+        hasAllChildren = false
+      }
+    }
+  }
+  if (children.length > 0) {
     if (hasAllChildren && children.length == city.children.length) {
       return {
         id: city.id,
@@ -121,6 +156,10 @@ export default {
     province: {
       type: Boolean,
       default: false
+    },
+    noMerge: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -138,7 +177,10 @@ export default {
         cityRange = getCityRangeAll(this.allCityTree, cityRange)
         usedCity = getCityRange(usedCity, cityRange)
       }
-      let cityTree = getCityTree(usedCity, initCityList)
+      console.log(this.noMerge)
+      console.log(this)
+      let cityTree = this.noMerge ? getCityTree(usedCity, initCityList) : getCityTreeMerge(usedCity, initCityList)
+      console.log(111, cityTree)
       this.$refs.box.open(usedCity, cityTree, viewOnly)
     },
     save (city) {

@@ -3,7 +3,7 @@
     <template v-if="viewOnly && single">{{cityName}}</template>
     <template v-else>
       <el-input :disabled="disabled" :value="cityName" readonly @focus="toSelect"></el-input>
-      <hc-city-box ref="hcCityBox" :title="title" :single="single" :province="province" @save="save"></hc-city-box>
+      <hc-city-box ref="hcCityBox" :no-merge="noMerge" :title="title" :single="single" :province="province" @save="save"></hc-city-box>
     </template>
   </div>
 </template>
@@ -85,6 +85,41 @@ function getCityTree (city, idList) {
     }
   }
   if (children.length > 0) {
+    if (idList.includes(city.id) && hasAllChildren && children.length == city.children.length) {
+      return {
+        id: city.id,
+        regionName: city.regionName
+      }
+    } else {
+      return {
+        id: city.id,
+        regionName: city.regionName,
+        children
+      }
+    }
+  } else if (idList.includes(city.id)) {
+    return {
+      id: city.id,
+      regionName: city.regionName
+    }
+  }
+  return null
+}
+
+function getCityTreeMerge (city, idList) {
+  let children = []
+  let hasAllChildren = true
+  for (let i = 0; i < city.children.length; i++) {
+    let cityC = city.children[i]
+    let child = getCityTreeMerge(cityC, idList)
+    if (child) {
+      children.push(child)
+      if (child.children) {
+        hasAllChildren = false
+      }
+    }
+  }
+  if (children.length > 0) {
     if (hasAllChildren && children.length == city.children.length) {
       return {
         id: city.id,
@@ -136,6 +171,10 @@ export default {
     province: {
       type: Boolean,
       default: false
+    },
+    noMerge: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -169,7 +208,7 @@ export default {
   methods: {
     initSelect () {
       let usedCity = getUsedCity(this.allCityTree, this.cityId)
-      let cityTree = getCityTree(usedCity, this.single ? (this.value ? [this.value] : []) : this.value)
+      let cityTree = this.noMerge ? getCityTree(usedCity, this.single ? (this.value ? [this.value] : []) : this.value) : getCityTreeMerge(usedCity, this.single ? (this.value ? [this.value] : []) : this.value)
       this.citySelected = !this.single ? getCityShow(cityTree) : getLastCity(cityTree)
     },
     toSelect () {
