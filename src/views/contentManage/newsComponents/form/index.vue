@@ -64,9 +64,9 @@
         <hc-city-select v-model="formData.cityIdList" :city-id="userInfo.manageCityId" :province="userType == 1"></hc-city-select>
       </el-form-item>
       <el-form-item label="标题图：" prop="titleImage">
-        <hc-image-upload v-model="titleImage" :limit="3"></hc-image-upload>
+        <hc-image-upload v-model="titleImage" :limit="3" :file-size="10" bottom-tip="建议上传图片比例113px*76px，格式jpg/png，图片大小不能超过10M"></hc-image-upload>
       </el-form-item>
-      <el-form-item label="图片展示比例：" prop="imageSizeType">
+      <!-- <el-form-item label="图片展示比例：" prop="imageSizeType">
         <el-radio-group v-model="formData.imageSizeType">
           <el-radio
             v-for="size in dicList['NEWS_IMAGE_SIZE_TYPE']"
@@ -75,7 +75,7 @@
             >{{ size.label }}</el-radio
           >
         </el-radio-group>
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item label="详情：" prop="content">
         <hc-quill ref="quill" v-model="quillContent"></hc-quill>
       </el-form-item>
@@ -248,7 +248,7 @@ export default {
         titleImage.push({
           type: "image",
           newsUrl: this.titleImage[i],
-          imageSizeType: this.formData.imageSizeType
+          imageSizeType: '1'
         });
       }
       formData.urlList = titleImage;
@@ -267,7 +267,8 @@ export default {
       this.$emit('save', {
         data: {
           ...formData,
-          state
+          state,
+          imageSizeType: '1'
         },
         isEdit: this.isEdit
       })

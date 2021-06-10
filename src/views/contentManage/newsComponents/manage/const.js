@@ -55,14 +55,14 @@ export const tableOption = (admin = false) => {
     },
 
   ]
-  if (admin) {
-    columns.push({
-      label: '展示范围',
-      prop: 'cityList',
-      slot: true,
-      width: 80,
-    })
-  }
+  // if (admin) {
+  //   columns.push({
+  //     label: '展示范围',
+  //     prop: 'cityList',
+  //     slot: true,
+  //     width: 80,
+  //   })
+  // }
 
   let option = {
     menu: true,

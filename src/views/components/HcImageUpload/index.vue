@@ -78,6 +78,10 @@ export default {
     multipleChoice: {
       type: Boolean,
       default: false
+    },
+    fileSize: {
+      type: Number,
+      default: 50
     }
   },
   data () {
@@ -127,12 +131,14 @@ export default {
           let promise = new Promise((resolve, reject) => {
             getFileMimeType(file).then(res => {
               if (res) {
-                const isLt1M = file.size / 1024 / 1024 < 50;
+                const isLt1M = file.size / 1024 / 1024 < this.fileSize;
                 if (!isLt1M) {
+                  this.$message.warning(`上传文件大小不能超过${this.fileSize}MB!`)
+                  console.log(132321)
                   resolve({
                     type: 'error',
                     index: i,
-                    message: '上传文件大小不能超过 50MB!'
+                    message: `上传文件大小不能超过${this.fileSize}MB!`
                   })
                 } else {
                   resolve({
