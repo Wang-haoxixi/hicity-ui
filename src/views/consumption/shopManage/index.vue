@@ -74,7 +74,7 @@
           </el-form-item>
           <el-form-item label="店铺Logo：" prop="storeLogo">
             <!-- <hc-image-upload single :limit="1" v-model="formData.storeLogo" :disabled="publishType == 'view'" @change="logoChange"></hc-image-upload> -->
-            <hc-image-cropper v-model="formData.storeLogo" :disabled="publishType == 'view'" single :limit="1" @change="logoChange" bottom-tip="请上传尺寸为144*144，大小不超过2M的图片"></hc-image-cropper>
+            <hc-image-cropper v-model="formData.storeLogo" show-image-list :disabled="publishType == 'view'" single :limit="1" @change="logoChange" bottom-tip="请上传尺寸为144*144，大小不超过2M的图片"></hc-image-cropper>
           </el-form-item>
           <el-form-item label="营业时间：" prop="openingHours">
             <el-input v-model.trim="formData.openingHours" placeholder="示例：周一至周五 10:00~17:00" maxlength="20"></el-input>

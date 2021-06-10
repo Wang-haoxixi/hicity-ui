@@ -1,18 +1,20 @@
 <template>
   <div class="hc-upload-image-container">
     <div v-if="topTip" class="upload-tip">{{topTip}}</div>
-    <div v-for="(file, index) in fileList" :key="index" class="image-box upload">
-      <div class="image-box-content" :style="getStyle()">
-        <img v-if="file.type == 'formal'" class="image-box-content-image" fit="fill" :src="file.url"/>
-        <el-progress v-if="file.type == 'temp'" type="circle" :percentage="0"></el-progress>
-        <div v-if="!disabled" class="image-box-cotent-shadow" @click.stop="">
-          <i class="el-icon-refresh" @click="changeFile(file, index)"></i>
-          <i class="el-icon-delete" @click="removeFile(index)"></i>
+    <template v-if="showImageList">
+      <div v-for="(file, index) in fileList" :key="index" class="image-box upload">
+        <div class="image-box-content" :style="getStyle()">
+          <img v-if="file.type == 'formal'" class="image-box-content-image" fit="fill" :src="file.url"/>
+          <el-progress v-if="file.type == 'temp'" type="circle" :percentage="0"></el-progress>
+          <div v-if="!disabled" class="image-box-cotent-shadow" @click.stop="">
+            <i class="el-icon-refresh" @click="changeFile(file, index)"></i>
+            <i class="el-icon-delete" @click="removeFile(index)"></i>
+          </div>
         </div>
       </div>
-    </div>
+    </template>
     <file-upload
-      v-show="!single || fileList.length == 0"
+      v-show="!showImageList || !single || fileList.length == 0"
       ref="fileUpload"
       key="fileUpload"
       @file-add="fileAddTemp"
@@ -87,6 +89,10 @@ export default {
       type: String,
       default: ''
     },
+    showImageList: {
+      type: Boolean,
+      default: false
+    }
   },
   data () {
     return {

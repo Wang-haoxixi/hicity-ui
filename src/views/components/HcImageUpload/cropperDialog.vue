@@ -58,7 +58,7 @@ export default {
       finishResolve: null,
       optionsInit: {
         autoCrop: true,
-        fixedBox: false,
+        fixedBox: true,
         canMoveBox: false,
         autoCropWidth: this.width,
         autoCropHeight: this.height,
