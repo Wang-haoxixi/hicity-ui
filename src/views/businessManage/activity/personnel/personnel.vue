@@ -6,14 +6,14 @@
         <el-button @click="$router.back(-1)">返回</el-button>
       </div>
       <div class="search-box">
-        <el-form :inline="true" :model="query" class="demo-form-inline">
+        <el-form :inline="true" :model="query" class="demo-form-inline" ref="searchForm">
           <el-button
             type="primary"
             style="margin-right: 10px"
             @click="handleExportData"
             >导出</el-button
           >
-          <el-form-item>
+          <el-form-item prop="selectType">
             <el-input
               placeholder="请输入关键字"
               v-model="searchName"
@@ -32,7 +32,7 @@
               </el-select>
             </el-input>
           </el-form-item>
-          <el-form-item label="订单状态:">
+          <el-form-item label="订单状态:" prop="orderStatus">
             <el-select v-model="query.orderStatus">
               <el-option label="全部" value=""></el-option>
               <el-option label="待支付" value="0"></el-option>
@@ -41,28 +41,28 @@
               <el-option label="取消支付" value="3"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="票种类型:">
+          <el-form-item label="票种类型:" prop="ticketingType">
             <el-select v-model="query.ticketingType">
               <el-option label="全部" value=""></el-option>
               <el-option label="付费票" value="2"></el-option>
               <el-option label="免费票" value="1"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="核销状态:">
+          <el-form-item label="核销状态:" prop="cancelStatus">
             <el-select v-model="query.cancelStatus">
               <el-option label="全部" value=""></el-option>
               <el-option label="未核销" value="0"></el-option>
               <el-option label="已核销" value="1"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="人员类型:">
+          <el-form-item label="人员类型:" prop="isVip">
             <el-select v-model="query.isVip">
               <el-option label="全部" value=""></el-option>
               <el-option label="vip" value="1"></el-option>
               <el-option label="普通" value="0"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="审核状态:">
+          <el-form-item label="审核状态:" prop="auditStatus">
             <el-select v-model="query.auditStatus">
               <el-option label="全部" value=""></el-option>
               <el-option label="无需审核" value="0"></el-option>
@@ -72,7 +72,8 @@
             </el-select>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="handlecheck">查询</el-button>
+            <el-button type="primary" icon="el-icon-search" @click="handlecheck">查 询</el-button>
+            <el-button icon="el-icon-refresh" @click="resetForm">重 置</el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -85,7 +86,7 @@
         :span-method="mergeCell"
         :header-cell-style="{ background: '#FAFAFA' }"
       >
-        <el-table-column prop="userName" label="名称" fixed>
+        <el-table-column prop="userName" label="名称" fixed width="120">
           <template slot-scope="scope">
             {{ !scope.row.rows ? scope.row.userName : scope.row.enroleName }}
           </template>
@@ -132,6 +133,8 @@
             ></el-button>
             <el-input
               ref="saveInputRef"
+              maxlength="15"
+              show-word-limit
               v-model="scope.row.seatNumber"
               placeholder="设置座位号"
               @blur="blurInput(scope.row)"
@@ -295,6 +298,13 @@ export default {
     this.getpeopleManagementPage();
   },
   methods: {
+    resetForm(){
+      this.$refs.searchForm.resetFields()
+      this.selectType = "all"
+      this.searchName = ""
+      this.query.userName = ""
+      this.query.phone = ""
+    },
     getList() {
       this.getpeopleManagementPage();
     },
@@ -350,6 +360,7 @@ export default {
         }
       }
       this.tableData = newList;
+      console.log('data...',this.tableData)
     },
     // 获取人员数据
     getpeopleManagementPage() {

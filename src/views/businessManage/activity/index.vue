@@ -31,8 +31,8 @@
           <span style="margin-left: 30px; color: #919397"
             >发布时间：{{ props.row.updateTime }}</span
           >
-          <span style="margin-left: 30px; color: #919397">
-            活动圈子：2021城市超级APP体检官方活动群
+          <span style="margin-left: 30px; color: #919397" v-if="props.row.circleName">
+            活动圈子：{{ props.row.circleName ? props.row.circleName : "" }}
             <el-tag size="mini" type="danger">官方</el-tag>
           </span>
           <span style="margin-left: 30px">
@@ -81,7 +81,10 @@
               >删除</el-button
             >
             <el-button type="text" @click="handleShowCode(scope.row)"
-              >生成签到码</el-button
+              >签到码</el-button
+            >
+            <el-button type="text" @click="handleShowDetailCode(scope.row)"
+              >详情码</el-button
             >
           </template>
         </template>
@@ -109,7 +112,7 @@
               color: #c0c4cc;
             "
           >
-            草稿状态无签到码
+            暂无签到码
           </div>
           <div
             slot="placeholder"
@@ -123,6 +126,43 @@
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="downloadCode">下载签到码</el-button>
         <el-button type="primary" @click="showCodeDialogVisible = false"
+          >关 闭</el-button
+        >
+      </span>
+    </el-dialog>
+    <!--  -->
+    <!-- 详情码弹框 -->
+    <el-dialog
+      title="活动详情码"
+      :visible.sync="showDetailCodeDialogVisible"
+      append-to-body
+      width="30%"
+    >
+      <div class="code-img">
+        <el-image :src="detailImg">
+          <div
+            slot="error"
+            style="
+              line-height: 250px;
+              text-align: center;
+              background-color: #f5f7fa;
+              color: #c0c4cc;
+            "
+          >
+            暂无详情码
+          </div>
+          <div
+            slot="placeholder"
+            style="line-height: 250px; text-align: center"
+          >
+            加载中<span class="dot">...</span>
+            <i class="el-icon-loading"></i>
+          </div>
+        </el-image>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="downloadDetailCode">下载签到码</el-button>
+        <el-button type="primary" @click="showDetailCodeDialogVisible = false"
           >关 闭</el-button
         >
       </span>
@@ -211,8 +251,10 @@ export default {
     return {
       showCityDialogVisible: false, //控制展示城市
       showCodeDialogVisible: false, //展示签到码
+      showDetailCodeDialogVisible: false, //展示详情码
       dialogVisibleRelevanceMore: false,
       img: "", //签到码地址
+      detailImg: "", //详情码地址
       relevanceQuery: {
         activityId: "", //活动id
         circleId: "", //圈子id
@@ -399,11 +441,23 @@ export default {
       this.showCodeDialogVisible = true;
       this.img = row.weChatCode;
     },
+    // 展示详情码
+    handleShowDetailCode(row){
+      this.showDetailCodeDialogVisible = true
+      this.detailImg = row.weChatDetailCode
+    },
     // 下载签到码
     downloadCode() {
-      var a = document.createElement("a");
+      let a = document.createElement("a");
       a.download = "签到码";
       a.href = this.img;
+      a.click();
+    },
+    // 下载详情码
+    downloadDetailCode() {
+      let a = document.createElement("a");
+      a.download = "详情码";
+      a.href = this.detailImg;
       a.click();
     },
     // 查看

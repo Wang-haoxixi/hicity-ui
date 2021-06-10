@@ -162,7 +162,8 @@ export default {
         ticketingName: '免费票',
         number: 1,
         limitTicket: 1,
-        needAudit: true,
+        // needAudit: true,
+        needAudit: false,
         allowedRefund: 0,
         ...ticket
       }
