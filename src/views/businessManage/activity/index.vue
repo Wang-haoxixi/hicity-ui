@@ -130,7 +130,7 @@
         >
       </span>
     </el-dialog>
-
+    <!--  -->
     <!-- 详情码弹框 -->
     <el-dialog
       title="活动详情码"
