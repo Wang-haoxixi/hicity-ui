@@ -236,7 +236,7 @@
               <el-input
                 maxlength="250"
                 show-word-limit
-                :rows="5"
+                rows="6"
                 placeholder="请填写几句活动核心亮点，便于分享摘要以及百度等搜索引擎搜索（250个字）"
                 type="textarea"
                 v-model="baseFormData.spot"
@@ -299,6 +299,7 @@
                   <el-select
                     v-model="item.ticketingType"
                     placeholder="请选择票务种类"
+                    @change="changeTicketingType"
                   >
                     <el-option label="免费票" value="1"></el-option>
                     <el-option label="付费票" value="2"></el-option>
@@ -1175,8 +1176,12 @@ export default {
     ...mapGetters(["userType", "userInfo"]),
   },
   methods: {
+    changeTicketingType(e){
+      // console.log(e)
+      // console.log('i...',i)
+      // console.log('val...',val)
+    },
     logoChange(){
-
     },
     placeholderName(type) {
       // 提示语placeholder
