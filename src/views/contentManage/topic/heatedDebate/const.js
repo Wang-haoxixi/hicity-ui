@@ -3,7 +3,7 @@ export const tableOption = (admin = false) => {
     {
       label: '热议话题',
       prop: 'title',
-      search: true,
+      search: 'basic',
       maxlength: 50,
     },
     {
@@ -50,6 +50,6 @@ export const tableOption = (admin = false) => {
     menu: true,
     columns,
   }
-  
+
   return option
 }

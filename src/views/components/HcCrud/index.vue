@@ -10,7 +10,7 @@
         <slot name="menuRight"></slot>
         <el-button v-if="optionC.refresh" icon="el-icon-refresh" circle :size="optionC.headerSize" @click="handleRefresh"></el-button>
 
-        <hc-search-form ref="hcSearchForm" :searchs="searchList" style="margin-left: 10px" @search="coverSearch">
+        <hc-search-form ref="hcSearchForm" :searchs="searchList" style="margin-left: 10px" :search-show="optionC.search" @search="coverSearch">
           <template v-slot:basicSearch="scope">
             <slot name="basicSearch" :searchFun="scope.searchFun"></slot>
           </template>
@@ -18,8 +18,11 @@
           <template v-slot:seniorSearch="scope">
             <slot :searchFun="scope.searchFun" :searchList="scope.searchList"></slot>
           </template>
-          <template v-for="search in searchList" v-slot:[`${search.prop}SeniorSearch`]="scope">
-            <slot :name="search.prop + 'SeniorSearch'" :searchForm="scope.searchForm" :prop="scope.prop">
+          <template v-slot:searchItems="scope">
+            <slot name="searchItems" :search-form="scope.searchForm"></slot>
+          </template>
+          <template v-for="search in searchList" v-slot:[`${search.prop}SearchItem`]="scope">
+            <slot :name="search.prop + 'SearchItem'" :searchForm="scope.searchForm" :prop="scope.prop">
             </slot>
           </template>
         </hc-search-form>
@@ -160,7 +163,14 @@ export default {
     },
     searchList() {
       if (this.searchQuery && this.searchQuery.length > 0) {
-        return this.searchQuery;
+        let list = []
+        for (let i = 0; i < this.searchQuery.length; i++) {
+          list.push({
+            search: true,
+            ...this.searchQuery[i]
+          })
+        }
+        return list;
       } else {
         let list = [];
         let columns = this.optionC.columns || [];
@@ -341,12 +351,12 @@ export default {
       });
     },
     resetSearch () {
-      this.hcSearchForm.resetSearch(arguments)
+      this.$refs.hcSearchForm && this.$refs.hcSearchForm.resetSearch(...arguments)
     },
     resetSearchItems () {
-      this.hcSearchForm.resetSearchItems(arguments)
+      this.$refs.hcSearchForm && this.$refs.hcSearchForm.resetSearchItems(...arguments)
     },
-    coverSearch (searchForm) {
+    coverSearch (searchForm = {}) {
       this.tableData = []
       this.searchForm = {
         ...searchForm

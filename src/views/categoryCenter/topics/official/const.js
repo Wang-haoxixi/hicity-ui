@@ -5,7 +5,7 @@ export const tableOption = (admin = false) => {
       prop: 'topicsName',
       span: 24,
       rules: [{required: true, message: '请输入话题名称'}],
-      search: true,
+      search: 'basic',
       maxlength: 50,
     },
     {
@@ -31,6 +31,6 @@ export const tableOption = (admin = false) => {
     menu: ['edit', 'delete'],
     columns
   }
-  
+
   return option
 }

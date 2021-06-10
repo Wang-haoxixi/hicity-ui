@@ -8,7 +8,7 @@ export const tableOption = (admin = false) => {
     {
       label: '圈子名称',
       prop: 'name',
-      search: true,
+      search: 'basic',
       maxlength: 50,
     },
     {
@@ -39,7 +39,7 @@ export const tableOption = (admin = false) => {
       prop: 'city',
       width: 120
     },
-    
+
   ]
   let option = {
     labelWidth: 160,
@@ -52,6 +52,6 @@ export const tableOption = (admin = false) => {
     ],
     columns
   }
-  
+
   return option
 }

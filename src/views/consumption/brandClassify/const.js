@@ -21,7 +21,7 @@ export const tableOption = (admin = false) => {
   let option = {
     border: true,
     // index: true,
-    // indexLabel: '序号', 
+    // indexLabel: '序号',
     stripe: true,
     menuAlign: 'center',
     editBtn: false,
@@ -32,6 +32,6 @@ export const tableOption = (admin = false) => {
     menuWidth: 150,
     column
   }
-  
+
   return option
 }

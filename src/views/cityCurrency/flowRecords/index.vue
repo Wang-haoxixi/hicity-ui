@@ -16,7 +16,7 @@ export default {
           {
             label: '流水号',
             prop: 'flowId',
-            search: true,
+            search: 'senior',
             maxlength: 20,
             type: 'number',
             max: 2147483647,
@@ -31,7 +31,7 @@ export default {
             label: '类型',
             prop: 'type',
             type: 'select',
-            search: true,
+            search: 'senior',
             dicData: [
               {
                 label: '收入',
@@ -63,7 +63,7 @@ export default {
             type: 'date',
             valueFormat: 'yyyy-MM-dd',
             hidden: true,
-            search: true
+            search: 'senior'
           },
           {
             label: '结束时间',
@@ -71,7 +71,7 @@ export default {
             type: 'date',
             valueFormat: 'yyyy-MM-dd',
             hidden: true,
-            search: true
+            search: 'senior'
           },
         ]
       }
@@ -93,7 +93,7 @@ export default {
         })
       })
 
-      
+
     }
   }
 }

@@ -8,7 +8,7 @@ export const tableOption = () => {
     {
       label: '商品名称',
       prop: 'name',
-      search: true,
+      search: 'basic',
       maxlength: 50,
     },
     {
@@ -61,6 +61,6 @@ export const tableOption = () => {
     header: true,
     columns
   }
-  
+
   return option
 }

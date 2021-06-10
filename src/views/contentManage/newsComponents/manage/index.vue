@@ -33,7 +33,7 @@
           </el-select>
         </template>
         <template v-slot:updateBySearchItem="scope">
-          <hc-remote-select v-model="scope.searchForm[scope.prop]" :remote-fun="getAllUser" :show-word="updateByName" @option-change="updateByChange">
+          <hc-remote-select v-model="scope.searchForm[scope.prop]" style="width: 100%;" :remote-fun="getAllUser" :show-word="updateByName" @option-change="updateByChange">
             <template v-slot:option="scope">
               <strong>{{scope.option.data.realName}} </strong>
               <span> ({{scope.option.data.username}})</span>

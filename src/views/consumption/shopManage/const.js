@@ -24,6 +24,12 @@ export const tableOption = (admin = false) => {
     },
     {
       label: '城市/地区',
+      prop: 'cityId',
+      search: true,
+      hidden: true
+    },
+    {
+      label: '城市/地区',
       prop: 'cityName',
       width: "100",
     },

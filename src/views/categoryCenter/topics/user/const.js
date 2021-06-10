@@ -4,7 +4,7 @@ export const tableOption = (admin = false) => {
       label: '话题名称',
       prop: 'topicsName',
       span: 24,
-      search: true,
+      search: 'basic',
       maxlength: 50,
     },
   ]
@@ -15,6 +15,6 @@ export const tableOption = (admin = false) => {
     menuWidth: 100,
     columns
   }
-  
+
   return option
 }

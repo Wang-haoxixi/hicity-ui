@@ -13,24 +13,8 @@
             @click="toCreate"
             >新建</el-button>
         </template>
-        <template v-slot:searchItems="scope">
-          <div class="search-item">
-            <div style="white-space: nowrap;">商户姓名：</div>
-            <el-input v-model="scope.searchForm.name" placeholder="请输入商户账户" maxlength="11" clearable></el-input>
-          </div>
-          <div class="search-item">
-            <div style="white-space: nowrap;">商户状态：</div>
-            <el-select v-model="scope.searchForm.merchantStatus">
-              <el-option label="全部" :value="undefined">全部</el-option>
-              <el-option label="正常" value='0'>正常</el-option>
-              <el-option label="停用" value='1'>停用</el-option>
-              <el-option label="注销" value='2'>注销</el-option>
-            </el-select>
-          </div>
-          <div class="search-item">
-            <div style="white-space: nowrap;">城市/地区：</div>
-            <hc-city-select v-model="scope.searchForm.cityId" :city-id="userInfo.manageCityId" single></hc-city-select>
-          </div>
+        <template v-slot:cityIdSearchItem="scope">
+          <hc-city-select v-model="scope.searchForm.cityId" :city-id="userInfo.manageCityId" single></hc-city-select>
         </template>
         <template slot="menu" slot-scope="scope">
           <template>
@@ -62,27 +46,27 @@
 
         <hc-crud v-else-if="publishType == 'order'" ref="orderCrud" :option="orderTableOption" :fetchListFun="orderFetchListFun" :auto-load="false">
           <template v-slot:searchItems="scope">
-            <div class="search-item">
-              <div style="white-space: nowrap;">订单号：</div>
+            <div class="senior-search-item">
+              <div class="senior-search-item-title">订单号：</div>
               <el-input v-model="scope.searchForm.orderNum" placeholder="请输入订单号" maxlength="50" clearable></el-input>
             </div>
-            <div class="search-item">
-              <div style="white-space: nowrap;">收款店铺：</div>
-              <el-select v-model="scope.searchForm.storeId" clearable @change="storeChange">
+            <div class="senior-search-item">
+              <div class="senior-search-item-title">收款店铺：</div>
+              <el-select v-model="scope.searchForm.storeId" clearable style="width: 100%" @change="storeChange">
                 <el-option label="全部" :value="undefined">全部</el-option>
                 <el-option v-for="(item, index) in storeList" :key="index" :label="item.storeName" :value="item.storeId">{{item.storeName}}</el-option>
               </el-select>
             </div>
-            <div class="search-item">
-              <div style="white-space: nowrap;">收银员：</div>
-              <el-select v-model="scope.searchForm.storeManagerId" clearable>
+            <div class="senior-search-item">
+              <div class="senior-search-item-title">收银员：</div>
+              <el-select v-model="scope.searchForm.storeManagerId" style="width: 100%" clearable>
                 <el-option label="全部" v-if="cashierList && cashierList.length > 0" :value="undefined">全部</el-option>
                 <el-option v-for="(item, index) in cashierList" :key="index" :label="item.name" :value="item.storeManagerId">{{item.name}}</el-option>
               </el-select>
             </div>
-            <div class="search-item">
-            <div style="white-space: nowrap;">收款状态：</div>
-              <el-select v-model="scope.searchForm.storeOrderStatus" clearable>
+            <div class="senior-search-item">
+            <div class="senior-search-item-title">收款状态：</div>
+              <el-select v-model="scope.searchForm.storeOrderStatus" style="width: 100%" clearable>
                 <el-option label="全部" :value="undefined">全部</el-option>
                 <el-option v-for="(item, index) in dicList['STORE_ORDER_STATUS']" :key="index" :value="item.value" :label="item.label">{{item.label}}</el-option>
               </el-select>
@@ -518,8 +502,7 @@ export default {
       this.publish = true
       this.publishType = "shop"
       this.$nextTick(() => {
-        this.$refs.shopCrud.resetSearch()
-        this.$refs.shopCrud.toSearch()
+        this.$refs.shopCrud.coverSearch()
       })
     },
     toViewShop ({storeId}) {
@@ -551,7 +534,7 @@ export default {
       this.publishType = "order"
       this.$nextTick(() => {
         this.$refs.orderCrud.resetSearch()
-        this.$refs.orderCrud.toSearch()
+        this.$refs.orderCrud.coverSearch()
       })
       getMerchantStoreList({storeManagerId}).then(({ data }) => {
         this.storeList = data.data.data
@@ -585,7 +568,7 @@ export default {
       this.publishType = "account"
       this.$nextTick(() => {
         this.$refs.accountCrud.resetSearch()
-        this.$refs.accountCrud.toSearch()
+        this.$refs.accountCrud.coverSearch()
       })
     },
   },
@@ -612,5 +595,14 @@ export default {
   align-items: center;
   margin: 10px 20px 0 0;
 }
+.senior-search-item {
+  margin-bottom: 20px;
+  .senior-search-item-title {
+    height: 20px;
+    line-height: 20px;
+    padding-bottom: 10px;
+  }
+}
+
 </style>
 
