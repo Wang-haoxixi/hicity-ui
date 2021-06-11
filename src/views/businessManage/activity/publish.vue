@@ -299,7 +299,6 @@
                   <el-select
                     v-model="item.ticketingType"
                     placeholder="请选择票务种类"
-                    @change="changeTicketingType"
                   >
                     <el-option label="免费票" value="1"></el-option>
                     <el-option label="付费票" value="2"></el-option>
@@ -1176,11 +1175,6 @@ export default {
     ...mapGetters(["userType", "userInfo"]),
   },
   methods: {
-    changeTicketingType(e){
-      // console.log(e)
-      // console.log('i...',i)
-      // console.log('val...',val)
-    },
     logoChange(){
     },
     placeholderName(type) {
@@ -1852,6 +1846,7 @@ export default {
         // 保存时将支付方式列表清空并重新
         if (item.ticketingType == "2") {
           item.payMethodList.push(item.payOfflinePay);
+          item.needAudit = false
         }
       });
       this.baseFormData.submitType = 1;
@@ -1932,6 +1927,7 @@ export default {
         // 保存时将支付方式列表清空并重新
         if (item.ticketingType == "2") {
           item.payMethodList.push(item.payOfflinePay);
+          item.needAudit = false
         }
       });
 
@@ -1994,6 +1990,7 @@ export default {
         // 保存时将支付方式列表清空并重新
         if (item.ticketingType == "2") {
           item.payMethodList.push(item.payOfflinePay);
+          item.needAudit = false
         }
       });
       this.baseFormData.submitType = 0;
@@ -2047,6 +2044,7 @@ export default {
         item.payMethodList = [];
         if (item.ticketingType == "2") {
           item.payMethodList.push(item.payOfflinePay);
+          item.needAudit = false
         }
       });
       this.baseFormData.submitType = 0;

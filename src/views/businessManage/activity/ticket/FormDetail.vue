@@ -188,10 +188,12 @@ export default {
         this.priceTemp = '0.01'
         this.price = 0.01
       } else if (type == '2') {
+        this.formData.needAudit = false
         this.formData.ticketingName = '付费票'
       }
     },
     save () {
+      console.log('query...',this.formData)
       this.$refs.form.validate(valid => {
         let formData = {
           activityId: this.activityId,
