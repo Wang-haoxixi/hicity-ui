@@ -54,7 +54,8 @@ export const tableOption = (admin = false) => {
       label: '城市/地区',
       prop: 'cityId',
       width: "100",
-      search: true
+      search: true,
+      hidden: true
     },
     {
       label: '创建时间',

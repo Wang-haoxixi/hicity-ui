@@ -8,50 +8,49 @@
       </slot>
     </div>
     <div v-if="seniorSearchs && seniorSearchs.length > 0 || (searchShow === true || searchShow == 'senior')" class="senior-search">
-      <el-popover
-        placement="bottom-end"
-        width="350"
-        v-model="seniorVisible"
-        trigger="manual">
-        <el-button slot="reference" size="mini" class="senior-search-down" icon="hc-icon icon-gengduo1" @click="seniorVisible = !seniorVisible"></el-button>
+      <hc-search-popover>
+        <el-button slot="reference" size="mini" class="senior-search-down" icon="hc-icon icon-gengduo1"></el-button>
         <slot name="seniorSearch" :searchFun="toSeniorSearch">
-          <div class="senior-search-list">
-            <slot name="searchItems" :searchForm="searchFormSenior">
-              <template v-if="seniorSearchs && seniorSearchs.length > 0">
-                <div v-for="(search, index) in seniorSearchs" :key="index" class="senior-search-item">
-                  <div class="senior-search-item-title">{{search.label}}：</div>
-                  <div class="senior-search-item-content">
-                    <slot :name="search.prop + 'SearchItem'" :searchForm="searchFormSenior" :prop="search.prop">
-                      <hc-form-item v-model="searchFormSenior[search.prop]" style="width: 100%" :option="search"></hc-form-item>
-                    </slot>
+          <div style="overflow: auto;">
+            <div class="senior-search-list">
+              <slot name="searchItems" :searchForm="searchFormSenior">
+                <template v-if="seniorSearchs && seniorSearchs.length > 0">
+                  <div v-for="(search, index) in seniorSearchs" :key="index" class="senior-search-item">
+                    <div class="senior-search-item-title">{{search.label}}：</div>
+                    <div class="senior-search-item-content">
+                      <slot :name="search.prop + 'SearchItem'" :searchForm="searchFormSenior" :prop="search.prop">
+                        <hc-form-item v-model="searchFormSenior[search.prop]" style="width: 100%" :option="search"></hc-form-item>
+                      </slot>
+                    </div>
                   </div>
-                </div>
-              </template>
-            </slot>
-          </div>
-          <div class="search-button-list">
-            <el-button
-              type="primary"
-              icon="el-icon-search"
-              @click="toSeniorSearch(searchFormSenior)"
-              >搜 索</el-button
-            >
-            <el-button
-              icon="el-icon-refresh"
-              @click="resetSearch()"
-              >重 置</el-button
-            >
+                </template>
+              </slot>
+            </div>
+            <div class="search-button-list">
+              <el-button
+                type="primary"
+                icon="el-icon-search"
+                @click="toSeniorSearch(searchFormSenior)"
+                >搜 索</el-button
+              >
+              <el-button
+                icon="el-icon-refresh"
+                @click="resetSearch()"
+                >重 置</el-button
+              >
+            </div>
           </div>
         </slot>
-      </el-popover>
+      </hc-search-popover>
     </div>
   </div>
 </template>
 
 <script>
 import HcFormItem from "./HcFormItem";
+import HcSearchPopover from "./HcSearchPopover.vue"
 export default {
-  components: { HcFormItem },
+  components: { HcFormItem, HcSearchPopover },
   props: {
     searchs: {
       type: Array,
