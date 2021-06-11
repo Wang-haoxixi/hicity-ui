@@ -210,7 +210,6 @@ export default {
   },
   data() {
     return {
-      isShowBtn: true,
       loading: false,
       total: 0,
       query: {

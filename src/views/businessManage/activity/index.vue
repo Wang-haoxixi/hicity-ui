@@ -373,6 +373,7 @@ export default {
     },
     toRelevance() {
       // relevance code...
+      if(!this.relevanceQuery.circleId) return this.$message.warning("请先选择圈子")
       relevanceSave(this.relevanceQuery).then((res) => {
         if (res.data.data.businessCode == 1000) {
           this.getOrgedList({
