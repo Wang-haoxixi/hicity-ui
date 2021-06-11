@@ -299,7 +299,6 @@
                   <el-select
                     v-model="item.ticketingType"
                     placeholder="请选择票务种类"
-                    @change="changeTicketingType"
                   >
                     <el-option label="免费票" value="1"></el-option>
                     <el-option label="付费票" value="2"></el-option>
@@ -972,74 +971,25 @@ export default {
       // 活动状态
       statusFlag: "",
       baseFormDataRules: {
-        cityIdList: [
-          { required: true, message: "请输入城市", trigger: "blur" },
-        ],
+        cityIdList: [{ required: true, message: "请输入城市", trigger: "blur" },],
         name: [{ required: true, message: "请输入活动标题", trigger: "blur" }],
-
         sponsor: [{ required: true, message: "请输入主办方", trigger: "blur" }],
-
-        startTime: [
-          {
-            required: true,
-            validator: this.beginDataValidator,
-            trigger: "change",
-          },
-        ],
-        endTime: [
-          {
-            required: true,
-            validator: this.endDataValidator,
-            trigger: "change",
-          },
-        ],
-        type: [
-          { required: true, message: "请选择活动类型", trigger: "change" },
-        ],
-        poster: [
-          {
-            validator: this.validatorPoster,
-            required: true,
-            trigger: "change",
-          },
-        ],
-        cityId: [
-          { required: true, message: "请选择举办地", trigger: "change" },
-        ],
+        startTime: [{ required: true, validator: this.beginDataValidator, trigger: "change" }],
+        endTime: [{ required: true, validator: this.endDataValidator, trigger: "change" }],
+        type: [{ required: true, message: "请选择活动类型", trigger: "change" }],
+        poster: [{ validator: this.validatorPoster, required: true, trigger: "change" }],
+        cityId: [{ required: true, message: "请选择举办地", trigger: "change" }],
         field: [{ required: true, message: "请输入活动地址", trigger: "blur" }],
-        classification: [
-          { required: true, message: "请选择活动分类", trigger: "change" },
-        ],
-        label: [
-          {
-            validator: this.validatorLabel,
-            required: true,
-            message: "请选择活动标签",
-            trigger: "change",
-          },
-        ],
-        spot: [
-          { required: true, message: "请输入活动亮点", trigger: "blur" },
-          { message: "票务名称最多250字", max: 250, trigger: "blur" },
-        ],
-        details: [
-          { required: true, message: "请输入活动详情", trigger: "blur" },
-        ],
+        classification: [{ required: true, message: "请选择活动分类", trigger: "change" }],
+        label: [{ validator: this.validatorLabel, required: true, message: "请选择活动标签", trigger: "change" }],
+        spot: [{ required: true, message: "请输入活动亮点", trigger: "blur" }, { message: "票务名称最多250字", max: 250, trigger: "blur" },],
+        details: [{ required: true, message: "请输入活动详情", trigger: "blur" }],
       },
       setTicketDataRules: {
-        ticketingType: [
-          { required: true, message: "请选择票务种类", trigger: "change" },
-        ],
-        ticketingName: [
-          { required: true, message: "请输入票务名称", trigger: "blur" },
-          { message: "票务名称最多20字", max: 20, trigger: "blur" },
-        ],
-        number: [
-          { required: true, message: "请输入票种数量", trigger: "blur" },
-        ],
-        limitTicket: [
-          { required: true, message: "请输入购票数量", trigger: "blur" },
-        ],
+        ticketingType: [{ required: true, message: "请选择票务种类", trigger: "change" }],
+        ticketingName: [{ required: true, message: "请输入票务名称", trigger: "blur" }, { message: "票务名称最多20字", max: 20, trigger: "blur" }],
+        number: [{ required: true, message: "请输入票种数量", trigger: "blur" }],
+        limitTicket: [{ required: true, message: "请输入购票数量", trigger: "blur" }],
       },
       // 选择今天之后的日期
       pickerOptionsBeginDate: {
@@ -1060,13 +1010,10 @@ export default {
       // 基本信息数据
       baseFormData: {
         whetherToFill: true, //自动带入昵称
-
         conferenceFormList: [],
         cityIdList: [], //所属城市
         name: "",
-
         sponsor: "",//主办方
-
         startTime: "",
         endTime: "",
         type: "",
@@ -1168,7 +1115,6 @@ export default {
         offcialName: "",
       },
       timeout: null,
-
       publishType: ''
     };
   },
@@ -1176,11 +1122,6 @@ export default {
     ...mapGetters(["userType", "userInfo"]),
   },
   methods: {
-    changeTicketingType(e){
-      // console.log(e)
-      // console.log('i...',i)
-      // console.log('val...',val)
-    },
     logoChange(){
     },
     placeholderName(type) {
@@ -1852,6 +1793,7 @@ export default {
         // 保存时将支付方式列表清空并重新
         if (item.ticketingType == "2") {
           item.payMethodList.push(item.payOfflinePay);
+          item.needAudit = false
         }
       });
       this.baseFormData.submitType = 1;
@@ -1932,6 +1874,7 @@ export default {
         // 保存时将支付方式列表清空并重新
         if (item.ticketingType == "2") {
           item.payMethodList.push(item.payOfflinePay);
+          item.needAudit = false
         }
       });
 
@@ -1994,6 +1937,7 @@ export default {
         // 保存时将支付方式列表清空并重新
         if (item.ticketingType == "2") {
           item.payMethodList.push(item.payOfflinePay);
+          item.needAudit = false
         }
       });
       this.baseFormData.submitType = 0;
@@ -2047,6 +1991,7 @@ export default {
         item.payMethodList = [];
         if (item.ticketingType == "2") {
           item.payMethodList.push(item.payOfflinePay);
+          item.needAudit = false
         }
       });
       this.baseFormData.submitType = 0;

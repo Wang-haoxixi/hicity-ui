@@ -10,7 +10,7 @@
         <el-row>
           <el-col :span="8">
             <el-form-item label="票务种类：" prop="ticketingType">
-              <el-select v-model="formData.ticketingType" style="width: 80%;" @change="typeChange">
+              <el-select v-model="formData.ticketingType" style="width: 80%;" @change="typeChange" :disabled="isBuy">
                 <el-option label="免费票" value="1">免费票</el-option>
                 <el-option label="付费票" value="2">付费票</el-option>
               </el-select>
@@ -25,7 +25,7 @@
         <el-row>
           <el-col :span="8">
             <el-form-item label="票种数量：" prop="number">
-              <el-input-number v-model="formData.number" :min="1" :max="10000" placeholder="" style="width: 80%;"></el-input-number>
+              <el-input-number v-model="formData.number" :min="1" :max="10000" placeholder="" style="width: 80%;" :disabled="isBuy"></el-input-number>
             </el-form-item>
           </el-col>
           <el-col :span="8">
@@ -45,7 +45,7 @@
         <el-row v-if="formData.ticketingType == 2">
           <el-col :span="8">
             <el-form-item label="票务金额：" prop="price">
-              <hc-input v-model="priceTemp" :decimal="2" :min="0.01" :max="99999999.99" maxlength="11" style="width: 200px;">
+              <hc-input v-model="priceTemp" :decimal="2" :min="0.01" :max="99999999.99" maxlength="11" style="width: 200px;" :disabled="isBuy">
                 <div slot="append">元</div>
               </hc-input>
               <!-- <el-input v-model="priceTemp">
@@ -82,6 +82,7 @@ export default {
   components: { OptionForm, HcInput },
   data () {
     return {
+      isBuy: false,//是否购票
       dialogVisible: false,
       detailType: 'add',
       resetFormData: {},
@@ -146,8 +147,12 @@ export default {
       }
     },
     open (activityId, ticket = {}) {
+      console.log('ticket...',ticket)
       this.hasOthers = false
       this.detailType = ticket.id ? 'edit' : 'add'
+      if(ticket.id && ticket.surplus != ticket.number){
+        this.isBuy = true
+      }
       if (ticket.ticketingType == '2') {
         this.price = ticket.rmb || 0.01
         this.priceTemp = this.price.toFixed(2)
@@ -188,10 +193,12 @@ export default {
         this.priceTemp = '0.01'
         this.price = 0.01
       } else if (type == '2') {
+        this.formData.needAudit = false
         this.formData.ticketingName = '付费票'
       }
     },
     save () {
+      console.log('query...',this.formData)
       this.$refs.form.validate(valid => {
         let formData = {
           activityId: this.activityId,
