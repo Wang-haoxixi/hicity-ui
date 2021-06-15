@@ -4,6 +4,7 @@
       title="提示"
       :visible.sync="dialogVisibleDiscussionGroup"
       width="30%"
+      :close-on-click-modal="false"
       @close="closeDialog"
     >
       <div class="discussionGroup-warp">

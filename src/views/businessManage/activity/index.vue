@@ -201,7 +201,7 @@
         </div>
         <el-divider></el-divider>
         <div class="circle-list">
-          <div class="tiitle-org">关联圈子</div>
+          <div class="tiitle-org">关联圈子：</div>
           <div v-if="orgedArr.length != 0">
             <div
               class="circle-item"

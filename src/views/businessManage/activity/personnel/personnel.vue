@@ -28,7 +28,7 @@
                 <el-option label="全部" value="all"></el-option>
                 <el-option label="用户名" value="user"></el-option>
                 <el-option label="手机号" value="cell"></el-option>
-                <el-option label="单位" value="unit"></el-option>
+                <!-- <el-option label="单位" value="unit"></el-option> -->
               </el-select>
             </el-input>
           </el-form-item>
