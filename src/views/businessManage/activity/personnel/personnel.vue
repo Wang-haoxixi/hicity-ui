@@ -6,7 +6,12 @@
         <el-button @click="$router.back(-1)">返回</el-button>
       </div>
       <div class="search-box">
-        <el-form :inline="true" :model="query" class="demo-form-inline" ref="searchForm">
+        <el-form
+          :inline="true"
+          :model="query"
+          class="demo-form-inline"
+          ref="searchForm"
+        >
           <!-- <el-button
             type="primary"
             style="margin-right: 10px"
@@ -72,8 +77,12 @@
             </el-select>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" icon="el-icon-search" @click="handlecheck">查 询</el-button>
-            <el-button icon="el-icon-refresh" @click="resetForm">重 置</el-button>
+            <el-button type="primary" icon="el-icon-search" @click="handlecheck"
+              >查 询</el-button
+            >
+            <el-button icon="el-icon-refresh" @click="resetForm"
+              >重 置</el-button
+            >
           </el-form-item>
         </el-form>
       </div>
@@ -142,7 +151,8 @@
             ></el-input>
           </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="报名时间" width="180"> </el-table-column>
+        <el-table-column prop="createTime" label="报名时间" width="180">
+        </el-table-column>
         <el-table-column prop="orderStatus" label="订单状态" width="120">
           <template slot-scope="scope">
             {{ scope.row.orderStatus | orderStatusFilter }}
@@ -297,12 +307,12 @@ export default {
     this.getpeopleManagementPage();
   },
   methods: {
-    resetForm(){
-      this.$refs.searchForm.resetFields()
-      this.selectType = "all"
-      this.searchName = ""
-      this.query.userName = ""
-      this.query.phone = ""
+    resetForm() {
+      this.$refs.searchForm.resetFields();
+      this.selectType = "all";
+      this.searchName = "";
+      this.query.userName = "";
+      this.query.phone = "";
     },
     getList() {
       this.getpeopleManagementPage();
@@ -312,7 +322,6 @@ export default {
       dataExport(this.$route.query.id);
     },
     changeType(data) {
-      console.log("data", data);
       this.searchName = "";
     },
     handlecheck() {
@@ -327,7 +336,6 @@ export default {
         this.query.phone = this.searchName;
       } else if (this.selectType == "unit") {
       }
-      console.log("searQuery...", this.query);
       this.getpeopleManagementPage();
     },
     mergeCell({ row, column, rowIndex, columnIndex }) {
@@ -359,7 +367,6 @@ export default {
         }
       }
       this.tableData = newList;
-      console.log('data...',this.tableData)
     },
     // 获取人员数据
     getpeopleManagementPage() {
@@ -371,22 +378,20 @@ export default {
       });
     },
     handleSizeChange(val) {
-      console.log("每页显示条数", val);
+      this.query.size = val;
+      this.getpeopleManagementPage();
     },
     handleCurrentChange(val) {
-      console.log("当前页", val);
       this.query.current = val;
       this.getpeopleManagementPage();
     },
     handleEdit(row) {
-      console.log("修改", row.enroleId);
       checkFormInfo({ id: row.enroleId }).then((res) => {
         let data = res.data.data.data;
-        this.$refs.editApplyInfoRef.openApplyInfoDialog(data,row.enroleId);
+        this.$refs.editApplyInfoRef.openApplyInfoDialog(data, row.enroleId);
       });
     },
     handleAudit(row) {
-      console.log("审核", row);
       // this.$refs.personnelAuditRef.openAuditDialog(2,123);
       this.$refs.personnelAuditRef.openAuditDialog(
         row.auditStatus,
@@ -394,17 +399,12 @@ export default {
       );
     },
     changeVip(row) {
-      console.log("vips", row);
       this.vipQuery.id = row.enroleId;
       this.vipQuery.vip = row.isVip ? 1 : 0;
       this.vipQuery.seatNumber = row.seatNumber;
-      console.log("vipQuery", this.vipQuery);
-      set_vip_or_seat(this.vipQuery).then((res) => {
-        console.log("setVip...", res);
-      });
+      set_vip_or_seat(this.vipQuery).then((res) => {});
     },
     handleToSet(row) {
-      console.log("toSet...", row);
       row.isShowBtn = !row.isShowBtn;
       this.$nextTick(() => {
         this.$refs.saveInputRef.focus();

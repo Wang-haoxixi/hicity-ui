@@ -89,18 +89,15 @@ export default {
       this.$router.go(-1);
     },
     openDiscussionGroupDialog(data) {
-      console.log("id...", data);
       this.discussionData.id = data;
       this.dialogVisibleDiscussionGroup = true;
     },
     //确定生成圈子
     confirmClick() {
       this.isLoading = true
-      console.log("dialogVisibleDiscussionGroup...", this.discussionData);
       this.$refs.discussionFormRef.validate((valid) => {
         if (valid) {
           createCircle(this.discussionData).then((res) => {
-            // console.log("create...", res);
             if (res.data.data.businessCode == 1000) {
               this.$message.success("发布活动并生成讨论组成功");
               this.$router.go(-1);

@@ -1317,7 +1317,6 @@ export default {
             data.conferenceFormList.sort(function(a,b){
               return a.id - b.id
             })
-            console.log('conferenceFormList...',data.conferenceFormList)
             this.defaultList = data.conferenceFormList
               .filter((item) => {
                 return item.code || item.label == "备注";
@@ -1903,7 +1902,7 @@ export default {
         if (!this.validRst.includes(false) && valid1) {
           savePublish(this.baseFormData)
             .then((res) => {
-              console.log('success...',res)
+              console.log('publish success!')
               if (res.data.code !== 0) {
                 this.validRst = [];
                 return this.$message.error("发布活动失败");
