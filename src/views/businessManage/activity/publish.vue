@@ -1246,9 +1246,9 @@ export default {
     // 活动分类改变触发
     changeClassification(e) {
       this.baseFormData.classification = this.classification[0];
-      this.baseFormData.subClassification = this.classification[1];
+      this.baseFormData.subClassification = this.classification[1] ? this.classification[1] : "";
     },
-    // 处理数据的递归函数
+    // 处理树状的递归函数
     handleRecurve(arr) {
       arr.forEach((item) => {
         // children为空则删除
@@ -1290,9 +1290,7 @@ export default {
             this.statusFlag = data.statusFlag;
             this.baseFormData.cityIdList = data.cityIdList;
             this.baseFormData.name = data.name;
-
             this.baseFormData.whetherToFill = data.whetherToFill
-
             this.baseFormData.sponsor = data.sponsor;
             this.baseFormData.startTime = data.startTime;
             this.baseFormData.endTime = data.endTime;
@@ -1302,21 +1300,24 @@ export default {
             this.baseFormData.field = data.field;
             this.baseFormData.onLine = data.onLine;
             this.baseFormData.source = data.source;
-            this.classification = [data.classification, data.subClassification];
-            this.baseFormData.classification = this.classification[0];
-            this.baseFormData.subClassification = this.classification[1];
+            if( data.classification ==  "5"){
+              this.classification = [data.classification];
+              this.baseFormData.classification = this.classification[0];
+              this.baseFormData.subClassification = ""
+            }else {
+              this.classification = [data.classification, data.subClassification];
+              this.baseFormData.classification = this.classification[0];
+              this.baseFormData.subClassification = this.classification[1];
+            }
             this.baseFormData.label = data.label;
             this.baseFormData.spot = data.spot;
             this.quillContent.content = data.details;
             this.contentShow = true;
-
             this.baseFormData.conferenceFormList = data.conferenceFormList;
-
             data.conferenceFormList.sort(function(a,b){
               return a.id - b.id
             })
             console.log('conferenceFormList...',data.conferenceFormList)
-
             this.defaultList = data.conferenceFormList
               .filter((item) => {
                 return item.code || item.label == "备注";

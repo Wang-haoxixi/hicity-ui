@@ -41,7 +41,7 @@
         <el-button @click="dialogVisibleDiscussionGroup = false"
           >取 消</el-button
         >
-        <el-button type="primary" @click="confirmClick">确 定</el-button>
+        <el-button type="primary" @click="confirmClick" :loading="isLoading">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -58,6 +58,7 @@ export default {
   },
   data() {
     return {
+      isLoading: false,
       dialogVisibleDiscussionGroup: false,
       discussionData: {
         circleName: "",
@@ -94,6 +95,7 @@ export default {
     },
     //确定生成圈子
     confirmClick() {
+      this.isLoading = true
       console.log("dialogVisibleDiscussionGroup...", this.discussionData);
       this.$refs.discussionFormRef.validate((valid) => {
         if (valid) {
@@ -103,7 +105,11 @@ export default {
               this.$message.success("发布活动并生成讨论组成功");
               this.$router.go(-1);
             }
-          });
+          }).finally(_ => {
+            this.isLoading = false
+          })
+        } else {
+          this.isLoading = false
         }
       });
     },
