@@ -177,10 +177,7 @@ export default {
         cityRange = getCityRangeAll(this.allCityTree, cityRange)
         usedCity = getCityRange(usedCity, cityRange)
       }
-      console.log(this.noMerge)
-      console.log(this)
       let cityTree = this.noMerge ? getCityTree(usedCity, initCityList) : getCityTreeMerge(usedCity, initCityList)
-      console.log(111, cityTree)
       this.$refs.box.open(usedCity, cityTree, viewOnly)
     },
     save (city) {
