@@ -764,7 +764,7 @@
                 label="标题"
                 width="800px"
               ></el-table-column>
-              <el-table-column label="操作" width="80px">
+              <el-table-column label="操作" width="80px" fixed="right">
                 <template slot-scope="scope">
                   <el-button
                     size="mini"

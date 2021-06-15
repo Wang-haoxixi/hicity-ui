@@ -7,12 +7,12 @@
       </div>
       <div class="search-box">
         <el-form :inline="true" :model="query" class="demo-form-inline" ref="searchForm">
-          <el-button
+          <!-- <el-button
             type="primary"
             style="margin-right: 10px"
             @click="handleExportData"
             >导出</el-button
-          >
+          > -->
           <el-form-item prop="selectType">
             <el-input
               placeholder="请输入关键字"
