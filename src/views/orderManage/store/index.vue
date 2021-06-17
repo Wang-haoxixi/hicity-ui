@@ -13,7 +13,7 @@
         <store-order-detail :detail="orderDetail"></store-order-detail>
       </template>
     </hc-table-form>
-    
+
   </basic-container>
 </template>
 
@@ -21,7 +21,7 @@
 import { tableOption } from "./const";
 import { mapGetters } from "vuex";
 import { getStoreOrderPage, getStoreOrderDetail } from "@/api/mms/store"
-import StoreOrderDetail from './orderDetail'
+import StoreOrderDetail from '@/views/components/BusinessComponents/OrderDetail/index'
 export default {
   components: { StoreOrderDetail },
   data() {
