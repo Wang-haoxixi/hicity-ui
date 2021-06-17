@@ -2,7 +2,7 @@
   <div class="hc-search-form-contaner">
     <div v-if="basicSearch || (searchShow === true || searchShow == 'basic')" class="basic-search">
       <slot name="basicSearch" :searchFun="toBsiciSearch">
-        <el-input v-if="basicSearch" class="basic-search-input" v-model="searchFormBasic[basicSearch.prop]" clearable :placeholder="'请输入' + basicSearch.label" @keyup.native.enter="toBsiciSearch(searchFormBasic)">
+        <el-input v-if="basicSearch" class="basic-search-input" v-model="searchFormBasic[basicSearch.prop]" clearable :placeholder="'请输入' + basicSearch.label" :maxlength="basicSearch.maxlength" @keyup.native.enter="toBsiciSearch(searchFormBasic)">
           <i slot="suffix" class="el-icon-search" @click="toBsiciSearch(searchFormBasic)"></i>
         </el-input>
       </slot>
