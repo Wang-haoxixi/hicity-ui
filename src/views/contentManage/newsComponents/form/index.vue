@@ -60,8 +60,11 @@
         </hc-remote-select>
       </el-form-item>
 
-      <el-form-item v-if="formData.source ? (userType != 3 && userType == formData.source) : (userType == 1 || userType == 2)" label="发布城市：" prop="cityIdList">
+      <!-- <el-form-item v-if="formData.source ? (userType != 3 && userType == formData.source) : (userType == 1 || userType == 2)" label="发布城市：" prop="cityIdList">
         <hc-city-select v-model="formData.cityIdList" :city-id="userInfo.manageCityId" :province="userType == 1"></hc-city-select>
+      </el-form-item> -->
+      <el-form-item v-if="userType == 1 || userType == 2" label="发布城市：" prop="cityIdList">
+        <hc-city-select v-model="formData.cityIdList" :view-only="formData.source && userType != formData.source" :city-id="userInfo.manageCityId" :province="userType == 1"></hc-city-select>
       </el-form-item>
       <el-form-item label="标题图：" prop="titleImage">
         <hc-image-upload v-model="titleImage" :limit="3" :file-size="10" bottom-tip="建议上传图片比例113px*76px，格式jpg/png，图片大小不能超过10M"></hc-image-upload>
@@ -126,7 +129,7 @@ export default {
         imageSizeType: [{required: true, message: '请选择图片展示比例'}],
         cityIdList: [{required: true, message: '请选择城市'}],
         content: [{validator: this.contentValidator, required: true}],
-        labelObj: [{validator: this.labelValidator, required: true}],
+        // labelObj: [{validator: this.labelValidator, required: true}],
       },
       formLoading: false,
       labelObj: [],
