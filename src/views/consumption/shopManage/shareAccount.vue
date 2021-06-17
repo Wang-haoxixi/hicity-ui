@@ -50,7 +50,7 @@ export default {
       this.dialogVisible = true
       this.$nextTick(() => {
         this.$refs.hcCrud.resetSearch()
-        this.$refs.hcCrud.toSearch()
+        this.$refs.hcCrud.coverSearch()
       })
     },
     fetchListFun (params) {

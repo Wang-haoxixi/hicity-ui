@@ -701,7 +701,7 @@ export default {
       this.cashierVisible = true
       this.$nextTick(() => {
         this.$refs.cashierCrud.resetSearch()
-        this.$refs.cashierCrud.toSearch()
+        this.$refs.cashierCrud.coverSearch()
       })
     },
     toUnbundling ({storeManagerId}) {
