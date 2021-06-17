@@ -2,7 +2,7 @@
   <div class="type-item">
     <div class="type-item-name">
       <span v-if="!isEdit">{{itemData.positionLableType}}</span>
-      <el-input v-else ref="input" v-model="editText" size="small" style="max-width: 300px;" @keyup.enter.native="updateTagType" @blur="blur"></el-input>
+      <el-input v-else ref="input" v-model="editText" size="small" maxlength="20" style="max-width: 300px;" @keyup.enter.native="updateTagType" @blur="blur"></el-input>
     </div>
     <div class="type-item-options">
       <i v-show="!isEdit" class="el-icon-edit" @click="toEdit"></i>
