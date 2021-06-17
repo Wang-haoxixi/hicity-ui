@@ -1,6 +1,8 @@
 <template>
   <basic-container>
-    <hc-table-form title="城市合伙人">
+    <hc-table-form :title="title"
+      :formVisible="accountManage"
+      @go-back="goBack">
       <hc-crud ref="hcCrud" :option="tableOption" :fetchListFun="fetchListFun">
         <template
           slot="menu"
@@ -17,9 +19,44 @@
             size="mini"
             @click="handleLock(scope.row)">{{scope.row.state == 0 ? '锁定' : '解锁'}}
           </el-button>
+          <el-button
+            v-if="scope.row.isOpening && scope.row.state == 0 "
+            type="text"
+            size="mini"
+            @click="toAccountManage(scope.row)">账户管理</el-button>
         </template>
       </hc-crud>
+
+      <template v-slot:form>
+        <account-manage ref="accountManage"></account-manage>
+
+        <!-- <hc-crud ref="accountCrud" :option="accountOption()" :fetchListFun="accountFetchListFun" :auto-load="false">
+          <template
+            slot="menu"
+            slot-scope="scope">
+            <el-button
+              v-if="scope.row.transactionType == '3'"
+              type="text"
+              size="mini"
+              @click="toOpen(scope.row)">开通城市
+            </el-button>
+            <el-button
+              v-else
+              type="text"
+              size="mini"
+              @click="handleLock(scope.row)">{{scope.row.state == 0 ? '锁定' : '解锁'}}
+            </el-button>
+            <el-button
+              v-if="scope.row.isOpening && scope.row.state == 0 "
+              type="text"
+              size="mini"
+              @click="toAccountManage(scope.row)">账户管理</el-button>
+          </template>
+        </hc-crud> -->
+      </template>
     </hc-table-form>
+
+
     <el-dialog
       :visible.sync="dialogRoleVisible"
       :close-on-click-modal="false"
@@ -54,12 +91,13 @@
 </template>
 
 <script>
-import { tableOption } from './const'
+import { tableOption, accountOption } from './const'
 import { mapGetters } from 'vuex'
 import { adminCityOpen, adminCityOpenList, adminCityLock } from '@/api/admin/city'
+import AccountManage from './accountManage'
 
 export default {
-  name: 'SysUser',
+  components: { AccountManage },
   data() {
     return {
       page: {
@@ -78,13 +116,17 @@ export default {
         username: {required: true, message: '请输入账号', trigger: 'blur'},
         password: {required: true, message: '请输入密码', trigger: 'blur'}
       },
-      formLoading: false
+      formLoading: false,
+      accountManage: false,
     }
   },
   computed: {
     ...mapGetters(['permissions', 'userInfo']),
     tableOption() {
       return tableOption(this.edit, this.userInfo.userType == 3 || this.userInfo.userType == 4)
+    },
+    title () {
+      return this.accountManage ? '账户管理' : '城市合伙人'
     }
   },
   watch: {
@@ -92,6 +134,10 @@ export default {
   created() {
   },
   methods: {
+    goBack () {
+      this.accountManage = false
+    },
+    accountOption,
     fetchListFun (params) {
       return new Promise((resolve, reject) => {
         adminCityOpenList(params).then(({data}) => {
@@ -159,6 +205,12 @@ export default {
       }).catch(function() {
       })
     },
+    toAccountManage (row) {
+      this.accountManage = true
+      this.$nextTick(() => {
+        this.$refs.accountManage.open(row.userId)
+      })
+    }
   }
 }
 </script>
