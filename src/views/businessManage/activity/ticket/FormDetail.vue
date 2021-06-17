@@ -22,10 +22,17 @@
             </el-form-item>
           </el-col>
         </el-row>
+        <el-row v-if="soldNum">
+          <el-col :span="24">
+            <el-form-item label="已售数量：">
+              {{soldNum}}
+            </el-form-item>
+          </el-col>
+        </el-row>
         <el-row>
           <el-col :span="8">
             <el-form-item label="票种数量：" prop="number">
-              <el-input-number v-model="formData.number" :min="1" :max="10000" placeholder="" style="width: 80%;" :disabled="isBuy"></el-input-number>
+              <el-input-number v-model="formData.number" :min="1" :max="10000" placeholder="" style="width: 80%;"></el-input-number>
             </el-form-item>
           </el-col>
           <el-col :span="8">
@@ -97,7 +104,7 @@ export default {
       formRules: {
         ticketingType: [{required: true, message: '请选择票务种类', trigger: 'blur'}],
         ticketingName: [{required: true, message: '请填写票务名称', trigger: 'blur'}],
-        number: [{required: true, message: '请填写票种数量', trigger: 'blur'}],
+        number: [{required: true, message: '请填写票种数量', trigger: 'blur'}, {validator: this.numberValidator, trigger: 'blur'}],
         limitTicket: [{required: true, message: '请填写单词购票数量', trigger: 'blur'}],
         price: [{validator: this.priceValidator, message: '请填写票务金额', trigger: 'blur'}],
         others: {validator: this.othersValidator, trigger: 'blur'}
@@ -112,6 +119,7 @@ export default {
       resetTicketConfig: {},
       hasOthers: false,
       resetHasOthers: false,
+      soldNum: 0
     }
   },
   computed: {
@@ -146,12 +154,22 @@ export default {
         callback()
       }
     },
+    numberValidator (rules, value, callback) {
+      if (value < this.soldNum) {
+        callback(new Error('票种数量不能小于已售数量'))
+      } else {
+        callback()
+      }
+    },
     open (activityId, ticket = {}) {
-      console.log('ticket...',ticket)
       this.hasOthers = false
       this.detailType = ticket.id ? 'edit' : 'add'
       if(ticket.id && ticket.surplus != ticket.number){
+        this.soldNum = (ticket.number || 0) - (ticket.surplus || 0)
         this.isBuy = true
+      } else {
+        this.soldNum = 0
+        this.isBuy = false
       }
       if (ticket.ticketingType == '2') {
         this.price = ticket.rmb || 0.01
