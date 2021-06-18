@@ -158,6 +158,7 @@ export default {
         header: true,
         headerSize: 'mini',
         refresh: true,
+        index: true,
         ...this.option
       }
     },

@@ -48,7 +48,7 @@ export default {
   methods: {
     open () {
       this.$refs.hcCrud.resetSearch()
-      this.$refs.hcCrud.toSearch()
+      this.$refs.hcCrud.coverSearch()
     },
     fetchListFun (params) {
       return new Promise((resolve, reject) => {

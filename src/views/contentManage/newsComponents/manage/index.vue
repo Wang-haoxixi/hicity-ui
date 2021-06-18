@@ -100,7 +100,7 @@
             <el-button v-if="scope.row.isRecommend" type="text" size="mini" @click="toCancelRecommend(scope.row)"
               >取消推荐</el-button
             >
-            <el-button v-else type="text" size="mini" @click="toRecommend(scope.row)"
+            <el-button v-else-if="scope.row.state == 1" type="text" size="mini" @click="toRecommend(scope.row)"
               >推荐</el-button
             >
           </template>
@@ -542,6 +542,10 @@ export default {
         for (let i = 0; i < selection.length; i++) {
           if (selection[i].isRecommend == 1) {
             this.$message.warning('勾选的资讯中存在已推荐数据，请重新勾选')
+            return
+          }
+          if (selection[i].state == '0') {
+            this.$message.warning('勾选的资讯中存在草稿状态数据，请重新勾选')
             return
           }
           dataIdList.push(selection[i].officialNewsId)

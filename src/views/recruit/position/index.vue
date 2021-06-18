@@ -165,7 +165,10 @@ export default {
   methods: {
     fetchListFun (params) {
       return new Promise((resolve, reject) => {
-        getPositionList(params).then(({data}) => {
+        getPositionList({
+          cityId: this.userInfo.manageCityId,
+          ...params
+        }).then(({data}) => {
           let records = data.data.data.records
           for (let i = 0; i < records.length; i++) {
             if (!records[i].positionLableType) {
