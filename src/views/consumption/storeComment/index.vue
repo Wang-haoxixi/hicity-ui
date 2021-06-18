@@ -21,9 +21,9 @@
 <script>
 import { tableOption } from "./const";
 import { mapGetters } from "vuex";
-import { getStoreOrderPage, getStoreOrderDetail, hide } from "@/api/mms/store"
+import { getStoreOrderDetail } from "@/api/mms/store"
 import { getCommentPage, hideComment } from "@/api/cms/common"
-import StoreOrderDetail from './detail'
+import StoreOrderDetail from '@/views/components/BusinessComponents/OrderDetail/index'
 import { dateFormat } from '@/util/date'
 export default {
   components: { StoreOrderDetail },

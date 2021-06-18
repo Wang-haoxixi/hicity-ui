@@ -152,59 +152,79 @@ export const orderTableOption = {
 }
 
 export const accountTableOption = {
-  menuWidth: 80,
   index: true,
-  menu: ['view'],
+  menu: true,
   search: true,
-  labelWidth: '150px',
+  menuWidth: '100px',
   columns: [
     {
-      label: '交易账户',
-      prop: 'payeePhone',
+      label: '订单号',
+      prop: 'orderNumber',
+      search: true,
+      maxlength: 20,
     },
     {
-      label: '交易日期',
-      prop: 'transactionDate',
-      type: 'date',
-      valueFormat: 'yyyy-MM-dd',
+      label: '日期',
+      prop: 'createTime',
+      type: 'daterange',
+      valueFormat: 'yyyy-MM-dd HH:mm:ss',
+      search: true,
       search: 'senior',
-      hidden: true,
-      formHidden: true,
+      formatter: function(row) {
+        return row.orderCreateTime
+      },
+      width: 160
+    },
+    {
+      label: '收益类型',
+      prop: 'transactionTypeStr',
+      width: 120
+    },
+    {
+      label: '金额',
+      prop: 'amount',
+      width: 100,
+    },
+    {
+      label: '状态',
+      prop: 'state',
+      type: 'select',
+      search: true,
+      width: 100,
+      dicData: [
+        {
+          label: '全部',
+          value: '0'
+        },
+        {
+          label: '未到账',
+          value: '1'
+        },
+        {
+          label: '已到账',
+          value: '2'
+        },
+        {
+          label: '待结算',
+          value: '3'
+        },
+        {
+          label: '已结算',
+          value: '4'
+        },
+        {
+          label: '结算失败',
+          value: '5'
+        }
+      ],
+      formatter: function (row) {
+        return row.stateStr
+      }
     },
     {
       label: '交易日期',
       prop: 'createTime',
-      width: 160,
-    },
-    {
-      label: '交易类型',
-      prop: 'transactionType',
-      type: 'select',
-      dicData: [
-        {
-          label: '收入',
-          value: 1
-        },
-        {
-          label: '提现',
-          value: 2
-        }
-      ],
-      search: 'senior',
-    },
-    {
-      label: '交易金额',
-      prop: 'amount'
-    },
-    {
-      label: '账户余额',
-      prop: 'balance',
-      formHidden: true
-    },
-    {
-      label: '收款订单号',
-      prop: 'serialNo',
-      hidden: true
+      width: 160
     },
   ]
 }
