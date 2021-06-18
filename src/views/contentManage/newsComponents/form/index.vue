@@ -77,7 +77,7 @@
         </el-radio-group>
       </el-form-item> -->
       <el-form-item label="详情：" prop="content">
-        <hc-quill ref="quill" v-model="quillContent"></hc-quill>
+        <hc-quill ref="quill" v-model="quillContent.content"></hc-quill>
       </el-form-item>
       <el-form-item>
         <el-button @click="handlePreview">预览</el-button>
@@ -97,7 +97,7 @@ import {
 import { mapGetters } from "vuex";
 import HcCitySelect from "@/views/components/HcCity/HcCitySelect/index";
 import HcImageUpload from "@/views/components/HcImageUpload/index";
-import HcQuill from "@/views/components/HcQuill";
+import HcQuill from "@/views/components/HcJoditEditor";
 import HcRemoteSelect from "@/views/components/HcForm/HcRemoteSelect/new"
 export default {
   components: { HcQuill, HcCitySelect, HcImageUpload, HcRemoteSelect },
@@ -107,7 +107,9 @@ export default {
       isEdit: false,
       columnsList: [],
       titleImage: [],
-      quillContent: {},
+      quillContent: {
+        content: '',
+      },
       formData: {
         dataType: "1",//文章来源默认为原创
         cityIdList: [],
