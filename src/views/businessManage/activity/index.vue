@@ -73,7 +73,8 @@
           <el-button type="text" @click="check(scope.row.id)">查看</el-button>
         </template>
         <template v-slot:menu="scope">
-          <template v-if="userType <= scope.row.source">
+          <!-- <template v-if="userType <= scope.row.source"> -->
+          <template>
             <el-button type="text" @click="handleEdit(scope.row)"
               >编辑</el-button
             >

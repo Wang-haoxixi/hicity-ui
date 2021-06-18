@@ -626,6 +626,10 @@
                 title="删除"
                 @click="handleDelete(index)"
               ></i>
+              <div style="width:100px;display:flex">
+                <span style="margin-right:10px">置顶:</span>
+                <el-switch v-model="item.isTop" @change='handleChangeStatus(index)'></el-switch>
+              </div>
             </div>
             <div
               class="option-list"
@@ -931,6 +935,7 @@ export default {
           optionsList: [],
           isInput: false,
           inputValue: "",
+          isTop: false
         },
         {
           typename: "多选按钮框",
@@ -943,6 +948,7 @@ export default {
           optionsList: [],
           isInput: false,
           inputValue: "",
+          isTop: false
         },
         {
           typename: "多行文本",
@@ -952,6 +958,7 @@ export default {
           must: false,
           fixedItem: false,
           placeholder: "多行文本",
+          isTop: false
         },
       ],
       checkedList: false,
@@ -1331,6 +1338,7 @@ export default {
                 this.$set(item, "inputValue", "");
               }
             });
+            console.log('customList...',this.customList)
             this.showFormCollect = true;
             data.fileList.forEach((item) => {
               this.fileList.push({
@@ -1629,6 +1637,14 @@ export default {
     },
     handleDelete(index) {
       this.customList.splice(index, 1);
+    },
+    // 是否置顶
+    handleChangeStatus(index){
+      this.customList.forEach((item,i)=>{
+        if(index != i){
+          item.isTop = false
+        }
+      })
     },
     // 删除标签
     handleCloseOption(item, tag, i) {
