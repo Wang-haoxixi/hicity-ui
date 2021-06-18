@@ -244,7 +244,8 @@ export default {
 
       let formData = this.formData;
       formData.officialNewsContent = this.quillContent.content;
-      formData.structuredContent = this.quillContent.structuredContent;
+      // formData.structuredContent = this.quillContent.structuredContent;
+      formData.structuredContent = '';
       let titleImage = [];
       for (let i = 0; i < this.titleImage.length; i++) {
         titleImage.push({
