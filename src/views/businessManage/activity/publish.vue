@@ -626,7 +626,7 @@
                 title="删除"
                 @click="handleDelete(index)"
               ></i>
-              <div style="width:100px;display:flex">
+              <div style="width:150px;display:flex;align-items: center;">
                 <span style="margin-right:10px">置顶:</span>
                 <el-switch v-model="item.isTop" @change='handleChangeStatus(index)'></el-switch>
               </div>
