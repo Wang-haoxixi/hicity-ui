@@ -153,7 +153,7 @@ export default {
             }
           };
         } else if (itemData.type == "textarea" && !itemData.code) {
-          console.log("nocodetextarea...");
+          // console.log("nocodetextarea...");
           // 自定义文本框
           return (rules, value, callback) => {
             if (itemData.value && itemData.value.length <= 100) {
@@ -187,7 +187,7 @@ export default {
       }
     },
     getRules(formList) {
-      console.log("formList111...", formList);
+      // console.log("formList111...", formList);
       let rules = {};
       for (let i = 0; i < formList.length; i++) {
         let formItem = formList[i];
@@ -205,7 +205,7 @@ export default {
     },
     openApplyInfoDialog(data, id) {
       this.dialogVisibleApplyInfo = true;
-      console.log("data...", data);
+      // console.log("data...", data);
       this.id = id;
       // this.data = data;
       this.data = {
@@ -222,7 +222,7 @@ export default {
       };
       // console.log("query...", query);
       updatePeopleInfo(query).then((res) => {
-        console.log("rst..", res);
+        // console.log("rst..", res);
         if (res.data.data.businessCode == 1000) {
           this.$notify({
             title: "成功",
@@ -252,7 +252,7 @@ export default {
       //     }
       //   }
       // });
-      console.log("校验通过...");
+      // console.log("校验通过...");
     },
     getRadioValue(options) {
       for (let i = 0; i < options.length; i++) {

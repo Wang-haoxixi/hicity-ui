@@ -54,3 +54,20 @@
       }
     }
   }
+
+  .act-img {
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+  
+    ::v-deep .image-slot {
+      width: 112px;
+      height: 74px;
+      line-height: 74px;
+      text-align: center;
+      background: #FAFAFA;
+      color: #909399;
+      font-size: 20px;
+    }
+  }
