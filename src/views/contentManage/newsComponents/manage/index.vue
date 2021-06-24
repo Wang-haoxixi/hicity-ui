@@ -118,6 +118,7 @@
     <el-dialog
       title="推荐列表"
       :visible.sync="dialogVisible"
+      append-to-body
       width="width">
       <news-recommend ref="recommend" @refresh="recommendRefresh"></news-recommend>
       <div slot="footer">

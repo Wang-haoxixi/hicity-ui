@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-dialog title="人员审核" :visible.sync="dialogVisibleAudit" width="20%">
+    <el-dialog title="人员审核" :visible.sync="dialogVisibleAudit" width="20%" append-to-body>
       <div class="audit-box">
         <div class="current">当前TA的状态为：</div>
         <el-tag type="danger" class="tag" v-if="currentAuditStatus == '1'"
@@ -43,7 +43,7 @@
         <el-button @click="handleOpenRejectReasonDialog">驳 回</el-button>
       </span>
     </el-dialog>
-    <el-dialog :visible.sync="dialogVisibleRejectReason" width="30%">
+    <el-dialog :visible.sync="dialogVisibleRejectReason" width="30%" append-to-body>
       <div class="reject-reason-box">
         <i class="el-icon-warning"></i>
         <div class="p">请选择拒绝告知理由</div>

@@ -33,6 +33,7 @@
     <el-dialog
       :title="handleType == 'recharge' ? '充值' : '结算'"
       :visible.sync="dialogVisible"
+      append-to-body
       width="400px"
       center>
       <el-form ref="form" :model="formData" :rules="rules" label-width="80px">
@@ -54,6 +55,7 @@
     <el-dialog
       title="凭证详细"
       :visible.sync="viewDialogVisible"
+      append-to-body
       width="500px">
       <el-form ref="form" :rules="rules" label-width="100px">
         <el-form-item label="订单号：">
@@ -80,6 +82,7 @@
     <el-dialog
       title="订单详情"
       :visible.sync="orderVisible"
+      append-to-body
       width="70%">
       <order-detail :detail="orderDetail"></order-detail>
       <div slot="footer">

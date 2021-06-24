@@ -3,6 +3,7 @@
     <el-dialog
       title="人员信息"
       :visible.sync="dialogVisibleApplyInfo"
+      append-to-body
       width="50%"
     >
       <div class="applyInfo-box">

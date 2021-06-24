@@ -222,6 +222,7 @@
     <el-dialog
       title="收银员管理"
       :visible.sync="cashierVisible"
+      append-to-body
       width="70%">
       <hc-crud ref="cashierCrud" :option="cashierOption" :fetchListFun="cashierFetchListFun" :auto-load="false">
         <template slot="menu" slot-scope="scope">

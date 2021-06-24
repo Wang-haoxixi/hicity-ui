@@ -165,6 +165,7 @@
         <el-dialog
           title="店铺详情"
           :visible.sync="storeVisible"
+          append-to-body
           width="70%">
           <store-detail :detail="storeDetail"></store-detail>
           <div slot="footer">
@@ -175,6 +176,7 @@
         <el-dialog
           title="订单详情"
           :visible.sync="orderVisible"
+          append-to-body
           width="70%">
           <order-detail :detail="orderDetail"></order-detail>
           <div slot="footer">

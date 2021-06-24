@@ -173,6 +173,7 @@
     <el-dialog
       title="2021城市超级APP免费体检活动"
       :visible.sync="dialogVisibleRelevanceMore"
+      append-to-body
       width="40%"
       @close="closeDialogMore"
     >

@@ -2,6 +2,7 @@
   <el-dialog
     title="省份选择"
     :visible.sync="dialogVisible"
+    append-to-body
     width="60%">
     <div>
       <el-checkbox-group v-model="provinceSelect">

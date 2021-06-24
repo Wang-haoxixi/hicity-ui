@@ -45,6 +45,7 @@
     <el-dialog
       title="新增广告路径"
       :visible.sync="dialogVisibleAddPath"
+      append-to-body
       width="50%"
     >
       <div>
@@ -73,6 +74,7 @@
     <el-dialog
       title="编辑广告路径"
       :visible.sync="dialogVisibleEditPath"
+      append-to-body
       width="50%"
       @close="handleCloseDialogVisibleEditPath"
     >
