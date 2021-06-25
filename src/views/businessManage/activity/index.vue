@@ -43,19 +43,19 @@
               >关联更多圈子</el-button
             >
           </span>
-          <!-- <span style="margin-left: 30px" v-if="props.row.circleName">
+          <span style="margin-left: 30px" v-if="props.row.circleName">
             <el-button type="text" @click="handleCirclePhoto"
               >圈子相册管理</el-button
             >
-          </span> -->
-          <!-- <span>
+          </span>
+          <span>
             <el-button
               type="text"
               style="margin-left: 30px"
-              @click="handleShareRecord"
+              @click="handleShareRecord(props)"
               >分销记录</el-button
             >
-          </span> -->
+          </span>
         </template>
         <template v-slot:poster="scope">
           <el-image class="act-img" :src="scope.row.poster" fit="contain">
@@ -65,7 +65,9 @@
           </el-image>
         </template>
         <template v-slot:info="scope">
-          <div>{{ scope.row.name }}</div>
+          <div style="font-size: 16px; font-weight: bold">
+            {{ scope.row.name }}
+          </div>
           <div v-if="scope.row.startTime && scope.row.endTime">
             <i class="el-icon-time" style="margin-right: 5px"></i
             >{{ scope.row.startTime }} 至 {{ scope.row.endTime }}
@@ -249,7 +251,11 @@
     <!-- 圈子相册管理 -->
     <CirclePhoto ref="circlePhotoRef" />
     <!-- 分销记录管理 -->
-    <ShareRecord ref="shareRecordRef" v-show="showShareRecord" @hideShareRecord="showShareRecord = false" />
+    <ShareRecord
+      ref="shareRecordRef"
+      v-show="showShareRecord"
+      @hideShareRecord="showShareRecord = false"
+    />
   </basic-container>
 </template>
 
@@ -295,6 +301,8 @@ export default {
       searchOrgList: [], //圈子搜索结果
       orgedArr: [],
       canmore: true, // 是否加载更多
+
+      actId: "", // 活动ID
     };
   },
   computed: {
@@ -305,6 +313,17 @@ export default {
   },
   activated() {
     this.$refs.hcCrud.refresh(); // 刷新表格数据
+  },
+  // mounted() {
+  //   this.$refs.hcCrud.refresh(); // 刷新表格数据
+  // },
+  watch: {
+    // 监听菜单是否切换
+    "$route.path"(newVal, oldVal) {
+      if (newVal != oldVal) {
+        this.showShareRecord = false;
+      }
+    },
   },
   directives: {
     "el-select-loadmore": {
@@ -424,8 +443,11 @@ export default {
     handleCirclePhoto() {
       this.$refs.circlePhotoRef.openDialogCirclePhotoVisible();
     },
-    handleShareRecord() {
-      console.log("share record...");
+    handleShareRecord({ row }) {
+      // this.actId = row.id;
+      this.$refs.shareRecordRef.updateData(row.id)
+      // this.$refs.shareRecordRef.updateData(1)
+      console.log("share record...", this.actId);
       this.showShareRecord = true;
     },
     fetchListFun(params) {

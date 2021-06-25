@@ -23,7 +23,6 @@
           :file-list="fileList"
           :on-preview="handlePictureCardPreview"
           :on-remove="handleRemove"
-          :before-upload="beforeUpload"
           :on-success="handleUploadSuccess"
         >
           <i class="el-icon-plus"></i>
@@ -74,11 +73,8 @@ export default {
   },
   methods: {
     openDialogCirclePhotoVisible(data) {
-      console.log("open...");
       this.dialogCirclePhotoVisible = true;
     },
-    // 图片上传前
-    beforeUpload(file) {},
     // 上传成功时
     handleUploadSuccess(response, file, fileList) {
       console.log("handleUploadSuccess...", fileList);
@@ -93,7 +89,7 @@ export default {
       this.dialogImageUrl = file.url;
       this.dialogVisible = true;
     },
-
+    // 保存
     handleSave() {
       console.log("save...", this.fileList);
     },

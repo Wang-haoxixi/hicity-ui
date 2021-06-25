@@ -64,3 +64,21 @@ export function deleteOrg(data) {
     method: "post",
   });
 }
+
+// 活动分销管理--分销
+export function shareList(data) {
+  return request({
+    url: "/dms/activity_distribution/get_distribution_page",
+    method: "get",
+    params: data
+  });
+}
+
+// 查看报名信息--分销
+export function applyInfo(data) {
+  return request({
+    url: "/dms/activity_distribution_relation/detail",
+    method: "get",
+    params: data
+  });
+}
