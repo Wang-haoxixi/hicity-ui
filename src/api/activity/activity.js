@@ -82,3 +82,30 @@ export function applyInfo(data) {
     params: data
   });
 }
+
+// 获取相册相片
+export function getCirclePhotoes(data) {
+  return request({
+    url: "/admin/org/album/list_page",
+    method: "get",
+    params: data
+  });
+}
+
+// 上传群相册
+export function uploadToCircle(data) {
+  return request({
+    url: "/admin/org/album/upload",
+    method: "post",
+    data: data
+  });
+}
+
+// 删除照片
+export function removePhotoes(data) {
+  return request({
+    url: "/admin/org/album/remove",
+    method: "post",
+    data: data
+  });
+}

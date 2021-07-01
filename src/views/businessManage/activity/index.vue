@@ -44,7 +44,7 @@
             >
           </span>
           <span style="margin-left: 30px" v-if="props.row.circleName">
-            <el-button type="text" @click="handleCirclePhoto"
+            <el-button type="text" @click="handleCirclePhoto(props)"
               >圈子相册管理</el-button
             >
           </span>
@@ -301,8 +301,6 @@ export default {
       searchOrgList: [], //圈子搜索结果
       orgedArr: [],
       canmore: true, // 是否加载更多
-
-      actId: "", // 活动ID
     };
   },
   computed: {
@@ -434,20 +432,20 @@ export default {
         this.orgedArr = res.data.data.data;
       });
     },
-    handleRelevanceMore({ row }) {
+    handleRelevanceMore({ row }) {  
       this.dialogVisibleRelevanceMore = true;
       this.relevanceQuery.activityId = row.id;
       let query = { activityId: row.id };
       this.getOrgedList(query);
     },
-    handleCirclePhoto() {
-      this.$refs.circlePhotoRef.openDialogCirclePhotoVisible();
+    handleCirclePhoto({ row }) {
+      this.$refs.circlePhotoRef.openDialogCirclePhotoVisible( row.circleId, row.circleName );
+      // this.$refs.circlePhotoRef.openDialogCirclePhotoVisible( 387 );
+      // this.$refs.circlePhotoRef.openDialogCirclePhotoVisible( 376 );
     },
     handleShareRecord({ row }) {
-      // this.actId = row.id;
-      this.$refs.shareRecordRef.updateData(row.id)
-      // this.$refs.shareRecordRef.updateData(1)
-      console.log("share record...", this.actId);
+      this.$refs.shareRecordRef.updateData(row.id);
+      // this.$refs.shareRecordRef.updateData(1);
       this.showShareRecord = true;
     },
     fetchListFun(params) {

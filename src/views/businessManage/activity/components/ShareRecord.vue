@@ -2,16 +2,16 @@
   <hc-table-form title="分销管理" :formVisible="true" @go-back="goBack">
     <template slot="form">
       <SearchSection
+        placeholder="分销人员"
         :refresh="true"
         @searchShare="searchShare"
-        placeholder="分销人员"
       />
       <el-table
         border
-        :header-cell-style="{ background: '#FAFAFA', color: 'rgb(51 51 51)' }"
-        v-loading="shareListLoading"
-        :data="shareList"
         style="width: 100%"
+        v-loading="shareListLoading"
+        :header-cell-style="{ background: '#FAFAFA', color: 'rgb(51 51 51)' }"
+        :data="shareList"
       >
         <el-table-column prop="userName" label="分销人员" width="180">
         </el-table-column>
@@ -32,12 +32,12 @@
       <div class="pagination-box">
         <el-pagination
           background
+          layout="total, sizes, prev, pager, next, jumper"
           @size-change="handleShareSizeChange"
           @current-change="handleShareCurrentChange"
           :current-page="query.current"
           :page-sizes="[10, 20, 30, 40, 50, 100]"
           :page-size="query.size"
-          layout="total, sizes, prev, pager, next, jumper"
           :total="shareListTotal"
         >
         </el-pagination>
@@ -46,9 +46,9 @@
     <!-- 报名信息弹窗 -->
     <el-dialog
       title="查看报名信息"
+      width="70%"
       append-to-body
       :visible.sync="dialogApplyInfoVisible"
-      width="70%"
       @closed="closeApplyInfoDialog"
     >
       <div>
@@ -61,12 +61,12 @@
         />
         <el-table
           border
+          style="width: 100%"
+          v-loading="applyInfoDataLoading"
           :cell-style="{ background: '#fff' }"
           :header-cell-style="{ background: '#FAFAFA', color: 'rgb(51 51 51)' }"
           :data="applyInfoData"
           :span-method="mergeCell"
-          style="width: 100%"
-          v-loading="applyInfoDataLoading"
         >
           <el-table-column
             prop="distributionUserName"
@@ -115,10 +115,11 @@ export default {
       },
       // 查看报名信息参数
       applyInfoQuery: {
-        distributionId: "",
         name: "",
         phone: "",
         company: "",
+        distributionId: "", // 活动分销ID
+        distributionUserId: "", // 分销人员ID
       },
       shareListLoading: false,
       applyInfoDataLoading: false,
@@ -135,6 +136,7 @@ export default {
         phone: "",
         company: "",
       };
+      this.applyInfoData = [];
     },
     // 处理获取的报名信息列表数据
     handleData(data) {
@@ -196,18 +198,24 @@ export default {
     goBack() {
       this.$emit("hideShareRecord");
     },
-    handleInfo({ id }) {
-      this.dialogApplyInfoVisible = true;
-      this.applyInfoDataLoading = true;
-      this.applyInfoQuery.distributionId = id;
+    handleInfo({ id, userId }) {
+      this.dialogApplyInfoVisible = true; // 弹窗
+      this.applyInfoDataLoading = true; // 加载中
+      this.applyInfoQuery.distributionId = id; // 活动分销ID
+      this.applyInfoQuery.distributionUserId = userId; // 分销人员ID(邀请人ID)
       this.getApplyInfo();
     },
     getApplyInfo() {
       applyInfo(this.applyInfoQuery).then((res) => {
         console.log("res...", res);
-        let data = res.data.data.data;
-        this.handleData(data);
-        this.applyInfoDataLoading = false;
+        if (res.data.data.businessCode == 1000) {
+          let data = res.data.data.data;
+          this.handleData(data);
+          this.applyInfoDataLoading = false;
+        } else if (res.data.data.businessCode == 2003) {
+          this.applyInfoData = [];
+          this.applyInfoDataLoading = false;
+        }
       });
     },
     getShareList() {
@@ -239,11 +247,14 @@ export default {
       this.query.current = val;
       this.getShareList();
     },
+    /**
+     * @description: 代表搜索报名信息
+     * @constructor
+     * @param { String } data - 搜索数据.
+     * @param { String } selectType - 代表搜索报名信息.
+     * @return void
+     */
     searchApplyInfo(data, selectType) {
-      /**
-       * data 搜索数据
-       * selectType 搜索类型
-       */
       if (selectType == "name") {
         this.applyInfoQuery.name = data;
         this.applyInfoQuery.phone = "";
@@ -258,6 +269,11 @@ export default {
         this.applyInfoQuery.name = "";
         this.applyInfoQuery.phone = "";
         this.applyInfoQuery.company = data;
+        this.getApplyInfo();
+      } else {
+        this.applyInfoQuery.name = "";
+        this.applyInfoQuery.phone = "";
+        this.applyInfoQuery.company = "";
         this.getApplyInfo();
       }
     },

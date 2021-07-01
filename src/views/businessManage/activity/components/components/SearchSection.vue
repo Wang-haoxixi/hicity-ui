@@ -11,9 +11,9 @@
       <el-input
         clearable
         v-model="searchVal"
+        class="basic-search-input"
         @keyup.native.enter="handleSearch()"
         :placeholder="'请输入' + placeholder"
-        class="basic-search-input"
       >
         <el-select
           slot="prepend"
@@ -38,15 +38,17 @@
 <script>
 export default {
   props: {
-    //刷新按钮显隐
+    // 刷新按钮显隐
     refresh: {
       type: Boolean,
       default: false,
     },
+    // 输入框占位文本
     placeholder: {
       type: String,
       default: "",
     },
+    // 复合型输入框
     prepend: {
       type: Boolean,
       default: false,
@@ -60,12 +62,18 @@ export default {
   },
   methods: {
     // 重置
-    handleReset(){
-        this.searchVal = "";
-        this.select = ""
+    handleReset() {
+      this.searchVal = "";
+      this.select = "";
     },
     // 刷新
     handleRefresh() {
+      if (this.prepend) {
+        this.searchVal = "";
+        this.select = "";
+        this.$emit("searchApplyInfo", "", "");
+        return;
+      }
       this.searchVal = "";
       this.$emit("searchShare");
     },
