@@ -79,6 +79,10 @@
           >
         </el-radio-group>
       </el-form-item> -->
+      <el-form-item label="关联活动：" prop="newsActivityList">
+        {{formData.newsActivityList}}
+        <news-activity v-model="formData.newsActivityList"></news-activity>
+      </el-form-item>
       <el-form-item label="详情：" prop="content">
         <hc-quill ref="quill" v-model="quillContent.content"></hc-quill>
       </el-form-item>
@@ -102,8 +106,9 @@ import HcCitySelect from "@/views/components/HcCity/HcCitySelect/index";
 import HcImageUpload from "@/views/components/HcImageUpload/index";
 import HcQuill from "@/views/components/HcJoditEditor";
 import HcRemoteSelect from "@/views/components/HcForm/HcRemoteSelect/new"
+import NewsActivity from "./NewsActivity"
 export default {
-  components: { HcQuill, HcCitySelect, HcImageUpload, HcRemoteSelect },
+  components: { HcQuill, HcCitySelect, HcImageUpload, HcRemoteSelect, NewsActivity },
   data () {
     return {
       init: false,
@@ -118,6 +123,7 @@ export default {
         cityIdList: [],
         officialColumnId: [],
         author: '',
+        newsActivityList: []
       },
       formRule: {
         officialNewsName: [{required: true, message: '请输入名称', trigger: 'blur'}],
