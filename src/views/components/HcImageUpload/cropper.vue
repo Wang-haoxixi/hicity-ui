@@ -23,7 +23,7 @@
       @upload-error="fileRemove"
       @change-success="fileChangeFormal"
       @change-error="fileChangeBack"
-      accept=".jpg,.jpeg,.png,.gif,.bmp,.JPG,.JPEG,.PNG,.GIF,.BMP"
+      :accept="accept"
       :before-upload="onBeforeUpload">
       <template v-slot:trigger>
         <div v-if="disabled"></div>
@@ -92,6 +92,14 @@ export default {
     showImageList: {
       type: Boolean,
       default: false
+    },
+    backgroundColor: {
+      type: String,
+      default: ''
+    },
+    accept: {
+      type: String,
+      default: '.jpg,.jpeg,.png,.gif,.bmp,.JPG,.JPEG,.PNG,.GIF,.BMP'
     }
   },
   data () {
@@ -275,7 +283,8 @@ export default {
     getStyle () {
       return {
         height: this.heightLimit + 'px',
-        width: this.widthLimit + 'px'
+        width: this.widthLimit + 'px',
+        backgroundColor: this.backgroundColor
       }
     }
   }
