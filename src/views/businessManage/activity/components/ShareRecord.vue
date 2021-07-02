@@ -140,6 +140,7 @@ export default {
     },
     // 处理获取的报名信息列表数据
     handleData(data) {
+      if(Object.keys(data).length == 0) return this.applyInfoData = []
       let newList = [];
       let outNum = 0;
       for (let i = 0; i < data.personnelInfos.length; i++) {
@@ -199,7 +200,7 @@ export default {
       this.$emit("hideShareRecord");
     },
     handleInfo({ id, userId }) {
-      this.dialogApplyInfoVisible = true; // 弹窗
+      this.dialogApplyInfoVisible = true; // 报名信息弹窗
       this.applyInfoDataLoading = true; // 加载中
       this.applyInfoQuery.distributionId = id; // 活动分销ID
       this.applyInfoQuery.distributionUserId = userId; // 分销人员ID(邀请人ID)
@@ -211,9 +212,6 @@ export default {
         if (res.data.data.businessCode == 1000) {
           let data = res.data.data.data;
           this.handleData(data);
-          this.applyInfoDataLoading = false;
-        } else if (res.data.data.businessCode == 2003) {
-          this.applyInfoData = [];
           this.applyInfoDataLoading = false;
         }
       });
