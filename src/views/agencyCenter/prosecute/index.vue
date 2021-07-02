@@ -1,29 +1,64 @@
 <template>
   <basic-container>
-    <hc-table-form title="投诉管理">
+    <hc-table-form
+      :title="title"
+      :formVisible="detailView"
+      @go-back="goBack">
       <hc-crud ref="hcCrud" :option="tableOption" :fetchListFun="fetchListFun" @toView="toView">
         <template v-slot:basicSearch="scope">
           <div class="search-item">
             <div class="search-item-title">投诉板块：</div>
             <div class="search-item-content">
               <el-select v-model="prosecuteType" @change="scope.searchFun()">
-                <el-option v-for="(item, index) in dicList['PROSECUTE_TYPE']" :key="index" :label="item.label" :value="item.value">{{item.label}}</el-option>
+                <el-option v-for="(item, index) in prosecuteTypes" :key="index" :label="item.label" :value="item.value">{{item.label}}</el-option>
               </el-select>
             </div>
           </div>
         </template>
       </hc-crud>
+      <template v-slot:form>
+        <prosecute-detail :detail="prosecuteDetail" @save="detailSave"></prosecute-detail>
+      </template>
     </hc-table-form>
   </basic-container>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import { getProsecutePage } from '@/api/cms/prosecute'
+import { getProsecutePage, getProsecuteDetail } from '@/api/cms/prosecute'
+import ProsecuteDetail from './detail/index'
+const prosecuteTypes = [
+  {
+    value: 'heatedDebate',
+    label: '热议'
+  },
+  {
+    value: 'officialNews',
+    label: '资讯'
+  },
+  {
+    value: 'travel',
+    label: '游记'
+  },
+  {
+    value: 'user',
+    label: '用户'
+  },
+  {
+    value: 'circle',
+    label: '圈子'
+  },
+  {
+    value: 'comment',
+    label: '评论'
+  }
+]
 export default {
+  components: { ProsecuteDetail },
   data () {
     return {
-      prosecuteType: 'travel',
+      prosecuteType: 'heatedDebate',
+      prosecuteTypes,
       tableOption: {
         menu: [{
           label: '详情',
@@ -40,9 +75,7 @@ export default {
           },
           {
             label: '投诉板块',
-            prop: 'prosecuteType',
-            type: 'select',
-            dicName: 'PROSECUTE_TYPE',
+            prop: 'module',
             width: 80
           },
           {
@@ -95,11 +128,16 @@ export default {
             width: 150
           },
         ]
-      }
+      },
+      detailView: false,
+      prosecuteDetail: {}
     }
   },
   computed: {
-    ...mapGetters(['dicList'])
+    ...mapGetters(['dicList']),
+    title () {
+      return this.detailView ? '投诉详情' : '投诉管理'
+    }
   },
   methods: {
     fetchListFun (params) {
@@ -114,8 +152,21 @@ export default {
         })
       })
     },
-    toView (row) {
-      console.log(row)
+    toView ({prosecuteId}) {
+      getProsecuteDetail({prosecuteId}).then(({data}) => {
+        this.detailView = true
+        this.prosecuteDetail = {
+          ...data.data.data,
+          prosecuteId
+        }
+      })
+    },
+    detailSave () {
+      this.$refs.hcCrud.refresh()
+      this.detailView = false
+    },
+    goBack () {
+      this.detailView = false
     }
   }
 }

@@ -6,3 +6,18 @@ export function getProsecutePage(params) {
     params
   })
 }
+
+export function getProsecuteDetail(params) {
+  return request({
+    url: '/cms/prosecute/detail',
+    params
+  })
+}
+
+export function handleProsecute(data) {
+  return request({
+    url: '/cms/prosecute/handle',
+    method: 'POST',
+    data
+  })
+}
