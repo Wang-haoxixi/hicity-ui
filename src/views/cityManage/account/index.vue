@@ -3,8 +3,10 @@
     <hc-crud ref="accountCrud" :option="option" :fetchListFun="fetchListFun">
       <template slot="menuLeft">
         账户余额：{{amount}}
-        <el-button size="mini" style="margin-left: 20px;" @click="toRecharge">充值</el-button>
-        <el-button size="mini" @click="toSettle">结算</el-button>
+        <template v-if="userType == 1">
+          <el-button size="mini" style="margin-left: 20px;" @click="toRecharge">充值</el-button>
+          <el-button size="mini" @click="toSettle">结算</el-button>
+        </template>
 
       </template>
       <template
@@ -186,7 +188,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['userInfo'])
+    ...mapGetters(['userInfo', 'userType'])
   },
   created () {
     this.getAmount()
