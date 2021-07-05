@@ -176,4 +176,13 @@ export function singleHandler (data) {
   })
 }
 
+// 关联活动列表
+export function getNewsActivityList (params) {
+  return request({
+    // url: '/cms/news_activity/list',
+    url: '/cms/open/news_activity/detail_list',
+    params
+  })
+}
+
 

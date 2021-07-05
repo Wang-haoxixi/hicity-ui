@@ -149,7 +149,8 @@ import {
   setRecommend,
   batchHandler,
   singleHandler,
-  cityColumn
+  cityColumn,
+  getNewsActivityList
 } from "@/api/cms/news";
 import { getAllUser } from '@/api/admin/user'
 import HcQuill from "@/views/components/HcQuill";
@@ -332,6 +333,7 @@ export default {
           officialColumnId: [],
           dataType: '1',
           author: this.userInfo.realName,
+          newsActivityList: []
         })
       })
     },
@@ -366,10 +368,16 @@ export default {
     },
     toUpdate({ officialNewsId }) {
       getNewsDetail({ officialNewsId }).then(({ data }) => {
-        this.publish = true;
-        this.publishType = 'edit'
-        this.$nextTick(() => {
-          this.$refs.newsForm.open(data.data.data, true)
+        let detail = data.data.data
+        getNewsActivityList({ officialNewsId }).then(({ data }) => {
+          this.publish = true;
+          this.publishType = 'edit'
+          this.$nextTick(() => {
+            this.$refs.newsForm.open({
+              ...detail,
+              newsActivityList: data.data.data || []
+            }, true)
+          })
         })
       });
     },
@@ -561,10 +569,16 @@ export default {
     },
     toView({ officialNewsId }) {
       getNewsDetail({ officialNewsId }).then(({ data }) => {
-        this.publish = true;
-        this.publishType = 'edit'
-        this.$nextTick(() => {
-          this.$refs.newsForm.open(data.data.data, true)
+        let detail = data.data.data
+        getNewsActivityList({ officialNewsId }).then(({ data }) => {
+          this.publish = true;
+          this.publishType = 'edit'
+          this.$nextTick(() => {
+            this.$refs.newsForm.open({
+              ...detail,
+              newsActivityList: data.data.data || []
+            }, true)
+          })
         })
       });
     },

@@ -80,7 +80,6 @@
         </el-radio-group>
       </el-form-item> -->
       <el-form-item label="关联活动：" prop="newsActivityList">
-        {{formData.newsActivityList}}
         <news-activity v-model="formData.newsActivityList"></news-activity>
       </el-form-item>
       <el-form-item label="详情：" prop="content">
