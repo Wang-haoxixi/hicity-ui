@@ -165,7 +165,6 @@ export default {
       for (let i = 0; i < newList.length; i++) {
         newList[i].outRows = i == 0 ? outNum : 0;
       }
-      console.log("newList...", newList);
       this.applyInfoData = newList;
     },
     mergeCell({ row, column, rowIndex, columnIndex }) {
@@ -208,7 +207,6 @@ export default {
     },
     getApplyInfo() {
       applyInfo(this.applyInfoQuery).then((res) => {
-        console.log("res...", res);
         if (res.data.data.businessCode == 1000) {
           let data = res.data.data.data;
           this.handleData(data);
@@ -219,7 +217,6 @@ export default {
     getShareList() {
       this.shareListLoading = true;
       shareList(this.query).then((res) => {
-        console.log(res);
         this.shareListTotal = res.data.data.data.total;
         this.shareList = res.data.data.data.records;
         this.shareListLoading = false;
@@ -235,13 +232,11 @@ export default {
       this.getShareList();
     },
     handleShareSizeChange(val) {
-      console.log("每页条数", val);
       this.query.size = val;
       this.query.current = 1;
       this.getShareList();
     },
     handleShareCurrentChange(val) {
-      console.log("当前页", val);
       this.query.current = val;
       this.getShareList();
     },

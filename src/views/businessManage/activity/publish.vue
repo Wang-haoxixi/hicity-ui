@@ -3,7 +3,7 @@
     <basic-container>
       <div class="title">
         <div>基本信息</div>
-        <el-button @click="backClick">返回</el-button>
+        <el-button @click="backClick">返 回</el-button>
       </div>
       <el-form
         class="elForm"
@@ -112,12 +112,12 @@
             </el-upload> -->
             <hc-image-cropper :widthLimit='286' :heightLimit='186' v-model="baseFormData.poster" :disabled="publishType == 'view'" single :limit="1" @change="logoChange" bottom-tip="请上传尺寸为286*186，大小不超过2M的图片">
               <el-button icon="el-icon-upload">点击上传</el-button>
+              <!-- 海报图库按钮 -->
+              <el-button icon="el-icon-picture" @click.stop="showPosters" class="poster-btn"
+                >海报图库</el-button
+              >
             </hc-image-cropper>
-            <!-- 海报图库按钮 -->
-            <el-button icon="el-icon-picture" @click="showPosters" class="poster-btn"
-              >海报图库</el-button
-            >
-            <div style="margin-left: 15px">
+            <!-- <div style="margin-left: 15px">
               <el-popover
                 popper-class="popperName"
                 ref="popoverPoster"
@@ -128,7 +128,7 @@
               >
               </el-popover>
               <i class="el-icon-info" v-popover:popoverPoster></i>
-            </div>
+            </div> -->
           </div>
           <div
             class="poster-box"
@@ -695,7 +695,7 @@
           @click="saveManuscriptUpdate"
           >保存草稿</el-button
         >
-        <el-button @click="backClick">取消</el-button>
+        <el-button @click="backClick">取 消</el-button>
       </div>
       <!-- 海报弹窗 -->
       <el-dialog
@@ -1033,7 +1033,7 @@ export default {
         onLine: false, //是否线上
         classification: "", //活动父类
         subClassification: "", //活动子类
-        label: ['1','2'], //标签
+        label: [], //标签
         spot: "", //亮点
         details: "", //活动详情
         fileList: [], //附件
