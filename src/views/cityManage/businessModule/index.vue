@@ -80,7 +80,7 @@
             </el-col>
             <el-col :span="16">
               <div style="padding-left: 10px;">
-                <el-input v-if="modPath == 'others'" v-model="modDetail.path" maxlength="200"></el-input>
+                <el-input v-if="modPath == 'others'" v-model="modDetail.path" maxlength="1024"></el-input>
               </div>
             </el-col>
           </el-row>
@@ -103,6 +103,7 @@ import { mapGetters } from 'vuex'
 import HcSingleView from '@/views/components/HcSingleView/index'
 import HcImageCropper from '@/views/components/HcImageUpload/cropper'
 import HcCitySelect from "@/views/components/HcCity/HcCitySelect/index";
+const prefix = 'http://183.131.134.242:10173/module_web/WebActivity?webUrl='
 export default {
   components: { HcSingleView, HcImageCropper, HcCitySelect },
   data () {
@@ -131,7 +132,7 @@ export default {
         return [
           ...this.dicList[`CITY_BUSINESS_MODULE_${this.modType}`],
           {
-            label: '其他',
+            label: 'H5模块',
             value: 'others'
           }
         ]
@@ -195,13 +196,20 @@ export default {
     save () {
       this.$refs.form.validate(valid => {
         if (valid) {
+          let path = this.modPath == 'others' ? prefix + this.modDetail.path : this.modDetail.path
           if (this.modDetail.moduleId) {
-            updateCityModule(this.modDetail).then((data) => {
+            updateCityModule({
+              ...this.modDetail,
+              path
+            }).then((data) => {
               this.init()
               this.dialogVisible = false
             })
           } else {
-            addCityModule(this.modDetail).then((data) => {
+            addCityModule({
+              ...this.modDetail,
+              path
+            }).then((data) => {
               this.init()
               this.dialogVisible = false
             })
@@ -224,10 +232,20 @@ export default {
         this.editable = data.data.data.editable && data.data.data.cityId == this.userInfo.manageCityId
         this.modType = type
         let types = this.dicList[`CITY_BUSINESS_MODULE_${this.modType}`]
-        this.modPath = 'others'
+        let systemPath = false
         for (let i = 0; i < types.length; i++) {
           if (types[i].value == data.data.data.path) {
-            this.modPath = data.data.data.path
+            systemPath = true
+            break
+          }
+        }
+        if (systemPath) {
+          this.modPath = data.data.data.path
+        } else {
+          this.modPath = 'others'
+          let path = data.data.data.path
+          if (path.startsWith(prefix)) {
+            this.modDetail.path = path.substring(prefix.length)
           }
         }
         this.dialogVisible = true
