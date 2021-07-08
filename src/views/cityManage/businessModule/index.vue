@@ -72,9 +72,18 @@
           <hc-image-cropper v-model="modDetail.icon" :disabled="!editable" :init-data="modDetail.icon" :heightLimit="120" :widthLimit="210" show-image-list single :limit="1" bottom-tip="请上传尺寸为210*120的图片" accept=".jpg,.png,.JPG,.PNG" background-color="#F9F9F9" @change="$refs.form.validateField('icon')"></hc-image-cropper>
         </el-form-item>
         <el-form-item label="关联功能：" prop="path">
-          <el-select v-model="modDetail.path" :disabled="!editable">
-            <el-option v-for="(item, index) in dicList[`CITY_BUSINESS_MODULE_${modType}`]" :key="index" :value="item.value" :label="item.label">{{item.label}}</el-option>
-          </el-select>
+          <el-row>
+            <el-col :span="8">
+              <el-select v-model="modPath" :disabled="!editable" @change="pathChange">
+                <el-option v-for="(item, index) in businessModules" :key="index" :value="item.value" :label="item.label">{{item.label}}</el-option>
+              </el-select>
+            </el-col>
+            <el-col :span="16">
+              <div style="padding-left: 10px;">
+                <el-input v-if="modPath == 'others'" v-model="modDetail.path" maxlength="200"></el-input>
+              </div>
+            </el-col>
+          </el-row>
         </el-form-item>
         <el-form-item label="所属城市：" prop="cityIds">
           <hc-city-select v-model="modDetail.cityIds" :view-only="!editable" noMerge :city-id="userInfo.manageCityId"></hc-city-select>
@@ -104,23 +113,44 @@ export default {
       moduleLife: [],
       dialogVisible: false,
       modDetail: {},
+      modPath: '',
       modType: '',
       editable: false,
       formRules: {
         name: [{required: true, message: '请输入模块名称', trigger: 'blur'}],
         icon: [{required: true, message: '请添加模块logo', trigger: 'change'}],
-        path: [{required: true, message: '请选择管理模块', trigger: 'change'}],
+        path: [{required: true, message: '请选择或填写关联功能', trigger: 'blur'}],
         cityIds: [{required: true, message: '请选择所属城市', trigger: 'change'}],
       }
     }
   },
   computed: {
     ...mapGetters(['userInfo', 'dicList', 'userType']),
+    businessModules () {
+      if (this.modType) {
+        return [
+          ...this.dicList[`CITY_BUSINESS_MODULE_${this.modType}`],
+          {
+            label: '其他',
+            value: 'others'
+          }
+        ]
+      } else {
+        return []
+      }
+    }
   },
   created () {
     this.init()
   },
   methods: {
+    pathChange (val) {
+      if (val !== 'others') {
+        this.modDetail.path = val
+      } else {
+        this.modDetail.path = ''
+      }
+    },
     init () {
       this.moduleFirst = []
       this.moduleSecond = []
@@ -155,6 +185,7 @@ export default {
         cityIds: [],
         location
       }
+      this.modPath = ''
       this.editable = true
       this.dialogVisible = true
       this.$nextTick(() => {
@@ -192,7 +223,17 @@ export default {
         }
         this.editable = data.data.data.editable && data.data.data.cityId == this.userInfo.manageCityId
         this.modType = type
+        let types = this.dicList[`CITY_BUSINESS_MODULE_${this.modType}`]
+        this.modPath = 'others'
+        for (let i = 0; i < types.length; i++) {
+          if (types[i].value == data.data.data.path) {
+            this.modPath = data.data.data.path
+          }
+        }
         this.dialogVisible = true
+        this.$nextTick(() => {
+          this.$refs.form.clearValidate()
+        })
       })
     },
     moduleEnable (mod) {
