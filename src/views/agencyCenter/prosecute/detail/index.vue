@@ -38,10 +38,16 @@
           </div>
           <div class="line-item">
             <div class="line-item-title">{{prosecuteInfo.content}}：</div>
-            <div class="line-item-content">{{detail.dataContent}}</div>
+            <!-- <div class="line-item-content">{{detail.dataContent}}</div> -->
+            <div class="line-item-content dataContent" v-html="detail.dataContent"></div>
           </div>
-          <div v-if="detail.dataImageList && detail.dataImageList.length > 0">
-            <el-image v-for="(image, index) in detail.dataImageList" :key="index" :src="image" :preview-src-list="detail.dataImageList"></el-image>
+          <div class="line-item" v-if="detail.dataImageList && detail.dataImageList.length > 0">
+            <div class="line-item-title">标题图：</div>
+            <div class="line-item-content">
+              <div class="title-img" >
+                <el-image class="img" v-for="(image, index) in detail.dataImageList" :key="index" :src="image" :preview-src-list="detail.dataImageList"></el-image>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -94,7 +100,7 @@
       <div class="line-item-title"></div>
       <div class="line-item-content">
         <el-button v-if="detail.prosecuteStatus == 0 || isModify" type="primary" @click="submit">确 定</el-button>
-        <el-button>返 回</el-button>
+        <el-button @click="back">返 回</el-button>
       </div>
     </div>
   </div>
@@ -274,6 +280,11 @@ export default {
           })
         }
       })
+    },
+    // 返 回
+    back(){
+      console.log('par..',this)
+      this.$parent.goBack();
     }
   }
 }
@@ -298,6 +309,7 @@ export default {
     line-height: 36px;
     flex: 150px 1 1;
     .content-block {
+      padding-right: 25px;
       background-color: #F3F3F3;
       border-radius: 5px;
       .content-block-item {
@@ -306,9 +318,25 @@ export default {
     }
   }
 }
+.title-img{
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  .img{
+    width: 150px;
+    height: 90px;
+    margin: 0 5px 5px 0;
+  }
+}
 .type-radio {
   height: 36px;
   display: flex;
   align-items: center;
+}
+
+.dataContent ::v-deep img{
+  display: block;
+  width: 300px;
+  height: 180px;
 }
 </style>
