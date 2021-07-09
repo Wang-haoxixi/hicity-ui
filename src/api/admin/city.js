@@ -171,3 +171,48 @@ export function getCityAdmin (params) {
     params
   })
 }
+
+export function addCityModule (data) {
+  return request({
+    url: '/admin/module/save',
+    method: 'POST',
+    data
+  })
+}
+
+export function updateCityModule (data) {
+  return request({
+    url: '/admin/module/update',
+    method: 'POST',
+    data
+  })
+}
+export function getCityModuleDetail (moduleId) {
+  return request({
+    url: `/admin/module/info/${moduleId}`,
+  })
+}
+
+export function enableCityModule (data) {
+  return request({
+    url: '/admin/module/enable',
+    method: 'POST',
+    data
+  })
+}
+
+export function cityModuleSort (data) {
+  return request({
+    url: '/admin/module/sort',
+    method: 'POST',
+    data
+  })
+}
+
+export function deleteCityModule (data) {
+  return request({
+    url: '/admin/module/delete',
+    method: 'POST',
+    data
+  })
+}
