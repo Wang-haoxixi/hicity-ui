@@ -372,10 +372,18 @@ export default {
         getNewsActivityList({ officialNewsId }).then(({ data }) => {
           this.publish = true;
           this.publishType = 'edit'
+          let newsActivitys = data.data.data || []
+          let newsActivityList = []
+          for (let i = 0; i < newsActivitys.length; i++) {
+            newsActivityList.push({
+              activityId: newsActivitys[i].id,
+              activityName: newsActivitys[i].name
+            })
+          }
           this.$nextTick(() => {
             this.$refs.newsForm.open({
               ...detail,
-              newsActivityList: data.data.data || []
+              newsActivityList
             }, true)
           })
         })
@@ -573,10 +581,18 @@ export default {
         getNewsActivityList({ officialNewsId }).then(({ data }) => {
           this.publish = true;
           this.publishType = 'edit'
+          let newsActivitys = data.data.data || []
+          let newsActivityList = []
+          for (let i = 0; i < newsActivitys.length; i++) {
+            newsActivityList.push({
+              activityId: newsActivitys[i].id,
+              activityName: newsActivitys[i].name
+            })
+          }
           this.$nextTick(() => {
             this.$refs.newsForm.open({
               ...detail,
-              newsActivityList: data.data.data || []
+              newsActivityList
             }, true)
           })
         })
