@@ -144,7 +144,7 @@ export function getStoreOrderPage (params) {
 
 export function getStoreOrderDetail (params) {
   return request({
-    url: '/mms/store_order/detail',
+    url: '/mms/store_order/proceeds_detail_pc',
     params
   })
 }
@@ -159,20 +159,6 @@ export function getMerchantStoreList (params) {
 export function getMerchantOrderPage (params) {
   return request({
     url: '/mms/store_order/proceeds_page',
-    params
-  })
-}
-
-export function getMerchantOrderDetail (params) {
-  return request({
-    url: '/mms/store_order/proceeds_detail',
-    params
-  })
-}
-
-export function getMerchantAccountPage (params) {
-  return request({
-    url: '/fms/account/flow/pc/list',
     params
   })
 }

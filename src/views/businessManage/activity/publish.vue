@@ -248,7 +248,7 @@
         <!-- 活动详情 -->
         <el-form-item prop="details" label="活动详情：">
           <hc-quill
-            v-model="quillContent"
+            v-model="quillContent.content"
             v-if="!$route.query.id || contentShow"
           ></hc-quill>
         </el-form-item>
@@ -809,7 +809,7 @@
 <script>
 import store from "@/store";
 import { dateFormat } from "@/util/date.js";
-import HcQuill from "@/views/components/HcQuill";
+import HcQuill from "@/views/components/HcJoditEditor";
 import HcCitySelect from "@/views/components/HcCity/HcCitySelect/index";
 import DiscussionGroup  from "./components/DiscussionGroup "
 import { mapGetters } from "vuex";

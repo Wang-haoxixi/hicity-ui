@@ -108,7 +108,7 @@
         </template>
       </avue-crud>
     </basic-container>
-    <el-dialog :visible.sync="dialogFormVisible" title="执行日志" width="90%" @close="closeJobLogDialog">
+    <el-dialog :visible.sync="dialogFormVisible" title="执行日志" append-to-body width="90%" @close="closeJobLogDialog">
       <avue-crud
         ref="crudLog"
         :page="pageLog"

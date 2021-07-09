@@ -3,6 +3,7 @@
     <el-dialog
       title="购票信息"
       :visible.sync="dialogVisibleTicketInfo"
+      append-to-body
       width="30%"
     >
       <div class="info-box">

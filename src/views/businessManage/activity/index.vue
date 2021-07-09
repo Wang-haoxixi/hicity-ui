@@ -192,6 +192,7 @@
     <el-dialog
       title="关联圈子"
       :visible.sync="dialogVisibleRelevanceMore"
+      append-to-body
       width="40%"
       @close="closeDialogMore"
     >

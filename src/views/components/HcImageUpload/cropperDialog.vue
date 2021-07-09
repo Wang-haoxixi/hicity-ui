@@ -2,6 +2,7 @@
   <el-dialog
     title="图片裁剪"
     :visible.sync="dialogVisible"
+    append-to-body
     :width="`${width+240}px`">
     <div class="cropper-content" :style="{height: `${height + 200}px`, width: `${width + 200}px`}">
       <vue-cropper

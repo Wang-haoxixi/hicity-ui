@@ -347,7 +347,7 @@
       </div>
     </el-dialog>
     <!-- 新增选择跳转对象 -->
-    <el-dialog title="跳转对象" :visible.sync="jumpDialogVisible" width="50%" @closed='closeDialogAddJumpVisible'>
+    <el-dialog title="跳转对象" :visible.sync="jumpDialogVisible" width="50%" append-to-body @closed='closeDialogAddJumpVisible'>
       <el-input clearable v-model="searchName" placeholder="请输入关键字" class="input-with-select" style="width:300px">
         <el-button slot="append" icon="el-icon-search" @click="searchAddItem"></el-button>
       </el-input>
@@ -470,7 +470,7 @@
       </span>
     </el-dialog>
     <!-- 编辑选择跳转对象 -->
-    <el-dialog title="跳转对象" :visible.sync="editJumpDialogVisible" width="50%" @close='closeDialogEditJumpVisible'>
+    <el-dialog title="跳转对象" :visible.sync="editJumpDialogVisible" append-to-body width="50%" @close='closeDialogEditJumpVisible'>
       <el-input clearable v-model="searchName" placeholder="请输入关键字" class="input-with-select" style="width:300px">
         <el-button slot="append" icon="el-icon-search" @click="searchEditItem"></el-button>
       </el-input>

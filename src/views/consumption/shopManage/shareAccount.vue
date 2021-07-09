@@ -2,6 +2,7 @@
   <el-dialog
     title="选择合伙人"
     :visible.sync="dialogVisible"
+    append-to-body
     width="70%">
     <hc-crud ref="hcCrud" :option="tableOption" :fetchListFun="fetchListFun" :auto-load="false">
       <template slot="menu" slot-scope="scope">

@@ -5,6 +5,7 @@
       :visible.sync="dialogVisibleDiscussionGroup"
       width="30%"
       :close-on-click-modal="false"
+      append-to-body
       @close="closeDialog"
     >
       <div class="discussionGroup-warp">

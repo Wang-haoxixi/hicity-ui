@@ -30,7 +30,7 @@
               <el-button type="text" size="mini" @click="toViewOrder(scope.row)"
                 >收款明细</el-button>
               <el-button type="text" size="mini" @click="toViewAccount(scope.row)"
-                >账户明细</el-button>
+                >收益明细</el-button>
             </template>
           </template>
         </template>
@@ -78,6 +78,9 @@
         </hc-crud>
 
         <hc-crud v-else-if="publishType == 'account'" ref="accountCrud" :option="accountTableOption" :fetchListFun="accountFetchListFun" :auto-load="false">
+          <template v-slot:menu="scope">
+            <el-button size="mini" type="text" @click="toOrderView(scope.row)">查看订单详情</el-button>
+          </template>
         </hc-crud>
 
         <el-form
@@ -162,6 +165,7 @@
         <el-dialog
           title="店铺详情"
           :visible.sync="storeVisible"
+          append-to-body
           width="70%">
           <store-detail :detail="storeDetail"></store-detail>
           <div slot="footer">
@@ -172,6 +176,7 @@
         <el-dialog
           title="订单详情"
           :visible.sync="orderVisible"
+          append-to-body
           width="70%">
           <order-detail :detail="orderDetail"></order-detail>
           <div slot="footer">
@@ -197,10 +202,10 @@ import {
   unbundlingStore,
   cancelManager,
   getMerchantOrderPage,
-  getMerchantOrderDetail,
+  getStoreOrderDetail,
   getMerchantStoreList,
-  getMerchantAccountPage
 } from "@/api/mms/store";
+import { getMerchantAccountPage } from '@/api/fms/account'
 import HcImageUpload from "@/views/components/HcImageUpload/index";
 import HcTableForm from "@/views/components/HcTableForm/index"
 import HcEmptyData from "@/views/components/HcEmptyData/index"
@@ -210,7 +215,7 @@ import HcCitySelect from "@/views/components/HcCity/HcCitySelect/index"
 import HcInput from "@/views/components/HcForm/HcInput/index"
 import MerchantQrCode from "@/views/components/BusinessComponents/MerchantQrCode/index"
 import StoreDetail from '@/views/consumption/shopManage/detail'
-import OrderDetail from './orderDetail'
+import OrderDetail from '@/views/components/BusinessComponents/OrderDetail/index'
 import { isMobile, isPhone } from '@/util/validate'
 
 export default {
@@ -264,7 +269,7 @@ export default {
         } else if (this.publishType == 'order') {
           return '收款明细'
         } else if (this.publishType == 'account') {
-          return '账户明细'
+          return '收益明细'
         } else {
           return '商户信息'
         }
@@ -543,7 +548,13 @@ export default {
       })
     },
     toViewOrderDetail ({storeOrderId}) {
-      getMerchantOrderDetail({ storeOrderId }).then(({ data }) => {
+      getStoreOrderDetail({ storeOrderId }).then(({ data }) => {
+        this.orderDetail = data.data.data;
+        this.orderVisible = true
+      });
+    },
+    toOrderView ({orderNumber}) {
+      getStoreOrderDetail({ orderNum: orderNumber }).then(({ data }) => {
         this.orderDetail = data.data.data;
         this.orderVisible = true
       });
@@ -562,8 +573,8 @@ export default {
         this.$refs.orderCrud.resetSearchItems(['storeManagerId'])
       }
     },
-    toViewAccount ({storeManagerId}) {
-      this.handleId = storeManagerId
+    toViewAccount ({userId}) {
+      this.handleId = userId
       this.publish = true
       this.publishType = "account"
       this.$nextTick(() => {

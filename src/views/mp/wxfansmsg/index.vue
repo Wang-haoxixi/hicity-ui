@@ -24,7 +24,7 @@
           </el-button>
         </template>
       </avue-crud>
-      <el-dialog :visible.sync="dialogFormVisible" title="回复消息">
+      <el-dialog :visible.sync="dialogFormVisible" append-to-body title="回复消息">
         <avue-crud
           ref="crudLog"
           :page="pageRes"
