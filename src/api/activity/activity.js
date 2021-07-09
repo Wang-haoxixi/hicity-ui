@@ -64,3 +64,48 @@ export function deleteOrg(data) {
     method: "post",
   });
 }
+
+// 活动分销管理--分销
+export function shareList(data) {
+  return request({
+    url: "/dms/activity_distribution/get_distribution_page",
+    method: "get",
+    params: data
+  });
+}
+
+// 查看报名信息--分销
+export function applyInfo(data) {
+  return request({
+    url: "/dms/activity_distribution_relation/detail",
+    method: "get",
+    params: data
+  });
+}
+
+// 获取相册相片
+export function getCirclePhotoes(data) {
+  return request({
+    url: "/admin/org/album/list_page",
+    method: "get",
+    params: data
+  });
+}
+
+// 上传群相册
+export function uploadToCircle(data) {
+  return request({
+    url: "/admin/org/album/upload",
+    method: "post",
+    data: data
+  });
+}
+
+// 删除照片
+export function removePhotoes(data) {
+  return request({
+    url: "/admin/org/album/remove",
+    method: "post",
+    data: data
+  });
+}

@@ -2,7 +2,7 @@
   <div>
     <basic-container>
       <div class="title">
-        <div>人员管理</div>
+        <div>活动 - 人员管理</div>
         <el-button @click="$router.back(-1)">返回</el-button>
       </div>
       <div class="search-box">
@@ -438,7 +438,7 @@ export default {
 <style lang="scss" scoped>
 .title {
   padding-bottom: 20px;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 400;
   display: flex;
   justify-content: space-between;

@@ -1,6 +1,6 @@
 <template>
   <basic-container>
-    <hc-table-form title="活动列表">
+    <hc-table-form title="活动列表" v-show="!showShareRecord">
       <hc-crud ref="hcCrud" :option="tableOption" :fetchListFun="fetchListFun">
         <template v-slot:menuLeft>
           <el-button
@@ -31,7 +31,10 @@
           <span style="margin-left: 30px; color: #919397"
             >发布时间：{{ props.row.updateTime }}</span
           >
-          <span style="margin-left: 30px; color: #919397" v-if="props.row.circleName">
+          <span
+            style="margin-left: 30px; color: #919397"
+            v-if="props.row.circleName"
+          >
             活动圈子：{{ props.row.circleName ? props.row.circleName : "" }}
             <el-tag size="mini" type="danger">官方</el-tag>
           </span>
@@ -40,21 +43,36 @@
               >关联更多圈子</el-button
             >
           </span>
+          <span style="margin-left: 30px" v-if="props.row.circleName">
+            <el-button type="text" @click="handleCirclePhoto(props)"
+              >圈子相册管理</el-button
+            >
+          </span>
+          <span>
+            <el-button
+              type="text"
+              style="margin-left: 30px"
+              @click="handleShareRecord(props)"
+              >分销记录</el-button
+            >
+          </span>
         </template>
         <template v-slot:poster="scope">
-          <el-image
-            style="width: 100px; height: 100px"
-            :src="scope.row.poster"
-            fit="contain"
-          ></el-image>
+          <el-image class="act-img" :src="scope.row.poster" fit="contain">
+            <div slot="error" class="image-slot">
+              <i class="el-icon-picture-outline"></i>
+            </div>
+          </el-image>
         </template>
         <template v-slot:info="scope">
-          <div>{{ scope.row.name }}</div>
-          <div>
+          <div style="font-size: 16px; font-weight: bold">
+            {{ scope.row.name }}
+          </div>
+          <div v-if="scope.row.startTime && scope.row.endTime">
             <i class="el-icon-time" style="margin-right: 5px"></i
             >{{ scope.row.startTime }} 至 {{ scope.row.endTime }}
           </div>
-          <div>
+          <div v-if="scope.row.city">
             <i class="el-icon-location-outline" style="margin-right: 5px"></i
             >{{ scope.row.city }} {{ scope.row.field }}
           </div>
@@ -131,7 +149,6 @@
         >
       </span>
     </el-dialog>
-    <!--  -->
     <!-- 详情码弹框 -->
     <el-dialog
       title="活动详情码"
@@ -162,7 +179,9 @@
         </el-image>
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="downloadDetailCode">下载签到码</el-button>
+        <el-button type="primary" @click="downloadDetailCode"
+          >下载签到码</el-button
+        >
         <el-button type="primary" @click="showDetailCodeDialogVisible = false"
           >关 闭</el-button
         >
@@ -171,7 +190,7 @@
 
     <!-- 关联更多圈子弹框 -->
     <el-dialog
-      title="2021城市超级APP免费体检活动"
+      title="关联圈子"
       :visible.sync="dialogVisibleRelevanceMore"
       append-to-body
       width="40%"
@@ -215,7 +234,7 @@
                 type="danger"
                 round
                 size="mini"
-                :disabled="item.isOfficial=='1' ? true : false"
+                :disabled="item.isOfficial == '1' ? true : false"
                 @click="deleteCircleItem(item.id)"
                 >删除</el-button
               >
@@ -230,6 +249,14 @@
         </div>
       </div>
     </el-dialog>
+    <!-- 圈子相册管理 -->
+    <CirclePhoto ref="circlePhotoRef" />
+    <!-- 分销记录管理 -->
+    <ShareRecord
+      ref="shareRecordRef"
+      v-show="showShareRecord"
+      @hideShareRecord="showShareRecord = false"
+    />
   </basic-container>
 </template>
 
@@ -247,10 +274,14 @@ import { tableOption } from "./const.js";
 import HcCityBox from "@/views/components/HcCity/HcCityBox/index";
 import { mapGetters } from "vuex";
 import Download from "downloadjs";
+import CirclePhoto from "./components/CirclePhoto.vue";
+import ShareRecord from "./components/ShareRecord.vue";
 export default {
-  components: { HcCityBox },
+  components: { HcCityBox, CirclePhoto, ShareRecord },
   data() {
     return {
+      showShareRecord: false, //分销管理显隐
+
       showCityDialogVisible: false, //控制展示城市
       showCodeDialogVisible: false, //展示签到码
       showDetailCodeDialogVisible: false, //展示详情码
@@ -281,6 +312,17 @@ export default {
   },
   activated() {
     this.$refs.hcCrud.refresh(); // 刷新表格数据
+  },
+  // mounted() {
+  //   this.$refs.hcCrud.refresh(); // 刷新表格数据
+  // },
+  watch: {
+    // 监听菜单是否切换
+    "$route.path"(newVal, oldVal) {
+      if (newVal != oldVal) {
+        this.showShareRecord = false;
+      }
+    },
   },
   directives: {
     "el-select-loadmore": {
@@ -375,7 +417,8 @@ export default {
     },
     toRelevance() {
       // relevance code...
-      if(!this.relevanceQuery.circleId) return this.$message.warning("请先选择圈子")
+      if (!this.relevanceQuery.circleId)
+        return this.$message.warning("请先选择圈子");
       relevanceSave(this.relevanceQuery).then((res) => {
         if (res.data.data.businessCode == 1000) {
           this.getOrgedList({
@@ -390,11 +433,21 @@ export default {
         this.orgedArr = res.data.data.data;
       });
     },
-    handleRelevanceMore({ row }) {
+    handleRelevanceMore({ row }) {  
       this.dialogVisibleRelevanceMore = true;
       this.relevanceQuery.activityId = row.id;
       let query = { activityId: row.id };
       this.getOrgedList(query);
+    },
+    handleCirclePhoto({ row }) {
+      this.$refs.circlePhotoRef.openDialogCirclePhotoVisible( row.circleId, row.circleName );
+      // this.$refs.circlePhotoRef.openDialogCirclePhotoVisible( 387 );
+      // this.$refs.circlePhotoRef.openDialogCirclePhotoVisible( 376 );
+    },
+    handleShareRecord({ row }) {
+      this.$refs.shareRecordRef.updateData(row.id);
+      // this.$refs.shareRecordRef.updateData(1);
+      this.showShareRecord = true;
     },
     fetchListFun(params) {
       return new Promise((resolve, reject) => {
@@ -445,9 +498,9 @@ export default {
       this.img = row.weChatCode;
     },
     // 展示详情码
-    handleShowDetailCode(row){
-      this.showDetailCodeDialogVisible = true
-      this.detailImg = row.weChatDetailCode
+    handleShowDetailCode(row) {
+      this.showDetailCodeDialogVisible = true;
+      this.detailImg = row.weChatDetailCode;
     },
     // 下载签到码
     downloadCode() {

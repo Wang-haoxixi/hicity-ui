@@ -3,7 +3,7 @@
     <basic-container>
       <div class="title">
         <div>基本信息</div>
-        <el-button @click="backClick">返回</el-button>
+        <el-button @click="backClick">返 回</el-button>
       </div>
       <el-form
         class="elForm"
@@ -112,12 +112,12 @@
             </el-upload> -->
             <hc-image-cropper :widthLimit='286' :heightLimit='186' v-model="baseFormData.poster" :disabled="publishType == 'view'" single :limit="1" @change="logoChange" bottom-tip="请上传尺寸为286*186，大小不超过2M的图片">
               <el-button icon="el-icon-upload">点击上传</el-button>
+              <!-- 海报图库按钮 -->
+              <el-button icon="el-icon-picture" @click.stop="showPosters" class="poster-btn"
+                >海报图库</el-button
+              >
             </hc-image-cropper>
-            <!-- 海报图库按钮 -->
-            <el-button icon="el-icon-picture" @click="showPosters" class="poster-btn"
-              >海报图库</el-button
-            >
-            <div style="margin-left: 15px">
+            <!-- <div style="margin-left: 15px">
               <el-popover
                 popper-class="popperName"
                 ref="popoverPoster"
@@ -128,7 +128,7 @@
               >
               </el-popover>
               <i class="el-icon-info" v-popover:popoverPoster></i>
-            </div>
+            </div> -->
           </div>
           <div
             class="poster-box"
@@ -194,7 +194,8 @@
         <!-- 活动标签 -->
         <el-form-item prop="label" label="活动标签：">
           <!-- 暂无标签 -->
-          <em style="margin-right: 10px" v-if="baseFormData.label.length === 0"
+          <!-- <em style="margin-right: 10px" v-if="baseFormData.label.length === 0" -->
+          <em style="margin-right: 10px" v-if="!baseFormData.label.length"
             >暂无标签</em
           >
           <!-- 标签 -->
@@ -670,8 +671,9 @@
       </div>
       <div class="footer-btn">
         <!-- this.$route.query.id是否有参数传递过来,没有参数说明走新建,否则走编辑   -->
+          <!-- v-if="!this.$route.query.id" -->
         <el-button
-          v-if="!this.$route.query.id"
+          v-if="!statusFlag"
           :loading="formLoading"
           @click="publish"
           type="danger"
@@ -680,8 +682,9 @@
         <el-button v-else @click="editSave" :loading="formLoading" type="danger"
           >发布活动</el-button
         >
+          <!-- v-if="!this.$route.query.id" -->
         <el-button
-          v-if="!this.$route.query.id"
+          v-if="!statusFlag"
           :loading="formLoading"
           @click="saveManuscript"
           >保存草稿</el-button
@@ -692,7 +695,7 @@
           @click="saveManuscriptUpdate"
           >保存草稿</el-button
         >
-        <el-button @click="backClick">取消</el-button>
+        <el-button @click="backClick">取 消</el-button>
       </div>
       <!-- 海报弹窗 -->
       <el-dialog
@@ -981,8 +984,8 @@ export default {
         cityIdList: [{ required: true, message: "请输入城市", trigger: "blur" },],
         name: [{ required: true, message: "请输入活动标题", trigger: "blur" }],
         sponsor: [{ required: true, message: "请输入主办方", trigger: "blur" }],
-        startTime: [{ required: true, validator: this.beginDataValidator, trigger: "change" }],
-        endTime: [{ required: true, validator: this.endDataValidator, trigger: "change" }],
+        startTime: [{ required: true, validator: this.beginDataValidator, trigger: "blur" }],
+        endTime: [{ required: true, validator: this.endDataValidator, trigger: "blur" }],
         type: [{ required: true, message: "请选择活动类型", trigger: "change" }],
         poster: [{ validator: this.validatorPoster, required: true, trigger: "change" }],
         cityId: [{ required: true, message: "请选择举办地", trigger: "change" }],
@@ -1316,7 +1319,8 @@ export default {
               this.baseFormData.classification = this.classification[0];
               this.baseFormData.subClassification = this.classification[1];
             }
-            this.baseFormData.label = data.label;
+            // this.baseFormData.label = data.label;
+            this.baseFormData.label = data.label ? data.label : [];
             this.baseFormData.spot = data.spot;
             this.quillContent.content = data.details;
             this.contentShow = true;
@@ -1338,7 +1342,6 @@ export default {
                 this.$set(item, "inputValue", "");
               }
             });
-            console.log('customList...',this.customList)
             this.showFormCollect = true;
             data.fileList.forEach((item) => {
               this.fileList.push({
@@ -1907,7 +1910,6 @@ export default {
         ...this.customList,
       ];
 
-      console.log("baseFormData...", this.baseFormData);
       this.$refs.baseFormDataRef.validate((valid1) => {
         this.$refs.setTicketDataRef.forEach((item) => {
           item.validate((valid2) => {
@@ -1918,13 +1920,11 @@ export default {
         if (!this.validRst.includes(false) && valid1) {
           savePublish(this.baseFormData)
             .then((res) => {
-              console.log('publish success!')
               if (res.data.code !== 0) {
                 this.validRst = [];
                 return this.$message.error("发布活动失败");
               }
               this.$refs.discussionGroupRef.openDiscussionGroupDialog(res.data.data.data)//显示创建圈子弹窗
-              // this.$message.success("发布活动成功");
               this.fileList = [];
               this.baseFormData.fileList = [];
               // this.$router.go(-1);
@@ -1968,32 +1968,19 @@ export default {
         ...this.defaultList,
         ...this.customList,
       ];
-      this.$refs.baseFormDataRef.validate((valid1) => {
-        this.$refs.setTicketDataRef.forEach((item) => {
-          item.validate((valid2) => {
-            that.validRst.push(valid2);
-            return false;
-          });
-        });
-        if (!this.validRst.includes(false) && valid1) {
-          savePublish(this.baseFormData)
-            .then((res) => {
-              if (res.data.code !== 0) {
-                return this.$message.error("保存草稿失败");
-              }
-              this.$message.success("保存草稿成功");
-              this.fileList = [];
-              this.baseFormData.fileList = [];
-              this.$router.go(-1);
-            })
-            .finally(() => {
-              this.formLoading = false;
-            });
-        } else {
-          this.$message.error("活动信息填写不完整");
-          this.validRst = [];
-          this.formLoading = false;
+
+      savePublish(this.baseFormData)
+      .then((res) => {
+        if (res.data.code !== 0) {
+          return this.$message.error("保存草稿失败");
         }
+        this.$message.success("保存草稿成功");
+        this.fileList = [];
+        this.baseFormData.fileList = [];
+        this.$router.go(-1);
+      })
+      .finally(() => {
+        this.formLoading = false;
       });
     },
 
@@ -2023,55 +2010,39 @@ export default {
         ...this.defaultList,
         ...this.customList,
       ];
-      this.$refs.baseFormDataRef.validate((valid1) => {
-        // 状态不为草稿
-        if (this.statusFlag != "0") {
-          if (valid1) {
-            editSaveActivity(this.baseFormData)
-              .then((res) => {
-                if (res.data.code !== 0) {
-                  return this.$message.error("保存草稿失败");
-                }
-                this.$message.success("保存草稿成功");
-                this.fileList = [];
-                this.baseFormData.fileList = [];
-                this.$router.go(-1);
-              })
-              .finally(() => {
-                this.formLoading = false;
-              });
-          } else {
-            this.$message.error("活动信息填写不完整");
-            this.validRst = [];
-            this.formLoading = false;
+
+      // 状态不为草稿
+      if (this.statusFlag != "0") {
+
+        editSaveActivity(this.baseFormData)
+        .then((res) => {
+          if (res.data.code !== 0) {
+            return this.$message.error("保存草稿失败");
           }
-          return;
-        }
-        this.$refs.setTicketDataRef.forEach((item) => {
-          item.validate((valid2) => {
-            that.validRst.push(valid2);
-            return false;
-          });
-        });
-        if (!this.validRst.includes(false) && valid1) {
-          editSaveActivity(this.baseFormData)
-            .then((res) => {
-              if (res.data.code !== 0) {
-                return this.$message.error("保存草稿失败");
-              }
-              this.$message.success("保存草稿成功");
-              this.fileList = [];
-              this.baseFormData.fileList = [];
-              this.$router.go(-1);
-            })
-            .finally(() => {
-              this.formLoading = false;
-            });
-        } else {
-          this.$message.error("活动信息填写不完整");
-          this.validRst = [];
+          this.$message.success("保存草稿成功");
+          this.fileList = [];
+          this.baseFormData.fileList = [];
+          this.$router.go(-1);
+        })
+        .finally(() => {
           this.formLoading = false;
+        });
+
+        return;
+      }
+
+      editSaveActivity(this.baseFormData)
+      .then((res) => {
+        if (res.data.code !== 0) {
+          return this.$message.error("保存草稿失败");
         }
+        this.$message.success("保存草稿成功");
+        this.fileList = [];
+        this.baseFormData.fileList = [];
+        this.$router.go(-1);
+      })
+      .finally(() => {
+        this.formLoading = false;
       });
     },
     // 移入
