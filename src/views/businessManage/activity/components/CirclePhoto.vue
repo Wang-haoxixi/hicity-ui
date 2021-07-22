@@ -184,7 +184,7 @@ export default {
               dataList: dataList,
             });
           });
-          this.addqueue();
+          this.addqueue(); // 增加时间列表
         }
       });
     },
@@ -249,13 +249,13 @@ export default {
               this.ids.push(itemI.photoId);
             } else if (indexI == i) {
               ele.dataList.splice(i, 1);
+              this.saveQuery.photos.forEach((item, index) => {
+                if (itemI.url == item.imgUrl) {
+                  this.saveQuery.photos.splice(index, 1);
+                }
+              });
             }
           });
-        }
-      });
-      this.saveQuery.photos.forEach((item, index) => {
-        if (indexI == index) {
-          this.saveQuery.photos.splice(index, 1);
         }
       });
     },

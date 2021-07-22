@@ -71,7 +71,7 @@
           prop="adName"
           :label-width="formLabelWidth"
         >
-          <el-input v-model.trim="form.adName" autocomplete="off"></el-input>
+          <el-input v-model.trim="form.adName" placeholder="请输入广告名称" autocomplete="off"></el-input>
         </el-form-item>
         <!-- 开始时间 -->
         <el-form-item
@@ -126,22 +126,43 @@
         </el-form-item>
 
         <el-form-item
-          v-if="form.type  && form.type!='false'"
+          v-if="form.type && form.type!='false' && form.type!='wechatMiniProgram'"
           label="跳转对象 :"
           prop="relationId"
-          :label-width="formLabelWidth"
           class="jump-item"
+          :label-width="formLabelWidth"
         >
-          <div class="jump-name" v-if="jumpName !== ''">{{ jumpName }}</div>
-          <el-button
-            class="jump-btn"
-            type="primary"
-            size="mini"
-            round
-            plain
-            @click="handleSelectJump()"
-            >选择跳转对象</el-button
-          >
+          <div class="warp-right">
+            <div class="jump-name" v-if="jumpName !== ''">{{ jumpName }}</div>
+            <el-button
+              type="primary"
+              size="mini"
+              round
+              plain
+              @click="handleSelectJump()"
+              >选择跳转对象</el-button
+            >
+          </div>
+        </el-form-item>
+
+        <template v-if="form.type=='wechatMiniProgram'">
+          <el-form-item label="AppID(小程序ID)" :label-width="formLabelWidth">
+            <el-input placeholder="请输入AppID(小程序ID)" v-model="form.parameter.appId"></el-input>
+          </el-form-item>
+          <el-form-item label="原始ID" :label-width="formLabelWidth">
+            <el-input placeholder="请输入原始ID" v-model="form.parameter.userName"></el-input>
+          </el-form-item>
+          <el-form-item label="页面路径" :label-width="formLabelWidth">
+            <el-input placeholder="请输入页面路径" v-model="form.parameter.path"></el-input>
+          </el-form-item>
+        </template>
+
+        <el-form-item label="关联渠道" :label-width="formLabelWidth" prop="channel">
+          <el-checkbox-group v-model="form.channel" class="checkbox">
+            <el-checkbox label="1">Ios</el-checkbox>
+            <el-checkbox label="2">Android</el-checkbox>
+            <el-checkbox label="3">微信小程序</el-checkbox>
+          </el-checkbox-group>
         </el-form-item>
 
         <!-- 广告文字 -->
@@ -186,7 +207,6 @@
         >
       </div>
     </el-dialog>
-
     <!-- 广告编辑 -->
     <el-dialog
       title="广告编辑"
@@ -285,21 +305,43 @@
 
         <!-- 跳转对象 -->
         <el-form-item
-          v-if="editForm.type && editForm.type!='false'"
+          v-if="editForm.type && editForm.type!='false' && editForm.type!='wechatMiniProgram'"
           label="跳转对象 :"
           prop="relationId"
           :label-width="formLabelWidth"
           class="jump-item"
         >
-          <div class="jump-name" v-if="jumpName">{{ jumpName }}</div>
-          <el-button
-            type="primary"
-            size="mini"
-            round
-            plain
-            @click="handleEditSelectJump()"
-            >选择跳转对象</el-button
-          >
+          <div class="warp-right">
+            <div class="jump-name" v-if="jumpName">{{ jumpName }}</div>
+            <el-button
+              type="primary"
+              size="mini"
+              round
+              plain
+              @click="handleEditSelectJump()"
+              >选择跳转对象</el-button
+            >
+          </div>
+        </el-form-item>
+
+        <template v-if="editForm.type=='wechatMiniProgram'">
+          <el-form-item label="AppID(小程序ID)" :label-width="formLabelWidth">
+            <el-input placeholder="请输入AppID(小程序ID)" v-model="editForm.parameter.appId"></el-input>
+          </el-form-item>
+          <el-form-item label="原始ID" :label-width="formLabelWidth">
+            <el-input placeholder="请输入原始ID" v-model="editForm.parameter.userName"></el-input>
+          </el-form-item>
+          <el-form-item label="页面路径" :label-width="formLabelWidth">
+            <el-input placeholder="请输入页面路径" v-model="editForm.parameter.path"></el-input>
+          </el-form-item>
+        </template>
+
+        <el-form-item label="关联渠道" :label-width="formLabelWidth" prop="channel">
+          <el-checkbox-group v-model="editForm.channel" class="checkbox">
+            <el-checkbox label="1">Ios</el-checkbox>
+            <el-checkbox label="2">Android</el-checkbox>
+            <el-checkbox label="3">微信小程序</el-checkbox>
+          </el-checkbox-group>
         </el-form-item>
 
         <!-- 广告文字 -->
@@ -661,6 +703,13 @@ export default {
       },
       // 新增广告表单
       form: {
+        parameter: {
+          appId: "", // AppID(小程序ID)
+          userName: "", // 原始ID
+          path: "", // 页面路径
+        },
+        channel: [], // 关联渠道
+
         cityName: "", //城市名称
         cityIdList: [],
 
@@ -702,6 +751,10 @@ export default {
         type: [
           { required: true, message: "请选择广告类型", trigger: "change" },
         ],
+        channel: [
+          { type: 'array', required: true, message: '请至少选择一个关联渠道', trigger: 'change' }
+        ],
+
         text: [{ required: true, message: "请输入广告文字", trigger: "blur" }],
         relationId: [
           { required: true, message: "请选择跳转对象", trigger: "change" },
@@ -957,8 +1010,8 @@ export default {
       });
     },
     // 新增广告
-    addAdFn() {
-      addAd(this.form)
+    addAdFn(query) {
+      addAd(query)
         .then((res) => {
           if (res.data.code !== 0) {
             return this.$message.error("新增广告失败！");
@@ -977,7 +1030,9 @@ export default {
     // 编辑按钮
     handleEdit(row) {
       adCheckDetail(row.adId).then(res=>{
-        this.editForm = res.data.data.data
+        let form = res.data.data.data
+        form.channel = form.channel.split(",")
+        this.editForm = form
         this.imageUrl = this.editForm.imageUrl;
         this.jumpName = this.editForm.relationName;
         this.dialogEditFormVisible = true;
@@ -991,6 +1046,11 @@ export default {
       this.form.relationId = ''
       this.editForm.relationId = ''
       this.jumpName = ''
+      this.form.parameter = {
+        appId: "",
+        userName: "",
+        path: "",
+      }
       if (val === "activity") {
         this.getActivitiePageFn(this.form.cityId); //活动
       } else if (val === "travel") {
@@ -1001,8 +1061,9 @@ export default {
         this.getNewsPageFn(this.form.cityId); //城市新闻
       } else if (val === "official_column") {
         this.getOfficial_columnPageFn(this.form.cityId); //官方发布
-      }else if(val === false){
-
+      }else if (val === false) {
+      }else if(val === "wechatMiniProgram") {
+        console.log("wechatMiniProgram..")
       }
     },
     // 展示跳转对象dialog
@@ -1084,10 +1145,12 @@ export default {
     },
     // 广告编辑 提交
     editSubmit() {
+      let formData = {...this.editForm}
+      formData.channel = formData.channel.map(Number).join()
       this.formLoading = true;
       this.$refs.ruleEditForm.validate((valid) => {
         if (valid) {
-          updateAd(this.editForm)
+          updateAd(formData)
             .then((res) => {
               if (res.data.code !== 0) {
                 return this.$message.error("广告编辑失败！");
@@ -1133,6 +1196,8 @@ export default {
     },
     // 广告新增 提交
     submit() {
+      let formData = {...this.form}
+      formData.channel = formData.channel.map(Number).join()
       this.formLoading = true
       this.$refs.ruleAddForm.validate((valid) => {
         // 校验未通过
@@ -1140,7 +1205,7 @@ export default {
           this.formLoading = false
           return this.$message.error("请填写正确信息！");
         }
-        this.addAdFn();
+        this.addAdFn(formData);
       });
     },
     // 图片上传成功时的钩子
@@ -1229,8 +1294,14 @@ export default {
   white-space: nowrap;
 }
 .jump-item{
-  ::v-deep .el-form-item__content{
+  .warp-right{
+    height: 36px;
     display: flex;
+    align-items: center;
   }
+}
+
+::v-deep .el-checkbox .el-checkbox__input{
+  // line-height: 0px;
 }
 </style>
