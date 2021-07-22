@@ -110,13 +110,31 @@
             >
               <el-button icon="el-icon-upload">点击上传</el-button>
             </el-upload> -->
-            <hc-image-cropper :widthLimit='286' :heightLimit='186' v-model="baseFormData.poster" :disabled="publishType == 'view'" single :limit="1" @change="logoChange" bottom-tip="请上传尺寸为286*186，大小不超过2M的图片">
+            <!-- <hc-image-cropper :widthLimit='286' :heightLimit='186' v-model="baseFormData.poster" :disabled="publishType == 'view'" single :limit="1" @change="logoChange" bottom-tip="请上传尺寸为286*186，大小不超过2M的图片"> -->
+              <!-- <el-button icon="el-icon-upload">点击上传</el-button> -->
+              <!-- 海报图库按钮 -->
+              <!-- <el-button icon="el-icon-picture" @click.stop="showPosters" class="poster-btn" -->
+                <!-- >海报图库</el-button -->
+              <!-- > -->
+            <!-- </hc-image-cropper> -->
+            <el-upload
+              class="upload-demo"
+              :action="uploadPicUrl"
+              :on-success="handlePosterSuccess"
+              :show-file-list="false"
+              :headers="headersOpt"
+              :before-upload="onBeforeUpload"
+              accept=".jpg,.jpeg,.png,.gif,.bmp,.JPG,.JPEG,.PNG,.GIF,.BMP"
+            >
               <el-button icon="el-icon-upload">点击上传</el-button>
+            </el-upload>
+            <!-- <hc-image-upload single :limit="1" v-model="baseFormData.poster" @change="logoChange">
+              <el-button icon="el-icon-upload">点击上传</el-button> -->
               <!-- 海报图库按钮 -->
               <el-button icon="el-icon-picture" @click.stop="showPosters" class="poster-btn"
                 >海报图库</el-button
               >
-            </hc-image-cropper>
+            <!-- </hc-image-upload> -->
             <!-- <div style="margin-left: 15px">
               <el-popover
                 popper-class="popperName"
@@ -142,15 +160,16 @@
             <div v-if="!baseFormData.poster" class="noImage">
               <div style="text-align: center">
                 <i class="el-icon-picture"></i>
-                <p class="picSuggest">建议图片尺寸800*480，大小不超过2M</p>
+                <p class="picSuggest">建议图片尺寸 686px*412px，大小不超过2M</p>
               </div>
             </div>
             <img
               v-else
               :src="baseFormData.poster"
-              style="width: 100%; height: 100%; border-radius: 5px"
+              style="width: 100%; height: 100%; border-radius: 5px;object-fit: cover;"
             />
           </div>
+           <div>海报效果预览如上，请确认是否符合您的要求</div>
         </el-form-item>
         <!-- 活动地址 -->
         <!-- <el-form-item prop="cityId" label="活动地址："> -->
@@ -826,6 +845,7 @@ import {
   officialReleaseList,
 } from "@/api/activity/publish";
 import { Loading } from "element-ui";
+import HcImageUpload from '@/views/components/HcImageUpload/index'
 
 import HcImageCropper from "@/views/components/HcImageUpload/cropper"
 export default {
@@ -1184,9 +1204,9 @@ export default {
       return new Promise((resolve, reject) => {
         getFileMimeType(file).then((res) => {
           if (res) {
-            const isLt1M = file.size / 1024 / 1024 < 50;
-            if (!isLt1M) {
-              this.$message.warning("上传文件大小不能超过 50MB!");
+            const isLt2M = file.size / 1024 / 1024 < 2;
+            if (!isLt2M) {
+              this.$message.warning("上传文件大小不能超过 2MB!");
               reject();
             } else {
               resolve(true);
