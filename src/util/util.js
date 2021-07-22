@@ -142,6 +142,15 @@ export const fullscreenToggel = () => {
     reqFullScreen()
   }
 }
+
+export const setfullscreen = () => {
+  const isFullScreen = document.fullScreen || document.mozFullScreen || document.webkitIsFullScreen || document.msFullscreenElement
+  if (fullscreenEnable()) {
+    !isFullScreen && exitFullScreen()
+  } else {
+    !isFullScreen && reqFullScreen()
+  }
+}
 /**
  * esc监听全屏
  */

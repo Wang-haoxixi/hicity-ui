@@ -46,7 +46,7 @@
           </template>
         </template>
       </hc-crud>
-  
+
       <template slot="form">
         <el-form
           :disabled="publishType == 'view'"
@@ -105,9 +105,8 @@ import { getGoodsList, saveGoods, getGoodsDetail, deleteGoods, setGoodsState } f
 import { annexFileTypes } from "@/util/file"
 import HcInput from "@/views/components/HcForm/HcInput/index"
 import HcFileUploadImage from "@/views/components/HcFileUpload/image"
-import HcFileUpload from "@/views/components/HcFileUpload/index"
 export default {
-  components: { HcInput, HcFileUpload, HcFileUploadImage },
+  components: { HcInput, HcFileUploadImage },
   data() {
     return {
       annexFileTypes,
@@ -225,7 +224,7 @@ export default {
       })
     },
     save () {
-      let formData = { 
+      let formData = {
         ...this.formData,
       }
       let fileList = this.$refs.images.fileList

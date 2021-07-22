@@ -21,7 +21,8 @@ const common = {
     theme: getStore({ name: 'theme' }) || '#409EFF',
     themeName: getStore({ name: 'themeName' }) || 'theme-white',
     lockPasswd: getStore({ name: 'lockPasswd' }) || '',
-    website: website
+    website: website,
+    viewFull: false
   },
   actions: {},
   mutations: {
@@ -33,6 +34,9 @@ const common = {
     },
     SET_FULLSCREN: (state) => {
       state.isFullScren = !state.isFullScren
+    },
+    SET_VIEWFULL: (state, viewFull) => {
+      state.viewFull = viewFull
     },
     SET_SHOWCOLLAPSE: (state, active) => {
       state.showCollapse = active

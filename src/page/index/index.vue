@@ -1,5 +1,5 @@
 <template>
-  <div :class="{'avue--collapse':isCollapse}"
+  <div :class="{'avue--collapse':isCollapse, 'view-full': viewFull}"
     class="avue-contail">
     <div class="avue-left">
       <!-- 左侧导航栏 -->
@@ -13,9 +13,9 @@
       </div>
       <div class="avue-main">
         <!-- 顶部标签卡 -->
-        <tags/>
+        <tags class="main-tags"/>
         <!-- 主体视图层 -->
-        <el-scrollbar style="height:100%">
+        <el-scrollbar>
           <keep-alive>
             <router-view
               v-if="$route.meta.$keepAlive"
@@ -82,7 +82,7 @@
        * this.initWebSocket()
       */
     },
-    computed: mapGetters(['userInfo', 'isLock', 'isCollapse', 'website', 'expires_in']),
+    computed: mapGetters(['userInfo', 'isLock', 'isCollapse', 'website', 'expires_in', 'viewFull']),
     methods: {
       showCollapse() {
         this.$store.commit('SET_COLLAPSE')
@@ -168,3 +168,25 @@
     }
   }
 </script>
+
+<style lang="scss">
+.view-full {
+  .avue-left {
+    display: none;
+  }
+  .avue-header {
+    display: none;
+  }
+  .main-tags {
+    display: none;
+  }
+  .avue-main {
+    left: 0;
+    height: 100%;
+    width: 100%;
+  }
+  .el-scrollbar {
+    height: 100%;
+  }
+}
+</style>

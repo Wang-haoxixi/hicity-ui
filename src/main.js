@@ -24,6 +24,36 @@ import '@smallwei/avue/lib/index.css'
 // 插件 json 展示
 import vueJsonTreeView from 'vue-json-tree-view'
 import './styles/iconfont.scss'
+import VCharts from 'vue-echarts' // 在 webpack 环境下指向 components/ECharts.vue
+import { use } from 'echarts/core'
+import './styles/font/index.scss'
+import {
+  CanvasRenderer
+} from 'echarts/renderers'
+import {
+  BarChart,
+  MapChart,
+  LineChart,
+  PieChart
+} from 'echarts/charts'
+import {
+  TitleComponent,
+  TooltipComponent,
+  LegendComponent
+} from 'echarts/components'
+
+use([
+  CanvasRenderer,
+  LineChart,
+  BarChart,
+  PieChart,
+  MapChart,
+  TooltipComponent,
+  LegendComponent,
+  TitleComponent
+]);
+
+Vue.component('v-chart', VCharts)
 
 Vue.use(router)
 

@@ -56,17 +56,30 @@
     position: absolute;
     left: 240px;
     padding: 0;
-    padding-bottom: 20px;
+    // padding-bottom: 20px;
     width: calc(100% - 240px);
-    height: calc(100% - 70px);
+    height: calc(100% - 64px);
     box-sizing: border-box;
     overflow: hidden;
 }
 
+.el-scrollbar {
+  height: calc(100% - 50px);
+  box-sizing: content-box;;
+}
+
 .avue-view {
-    padding-bottom: 22px;
+    // padding-bottom: 22px;
     width: 100%;
     box-sizing: border-box;
+}
+
+.el-scrollbar__wrap {
+  padding-bottom: 17px;
+}
+
+.el-scrollbar__bar {
+  z-index: 2;
 }
 
 .avue-footer {

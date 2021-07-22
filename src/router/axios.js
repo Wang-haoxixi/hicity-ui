@@ -20,23 +20,25 @@ NProgress.configure({
 
 // HTTPrequest拦截
 axios.interceptors.request.use(config => {
-  NProgress.start() // start progress bar
-  const TENANT_ID = getStore({ name: 'tenantId' })
-  const isToken = (config.headers || {}).isToken === false
-  const token = store.getters.access_token
-  config.headers['source'] = 'HI_CITY_WEB'
-  if (token && !isToken) {
-    config.headers['Authorization'] = 'Bearer ' + token// token
-  }
-  if (TENANT_ID) {
-    config.headers['TENANT-ID'] = TENANT_ID // 租户ID
-  }
+  if (!config.noApi) {
+    NProgress.start() // start progress bar
+    const TENANT_ID = getStore({ name: 'tenantId' })
+    const isToken = (config.headers || {}).isToken === false
+    const token = store.getters.access_token
+    config.headers['source'] = 'HI_CITY_WEB'
+    if (token && !isToken) {
+      config.headers['Authorization'] = 'Bearer ' + token// token
+    }
+    if (TENANT_ID) {
+      config.headers['TENANT-ID'] = TENANT_ID // 租户ID
+    }
 
-  // headers中配置serialize为true开启序列化
-  config.url = '/api' + config.url
-  if (config.method === 'post' && config.headers.serialize) {
-    config.data = serialize(config.data)
-    delete config.data.serialize
+    // headers中配置serialize为true开启序列化
+    config.url = '/api' + config.url
+    if (config.method === 'post' && config.headers.serialize) {
+      config.data = serialize(config.data)
+      delete config.data.serialize
+    }
   }
   return config
 }, error => {

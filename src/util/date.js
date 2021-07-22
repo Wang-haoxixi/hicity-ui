@@ -22,6 +22,27 @@ export const calcDate = (date1, date2) => {
   }
 }
 
+function getDay (day, cn = false) {
+  switch (day) {
+    case 0:
+      return cn ? '日' : 7
+    case 1:
+      return cn ? '一' : 1
+    case 2:
+      return cn ? '二' : 2
+    case 3:
+      return cn ? '三' : 3
+    case 4:
+      return cn ? '四' : 4
+    case 5:
+      return cn ? '五' : 5
+    case 6:
+      return cn ? '六' : 6
+    default:
+      return ''
+  }
+}
+
 /**
  * 日期格式化
  */
@@ -34,7 +55,9 @@ export function dateFormat(date, format = 'yyyy-MM-dd hh:mm:ss') {
       'm+': date.getMinutes(), // minute
       's+': date.getSeconds(), // second
       'q+': Math.floor((date.getMonth() + 3) / 3), // quarter
-      'S': date.getMilliseconds() // millisecond
+      'S': date.getMilliseconds(), // millisecond
+      'W': getDay(date.getDay(), true),
+      'w': getDay(date.getDay())
     }
     if (/(y+)/.test(format)) {
       format = format.replace(RegExp.$1,
