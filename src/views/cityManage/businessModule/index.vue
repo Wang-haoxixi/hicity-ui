@@ -138,6 +138,7 @@
       title="模块配置"
       :visible.sync="dialogVisible"
       append-to-body
+      :before-close="beforeModDetailClose"
       width="60%"
     >
       <el-form
@@ -170,7 +171,7 @@
           ></hc-image-cropper>
         </el-form-item>
         <el-form-item label="关联类型：" prop="pathType">
-          <el-select v-model="modDetail.pathType">
+          <el-select v-model="modDetail.pathType" @change="pathTypeChange">
             <el-option :value="1" label="APP内部功能">APP内部功能</el-option>
             <el-option :value="2" label="微信小程序">微信小程序</el-option>
           </el-select>
@@ -211,15 +212,8 @@
           <el-form-item label="页面url：">
             <el-input v-model="modDetail.path"></el-input>
           </el-form-item>
-          <el-form-item label="原始id：">
-            <el-input v-model="modDetail.parameterObj.userName"></el-input>
-          </el-form-item>
-          <el-form-item label="appId：">
-            <el-input v-model="modDetail.parameterObj.appId"></el-input>
-          </el-form-item>
         </template>
         <el-form-item label="参数：" prop="parameterObj">
-          {{ parameterList }}
           <el-button size="mini" type="primary" @click="addParameter"
             >添加参数</el-button
           >
@@ -232,7 +226,7 @@
               <div class="item-line">
                 <div class="line-title">参数名称：</div>
                 <div class="line-content">
-                  <el-input v-model="parameter.key"></el-input>
+                  <el-input v-model.trim="parameter.key" @input="noSpace($event, parameter, 'key')" @change="noSpace($event, parameter, 'key')"></el-input>
                 </div>
               </div>
             </el-col>
@@ -240,7 +234,7 @@
               <div class="item-line">
                 <div class="line-title">参数值：</div>
                 <div class="line-content">
-                  <el-input v-model="parameter.value"></el-input>
+                  <el-input v-model.trim="parameter.value" @input="noSpace($event, parameter, 'value')" @change="noSpace($event, parameter, 'value')"></el-input>
                 </div>
               </div>
             </el-col>
@@ -250,14 +244,13 @@
           </el-row>
         </el-form-item>
 
-        <el-form-item label="版本要求：" prop="versionList">
-          {{ modDetail.versionList }}
+        <el-form-item label="版本要求：" prop="versionsList">
           <el-button size="mini" type="primary" @click="addVersion"
             >添加要求</el-button
           >
           <el-row
-            v-for="(version, index) in modDetail.versionList"
-            :key="index"
+            v-for="(version, index) in versionsList"
+            :key="version.symbol"
             style="margin-top: 10px"
           >
             <el-col :span="8">
@@ -284,9 +277,6 @@
                     :remoteFun="getVersionList"
                     :params="{ system: version.system }"
                   ></hc-select-more>
-                  <!-- <el-select v-model="version.versionId">
-                    <el-option v-for="(option, optionIndex) in version.versions" :key="optionIndex" :value="option.id" :label="option.versionNo + '及以上'">{{option.versionNo + '及以上'}}</el-option>
-                  </el-select> -->
                 </div>
               </div>
             </el-col>
@@ -306,8 +296,8 @@
         </el-form-item>
       </el-form>
       <div slot="footer">
-        <el-button @click="dialogVisible = false">返 回</el-button>
-        <el-button v-if="editable" type="primary" @click="save"
+        <el-button @click="closeModDetail">返 回</el-button>
+        <el-button v-if="editable" type="primary" @click="save" :loading="loading"
           >确 定</el-button
         >
       </div>
@@ -346,13 +336,14 @@ export default {
       modType: "",
       editable: false,
       parameterList: [],
+      versionsList: [],
       formRules: {
         name: [{ required: true, message: "请输入模块名称", trigger: "blur" }],
         icon: [
           { required: true, message: "请添加模块logo", trigger: "change" },
         ],
         pathType: [
-          { required: true, message: "请选择或填写关联功能", trigger: "blur" },
+          { required: true, message: "请选择关联类型", trigger: "blur" },
         ],
         path: [
           { required: true, message: "请选择或填写关联功能", trigger: "blur" },
@@ -360,7 +351,14 @@ export default {
         cityIds: [
           { required: true, message: "请选择所属城市", trigger: "change" },
         ],
+        parameterObj: [
+          { validator: this.parameterObjValidator, trigger: "blur" }
+        ],
+        versionsList: [
+          { validator: this.versionsListValidator, trigger: "blur" }
+        ]
       },
+      loading: false
     };
   },
   computed: {
@@ -383,6 +381,31 @@ export default {
     this.init();
   },
   methods: {
+    noSpace (val, targe, key) {
+      targe[key] = val.replace(/\s+/g,"")
+    },
+    parameterObjValidator (rules, value, callback) {
+      if (this.parameterList && this.parameterList.length > 0) {
+        for (let i = 0; i < this.parameterList.length; i++) {
+          if (!this.parameterList[i].key || !this.parameterList[i].value) {
+            callback(new Error('参数名称和参数值不能为空'))
+            return
+          }
+        }
+      }
+      callback()
+    },
+    versionsListValidator (rules, value, callback) {
+      if (this.versionsList && this.versionsList.length > 0) {
+        for (let i = 0; i < this.versionsList.length; i++) {
+          if (!this.versionsList[i].system || !this.versionsList[i].versionId) {
+            callback(new Error('系统和版本要求不能为空'))
+            return
+          }
+        }
+      }
+      callback()
+    },
     pathChange(val) {
       if (val !== "others") {
         this.modDetail.path = val;
@@ -425,10 +448,10 @@ export default {
         pathType: 1,
         path: "",
         cityIds: [],
-        location,
-        parameterObj: {},
-        versionList: [],
+        location
       };
+      this.versionsList = []
+      this.parameterList = []
       this.modPath = "";
       this.editable = true;
       this.dialogVisible = true;
@@ -437,34 +460,56 @@ export default {
       });
     },
     save() {
-      console.log(this.modDetail);
-      console.log(this.parameterList)
-
-      return;
+      this.loading = true
       this.$refs.form.validate((valid) => {
         if (valid) {
-          let path =
-            this.modPath == "others"
-              ? prefix + this.modDetail.path
-              : this.modDetail.path;
+          // 重组paramater
+          let parameterObj = {};
+          for (let i = 0; i < this.parameterList.length; i++) {
+            parameterObj[this.parameterList[i].key] =
+              this.parameterList[i].value;
+          }
+
+          // 获取最终path
+          let path = "";
+          if (this.modDetail.pathType == 1) {
+            path =
+              this.modPath == "others"
+                ? prefix + this.modDetail.path
+                : this.modDetail.path;
+          } else {
+            path = this.modDetail.path;
+          }
+
           if (this.modDetail.moduleId) {
             updateCityModule({
               ...this.modDetail,
               path,
+              parameterObj,
+              versionsList: this.versionsList
             }).then((data) => {
               this.init();
-              this.dialogVisible = false;
+              this.closeModDetail()
+            }).finally(() => {
+              this.loading = false
             });
           } else {
             addCityModule({
               ...this.modDetail,
               path,
+              parameterObj,
+              versionsList: this.versionsList
             }).then((data) => {
               this.init();
-              this.dialogVisible = false;
+              this.closeModDetail()
+            }).finally(() => {
+              this.loading = false
             });
           }
+        } else {
+          this.loading = false
         }
+
       });
     },
     moduleView(data, type) {
@@ -482,26 +527,55 @@ export default {
         this.editable =
           data.data.data.editable &&
           data.data.data.cityId == this.userInfo.manageCityId;
-        this.modType = type;
-        let types = this.dicList[`CITY_BUSINESS_MODULE_${this.modType}`];
-        let systemPath = false;
-        for (let i = 0; i < types.length; i++) {
-          if (types[i].value == data.data.data.path) {
-            systemPath = true;
-            break;
+        this.modType = type
+        this.modPath = ''
+        if (this.modDetail.pathType == 1) {
+          let types = this.dicList[`CITY_BUSINESS_MODULE_${this.modType}`];
+          let systemPath = false;
+          for (let i = 0; i < types.length; i++) {
+            if (types[i].value == data.data.data.path) {
+              systemPath = true;
+              break;
+            }
+          }
+          if (systemPath) {
+            this.modPath = data.data.data.path;
+          } else {
+            this.modPath = "others";
+            let path = data.data.data.path;
+            if (path.startsWith(prefix)) {
+              this.modDetail.path = path.substring(prefix.length);
+            }
           }
         }
-        if (systemPath) {
-          this.modPath = data.data.data.path;
-        } else {
-          this.modPath = "others";
-          let path = data.data.data.path;
-          if (path.startsWith(prefix)) {
-            this.modDetail.path = path.substring(prefix.length);
-          }
+        let parameter = JSON.parse(data.data.data.parameter)
+        let parameterObj = []
+        for (let key in parameter) {
+          parameterObj.push({
+            key,
+            value: parameter[key]
+          })
         }
+        this.parameterList = parameterObj
+        let versions = data.data.data.versionsList || []
+        let versionsList = []
+        for (let i = 0; i < versions.length; i++) {
+          versionsList.push({
+            symbol: Symbol(),
+            system: versions[i].system,
+            versionId: versions[i].versionId,
+            versionNo: versions[i].versionNo
+          })
+        }
+        this.versionsList = versionsList
         this.dialogVisible = true;
         this.$nextTick(() => {
+          for (let i = 0; i < this.versionsList.length; i++) {
+            this.$refs["versionSelect" + i][0].setData({
+              id: this.versionsList[i].versionId,
+              versionNo: this.versionsList[i].versionNo + ' 及以上'
+            });
+          }
           this.$refs.form.clearValidate();
         });
       });
@@ -562,23 +636,28 @@ export default {
         });
       });
     },
+    pathTypeChange () {
+      this.modDetail.path = ''
+      this.modPath = ''
+    },
     addParameter() {
       this.parameterList.push({
         key: "",
         value: "",
       });
     },
-    removeParameter (index) {
-      this.parameterList.splice(index, 1)
+    removeParameter(index) {
+      this.parameterList.splice(index, 1);
     },
     addVersion() {
-      this.modDetail.versionList.push({
+      this.versionsList.push({
+        symbol: Symbol(),
         system: "",
         versionId: "",
       });
     },
-    removeVersion (index) {
-      this.modDetail.versionList.splice(index, 1)
+    removeVersion(index) {
+      this.versionsList.splice(index, 1);
     },
     versionSystemChange(index, version, val) {
       version.versionId = "";
@@ -604,6 +683,30 @@ export default {
         }
       });
     },
+    closeModDetail () {
+      this.dialogVisible = false
+      this.initForm()
+    },
+    initForm () {
+      this.modDetail = {
+        cityId: this.userInfo.manageCityId,
+        name: "",
+        icon: "",
+        pathType: 1,
+        path: "",
+        cityIds: [],
+        location,
+        parameterObj: {}
+      }
+      this.parameterList = []
+      this.versionsList = []
+      this.modPath = "";
+      this.loading = false
+    },
+    beforeModDetailClose (next) {
+      this.initForm()
+      next()
+    }
   },
 };
 </script>

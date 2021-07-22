@@ -10,9 +10,9 @@
     <el-option
       v-for="(option, index) in options"
       :key="index"
-      :label="option[labelKey]"
+      :label="option[labelKey] + ' 及以上'"
       :value="option[valueKey]"
-    >{{option[labelKey]}}</el-option>
+    >{{option[labelKey] + ' 及以上'}}</el-option>
   </el-select>
 </template>
 
@@ -88,10 +88,11 @@ export default {
     setData (data = null) {
       this.tempData = data
       if (data) {
-        this.value = data[labelKey]
+        this.value = data[this.labelKey]
       } else {
         this.value = ''
       }
+      this.compareValue()
     },
     loadMore () {
       let symbol = this.symbol = Symbol()
@@ -116,8 +117,10 @@ export default {
       if (this.tempData) {
         let options = this.options
         for (let i = 0; i < options.length; i++) {
-          if (options[i][valueKey] == this.tempData[valueKey]) {
-            this.value = options[i][valueKey]
+          if (options[i][this.valueKey] == this.tempData[this.valueKey]) {
+            this.$nextTick(() => {
+              this.value = options[i][this.valueKey]
+            })
             this.tempData = null
             break
           }
