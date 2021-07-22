@@ -1,10 +1,10 @@
 // const url = "http://183.131.134.242:10167"; // 测试站
 // const url = "http://192.168.0.107:9999"; // 郑旭
-// const url = 'http://192.168.0.116:9999'// 张云生
+const url = 'http://192.168.0.116:9999'// 张云生
 //  const url = "http://192.168.0.181:9999"; // 司泉鑫
 //  const url = "http://192.168.0.154:9999"; // 杜友
 //  const url = "http://192.168.0.153:9999"; // 辜鹏
- const url = "http://192.168.0.134:9999"; // 建清
+//  const url = "http://192.168.0.134:9999"; // 建清
 module.exports = {
   lintOnSave: true,
   productionSourceMap: false,
