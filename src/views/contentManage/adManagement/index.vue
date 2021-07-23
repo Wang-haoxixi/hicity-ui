@@ -145,22 +145,23 @@
           </div>
         </el-form-item>
 
+        <!-- 跳转响应端的配置 -->
         <template v-if="form.type=='wechatMiniProgram'">
-          <el-form-item label="AppID(小程序ID)" :label-width="formLabelWidth">
+          <el-form-item label="AppID(小程序ID) :" :label-width="formLabelWidth" prop="parameter.appId" :key="100">
             <el-input placeholder="请输入AppID(小程序ID)" v-model="form.parameter.appId"></el-input>
           </el-form-item>
-          <el-form-item label="原始ID" :label-width="formLabelWidth">
+          <el-form-item label="原始ID :" :label-width="formLabelWidth" prop="parameter.userName" :key="101">
             <el-input placeholder="请输入原始ID" v-model="form.parameter.userName"></el-input>
           </el-form-item>
-          <el-form-item label="页面路径" :label-width="formLabelWidth">
+          <el-form-item label="页面路径 :" :label-width="formLabelWidth" prop="parameter.path" :key="102">
             <el-input placeholder="请输入页面路径" v-model="form.parameter.path"></el-input>
           </el-form-item>
         </template>
 
-        <el-form-item label="关联渠道" :label-width="formLabelWidth" prop="channel">
+        <el-form-item label="关联渠道 :" :label-width="formLabelWidth" prop="channel">
           <el-checkbox-group v-model="form.channel" class="checkbox">
-            <el-checkbox label="1">Ios</el-checkbox>
-            <el-checkbox label="2">Android</el-checkbox>
+            <el-checkbox label="1" disabled>IOS</el-checkbox>
+            <el-checkbox label="2" disabled>安卓</el-checkbox>
             <el-checkbox label="3">微信小程序</el-checkbox>
           </el-checkbox-group>
         </el-form-item>
@@ -171,7 +172,7 @@
           prop="text"
           :label-width="formLabelWidth"
         >
-          <el-input type="textarea" v-model="form.text"></el-input>
+          <el-input type="textarea" placeholder="请输入广告文字" v-model="form.text"></el-input>
         </el-form-item>
 
         <!-- 广告图片 -->
@@ -185,7 +186,11 @@
             :before-upload="onBeforeUpload"
             accept=".jpg,.jpeg,.png,.gif,.bmp,.JPG,.JPEG,.PNG,.GIF,.BMP"
           >
-            <img v-if="imageUrl" :src="form.imageUrl" class="avatar" />
+            <el-image
+              v-if="imageUrl"
+              style="width: 351px; height: 130px"
+              :src="form.imageUrl"
+              fit="cover"></el-image>
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
         </el-form-item>
@@ -325,21 +330,21 @@
         </el-form-item>
 
         <template v-if="editForm.type=='wechatMiniProgram'">
-          <el-form-item label="AppID(小程序ID)" :label-width="formLabelWidth">
-            <el-input placeholder="请输入AppID(小程序ID)" v-model="editForm.parameter.appId"></el-input>
+          <el-form-item label="AppID(小程序ID)" :label-width="formLabelWidth" prop="parameter.appId">
+            <el-input placeholder="请输入AppID(小程序ID)" v-model="editForm.parameter.appId" :key="200"></el-input>
           </el-form-item>
-          <el-form-item label="原始ID" :label-width="formLabelWidth">
-            <el-input placeholder="请输入原始ID" v-model="editForm.parameter.userName"></el-input>
+          <el-form-item label="原始ID" :label-width="formLabelWidth" prop="parameter.userName">
+            <el-input placeholder="请输入原始ID" v-model="editForm.parameter.userName" :key="201"></el-input>
           </el-form-item>
-          <el-form-item label="页面路径" :label-width="formLabelWidth">
-            <el-input placeholder="请输入页面路径" v-model="editForm.parameter.path"></el-input>
+          <el-form-item label="页面路径" :label-width="formLabelWidth" prop="parameter.path">
+            <el-input placeholder="请输入页面路径" v-model="editForm.parameter.path" :key="202"></el-input>
           </el-form-item>
         </template>
 
         <el-form-item label="关联渠道" :label-width="formLabelWidth" prop="channel">
           <el-checkbox-group v-model="editForm.channel" class="checkbox">
-            <el-checkbox label="1">Ios</el-checkbox>
-            <el-checkbox label="2">Android</el-checkbox>
+            <el-checkbox label="1" disabled>IOS</el-checkbox>
+            <el-checkbox label="2" disabled>安卓</el-checkbox>
             <el-checkbox label="3">微信小程序</el-checkbox>
           </el-checkbox-group>
         </el-form-item>
@@ -366,7 +371,11 @@
             :on-success="handleEditPicSuccess"
             :headers="headersOpt"
           >
-            <img v-if="imageUrl" :src="editForm.imageUrl" class="avatar" />
+            <el-image
+              v-if="imageUrl"
+              style="width: 351px; height: 130px"
+              :src="editForm.imageUrl"
+              fit="cover"></el-image>
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
         </el-form-item>
@@ -668,7 +677,6 @@ export default {
   data() {
     return {
       searchName: "",//搜索名称
-
       CITYID: '',
       tableOption: tableOption,
       imageUrl: "",
@@ -709,12 +717,9 @@ export default {
           path: "", // 页面路径
         },
         channel: [], // 关联渠道
-
         cityName: "", //城市名称
         cityIdList: [],
-
         cityId: "", //城市id
-
         adslotId: "", //广告位id
         adName: "", //广告名称
         beginDate: "", //开始时间
@@ -732,38 +737,22 @@ export default {
       adType: [], //广告类型数据
       jumpObjArr: [], //跳转对象数据
       editJumpObjArr: [],
-
-      formLabelWidth: "120px",
-
+      formLabelWidth: "140px",
       ruleForm: {
         cityName: [{ required: true, message: "请选择广告位" }],
         adslotId: [{ required: true, message: "请选择", trigger: "change" }],
-        adName: [
-          { required: true, message: "请输入广告名称", trigger: "blur" },
-          { min: 2, message: "长度大于 1 个字符", trigger: "blur" },
-        ],
-        beginDate: [
-          { required: true, validator: this.beginDataValidator, trigger: "change" },
-        ],
-        endDate: [
-          { required: true, validator: this.endDataValidator, trigger: "change" },
-        ],
-        type: [
-          { required: true, message: "请选择广告类型", trigger: "change" },
-        ],
-        channel: [
-          { type: 'array', required: true, message: '请至少选择一个关联渠道', trigger: 'change' }
-        ],
-
+        adName: [{ required: true, message: "请输入广告名称", trigger: "blur" },{ min: 2, message: "长度大于 1 个字符", trigger: "blur" }],
+        beginDate: [{ required: true, validator: this.beginDataValidator, trigger: "change" }],
+        endDate: [{ required: true, validator: this.endDataValidator, trigger: "change" }],
+        type: [{ required: true, message: "请选择广告类型", trigger: "change" }],
+        channel: [{ type: 'array', required: true, message: '请至少选择一个关联渠道', trigger: 'change' }],
         text: [{ required: true, message: "请输入广告文字", trigger: "blur" }],
-        relationId: [
-          { required: true, message: "请选择跳转对象", trigger: "change" },
-        ],
-        imageUrl: [
-          { required: true, message: "请添加广告图片", trigger: "change" },
-        ],
+        relationId: [{ required: true, message: "请选择跳转对象", trigger: "change" }],
+        imageUrl: [{ required: true, message: "请添加广告图片", trigger: "change" }],
+        "parameter.appId": [{ required: true, message: "请输入AppID(小程序ID)", trigger: "blur" }],
+        "parameter.userName": [{ required: true, message: "请输入原始ID", trigger: "blur" }],
+        "parameter.path": [{ required: true, message: "请输入页面路径", trigger: "blur" }],
       },
-
       formLoading: false,
       current1: 1,
       size1: 10,
@@ -1254,27 +1243,24 @@ export default {
   text-align: right;
 }
 ::v-deep .avatar-uploader .el-upload {
+  width: 351px;
+  height: 130px;
   border: 1px dashed #d9d9d9;
   border-radius: 6px;
   cursor: pointer;
   position: relative;
   overflow: hidden;
 }
-.avatar-uploader .el-upload:hover {
+::v-deep .avatar-uploader .el-upload:hover {
   border-color: #409eff;
 }
 .avatar-uploader-icon {
   font-size: 28px;
   color: #8c939d;
-  width: 178px;
-  height: 178px;
-  line-height: 178px;
+  width: 351px;
+  height: 130px;
+  line-height: 130px;
   text-align: center;
-}
-.avatar {
-  width: 178px;
-  height: 178px;
-  display: block;
 }
 .picbox {
   width: 180px;
@@ -1299,9 +1285,5 @@ export default {
     display: flex;
     align-items: center;
   }
-}
-
-::v-deep .el-checkbox .el-checkbox__input{
-  // line-height: 0px;
 }
 </style>
