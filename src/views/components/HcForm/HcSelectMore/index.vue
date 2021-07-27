@@ -5,6 +5,7 @@
     @change="change"
     :placeholder="placeholder"
     :multiple="multiple"
+    :disabled="disabled"
     v-el-select-loadmore="loadMore"
   >
     <el-option
@@ -43,6 +44,10 @@ export default {
     remoteFun: {
       type: Function,
       default: null
+    },
+    disabled: {
+      type: Boolean,
+      detault: false
     }
   },
   directives: {
@@ -74,7 +79,7 @@ export default {
       value: '',
       options: [],
       loading: false,
-      hasMore: true,
+      hasMore: false,
       formData: {
         current: 1,
         size: 10,
