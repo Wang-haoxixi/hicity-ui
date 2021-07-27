@@ -68,7 +68,9 @@ const user = {
       return new Promise((resolve, reject) => {
         loginByUsername(user.username, user.password, user.code, user.randomStr).then(response => {
           const data = response.data
-          if (data.access_token && data.refresh_token && data.expires_in) {
+          if (data['user_type'] == '0') {
+            reject(new Error('用户名不存在或者密码错误'))
+          } else if (data.access_token && data.refresh_token && data.expires_in) {
             commit('SET_ACCESS_TOKEN', data.access_token)
             commit('SET_REFRESH_TOKEN', data.refresh_token)
             commit('SET_EXPIRES_IN', data.expires_in)
