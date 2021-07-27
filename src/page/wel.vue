@@ -40,7 +40,7 @@
           <div class="selected-area">
             <span>当前区域：{{ currentCity.name }}</span>
             <div class="button-back"
-              v-show="currentCity.parentId"
+              v-show="currentCity.parentId && currentCity.cityId !== userInfo.manageCityId"
               @click="cityChange(currentCity.parentId)"
             >返回上一级</div>
           </div>
