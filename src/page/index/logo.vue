@@ -1,5 +1,5 @@
 <template>
-  <div class="avue-logo">
+  <div class="avue-logo" @click="titleClick">
     <transition name="fade">
       <span
         v-if="keyCollapse"
@@ -29,7 +29,15 @@ export default {
   computed: {
     ...mapGetters(['website', 'keyCollapse'])
   },
-  methods: {}
+  methods: {
+    titleClick () {
+      if (this.$route.fullPath !== '/wel/index') {
+        this.$router.push({
+          path: '/wel/index'
+        })
+      }
+    }
+  }
 }
 </script>
 

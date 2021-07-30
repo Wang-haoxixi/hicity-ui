@@ -65,17 +65,13 @@
 
 .el-scrollbar {
   height: calc(100% - 50px);
-  box-sizing: content-box;;
+  box-sizing: content-box;
 }
 
 .avue-view {
     // padding-bottom: 22px;
     width: 100%;
     box-sizing: border-box;
-}
-
-.el-scrollbar__wrap {
-  padding-bottom: 17px;
 }
 
 .el-scrollbar__bar {

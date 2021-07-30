@@ -34,7 +34,7 @@
               >删除</el-button
             >
             <el-button
-              v-if="userType != 1 && mod.enable"
+              v-if="userType != 1"
               type="text"
               size="mini"
               @click="moduleEnable(mod)"
@@ -79,7 +79,7 @@
               >删除</el-button
             >
             <el-button
-              v-if="userType != 1 && mod.enable"
+              v-if="userType != 1"
               type="text"
               size="mini"
               @click="moduleEnable(mod)"
@@ -123,7 +123,7 @@
               >删除</el-button
             >
             <el-button
-              v-if="userType != 1 && mod.enable"
+              v-if="userType != 1"
               type="text"
               size="mini"
               @click="moduleEnable(mod)"
@@ -171,7 +171,7 @@
           ></hc-image-cropper>
         </el-form-item>
         <el-form-item label="关联类型：" prop="pathType">
-          <el-select v-model="modDetail.pathType" @change="pathTypeChange">
+          <el-select v-model="modDetail.pathType" :disabled="!editable" @change="pathTypeChange">
             <el-option :value="1" label="APP内部功能">APP内部功能</el-option>
             <el-option :value="2" label="微信小程序">微信小程序</el-option>
           </el-select>
@@ -202,6 +202,7 @@
                 <el-input
                   v-if="modPath == 'others'"
                   v-model="modDetail.path"
+                  :disabled="!editable"
                   maxlength="1024"
                 ></el-input>
               </div>
@@ -210,23 +211,23 @@
         </el-form-item>
         <template v-if="modDetail.pathType === 2">
           <el-form-item label="页面url：">
-            <el-input v-model="modDetail.path"></el-input>
+            <el-input :disabled="!editable" v-model="modDetail.path"></el-input>
           </el-form-item>
         </template>
         <el-form-item label="参数：" prop="parameterObj">
-          <el-button size="mini" type="primary" @click="addParameter"
+          <el-button size="mini" type="primary" v-show="editable" style="margin-bottom: 10px" @click="addParameter"
             >添加参数</el-button
           >
           <el-row
             v-for="(parameter, index) in parameterList"
             :key="index"
-            style="margin-top: 10px"
+
           >
             <el-col :span="8">
               <div class="item-line">
                 <div class="line-title">参数名称：</div>
                 <div class="line-content">
-                  <el-input v-model.trim="parameter.key" @input="noSpace($event, parameter, 'key')" @change="noSpace($event, parameter, 'key')"></el-input>
+                  <el-input v-model.trim="parameter.key" :disabled="!editable" @input="noSpace($event, parameter, 'key')" @change="noSpace($event, parameter, 'key')"></el-input>
                 </div>
               </div>
             </el-col>
@@ -234,24 +235,23 @@
               <div class="item-line">
                 <div class="line-title">参数值：</div>
                 <div class="line-content">
-                  <el-input v-model.trim="parameter.value" @input="noSpace($event, parameter, 'value')" @change="noSpace($event, parameter, 'value')"></el-input>
+                  <el-input v-model.trim="parameter.value" :disabled="!editable" @input="noSpace($event, parameter, 'value')" @change="noSpace($event, parameter, 'value')"></el-input>
                 </div>
               </div>
             </el-col>
-            <el-col :span="4" style="text-align: center">
+            <el-col :span="4" style="text-align: center" v-show="editable">
               <i class="el-icon-remove" @click="removeParameter(index)"></i>
             </el-col>
           </el-row>
         </el-form-item>
 
         <el-form-item label="版本要求：" prop="versionsList">
-          <el-button size="mini" type="primary" @click="addVersion"
+          <el-button size="mini" type="primary" v-show="editable" style="margin-bottom: 10px" @click="addVersion"
             >添加要求</el-button
           >
           <el-row
             v-for="(version, index) in versionsList"
             :key="version.symbol"
-            style="margin-top: 10px"
           >
             <el-col :span="8">
               <div class="item-line">
@@ -259,6 +259,7 @@
                 <div class="line-content">
                   <el-select
                     v-model="version.system"
+                    :disabled="!editable"
                     @change="versionSystemChange(index, version, $event)"
                   >
                     <el-option :value="1" label="IOS">IOS</el-option>
@@ -272,6 +273,7 @@
                 <div class="line-title">版本要求：</div>
                 <div class="line-content">
                   <hc-select-more
+                    :disabled="!editable"
                     :ref="'versionSelect' + index"
                     v-model="version.versionId"
                     :remoteFun="getVersionList"
@@ -280,7 +282,7 @@
                 </div>
               </div>
             </el-col>
-            <el-col :span="4" style="text-align: center">
+            <el-col :span="4" style="text-align: center" v-show="editable">
               <i class="el-icon-remove" @click="removeVersion(index)"></i>
             </el-col>
           </el-row>
