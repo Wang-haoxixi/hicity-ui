@@ -160,8 +160,8 @@
 
         <el-form-item label="关联渠道 :" :label-width="formLabelWidth" prop="channel">
           <el-checkbox-group v-model="form.channel" class="checkbox">
-            <el-checkbox label="1" disabled>IOS</el-checkbox>
-            <el-checkbox label="2" disabled>安卓</el-checkbox>
+            <el-checkbox label="1">IOS</el-checkbox>
+            <el-checkbox label="2">安卓</el-checkbox>
             <el-checkbox label="3">微信小程序</el-checkbox>
           </el-checkbox-group>
         </el-form-item>
@@ -343,8 +343,8 @@
 
         <el-form-item label="关联渠道" :label-width="formLabelWidth" prop="channel">
           <el-checkbox-group v-model="editForm.channel" class="checkbox">
-            <el-checkbox label="1" disabled>IOS</el-checkbox>
-            <el-checkbox label="2" disabled>安卓</el-checkbox>
+            <el-checkbox label="1">IOS</el-checkbox>
+            <el-checkbox label="2">安卓</el-checkbox>
             <el-checkbox label="3">微信小程序</el-checkbox>
           </el-checkbox-group>
         </el-form-item>
@@ -1250,6 +1250,9 @@ export default {
   cursor: pointer;
   position: relative;
   overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 ::v-deep .avatar-uploader .el-upload:hover {
   border-color: #409eff;
@@ -1257,10 +1260,6 @@ export default {
 .avatar-uploader-icon {
   font-size: 28px;
   color: #8c939d;
-  width: 351px;
-  height: 130px;
-  line-height: 130px;
-  text-align: center;
 }
 .picbox {
   width: 180px;
