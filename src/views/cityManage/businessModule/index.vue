@@ -321,7 +321,7 @@ import HcSingleView from "@/views/components/HcSingleView/index";
 import HcImageCropper from "@/views/components/HcImageUpload/cropper";
 import HcCitySelect from "@/views/components/HcCity/HcCitySelect/index";
 import HcSelectMore from "@/views/components/HcForm/HcSelectMore/index";
-const prefix = "http://183.131.134.242:10173/module_web/WebActivity?webUrl=";
+const prefix = "https://admin.wecan.vip/module_web/WebActivity?webUrl=";
 export default {
   components: { HcSingleView, HcImageCropper, HcCitySelect, HcSelectMore },
   data() {

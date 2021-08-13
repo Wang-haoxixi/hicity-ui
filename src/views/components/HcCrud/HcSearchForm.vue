@@ -8,7 +8,7 @@
       </slot>
     </div>
     <div v-if="seniorSearchs && seniorSearchs.length > 0 || (searchShow === true || searchShow == 'senior')" class="senior-search">
-      <hc-search-popover>
+      <hc-search-popover ref="seniorSearch">
         <el-button slot="reference" size="mini" class="senior-search-down" icon="hc-icon icon-gengduo1"></el-button>
         <slot name="seniorSearch" :searchFun="toSeniorSearch">
           <div style="overflow: auto;">
@@ -98,6 +98,7 @@ export default {
       this.seniorVisible = false
       this.$emit('search', searchFormSenior)
       this.resetSearch('senior')
+      this.$refs.seniorSearch.close()
     },
     resetSearch (type = 'senior') {
       if (type == 'senior' || type == 'all') {
@@ -112,6 +113,7 @@ export default {
           searchForm[key] = undefined
         }
       }
+      this.$emit('reset-search', type)
     },
     resetSearchItems (items = [], type = 'senior') {
       if (type == 'senior' || type == 'all') {

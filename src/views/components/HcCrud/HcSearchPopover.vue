@@ -4,7 +4,7 @@
       <slot name="reference"></slot>
     </span>
     <div v-show="popoverShow">
-      <div class="hc-popover-shadow" @click="popoverShow = false"></div>
+      <div class="hc-popover-shadow" @click="close"></div>
       <div class="hc-popover-content" :style="getPopoverStyle">
         <div class="triangle" :style="{right: clientRect.width / 2 - 4 + 'px'}"></div>
         <slot></slot>
@@ -44,6 +44,9 @@ export default {
       this.clientRect = this.$el.getBoundingClientRect()
       this.bodyClientRect = document.body.getBoundingClientRect()
       this.windowWidth = window.innerWidth
+    },
+    close () {
+      this.popoverShow = false
     }
   }
 }

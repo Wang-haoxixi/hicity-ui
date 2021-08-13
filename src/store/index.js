@@ -4,6 +4,7 @@ import user from './modules/user'
 import common from './modules/common'
 import tags from './modules/tags'
 import logs from './modules/logs'
+import others from './modules/others'
 import getters from './getters'
 
 Vue.use(Vuex)
@@ -12,7 +13,8 @@ const store = new Vuex.Store({
     user,
     common,
     logs,
-    tags
+    tags,
+    others
   },
   getters
 })
