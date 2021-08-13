@@ -38,5 +38,6 @@ const getters = {
   },
   cityTree: state => state.user.cityTree,
   allCityTree: state => state.user.allCityTree,
+  recruitCompanyId: state => state.others.recruitCompanyId,
 }
 export default getters

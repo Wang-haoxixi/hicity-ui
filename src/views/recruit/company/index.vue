@@ -4,16 +4,12 @@
       :formVisible="viewDetail"
       :title="title"
       @go-back="viewDetail = false">
-      <hc-crud ref="hcCrud" :fetchListFun="fetchListFun" :option="tableOption" :auto-load="false" @reset-search="afterResetSearch">
+      <hc-crud ref="hcCrud" :fetchListFun="fetchListFun" :option="tableOption">
         <template v-slot:nameSearchItem="scope">
           <el-input v-model="scope.searchForm.name" placeholder="请输入职位名称" clearable></el-input>
         </template>
         <template v-slot:cityIdSearchItem="scope">
           <hc-city-select v-model="scope.searchForm.cityId" :city-id="userInfo.manageCityId" single></hc-city-select>
-        </template>
-        <template v-slot:companyIdSearchItem="scope">
-          <hc-remote-select ref="companySearch" style="width: 100%" v-model="scope.searchForm.companyId" :remote-fun="getAllCompany"></hc-remote-select>
-          <!-- <hc-city-select v-model="scope.searchForm.cityId" :city-id="userInfo.manageCityId" single></hc-city-select> -->
         </template>
         <template v-slot:statusFlagSearchItem="scope">
           <el-select v-model="scope.searchForm.statusFlag" style="width: 100%;" clearable>
@@ -43,158 +39,106 @@
           </div>
         </template> -->
         <template v-slot:menu="scope">
-          <el-button type="text" size="mini" @click="toView(scope.row)">详情</el-button>
-          <template v-if="scope.row.status == '3' && scope.row.auditStatus == '1'">
-            <el-button type="text" size="mini" @click="audit(scope.row, 'pass')">上架</el-button>
-            <el-button type="text" size="mini" @click="audit(scope.row, 'reject')">拒绝</el-button>
-          </template>
-          <el-button v-if="scope.row.status == '1'" type="text" size="mini" @click="offShelf(scope.row)">下架</el-button>
+          <el-button v-if="scope.row.certificationStatus == 0" type="text" size="mini" @click="toAudit(scope.row)">去审核</el-button>
+          <el-button v-if="scope.row.certificationStatus != 0" type="text" size="mini" @click="toAudit(scope.row)">查看资质</el-button>
+          <el-button v-if="scope.row.certificationStatus == 1" type="text" size="mini" @click="toView(scope.row)">公司主页</el-button>
         </template>
       </hc-crud>
-      <position-detail slot="form" :position-detail="positionDetail" @refresh="refresh"></position-detail>
+      <template v-slot:form>
+        <audit-detail v-if="formType == 'audit'" :details="auditDetail" @refresh="refresh"></audit-detail>
+        <company-detail v-if="formType == 'company'" :detail="companyDetail"></company-detail>
+      </template>
     </hc-table-form>
   </basic-container>
 </template>
 
 <script>
-import { getPositionList, getPositionDetail, offShelf, audit } from "@/api/recruit/position"
-import { getCompanyListByName } from "@/api/recruit/company"
+import { getPositionDetail, offShelf, audit } from "@/api/recruit/position"
+import { getCompanyPage, getAuditDetail, getCompanyDetail } from "@/api/recruit/company"
 import HcCitySelect from "@/views/components/HcCity/HcCitySelect/index"
-import PositionDetail from "./PositionDetail"
-import HcRemoteSelect from "@/views/components/HcForm/HcRemoteSelect/index"
+import AuditDetail from "./AuditDetail"
+import CompanyDetail from "./CompanyDetail"
 import { mapGetters } from "vuex"
 export default {
-  components: { PositionDetail, HcCitySelect, HcRemoteSelect },
+  components: { AuditDetail, CompanyDetail, HcCitySelect },
   data () {
     return {
-      viewDetail: false,
       tableOption: {
+        index: false,
         search: true,
         labelWidth: '100px',
         columns: [
           {
-            label: '职位ID',
-            prop: 'recruitPositionId',
+            label: '公司ID',
+            prop: 'id',
             width: 100,
           },
           {
-            label: '职位名称',
-            prop: 'name',
+            label: '公司名称',
+            prop: 'companyName',
             maxlength: 50,
             search: true,
           },
           {
-            label: '工作城市',
-            prop: 'cityId',
-            search: true,
-            hidden: true,
-          },
-          {
-            label: '职位状态',
-            prop: 'statusFlag',
-            width: 100,
-            type: 'select',
-            dicData: [
-              {
-                label: '招聘中',
-                value: 'valid'
-              },
-              {
-                label: '已关闭',
-                value: 'close'
-              },
-              {
-                label: '已下架',
-                value: 'off_shelf'
-              },
-              {
-                label: '待审核',
-                value: 'wait_audit'
-              }
-            ],
-            search: true,
-            hidden: true,
-          },
-          {
-            label: '所属公司',
-            prop: 'companyId',
-            width: 120,
-            formatter: (row) => {
-              return row.companyName
-            },
-            search: true,
-          },
-          {
-            label: '发布人',
+            label: '提交人',
             prop: 'createByName',
-            width: 120,
           },
           {
-            label: '发布时间',
+            label: '提交时间',
             prop: 'createTime',
             width: 160,
           },
           {
             label: '职位状态',
-            prop: 'status',
+            prop: 'certificationStatus',
             width: 100,
-            formatter: function (row) {
-              if (row.status == '1') {
-                return '招聘中'
-              } else if (row.status == '2') {
-                return '已关闭'
-              } else if (row.status == '3') {
-                if (row.auditStatus == '1') {
-                  return '待审核'
-                } else if (row.auditStatus == '3') {
-                  return '审核未通过'
-                } else if (row.auditStatus === '0') {
-                  return '已下架'
-                }
+            type: 'select',
+            dicData: [
+              {
+                label: '待审核',
+                value: 0
+              },
+              {
+                label: '认证成功',
+                value: 1
+              },
+              {
+                label: '认证失败',
+                value: 2
               }
-              return ''
-            },
+            ],
+            search: true,
           },
-          {
-            label: '工作城市',
-            prop: 'city',
-            width: 120,
-          }
         ],
         menu: true,
-        menuWidth: 120
+        menuWidth: 140
       },
-      positionDetail: {}
+      viewDetail: false,
+      formType: "",
+      auditDetail: {},
+      companyDetail: {}
     }
   },
   computed: {
-    ...mapGetters(['userInfo', 'recruitCompanyId']),
+    ...mapGetters(['userInfo']),
     title () {
       if (this.viewDetail) {
-        return '职位详情'
+        if (this.formType == 'audit') {
+          return '资质审核'
+        } else if (this.formType == 'company') {
+          return '公司主页'
+        } else {
+          return ''
+        }
       } else {
-        return '职位管理'
+        return '资质认证'
       }
     }
   },
-  mounted () {
-    let companyId = this.recruitCompanyId
-    setTimeout(() => {
-      this.$store.commit('SET_RECRUIT_COMPANY_ID', undefined)
-    })
-    this.$refs.hcCrud.refresh({}, {
-      companyId
-    })
-  },
   methods: {
-    afterResetSearch (type) {
-      if (type == 'senior') {
-        this.$refs.companySearch.initData()
-      }
-    },
     fetchListFun (params) {
       return new Promise((resolve, reject) => {
-        getPositionList({
+        getCompanyPage({
           cityId: this.userInfo.manageCityId,
           ...params
         }).then(({data}) => {
@@ -213,10 +157,18 @@ export default {
         })
       })
     },
-    toView ({recruitPositionId}) {
-      getPositionDetail({recruitPositionId}).then(({data}) => {
-        this.positionDetail = data.data.data
+    toAudit ({ id }) {
+      getAuditDetail({ companyId: id }).then(({ data}) => {
         this.viewDetail = true
+        this.formType = 'audit'
+        this.auditDetail = data.data.data
+      })
+    },
+    toView ({ id }) {
+      getCompanyDetail({ companyId: id }).then(({data}) => {
+        this.viewDetail = true
+        this.formType = 'company'
+        this.companyDetail = data.data.data
       })
     },
     audit ({recruitPositionId}, sign) {
@@ -276,23 +228,6 @@ export default {
     refresh () {
       this.viewDetail = false
       this.$refs.hcCrud.refresh()
-    },
-    getAllCompany (companyName) {
-      return new Promise((resolve, reject) => {
-        getCompanyListByName({companyName}).then(({data}) => {
-          let companyListTemp = data.data.data
-          let companyList = []
-          for (let i = 0; i < companyListTemp.length; i++) {
-            companyList.push({
-              label: companyListTemp[i].companyName,
-              value: companyListTemp[i].id
-            })
-          }
-          resolve(companyList)
-        }, () => {
-          reject(new Error("数据获取失败！"))
-        })
-      })
     }
   }
 }

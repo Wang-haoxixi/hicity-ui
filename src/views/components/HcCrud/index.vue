@@ -10,7 +10,7 @@
         <slot name="menuRight"></slot>
         <el-button v-if="optionC.refresh" icon="el-icon-refresh" circle :size="optionC.headerSize" @click="handleRefresh"></el-button>
 
-        <hc-search-form ref="hcSearchForm" :searchs="searchList" style="margin-left: 10px" :search-show="optionC.search" @search="coverSearch">
+        <hc-search-form ref="hcSearchForm" :searchs="searchList" style="margin-left: 10px" :search-show="optionC.search" @search="coverSearch" @reset-search="afterResetSearch">
           <template v-slot:basicSearch="scope">
             <slot name="basicSearch" :searchFun="scope.searchFun"></slot>
           </template>
@@ -353,6 +353,9 @@ export default {
     },
     resetSearch () {
       this.$refs.hcSearchForm && this.$refs.hcSearchForm.resetSearch(...arguments)
+    },
+    afterResetSearch (type) {
+      this.$emit('reset-search', type)
     },
     resetSearchItems () {
       this.$refs.hcSearchForm && this.$refs.hcSearchForm.resetSearchItems(...arguments)

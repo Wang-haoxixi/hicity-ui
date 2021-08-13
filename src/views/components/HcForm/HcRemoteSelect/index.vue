@@ -88,6 +88,9 @@ export default {
     }
   },
   methods: {
+    initData (data) {
+      this.selectData = data
+    },
     remote (query) {
       if (query !== '') {
         this.loading = true;
