@@ -8,7 +8,7 @@
     <el-form label-width="auto">
       <el-form-item label="跳转类型：">
         <el-select v-model="link.type">
-          <el-option label="官方发布" value="officialRelease">官方发布</el-option>
+          <el-option label="城市头条" value="officialRelease">城市头条</el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="跳转对象：">

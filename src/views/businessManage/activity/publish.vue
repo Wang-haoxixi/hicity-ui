@@ -754,7 +754,7 @@
               placeholder="请选择跳转类型"
               style="width: 250px"
             >
-              <el-option label="官方发布" value="officialRelease"></el-option>
+              <el-option label="城市头条" value="officialRelease"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="跳转对象：">

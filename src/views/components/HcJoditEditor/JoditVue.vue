@@ -81,6 +81,7 @@ export default {
             return obj;
           },
         },
+        imageDefaultWidth: "",
         ...this.config,
       };
     },
